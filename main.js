@@ -200,8 +200,8 @@ function createTray() {
       }
     },
     {
-      label: '🌐 Tarayıcıda Aç (localhost:8080)',
-      click: () => shell.openExternal('http://localhost:8080/')
+      label: '📺 Canlı Sahne Önizleme Penceresi',
+      click: () => openPreviewWindow('http://localhost:8080/kick/vexana/in-game.html')
     },
     {
       label: '📱 Mobil Kumanda Linkini Kopyala',

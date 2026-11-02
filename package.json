@@ -1,15 +1,69 @@
 {
-  "name": "yayin",
+  "name": "mira-broadcast-studio",
+  "productName": "MİRA Broadcast Studio",
   "version": "1.0.0",
-  "description": "Bu paket; **Kick** ve **TikTok Live Studio** platformlarında bağımsız veya **aynı anda çift yayın (Multi-Streaming)** yapan kadın yayıncılar için özel olarak tasarlanmış, **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyonluk ultra lüks dinamik yayın setidir: **💀 Vexana**, **👑 Zetian**, **🐾 Nana**, **🩸 Carmilla** ve **⚓ Atlas**.",
+  "description": "MLBB 5-Hero Kick & TikTok Live Studio Stream Deck & OBS Overlays",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "app": "electron ."
+    "start": "electron .",
+    "app": "electron .",
+    "server": "node server.js",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux",
+    "pack:win": "electron-builder --win --dir",
+    "pack:linux": "electron-builder --linux --dir"
   },
-  "keywords": [],
-  "author": "",
+  "build": {
+    "appId": "com.mira.broadcaststudio",
+    "productName": "MİRA Broadcast Studio",
+    "copyright": "Copyright © 2026 MİRA Studio",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "assets/**/*",
+      "kick/**/*",
+      "tiktok/**/*",
+      "shared/**/*",
+      "index.html",
+      "main.js",
+      "server.js",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MİRA Broadcast Studio"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "assets/icon.png",
+      "category": "AudioVideo"
+    }
+  },
+  "keywords": [
+    "mira",
+    "broadcast-studio",
+    "stream-deck",
+    "mlbb",
+    "obs",
+    "kick",
+    "tiktok"
+  ],
+  "author": "Cihan Ataş",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
@@ -18,6 +72,7 @@
     "tiktok-live-connector": "^2.5.0"
   },
   "devDependencies": {
-    "electron": "^45.2.1"
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0"
   }
 }

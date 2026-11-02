@@ -1,23 +1,62 @@
+# ============================================
+# MİRA BROADCAST STUDIO - GITIGNORE
+# ============================================
+
 # Dependencies
 node_modules/
+package-lock.json.bak
 
-# Builds & Binaries
+# Builds & Binary Outputs (Windows & Linux)
 dist/
 build/
+out/
+bin/
 *.deb
+*.ddeb
 *.AppImage
 *.exe
+*.msi
 *.zip
 *.tar.gz
+*.snap
 
-# Logs & Temp
+# Logs & Temporary Files
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 .cache/
 tmp/
+temp/
+now-playing.txt.tmp
 
-# OS Files
+# OS & Desktop Artifacts
 .DS_Store
 Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# IDE & Editor Settings
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test & Debug Screenshots
+test_*.png
+actual_*.png
+fixed_*.png
+desktop_*.png
+window_*.png
+screen_*.png
+final_*.png
+both_*.png
+
+# Environment & Local Secrets
+.env
+.env.local
+.env.*.local
+*.local
