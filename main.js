@@ -75,11 +75,9 @@ function createWindow() {
     }
   });
 
-  mainWindow.on('close', (event) => {
-    if (!isQuitting) {
-      event.preventDefault();
-      mainWindow.hide();
-    }
+  mainWindow.on('close', () => {
+    isQuitting = true;
+    app.quit();
   });
 
   mainWindow.on('closed', () => {
@@ -187,7 +185,7 @@ if (!gotTheLock) {
   });
 
   app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin' && isQuitting) {
+    if (process.platform !== 'darwin') {
       app.quit();
     }
   });
