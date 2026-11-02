@@ -1,0 +1,278 @@
+/* =============================================================
+   CARMILLA - SHADOW OF VANCE (MLBB IN-GAME OVERLAY STYLE V2)
+   Renk Paleti: Kan Kırmızısı (#D90429), Kadife Şarap Bordo (#2B0914)
+============================================================= */
+
+@import url('../../shared/css/base.css');
+
+:root {
+  --primary-color: #d90429;
+  --primary-glow: rgba(217, 4, 41, 0.6);
+  --secondary-color: #f72585;
+  --secondary-glow: rgba(247, 37, 133, 0.55);
+  --glass-bg: rgba(24, 8, 14, 0.92);
+  --font-hero: 'Cinzel', serif;
+}
+
+body {
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.hero-scene-bg {
+  background-image: url('assets/images/bg.jpg');
+}
+
+/* =============================================================
+   1. OYUN YANSITMA DİKDÖRTGEN ÇERÇEVESİ (GAME VIEWPORT)
+============================================================= */
+.game-viewport-frame {
+  border: 2.5px solid var(--primary-color);
+  box-shadow: 0 0 30px var(--primary-glow), inset 0 0 20px rgba(217, 4, 41, 0.2);
+}
+
+.game-viewport-header-strip {
+  background: linear-gradient(90deg, rgba(217, 4, 41, 0.35), rgba(24, 8, 14, 0.95));
+}
+
+.game-viewport-title {
+  color: var(--primary-color);
+  font-family: var(--font-hero);
+}
+
+.game-viewport-spec {
+  color: var(--secondary-color);
+}
+
+.game-corner {
+  border-color: var(--primary-color) !important;
+  filter: drop-shadow(0 0 6px var(--primary-glow));
+}
+
+/* =============================================================
+   2. HERO GÖRSELİ VE KARAKTER TANITIM KARTI (SOL ÜST)
+============================================================= */
+.hero-showcase-card {
+  background: var(--glass-bg);
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 25px var(--primary-glow);
+}
+
+.hero-showcase-header-tag {
+  color: #ff8fa3;
+  font-family: var(--font-hero);
+}
+
+.hero-showcase-name {
+  color: #ffffff;
+  text-shadow: 0 0 15px var(--primary-glow);
+  font-family: var(--font-hero);
+}
+
+.hero-showcase-title {
+  color: var(--primary-color);
+  font-family: var(--font-hero);
+}
+
+.hero-role-pill {
+  background: rgba(217, 4, 41, 0.2);
+  border: 1px solid var(--primary-color);
+  color: #ff8fa3;
+}
+
+.hero-lane-pill {
+  background: rgba(247, 37, 133, 0.2);
+  border: 1px solid var(--secondary-color);
+  color: var(--secondary-color);
+}
+
+.hero-showcase-quote {
+  border-left-color: var(--primary-color);
+}
+
+/* =============================================================
+   3. SOL KOLON KİCK CANLI CHAT PANELİ
+============================================================= */
+.hero-chat-panel {
+  background: var(--glass-bg);
+  border: 1.5px solid rgba(217, 4, 41, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 20px rgba(217, 4, 41, 0.2);
+}
+
+.hero-chat-header {
+  background: linear-gradient(90deg, rgba(217, 4, 41, 0.25), rgba(24, 8, 14, 0.95));
+  border-bottom: 1.5px solid rgba(217, 4, 41, 0.35);
+}
+
+.hero-chat-header-title {
+  color: var(--primary-color);
+  font-family: var(--font-hero);
+}
+
+.hero-chat-live-tag {
+  color: var(--primary-color);
+  background: rgba(217, 4, 41, 0.15);
+  border: 1px solid rgba(217, 4, 41, 0.4);
+}
+
+.hero-chat-entry {
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 2.5px solid var(--primary-color);
+}
+
+.hero-chat-author {
+  color: var(--primary-color);
+  font-family: var(--font-hero);
+}
+
+/* =============================================================
+   4. SOL ALT WEBCAM ÇERÇEVESİ (BOTTOM-LEFT CAM)
+============================================================= */
+.hero-webcam-frame {
+  border: 2px solid var(--primary-color);
+  background: rgba(24, 8, 14, 0.4);
+  box-shadow: 0 0 25px var(--primary-glow), inset 0 0 35px rgba(0, 0, 0, 0.9);
+}
+
+.carmilla-bat-left {
+  position: absolute;
+  top: -16px;
+  left: 20px;
+  width: 34px;
+  height: 22px;
+  background: linear-gradient(135deg, var(--primary-color), #590d22);
+  clip-path: polygon(0% 100%, 25% 40%, 50% 0%, 75% 40%, 100% 100%);
+  filter: drop-shadow(0 0 8px var(--primary-glow));
+}
+
+.carmilla-bat-right {
+  position: absolute;
+  top: -16px;
+  right: 20px;
+  width: 34px;
+  height: 22px;
+  background: linear-gradient(135deg, #590d22, var(--primary-color));
+  clip-path: polygon(0% 100%, 25% 40%, 50% 0%, 75% 40%, 100% 100%);
+  filter: drop-shadow(0 0 8px var(--primary-glow));
+}
+
+.hero-cam-top-badge {
+  background: #18060c;
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.hero-cam-bottom-badge {
+  background: #18060c;
+  border: 1.5px solid var(--primary-color);
+  box-shadow: 0 0 18px var(--primary-glow);
+}
+
+.hero-cam-username {
+  font-family: var(--font-hero);
+}
+
+.hero-cam-rank-tag {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--primary-color), #590d22);
+  border: 1px solid rgba(217, 4, 41, 0.5);
+}
+
+/* =============================================================
+   5. ÜST BAR & HEDEF ÇUBUĞU
+============================================================= */
+.hero-brand-pill {
+  background: linear-gradient(135deg, rgba(217, 4, 41, 0.3), rgba(24, 8, 14, 0.95));
+  border: 1.5px solid var(--primary-color);
+  box-shadow: 0 0 18px var(--primary-glow);
+}
+
+.hero-brand-avatar {
+  border: 1px solid var(--primary-color);
+}
+
+.hero-brand-dot {
+  background: var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+.hero-brand-title {
+  color: var(--primary-color);
+  font-family: var(--font-hero);
+}
+
+.hero-stat-card {
+  background: var(--glass-bg);
+  border: 1px solid rgba(217, 4, 41, 0.35);
+  border-left: 3px solid var(--primary-color);
+}
+.hero-stat-card.sub-card { border-left-color: var(--secondary-color); }
+.hero-stat-card.donation-card { border-left-color: #ffccd5; }
+
+.hero-stat-label {
+  color: #ff8fa3;
+  font-family: var(--font-hero);
+}
+.hero-stat-card.sub-card .hero-stat-label { color: var(--secondary-color); }
+.hero-stat-card.donation-card .hero-stat-label { color: #ffccd5; }
+
+.hero-goal-container {
+  background: var(--glass-bg);
+  border: 1.5px solid rgba(217, 4, 41, 0.4);
+  border-right: 3px solid var(--secondary-color);
+}
+
+.hero-goal-title-badge {
+  color: var(--primary-color);
+  font-family: var(--font-hero);
+}
+
+.hero-goal-fill {
+  background: linear-gradient(90deg, #590d22, var(--primary-color), var(--secondary-color));
+  box-shadow: 0 0 14px var(--primary-color);
+}
+
+/* =============================================================
+   6. ALT ŞERİT
+============================================================= */
+.hero-bottom-ribbon {
+  background: #18060c;
+  border: 1.5px solid rgba(217, 4, 41, 0.45);
+}
+
+.hero-bottom-brand {
+  background: linear-gradient(135deg, var(--primary-color), #590d22);
+  color: #fff;
+  font-family: var(--font-hero);
+}
+
+.hero-bottom-clock {
+  color: var(--primary-color);
+  font-family: 'Cinzel', serif;
+}
+
+/* =============================================================
+   7. ALERT POPUP
+============================================================= */
+.hero-alert-card {
+  background: rgba(24, 8, 14, 0.96);
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 45px var(--primary-glow);
+}
+.hero-alert-follower { border-color: var(--primary-color); }
+.hero-alert-follower .hero-alert-main-title { color: var(--primary-color); }
+.hero-alert-sub { border-color: var(--secondary-color); }
+.hero-alert-sub .hero-alert-main-title { color: var(--secondary-color); }
+.hero-alert-donation { border-color: #ffccd5; }
+.hero-alert-donation .hero-alert-main-title { color: #ffccd5; }
+
+.hero-alert-icon-ring {
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+.hero-alert-header-tag {
+  color: #ff8fa3;
+  font-family: var(--font-hero);
+}
+.hero-alert-main-title {
+  font-family: var(--font-hero);
+}

@@ -1,0 +1,23 @@
+{
+  "name": "yayin",
+  "version": "1.0.0",
+  "description": "Bu paket; **Kick** ve **TikTok Live Studio** platformlarında bağımsız veya **aynı anda çift yayın (Multi-Streaming)** yapan kadın yayıncılar için özel olarak tasarlanmış, **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyonluk ultra lüks dinamik yayın setidir: **💀 Vexana**, **👑 Zetian**, **🐾 Nana**, **🩸 Carmilla** ve **⚓ Atlas**.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "app": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "obs-websocket-js": "^5.0.8",
+    "pusher-js": "^8.6.0",
+    "tiktok-live-connector": "^2.5.0"
+  },
+  "devDependencies": {
+    "electron": "^45.2.1"
+  }
+}

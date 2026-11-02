@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+  <title>Sahne 1: Yayın Başlıyor (Starting Soon with Live Chat)</title>
+  <link rel="stylesheet" href="../../assets/css/scenes.css">
+</head>
+<body data-scene-type="starting">
+  <div class="scene-wrapper">
+    
+    <div class="scene-layout-with-chat">
+      
+      <!-- Sol Kolon: Ana Sahne Kartı ve Sayaç -->
+      <div class="scene-main-col">
+        <div class="scene-card">
+          <div class="brand-row">
+            <div class="tiktok-pill">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M4 3h5v6h2V5h5v5h-3v4h3v5h-5v-4h-2v6H4V3z"/></svg>
+              <span>TIKTOK LIVE</span>
+            </div>
+            <div class="mlbb-tag">MOBILE LEGENDS: BANG BANG</div>
+          </div>
+
+          <h1 class="scene-title">YAYIN BAŞLIYOR</h1>
+          <p class="scene-subtitle">ŞAFAK VADİSİ'NE İNİŞ İÇİN HAZIRLANIN...</p>
+
+          <div class="countdown-container">
+            <div class="time-box">
+              <span class="time-digit" id="timer-min">05</span>
+              <span class="time-label">DAKİKA</span>
+            </div>
+            <div class="time-box">
+              <span class="time-digit" id="timer-sec">00</span>
+              <span class="time-label">SANİYE</span>
+            </div>
+          </div>
+
+          <div class="scene-music-ticker">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="#ff69b4"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            <span>Şu An Çalan: <strong>MLBB Arena • Lofi Chill Beats (Canlı BGM)</strong></span>
+          </div>
+
+          <div class="scene-socials" style="position: static; margin-top: 30px; box-shadow: none;">
+            <div class="scene-social-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="#ff69b4"><path d="M4 3h5v6h2V5h5v5h-3v4h3v5h-5v-4h-2v6H4V3z"/></svg>
+              <span class="bind-kick-channel">kick.com/mira</span>
+            </div>
+            <div class="scene-social-item">
+              <span>📱 @mira_mlbb</span>
+            </div>
+            <div class="scene-social-item">
+              <span>▶ @mira.gaming (YouTube)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sağ Kolon: Canlı Kick Chat Paneli -->
+      <div class="scene-chat-col">
+        <div class="large-chat-panel">
+          <div class="large-chat-header">
+            <div class="large-chat-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="#ff69b4"><path d="M4 3h5v6h2V5h5v5h-3v4h3v5h-5v-4h-2v6H4V3z"/></svg>
+              <span>TIKTOK CANLI SOHBET</span>
+            </div>
+            <span class="chat-live-tag">● YAYIN ÖNCESİ SOHBETİ</span>
+          </div>
+          <div class="large-chat-feed" id="chat-messages">
+            <!-- Otomatik ve canlı mesajlar akacak -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="../../assets/js/config.js"></script>
+  <script src="../../assets/js/scene-chat.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const config = window.OVERLAY_CONFIG || {};
+      const channelEl = document.querySelector('.bind-kick-channel');
+      if (channelEl && config.kickChannel) {
+        channelEl.textContent = `kick.com/${config.kickChannel}`;
+      }
+
+      let totalSeconds = (config.startingCountdownMinutes || 5) * 60;
+      const minEl = document.getElementById('timer-min');
+      const secEl = document.getElementById('timer-sec');
+
+      const timerInterval = setInterval(() => {
+        if (totalSeconds <= 0) {
+          clearInterval(timerInterval);
+          if (minEl) minEl.textContent = "00";
+          if (secEl) secEl.textContent = "00";
+          return;
+        }
+        totalSeconds--;
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        if (minEl) minEl.textContent = String(m).padStart(2, '0');
+        if (secEl) secEl.textContent = String(s).padStart(2, '0');
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

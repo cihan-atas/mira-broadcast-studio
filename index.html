@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MİRA BROADCAST STUDIO - MLBB & Stream Control Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #08090e;
+      --bg-surface: #0f121d;
+      --bg-card: rgba(18, 23, 38, 0.85);
+      --bg-card-hover: rgba(26, 33, 54, 0.95);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(168, 85, 247, 0.5);
+      
+      --kick-green: #53fc18;
+      --kick-glow: rgba(83, 252, 24, 0.25);
+      --tiktok-red: #fe2c55;
+      --tiktok-glow: rgba(254, 44, 85, 0.25);
+      
+      --vexana: #a855f7;
+      --zetian: #ffd700;
+      --nana: #ff85a2;
+      --carmilla: #ef233c;
+      --atlas: #00f5d4;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(83, 252, 24, 0.05) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 18, 29, 0.5) 0px, transparent 100%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 60px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-base);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Top Studio Header */
+    .top-header {
+      background: rgba(11, 14, 24, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+    }
+    .brand-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-badge {
+      font-size: 10px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+      letter-spacing: 0.5px;
+    }
+
+    /* Status Pills */
+    .header-status-pills {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+    .status-pill.active-server {
+      border-color: rgba(83, 252, 24, 0.3);
+      background: rgba(83, 252, 24, 0.08);
+      color: #53fc18;
+    }
+    .status-pill.active-kick {
+      border-color: rgba(83, 252, 24, 0.3);
+      background: rgba(83, 252, 24, 0.08);
+      color: #53fc18;
+    }
+    .status-pill.active-tiktok {
+      border-color: rgba(254, 44, 85, 0.3);
+      background: rgba(254, 44, 85, 0.08);
+      color: #fe2c55;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+      animation: pulseAnim 2s infinite;
+    }
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Platform Switcher Buttons */
+    .platform-toggle-pill {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+    }
+    .platform-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .platform-toggle-btn:hover {
+      color: #fff;
+    }
+    .platform-toggle-btn.active.kick-plat {
+      background: var(--kick-green);
+      color: #000;
+      box-shadow: 0 0 15px var(--kick-glow);
+    }
+    .platform-toggle-btn.active.tiktok-plat {
+      background: var(--tiktok-red);
+      color: #fff;
+      box-shadow: 0 0 15px var(--tiktok-glow);
+    }
+
+    /* Main Grid Workspace */
+    .studio-container {
+      max-width: 1680px;
+      margin: 24px auto 0;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1300px) {
+      .studio-container {
+        grid-template-columns: 1fr;
+      }
+      .monitor-sticky-wrap {
+        position: static !important;
+      }
+    }
+
+    /* Left Console */
+    .console-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Modern Tabs Nav */
+    .studio-tabs-nav {
+      display: flex;
+      gap: 8px;
+      background: rgba(14, 18, 30, 0.8);
+      backdrop-filter: blur(12px);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      overflow-x: auto;
+    }
+    .studio-tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .studio-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .studio-tab-btn.active {
+      background: rgba(168, 85, 247, 0.15);
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.15);
+    }
+
+    /* Tab Panes */
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeIn 0.25s ease forwards;
+    }
+    .tab-pane.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 22px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .card-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .card-panel-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-panel-badge {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* 5 Hero Selector Grid */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .hero-box {
+      position: relative;
+      background: rgba(14, 18, 30, 0.7);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+    }
+    .hero-box:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(22, 28, 46, 0.85);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    }
+    .hero-box.active {
+      background: rgba(20, 24, 40, 0.95);
+    }
+
+    .hero-avatar-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      border: 2px solid transparent;
+      transition: all 0.25s;
+    }
+    .hero-avatar-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .hero-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .hero-meta-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+    .hero-meta-role {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .hero-meta-tag {
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+
+    /* Hero Unique Colors */
+    .hero-vexana.active {
+      border-color: var(--vexana);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.35);
+    }
+    .hero-vexana.active .hero-avatar-wrap, .hero-vexana:hover .hero-avatar-wrap {
+      border-color: var(--vexana);
+    }
+    .hero-vexana .hero-meta-name { color: #d8b4fe; }
+    .hero-vexana .hero-meta-tag { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+
+    .hero-zetian.active {
+      border-color: var(--zetian);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.35);
+    }
+    .hero-zetian.active .hero-avatar-wrap, .hero-zetian:hover .hero-avatar-wrap {
+      border-color: var(--zetian);
+    }
+    .hero-zetian .hero-meta-name { color: #fde047; }
+    .hero-zetian .hero-meta-tag { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+
+    .hero-nana.active {
+      border-color: var(--nana);
+      box-shadow: 0 0 20px rgba(255, 133, 162, 0.35);
+    }
+    .hero-nana.active .hero-avatar-wrap, .hero-nana:hover .hero-avatar-wrap {
+      border-color: var(--nana);
+    }
+    .hero-nana .hero-meta-name { color: #f472b6; }
+    .hero-nana .hero-meta-tag { background: rgba(255, 133, 162, 0.2); color: #ff85a2; }
+
+    .hero-carmilla.active {
+      border-color: var(--carmilla);
+      box-shadow: 0 0 20px rgba(239, 35, 60, 0.35);
+    }
+    .hero-carmilla.active .hero-avatar-wrap, .hero-carmilla:hover .hero-avatar-wrap {
+      border-color: var(--carmilla);
+    }
+    .hero-carmilla .hero-meta-name { color: #f87171; }
+    .hero-carmilla .hero-meta-tag { background: rgba(239, 35, 60, 0.2); color: #ef233c; }
+
+    .hero-atlas.active {
+      border-color: var(--atlas);
+      box-shadow: 0 0 20px rgba(0, 245, 212, 0.35);
+    }
+    .hero-atlas.active .hero-avatar-wrap, .hero-atlas:hover .hero-avatar-wrap {
+      border-color: var(--atlas);
+    }
+    .hero-atlas .hero-meta-name { color: #2dd4bf; }
+    .hero-atlas .hero-meta-tag { background: rgba(0, 245, 212, 0.2); color: #00f5d4; }
+
+    /* Scene Selection Pills */
+    .scene-chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .scene-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(14, 18, 30, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .scene-chip:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .scene-chip.active {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(59, 130, 246, 0.25));
+      border-color: #a855f7;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+    }
+
+    /* OBS Link Copy Box */
+    .obs-url-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(8, 10, 16, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+    .obs-url-text {
+      flex: 1;
+      font-family: 'JetBrains Mono', monospace, monospace;
+      font-size: 12.5px;
+      color: var(--kick-green);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-action-copy {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-action-copy:hover {
+      filter: brightness(1.15);
+      transform: scale(1.02);
+    }
+
+    /* Form Styles */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-control {
+      width: 100%;
+      background: rgba(8, 11, 20, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .form-control:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+      background: rgba(12, 16, 28, 0.95);
+    }
+
+    /* Steppers & Progress */
+    .stepper-bar {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .stepper-btn {
+      flex: 1;
+      padding: 7px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .stepper-btn:hover {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: #a855f7;
+      color: #c084fc;
+    }
+
+    .goal-progress-wrap {
+      margin-top: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+    .goal-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .goal-progress-bar-bg {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+    .goal-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7c3aed, #06b6d4);
+      border-radius: 6px;
+      transition: width 0.3s ease;
+      width: 2%;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      filter: brightness(1.15);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-kick {
+      background: rgba(83, 252, 24, 0.15);
+      border: 1.5px solid var(--kick-green);
+      color: var(--kick-green);
+    }
+    .btn-kick:hover {
+      background: var(--kick-green);
+      color: #000;
+      box-shadow: 0 0 20px var(--kick-glow);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* Alert Buttons Grid */
+    .alerts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 600px) {
+      .alerts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .alert-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(14, 18, 30, 0.7);
+      border: 1.5px solid var(--border-subtle);
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .alert-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+    .alert-btn:active {
+      transform: scale(0.98);
+    }
+
+    .alert-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .alert-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .alert-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .alert-follower {
+      border-color: rgba(168, 85, 247, 0.3);
+    }
+    .alert-follower .alert-icon-wrap {
+      background: rgba(168, 85, 247, 0.2);
+      color: #c084fc;
+    }
+    .alert-follower:hover {
+      border-color: #a855f7;
+      background: rgba(168, 85, 247, 0.12);
+    }
+
+    .alert-sub {
+      border-color: rgba(255, 215, 0, 0.3);
+    }
+    .alert-sub .alert-icon-wrap {
+      background: rgba(255, 215, 0, 0.2);
+      color: #ffd700;
+    }
+    .alert-sub:hover {
+      border-color: #ffd700;
+      background: rgba(255, 215, 0, 0.12);
+    }
+
+    .alert-donation {
+      border-color: rgba(0, 245, 212, 0.3);
+    }
+    .alert-donation .alert-icon-wrap {
+      background: rgba(0, 245, 212, 0.2);
+      color: #00f5d4;
+    }
+    .alert-donation:hover {
+      border-color: #00f5d4;
+      background: rgba(0, 245, 212, 0.12);
+    }
+
+    .alert-gift {
+      border-color: rgba(254, 44, 85, 0.3);
+    }
+    .alert-gift .alert-icon-wrap {
+      background: rgba(254, 44, 85, 0.2);
+      color: #fe2c55;
+    }
+    .alert-gift:hover {
+      border-color: #fe2c55;
+      background: rgba(254, 44, 85, 0.12);
+    }
+
+    /* Right Sticky Monitor */
+    .monitor-sticky-wrap {
+      position: sticky;
+      top: 86px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .broadcast-monitor {
+      background: #06070a;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .monitor-top-bar {
+      background: #0b0e17;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tally-light {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #ef4444;
+      text-transform: uppercase;
+    }
+    .tally-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 10px #ef4444;
+      animation: pulseAnim 1.5s infinite;
+    }
+    .monitor-scene-title {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 250px;
+    }
+
+    .monitor-viewport-wrap {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+    .monitor-viewport-wrap iframe {
+      width: 1920px;
+      height: 1080px;
+      border: none;
+      transform-origin: 0 0;
+      pointer-events: none; /* önizlemede tıklamaları engelle, obs gibi çalışsın */
+    }
+
+    .monitor-bottom-bar {
+      background: #0b0e17;
+      border-top: 1px solid var(--border-subtle);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .monitor-url-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .monitor-url-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 5px 10px;
+      border-radius: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+    .monitor-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-monitor-tool {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-monitor-tool:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-monitor-tool.primary {
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      border: none;
+    }
+    .btn-monitor-tool.primary:hover {
+      filter: brightness(1.2);
+    }
+
+    /* Floating Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    .toast-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 20, 32, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 85, 247, 0.5);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      pointer-events: auto;
+    }
+    .toast-item.success {
+      border-color: #53fc18;
+    }
+    .toast-item.error {
+      border-color: #ef4444;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(40px) scale(0.95); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(40px); }
+    }
+
+    /* Info Tip Box */
+    .info-tip-box {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 10px;
+      padding: 12px 16px;
+      border-left: 3px solid #7c3aed;
+    }
+    .info-tip-box strong {
+      color: #fff;
+    }
+
+    /* Mobile Remote Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 12, 0.85);
+      backdrop-filter: blur(14px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-card {
+      background: #0f1424;
+      border: 1.5px solid rgba(168, 85, 247, 0.5);
+      border-radius: 20px;
+      max-width: 480px;
+      width: 100%;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      position: relative;
+      text-align: center;
+      animation: modalZoom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalZoom {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-close-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+    .qr-box {
+      margin: 18px auto;
+      width: 190px;
+      height: 190px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 14px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-box img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Studio Header -->
+  <header class="top-header">
+    <div class="brand-wrap">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-title">
+          MİRA STUDIO <span class="brand-badge">PRO v4.2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Badges -->
+    <div class="header-status-pills">
+      <div class="status-pill active-server">
+        <span class="pulse-dot"></span>
+        <span>PORT 8080</span>
+      </div>
+      <div class="status-pill active-kick" id="kick-status-pill">
+        <span class="pulse-dot"></span>
+        <span>KICK: <strong id="kick-user-name">cihanatas</strong> (<span id="kick-follower-badge">1</span>)</span>
+      </div>
+      <div class="status-pill" id="obs-status-pill">
+        <span class="pulse-dot" id="obs-pulse-dot" style="background: #64748b; box-shadow: none;"></span>
+        <span id="obs-status-txt">OBS: ÇEVRİMDIŞI</span>
+      </div>
+      <div class="status-pill" id="tiktok-live-pill">
+        <span>TIKTOK: <strong id="tiktok-live-txt">Çevrimdışı</strong></span>
+      </div>
+    </div>
+
+    <!-- Right Header Actions -->
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button class="btn-primary" style="padding: 7px 14px; font-size: 12px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); color: #fff;" onclick="openMobileRemoteModal()">
+        📱 Mobil Kumanda
+      </button>
+
+      <!-- Platform Toggle -->
+      <div class="platform-toggle-pill">
+        <button class="platform-toggle-btn kick-plat active" id="btn-plat-kick" onclick="switchPlatform('kick')">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M4 3h5v6h2V5h5v5h-3v4h3v5h-5v-4h-2v6H4V3z"/></svg>
+          KICK LIVE
+        </button>
+        <button class="platform-toggle-btn tiktok-plat" id="btn-plat-tiktok" onclick="switchPlatform('tiktok')">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+          TIKTOK
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Workspace Container -->
+  <main class="studio-container">
+
+    <!-- Left Workstation Console Deck -->
+    <div class="console-section">
+
+      <!-- Tab Navigation -->
+      <nav class="studio-tabs-nav">
+        <button class="studio-tab-btn active" onclick="switchTab('tab-heroes', this)">
+          🎮 Sahneler & Hero
+        </button>
+        <button class="studio-tab-btn" onclick="switchTab('tab-goal', this)">
+          🎯 Hedef & İstatistik
+        </button>
+        <button class="studio-tab-btn" onclick="switchTab('tab-alerts', this)">
+          ⚡ Alert & Testler
+        </button>
+        <button class="studio-tab-btn" onclick="switchTab('tab-chat', this)">
+          💬 Sohbet & BotRix
+        </button>
+        <button class="studio-tab-btn" onclick="switchTab('tab-music', this)">
+          🎵 Müzik & Tuna
+        </button>
+        <button class="studio-tab-btn" onclick="switchTab('tab-tiktok', this)">
+          📱 TikTok Canlı
+        </button>
+      </nav>
+
+      <!-- TAB 1: SAHNELER & HERO SEÇİMİ -->
+      <div id="tab-heroes" class="tab-pane active">
+        
+        <!-- 5 MLBB Hero Grid -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>⚔️</span> MLBB 5-HERO KONSEPTLERİ
+            </span>
+            <span class="card-panel-badge" id="active-hero-badge">Aktif: Vexana</span>
+          </div>
+
+          <div class="hero-grid">
+            <!-- Vexana -->
+            <div class="hero-box hero-vexana active" onclick="selectHero('vexana', this)">
+              <div class="hero-avatar-wrap">
+                <img src="kick/vexana/assets/images/avatar.jpg" alt="Vexana">
+              </div>
+              <div class="hero-meta">
+                <span class="hero-meta-name">VEXANA</span>
+                <span class="hero-meta-role">Necrokeep Kraliçesi</span>
+                <span class="hero-meta-tag">Ametist Ateşi</span>
+              </div>
+            </div>
+
+            <!-- Zetian -->
+            <div class="hero-box hero-zetian" onclick="selectHero('zetian', this)">
+              <div class="hero-avatar-wrap">
+                <img src="kick/zetian/assets/images/avatar.jpg" alt="Zetian">
+              </div>
+              <div class="hero-meta">
+                <span class="hero-meta-name">ZETIAN</span>
+                <span class="hero-meta-role">Shendu İmparatoriçesi</span>
+                <span class="hero-meta-tag">Göksel Anka</span>
+              </div>
+            </div>
+
+            <!-- Nana -->
+            <div class="hero-box hero-nana" onclick="selectHero('nana', this)">
+              <div class="hero-avatar-wrap">
+                <img src="kick/nana/assets/images/avatar.jpg" alt="Nana">
+              </div>
+              <div class="hero-meta">
+                <span class="hero-meta-name">NANA</span>
+                <span class="hero-meta-role">Tatlı Peri Leonin</span>
+                <span class="hero-meta-tag">Molina Pembesi</span>
+              </div>
+            </div>
+
+            <!-- Carmilla -->
+            <div class="hero-box hero-carmilla" onclick="selectHero('carmilla', this)">
+              <div class="hero-avatar-wrap">
+                <img src="kick/carmilla/assets/images/avatar.jpg" alt="Carmilla">
+              </div>
+              <div class="hero-meta">
+                <span class="hero-meta-name">CARMILLA</span>
+                <span class="hero-meta-role">Vance Gölgesi</span>
+                <span class="hero-meta-tag">Kan Kırmızısı</span>
+              </div>
+            </div>
+
+            <!-- Atlas -->
+            <div class="hero-box hero-atlas" onclick="selectHero('atlas', this)">
+              <div class="hero-avatar-wrap">
+                <img src="kick/atlas/assets/images/avatar.jpg" alt="Atlas">
+              </div>
+              <div class="hero-meta">
+                <span class="hero-meta-name">ATLAS</span>
+                <span class="hero-meta-role">Okyanus Gladyatörü</span>
+                <span class="hero-meta-tag">Abyssal Turkuaz</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Diğer Yayın Sahneleri -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>📺</span> DİĞER YAYIN SAHNELERİ (CHAT & MOLA)
+            </span>
+            <span class="card-panel-badge">Hazır Overlayler</span>
+          </div>
+
+          <div class="scene-chips-wrap">
+            <button class="scene-chip" onclick="selectScene('1-yayin-basliyor.html', '1. Yayın Başlıyor (Starting Soon)', this)">
+              ⏳ 1. Yayın Başlıyor + Chat
+            </button>
+            <button class="scene-chip" onclick="selectScene('2-sohbet.html', '2. Sohbet & Giriş (Just Chatting)', this)">
+              💬 2. Just Chatting + Chat
+            </button>
+            <button class="scene-chip" onclick="selectScene('3-mola.html', '3. Mola (Be Right Back)', this)">
+              ☕ 3. Mola + Chat
+            </button>
+            <button class="scene-chip" onclick="selectScene('4-yayin-bitti.html', '4. Yayın Bitti (Ending)', this)">
+              🎬 4. Yayın Bitti + Chat
+            </button>
+            <button class="scene-chip" onclick="selectScene('oyun-pc.html', 'PC Oyun Sahnesi (In-Game PC)', this)">
+              🎮 5. PC Oyun Sahnesi
+            </button>
+          </div>
+        </div>
+
+        <!-- OBS Browser Source Link Box -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>🔗</span> SEÇİLİ SAHNE OBS TARAYICI KAYNAĞI
+            </span>
+          </div>
+          <div class="obs-url-box">
+            <div class="obs-url-text" id="current-hero-url">http://localhost:8080/kick/vexana/in-game.html</div>
+            <button class="btn-action-copy" onclick="copyCurrentHeroUrl()">
+              📋 KOPYALA
+            </button>
+          </div>
+          <div class="info-tip-box" style="margin-top: 14px;">
+            💡 <strong>OBS Kurulumu:</strong> OBS'te yeni bir <strong>Tarayıcı Kaynağı (Browser Source)</strong> ekleyin, yukarıdaki linki yapıştırın ve genişliği <strong>1920</strong>, yüksekliği <strong>1080</strong> yapın.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: HEDEF & İSTATİSTİK -->
+      <div id="tab-goal" class="tab-pane">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>🎯</span> CANLI HEDEF ÇUBUĞU (FOLLOWER GOAL)
+            </span>
+            <span class="card-panel-badge">Canlı Senkron</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Hedef Başlığı</label>
+              <input type="text" id="goal-title-input" class="form-control" value="TAKİPÇİ HEDEFİ">
+            </div>
+            <div class="form-group">
+              <label>Hedef Sayı (Target)</label>
+              <input type="number" id="goal-target-input" class="form-control" value="50" onchange="updateGoalProgressPreview()">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Mevcut Takipçi Sayısı (Current)</label>
+            <input type="number" id="goal-current-input" class="form-control" value="1" onchange="updateGoalProgressPreview()">
+            <div class="stepper-bar">
+              <button class="stepper-btn" onclick="stepGoal(-5)">-5</button>
+              <button class="stepper-btn" onclick="stepGoal(-1)">-1</button>
+              <button class="stepper-btn" onclick="stepGoal(1)">+1</button>
+              <button class="stepper-btn" onclick="stepGoal(5)">+5</button>
+            </div>
+          </div>
+
+          <!-- Progress Preview -->
+          <div class="goal-progress-wrap">
+            <div class="goal-progress-labels">
+              <span id="preview-goal-text">TAKİPÇİ HEDEFİ</span>
+              <span><strong id="preview-goal-numbers">1 / 50</strong> (<span id="preview-goal-percent">2%</span>)</span>
+            </div>
+            <div class="goal-progress-bar-bg">
+              <div class="goal-progress-fill" id="preview-goal-fill"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 18px;">
+            <button class="btn-primary" style="flex: 1;" onclick="applyLiveGoal()">
+              ⚡ YAYINA GÖNDER (CANLI GÜNCELLE)
+            </button>
+            <button class="btn-primary btn-kick" style="flex: 1;" onclick="syncKickFollowersLive()">
+              🔄 KICK'TEN GERÇEK VERİYİ ÇEK
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ALERT & TESTLER -->
+      <div id="tab-alerts" class="tab-pane">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>⚡</span> ANLIK ALERT VE SES TESTLERİ
+            </span>
+            <span class="card-panel-badge">Gerçek Zamanlı Simülasyon</span>
+          </div>
+
+          <div class="alerts-grid">
+            <button class="alert-btn alert-follower" onclick="triggerTestAlert('follower')">
+              <div class="alert-icon-wrap">💜</div>
+              <div>
+                <div class="alert-title">Yeni Takipçi (+1)</div>
+                <div class="alert-desc">Hedef çubuğunu artırır & ses çalar</div>
+              </div>
+            </button>
+
+            <button class="alert-btn alert-sub" onclick="triggerTestAlert('sub')">
+              <div class="alert-icon-wrap">⭐</div>
+              <div>
+                <div class="alert-title">Yeni Abone (3. Ay)</div>
+                <div class="alert-desc">Özel ses efekti & TTS anonsu</div>
+              </div>
+            </button>
+
+            <button class="alert-btn alert-donation" onclick="triggerTestAlert('donation')">
+              <div class="alert-icon-wrap">💎</div>
+              <div>
+                <div class="alert-title">Bağış Testi (250₺)</div>
+                <div class="alert-desc">Büyük bağış görseli & efekt</div>
+              </div>
+            </button>
+
+            <button class="alert-btn alert-gift" onclick="triggerTestAlert('gift')">
+              <div class="alert-icon-wrap">🎁</div>
+              <div>
+                <div class="alert-title">TikTok Gül (x10)</div>
+                <div class="alert-desc">TikTok hediye animasyonu</div>
+              </div>
+            </button>
+          </div>
+
+          <div class="form-group" style="margin-top: 8px;">
+            <label>Özel İsimle Takipçi Test Et</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="custom-test-name" class="form-control" value="Aylin_Mage" placeholder="Kullanıcı adı...">
+              <button class="btn-primary" style="white-space: nowrap;" onclick="triggerCustomFollower()">
+                GÖNDER
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: SOHBET & BOTRIX -->
+      <div id="tab-chat" class="tab-pane">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>💬</span> CANLI CHAT VE BOTRIX WIDGET YÖNETİMİ
+            </span>
+            <span class="card-panel-badge" id="chat-status-badge">BotRix Bağlı</span>
+          </div>
+
+          <div class="form-group">
+            <label>BotRix / TikFinity / StreamElements Widget Linki</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="live-chat-url-input" class="form-control" placeholder="https://botrix.live/widgets/chat/?bid=...">
+              <button class="btn-primary" style="white-space: nowrap;" onclick="applyRealChatWidget()">
+                WIDGETI BAĞLA
+              </button>
+              <button class="btn-secondary" style="white-space: nowrap;" onclick="resetToSimulatedChat()">
+                SIFIRLA
+              </button>
+            </div>
+          </div>
+
+          <div class="info-tip-box" style="margin-bottom: 20px;">
+            ✅ <strong>Şeffaf ve Dinamik:</strong> BotRix widget URL'nizi bağladığınızda tüm sahnelerdeki chat kutularına anında otomatik aktarılır. Gereksiz sahte mesajlar kaldırılmıştır.
+          </div>
+
+          <div class="card-panel-header" style="margin-top: 10px;">
+            <span class="card-panel-title">
+              <span>✍️</span> TEST CHAT MESAJI GÖNDER
+            </span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Kullanıcı Adı</label>
+              <input type="text" id="chat-author-input" class="form-control" value="Kagura_Player">
+            </div>
+            <div class="form-group">
+              <label>Mesaj İçeriği</label>
+              <input type="text" id="chat-test-msg" class="form-control" value="Ulti harikaydı, lordu çaldık!">
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="triggerTestChat()">
+            💬 TEST MESAJINI CHAT'E EKLE
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 5: MÜZİK & TUNA -->
+      <div id="tab-music" class="tab-pane">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>🎵</span> SPOTIFY & NOW PLAYING (TUNA)
+            </span>
+            <span class="card-panel-badge">Otomatik Senkron</span>
+          </div>
+
+          <div class="form-group">
+            <label>Şu An Çalan Şarkı Adı (Manuel Giriş)</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="live-song-input" class="form-control" value="♪ MLBB Arena - Necrokeep Lo-Fi Chill Beats">
+              <button class="btn-primary" style="white-space: nowrap;" onclick="updateLiveSongTitle()">
+                GÜNCELLE
+              </button>
+            </div>
+          </div>
+
+          <div class="info-tip-box">
+            🎵 <strong>OBS Tuna Eklentisi:</strong> Bilgisayarınızda OBS Tuna eklentisi kuruldu. OBS içinden <strong>Araçlar -> Tuna</strong> menüsünden Spotify'ı seçtiğinizde veya arka planda müzik çaldığında <code>yayın/now-playing.txt</code> dosyası saniyesinde otomatik güncellenir ve yayında döner.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 6: TIKTOK CANLI -->
+      <div id="tab-tiktok" class="tab-pane">
+        <div class="card-panel" style="border-color: rgba(254, 44, 85, 0.3);">
+          <div class="card-panel-header">
+            <span class="card-panel-title" style="color: #fe2c55;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+              TIKTOK LIVE CANLI VERİ ENTEGRASYONU
+            </span>
+            <span class="card-panel-badge" id="tiktok-conn-badge">Çevrimdışı</span>
+          </div>
+
+          <div class="form-group">
+            <label>TikTok Yayıncı Kullanıcı Adınız</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="tiktok-user-input" class="form-control" placeholder="mira_mlbb" value="mira_mlbb">
+              <button class="btn-primary" id="btn-tiktok-connect" style="background: linear-gradient(135deg, #fe2c55, #ff0050); white-space: nowrap;" onclick="connectTiktokLive()">
+                ⚡ CANLIYA BAĞLAN
+              </button>
+              <button class="btn-secondary" id="btn-tiktok-disconnect" style="display: none; white-space: nowrap;" onclick="disconnectTiktokLive()">
+                BAĞLANTIYI KES
+              </button>
+            </div>
+          </div>
+
+          <div class="info-tip-box" style="border-left-color: #fe2c55;">
+            ✨ <strong>Otomatik Canlı Akış:</strong> TikTok'ta yayına geçtiğinizde kullanıcı adınızı girip bağlanın. Yayınınızdaki güller, hediyeler ve yeni takipçiler anında ekranınıza yansır.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Broadcast Monitor (Sticky) -->
+    <div class="monitor-sticky-wrap">
+      
+      <div class="broadcast-monitor">
+        
+        <!-- Monitor Top Bar -->
+        <div class="monitor-top-bar">
+          <div class="tally-light">
+            <span class="tally-dot"></span>
+            <span>ON AIR</span>
+          </div>
+          <div class="monitor-scene-title" id="preview-title">
+            [KICK] Vexana In-Game
+          </div>
+          <span style="font-size: 11px; font-weight: 700; color: #64748b;">1080p60</span>
+        </div>
+
+        <!-- 16:9 Screen Viewport -->
+        <div class="monitor-viewport-wrap" id="preview-wrap">
+          <iframe src="kick/vexana/in-game.html" id="preview-iframe"></iframe>
+        </div>
+
+        <!-- Monitor Bottom Bar -->
+        <div class="monitor-bottom-bar">
+          <div class="monitor-url-line">
+            <span class="monitor-url-pill" id="monitor-url-pill">http://localhost:8080/kick/vexana/in-game.html</span>
+          </div>
+          <div class="monitor-actions">
+            <button class="btn-monitor-tool primary" onclick="copyCurrentHeroUrl()">
+              📋 OBS Linki Kopyala
+            </button>
+            <button class="btn-monitor-tool" onclick="openPreviewTab()">
+              ↗ Yeni Sekme
+            </button>
+            <button class="btn-monitor-tool" onclick="refreshPreview()">
+              🔄 Yenile
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Platform Switch Reminder Card -->
+      <div class="card-panel" style="padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted);">
+          <span>🎯 Aktif Platform:</span>
+          <strong id="active-platform-label" style="color: var(--kick-green);">🟢 KICK LIVE</strong>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Mobile Remote Stream Deck Modal -->
+  <div class="modal-backdrop" id="mobile-remote-modal" style="display: none;" onclick="handleModalBackdropClick(event)">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeMobileRemoteModal()">✕</button>
+      <div style="font-size: 28px; margin-bottom: 6px;">📱</div>
+      <h2 style="font-family: 'Orbitron', sans-serif; font-size: 16px; color: #fff; margin-bottom: 8px;">
+        TELEFON / TABLET KUMANDASI
+      </h2>
+      <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+        Aynı Wi-Fi ağına bağlı telefonunuzun kamerasıyla aşağıdaki QR kodu tarayın veya tarayıcınızda açın. Telefonunuz <strong>dokunmatik Stream Deck</strong> gibi çalışır!
+      </p>
+
+      <div class="qr-box">
+        <img id="mobile-qr-img" src="" alt="QR Kod">
+      </div>
+
+      <div class="obs-url-box" style="margin-top: 14px;">
+        <span class="obs-url-text" id="mobile-remote-url-txt">http://localhost:8080/</span>
+        <button class="btn-action-copy" onclick="copyMobileRemoteUrl()">📋 KOPYALA</button>
+      </div>
+
+      <div style="margin-top: 16px; font-size: 11px; color: #64748b;">
+        💡 <em>Oyun oynarken Alt+Tab yapmadan tek dokunuşla kahramanları ve hedefleri telefonunuzdan değiştirin.</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Audio Script -->
+  <script src="shared/js/hero-audio.js"></script>
+  <script>
+    let activePlatform = 'kick';
+    let activeHero = 'vexana';
+    let activeScenePath = 'kick/vexana/in-game.html';
+
+    const localSFX = new HeroSoundFX('vexana');
+    const localTTS = new HeroTTSManager({ ttsEnabled: true, heroName: 'vexana' });
+
+    function getHostPrefix() {
+      if (window.location.protocol.startsWith('http')) {
+        return window.location.origin;
+      }
+      return 'http://localhost:8080';
+    }
+
+    /* Tab Switching */
+    function switchTab(tabId, btnEl) {
+      document.querySelectorAll('.studio-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      
+      if (btnEl) btnEl.classList.add('active');
+      const targetPane = document.getElementById(tabId);
+      if (targetPane) targetPane.classList.add('active');
+    }
+
+    /* Platform Switching */
+    function switchPlatform(plat) {
+      activePlatform = plat;
+      const kickBtn = document.getElementById('btn-plat-kick');
+      const tiktokBtn = document.getElementById('btn-plat-tiktok');
+      const label = document.getElementById('active-platform-label');
+
+      if (kickBtn) kickBtn.classList.toggle('active', plat === 'kick');
+      if (tiktokBtn) tiktokBtn.classList.toggle('active', plat === 'tiktok');
+      
+      if (label) {
+        label.textContent = plat === 'kick' ? '🟢 KICK LIVE' : '📱 TIKTOK LIVE';
+        label.style.color = plat === 'kick' ? 'var(--kick-green)' : 'var(--tiktok-red)';
+      }
+
+      selectHero(activeHero);
+      showToast(`Aktif Platform: ${plat.toUpperCase()} LIVE olarak ayarlandı.`, 'success');
+    }
+
+    /* Hero Selection */
+    function selectHero(heroName, cardEl) {
+      activeHero = heroName;
+      localSFX.setHero(heroName);
+      localTTS.heroName = heroName;
+
+      document.querySelectorAll('.hero-box, .scene-chip').forEach(c => c.classList.remove('active'));
+      const targetCard = cardEl || document.querySelector(`.hero-${heroName}`);
+      if (targetCard) targetCard.classList.add('active');
+
+      const heroBadge = document.getElementById('active-hero-badge');
+      if (heroBadge) heroBadge.textContent = `Aktif: ${heroName.toUpperCase()}`;
+
+      const path = `${activePlatform}/${heroName}/in-game.html`;
+      activeScenePath = path;
+      document.getElementById('preview-iframe').src = path;
+
+      const titles = {
+        vexana: 'Vexana (Necrokeep Kraliçesi)',
+        zetian: 'Zetian (Shendu İmparatoriçesi)',
+        nana: 'Nana (Tatlı Leonin)',
+        carmilla: 'Carmilla (Vance Gölgesi)',
+        atlas: 'Atlas (Okyanus Gladyatörü)'
+      };
+      const platLabel = activePlatform === 'kick' ? 'KICK' : 'TIKTOK';
+      document.getElementById('preview-title').textContent = `[${platLabel}] ${titles[heroName]} In-Game`;
+
+      const fullUrl = `${getHostPrefix()}/${path}`;
+      document.getElementById('current-hero-url').textContent = fullUrl;
+      document.getElementById('monitor-url-pill').textContent = fullUrl;
+      notifyObsScene(heroName);
+    }
+
+    /* Scene Selection */
+    function selectScene(sceneFileName, sceneTitle, btnEl) {
+      document.querySelectorAll('.hero-box, .scene-chip').forEach(c => c.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      const fullPath = `${activePlatform}/sahneler/${sceneFileName}`;
+      activeScenePath = fullPath;
+      document.getElementById('preview-iframe').src = fullPath;
+
+      const platTag = activePlatform === 'kick' ? 'KICK' : 'TIKTOK';
+      document.getElementById('preview-title').textContent = `[${platTag}] ${sceneTitle}`;
+
+      const fullUrl = `${getHostPrefix()}/${fullPath}`;
+      document.getElementById('current-hero-url').textContent = fullUrl;
+      document.getElementById('monitor-url-pill').textContent = fullUrl;
+      showToast(`Sahne seçildi: ${sceneTitle}`);
+      notifyObsScene(sceneFileName);
+    }
+
+    /* Copy URL */
+    function copyCurrentHeroUrl() {
+      const url = document.getElementById('current-hero-url').textContent;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('✓ OBS Linki panoya kopyalandı!', 'success');
+      }).catch(() => {
+        prompt('Aşağıdaki bağlantıyı kopyalayın:', url);
+      });
+    }
+
+    function openPreviewTab() {
+      window.open(activeScenePath, '_blank');
+    }
+
+    function refreshPreview() {
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe) {
+        iframe.src = activeScenePath;
+        showToast('Önizleme ekranı yenilendi.');
+      }
+    }
+
+    /* Event Dispatching */
+    function dispatchEventToOverlay(eventObj) {
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage(eventObj, '*');
+      }
+
+      try {
+        const bus1 = new BroadcastChannel('kick_hero_bus');
+        bus1.postMessage(eventObj);
+      } catch (e) {}
+
+      try {
+        const bus2 = new BroadcastChannel('kick_stream_bus');
+        bus2.postMessage(eventObj);
+      } catch (e) {}
+
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/test-alert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventObj)
+        }).catch(() => {});
+      }
+    }
+
+    /* Goal Functions */
+    function stepGoal(step) {
+      const input = document.getElementById('goal-current-input');
+      let val = parseInt(input.value, 10) || 0;
+      val = Math.max(0, val + step);
+      input.value = val;
+      updateGoalProgressPreview();
+      applyLiveGoal();
+    }
+
+    function updateGoalProgressPreview() {
+      const title = document.getElementById('goal-title-input').value || 'TAKİPÇİ HEDEFİ';
+      const current = parseInt(document.getElementById('goal-current-input').value, 10) || 0;
+      const target = Math.max(1, parseInt(document.getElementById('goal-target-input').value, 10) || 1);
+      const percent = Math.min(100, Math.round((current / target) * 100));
+
+      document.getElementById('preview-goal-text').textContent = title;
+      document.getElementById('preview-goal-numbers').textContent = `${current} / ${target}`;
+      document.getElementById('preview-goal-percent').textContent = `${percent}%`;
+      document.getElementById('preview-goal-fill').style.width = `${percent}%`;
+    }
+
+    function applyLiveGoal() {
+      const title = document.getElementById('goal-title-input').value;
+      const current = parseInt(document.getElementById('goal-current-input').value, 10) || 0;
+      const target = parseInt(document.getElementById('goal-target-input').value, 10) || 1;
+
+      updateGoalProgressPreview();
+
+      dispatchEventToOverlay({
+        type: 'UPDATE_GOAL',
+        goal: { title, current, target }
+      });
+      showToast(`Hedef yayına yollandı: ${current} / ${target}`, 'success');
+    }
+
+    function syncKickFollowersLive() {
+      fetch('/api/kick/channel?slug=cihanatas')
+        .then(r => r.json())
+        .then(data => {
+          const count = data.followers_count ?? data.followersCount;
+          if (typeof count === 'number') {
+            document.getElementById('goal-current-input').value = count;
+            document.getElementById('kick-follower-badge').textContent = count;
+            updateGoalProgressPreview();
+            applyLiveGoal();
+            showToast(`Kick Canlı Takipçi Alındı: ${count}`, 'success');
+          }
+        })
+        .catch(() => showToast('Kick API bağlantı hatası', 'error'));
+    }
+
+    /* Test Alerts */
+    function triggerTestAlert(type) {
+      let payload = {};
+      const heroNamesTr = {
+        vexana: 'Vexana',
+        zetian: 'Zetian',
+        nana: 'Nana',
+        carmilla: 'Carmilla',
+        atlas: 'Atlas'
+      };
+
+      if (type === 'follower') {
+        payload = { username: 'Aylin_MLBB' };
+        localSFX.playFollowerSound();
+        localTTS.speak(`Yeni takipçi: Aylin MLBB, ${heroNamesTr[activeHero]} yayınına katıldı!`);
+        stepGoal(1);
+      } else if (type === 'sub') {
+        payload = { username: 'Gamer_Deniz', months: 3 };
+        localSFX.playSubscriberSound();
+        localTTS.speak(`Teşekkürler Gamer Deniz, ${activeHero} ile 3. ay abone oldu!`);
+      } else if (type === 'donation') {
+        payload = { username: 'Emre_Pro', amount: '250₺', message: 'Mükemmel ulti zamanlaması!' };
+        localSFX.playDonationSound();
+        localTTS.speak(`Emre Pro, 250 lira destek gönderdi: Mükemmel ulti zamanlaması!`);
+      } else if (type === 'gift') {
+        payload = { username: 'MiraFan_01', giftName: 'Gül (x10)', message: 'Harika oyun tebrikler!' };
+        localSFX.playDonationSound();
+        localTTS.speak(`MiraFan 01, TikTok Gül hediyesi gönderdi!`);
+        stepGoal(1);
+      }
+
+      dispatchEventToOverlay({
+        type: 'TEST_ALERT',
+        alertType: type,
+        payload: payload
+      });
+      showToast(`${type.toUpperCase()} alerti gönderildi!`, 'success');
+    }
+
+    function triggerCustomFollower() {
+      const name = document.getElementById('custom-test-name').value || 'YeniOyuncu';
+      localSFX.playFollowerSound();
+      localTTS.speak(`Yeni takipçi: ${name}!`);
+      stepGoal(1);
+
+      dispatchEventToOverlay({
+        type: 'TEST_ALERT',
+        alertType: 'follower',
+        payload: { username: name }
+      });
+      showToast(`${name} takipçi olarak eklendi!`, 'success');
+    }
+
+    function triggerTestChat() {
+      const author = document.getElementById('chat-author-input').value || 'İzleyici';
+      const text = document.getElementById('chat-test-msg').value || 'Harika yayın!';
+
+      localTTS.speak(`${author} diyor ki: ${text}`);
+
+      dispatchEventToOverlay({
+        type: 'TEST_CHAT',
+        username: author,
+        content: text
+      });
+      showToast(`Chat mesajı iletildi: ${author}`);
+    }
+
+    function updateLiveSongTitle() {
+      const song = document.getElementById('live-song-input').value.trim();
+      if (!song) return;
+      fetch('/api/now-playing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: song })
+      }).then(r => r.json()).then(data => {
+        dispatchEventToOverlay({ type: 'UPDATE_SONG', title: song });
+        showToast(`Şarkı güncellendi: ${song}`, 'success');
+      }).catch(() => {
+        dispatchEventToOverlay({ type: 'UPDATE_SONG', title: song });
+        showToast(`Şarkı iletildi: ${song}`, 'success');
+      });
+    }
+
+    function applyRealChatWidget() {
+      const url = document.getElementById('live-chat-url-input').value.trim();
+      if (!url) return alert('Lütfen geçerli bir BotRix veya TikFinity widget linki yapıştırın!');
+      dispatchEventToOverlay({ type: 'SET_CHAT_WIDGET', url: url });
+      localStorage.setItem('stream_chat_widget_url', url);
+      document.getElementById('chat-status-badge').textContent = 'BotRix Aktif';
+      showToast('Gerçek chat widgeti bağlandı!', 'success');
+    }
+
+    function resetToSimulatedChat() {
+      document.getElementById('live-chat-url-input').value = '';
+      dispatchEventToOverlay({ type: 'SET_CHAT_WIDGET', url: '' });
+      localStorage.removeItem('stream_chat_widget_url');
+      document.getElementById('chat-status-badge').textContent = 'Varsayılan Chat';
+      showToast('Varsayılan chat moduna dönüldü!');
+    }
+
+    function connectTiktokLive() {
+      const username = document.getElementById('tiktok-user-input').value.trim();
+      if (!username) return alert('Lütfen TikTok kullanıcı adınızı girin!');
+      const btn = document.getElementById('btn-tiktok-connect');
+      const badge = document.getElementById('tiktok-conn-badge');
+      const topPill = document.getElementById('tiktok-live-txt');
+      btn.textContent = 'Bağlanıyor...';
+      btn.disabled = true;
+
+      fetch('/api/tiktok/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username })
+      }).then(r => r.json()).then(data => {
+        btn.disabled = false;
+        if (data.success) {
+          btn.style.display = 'none';
+          document.getElementById('btn-tiktok-disconnect').style.display = 'inline-block';
+          badge.textContent = `● @${username} CANLI`;
+          badge.style.color = 'var(--kick-green)';
+          topPill.textContent = `@${username} (CANLI)`;
+          document.getElementById('tiktok-live-pill').classList.add('active-tiktok');
+          showToast(`TikTok Canlı Yayınına Bağlandı: @${username}`, 'success');
+        } else {
+          btn.textContent = '⚡ CANLIYA BAĞLAN';
+          badge.textContent = `Hata: ${data.error || 'Bağlanılamadı'}`;
+          badge.style.color = '#ef4444';
+          alert(`TikTok Bağlantı Hatası: ${data.error}\n(Yayın açık mı? Kullanıcı adını kontrol edin)`);
+        }
+      }).catch(e => {
+        btn.disabled = false;
+        btn.textContent = '⚡ CANLIYA BAĞLAN';
+        alert('Sunucuya bağlanılamadı: ' + e.message);
+      });
+    }
+
+    function disconnectTiktokLive() {
+      fetch('/api/tiktok/disconnect', { method: 'POST' }).then(() => {
+        document.getElementById('btn-tiktok-connect').style.display = 'inline-block';
+        document.getElementById('btn-tiktok-connect').textContent = '⚡ CANLIYA BAĞLAN';
+        document.getElementById('btn-tiktok-disconnect').style.display = 'none';
+        const badge = document.getElementById('tiktok-conn-badge');
+        badge.textContent = 'Çevrimdışı';
+        badge.style.color = '';
+        document.getElementById('tiktok-live-txt').textContent = 'Çevrimdışı';
+        document.getElementById('tiktok-live-pill').classList.remove('active-tiktok');
+        showToast('TikTok bağlantısı kesildi.');
+      });
+    }
+
+    /* Toast Notification System */
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `toast-item ${type}`;
+      toast.innerHTML = `<span>${type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ')}</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'toastOut 0.3s forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    /* Monitor Preview Scale */
+    function resizePreview() {
+      const wrap = document.getElementById('preview-wrap');
+      const iframe = document.getElementById('preview-iframe');
+      if (wrap && iframe) {
+        const scale = wrap.clientWidth / 1920;
+        iframe.style.transform = `scale(${scale})`;
+      }
+    }
+
+    /* Mobile Remote Stream Deck */
+    let currentLanUrl = 'http://localhost:8080/';
+
+    function openMobileRemoteModal() {
+      fetch('/api/lan-ip')
+        .then(r => r.json())
+        .then(data => {
+          currentLanUrl = data.mobileUrl || `http://${data.ip || 'localhost'}:8080/`;
+          document.getElementById('mobile-remote-url-txt').textContent = currentLanUrl;
+          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(currentLanUrl)}`;
+          document.getElementById('mobile-qr-img').src = qrUrl;
+          document.getElementById('mobile-remote-modal').style.display = 'flex';
+        })
+        .catch(() => {
+          document.getElementById('mobile-remote-modal').style.display = 'flex';
+        });
+    }
+
+    function closeMobileRemoteModal() {
+      document.getElementById('mobile-remote-modal').style.display = 'none';
+    }
+
+    function handleModalBackdropClick(e) {
+      if (e.target.id === 'mobile-remote-modal') {
+        closeMobileRemoteModal();
+      }
+    }
+
+    function copyMobileRemoteUrl() {
+      navigator.clipboard.writeText(currentLanUrl).then(() => {
+        showToast('Mobil Kumanda linki kopyalandı!', 'success');
+      });
+    }
+
+    /* OBS WebSocket Status & Auto-Switch */
+    function checkObsWsStatus() {
+      fetch('/api/obs/status')
+        .then(r => r.json())
+        .then(data => {
+          const pill = document.getElementById('obs-status-pill');
+          const txt = document.getElementById('obs-status-txt');
+          const dot = document.getElementById('obs-pulse-dot');
+          if (data.connected) {
+            pill.className = 'status-pill active-server';
+            txt.textContent = 'OBS: BAĞLI';
+            dot.style.background = 'var(--kick-green)';
+            dot.style.boxShadow = '0 0 8px var(--kick-green)';
+          } else {
+            pill.className = 'status-pill';
+            txt.textContent = 'OBS: ÇEVRİMDIŞI';
+            dot.style.background = '#64748b';
+            dot.style.boxShadow = 'none';
+          }
+        }).catch(() => {});
+    }
+
+    function notifyObsScene(key) {
+      fetch('/api/obs/set-scene', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sceneKey: key })
+      }).then(r => r.json()).then(data => {
+        if (data.success && data.obsConnected) {
+          showToast(`⚡ OBS Sahnesi Değiştirildi: ${data.scene}`, 'success');
+        }
+      }).catch(() => {});
+    }
+
+    /* Initial Load */
+    window.addEventListener('resize', resizePreview);
+    window.addEventListener('load', () => {
+      resizePreview();
+      updateGoalProgressPreview();
+      syncKickFollowersLive();
+      checkObsWsStatus();
+      setInterval(checkObsWsStatus, 4000);
+
+      // Chat widget url yükle
+      fetch('/api/chat-widget')
+        .then(r => r.json())
+        .then(d => {
+          if (d.url) {
+            document.getElementById('live-chat-url-input').value = d.url;
+            document.getElementById('chat-status-badge').textContent = 'BotRix Aktif';
+          }
+        }).catch(() => {});
+    });
+  </script>
+</body>
+</html>

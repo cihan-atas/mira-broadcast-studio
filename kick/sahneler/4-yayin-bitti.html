@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+  <title>Sahne 5: Yayın Bitti (Stream Ending with Live Chat)</title>
+  <link rel="stylesheet" href="../../assets/css/scenes.css">
+</head>
+<body data-scene-type="ending">
+  <div class="scene-wrapper">
+    
+    <div class="scene-layout-with-chat">
+      
+      <!-- Sol Kolon: Ana Yayın Sonu Kartı -->
+      <div class="scene-main-col">
+        <div class="scene-card">
+          <div class="brand-row">
+            <div class="kick-pill">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M4 3h5v6h2V5h5v5h-3v4h3v5h-5v-4h-2v6H4V3z"/></svg>
+              <span>KICK CANLI</span>
+            </div>
+            <div class="mlbb-tag">YAYIN SONU</div>
+          </div>
+
+          <h1 class="scene-title">YAYIN BİTTİ</h1>
+          <p class="scene-subtitle">İZLEYEN, DESTEK VEREN VE CHAT'TE YANIMIZDA OLAN HERKESE TEŞEKKÜRLER!</p>
+
+          <div class="scene-status-badge">
+            <span style="font-size: 20px;">⭐</span>
+            <span>Sonraki Yayın: Yarın 20:00'de Görüşmek Üzere!</span>
+          </div>
+
+          <div class="scene-music-ticker" style="margin-top: 25px;">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="#ffd166"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>Günün MVP Şampiyonları: <strong>Vexana & Nana (8 Maçta 7 Galibiyet)</strong></span>
+          </div>
+
+          <div class="scene-socials" style="position: static; margin-top: 30px; box-shadow: none;">
+            <div class="scene-social-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="#ff69b4"><path d="M4 3h5v6h2V5h5v5h-3v4h3v5h-5v-4h-2v6H4V3z"/></svg>
+              <span class="bind-kick-channel">kick.com/miralive</span>
+            </div>
+            <div class="scene-social-item">
+              <span>📱 @mira_mlbb</span>
+            </div>
+            <div class="scene-social-item">
+              <span>▶ @mira.gaming (YouTube)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sağ Kolon: Canlı Kick Chat Paneli -->
+      <div class="scene-chat-col">
+        <div class="large-chat-panel">
+          <div class="large-chat-header">
+            <div class="large-chat-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="#ff69b4"><path d="M4 3h5v6h2V5h5v5h-3v4h3v5h-5v-4h-2v6H4V3z"/></svg>
+              <span>KICK CANLI SOHBET</span>
+            </div>
+            <span class="chat-live-tag">● YAYIN SONU VEDASI</span>
+          </div>
+          <div class="large-chat-feed" id="chat-messages">
+            <!-- Otomatik ve canlı mesajlar akacak -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="../../assets/js/config.js"></script>
+  <script src="../../assets/js/scene-chat.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const config = window.OVERLAY_CONFIG || {};
+      const channelEl = document.querySelector('.bind-kick-channel');
+      if (channelEl && config.kickChannel) {
+        channelEl.textContent = `kick.com/${config.kickChannel}`;
+      }
+    });
+  </script>
+</body>
+</html>
