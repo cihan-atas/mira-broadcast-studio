@@ -22,14 +22,19 @@
   box-sizing: border-box;
 }
 
-body {
-  width: 1920px;
-  height: 1080px;
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   font-family: var(--font-body);
   color: #ffffff;
   background-color: transparent !important;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Fullscreen Background with Vignette & Girl Streamer MLBB Art */
@@ -37,6 +42,8 @@ body {
   position: relative;
   width: 1920px;
   height: 1080px;
+  flex-shrink: 0;
+  transform-origin: center center;
   background: url('../images/mlbb-girl-bg.jpg') center center / cover no-repeat;
   display: flex;
   flex-direction: column;

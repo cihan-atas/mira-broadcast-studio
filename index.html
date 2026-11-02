@@ -1065,115 +1065,191 @@
       }
     }
 
-    /* 3. Mobil Telefonlar (<= 768px) */
+    /* 3. Mobil Telefonlar & Dokunmatik Kumanda (<= 768px) */
     @media (max-width: 768px) {
       body {
-        padding-bottom: 40px;
+        padding-bottom: 24px;
+      }
+      #btn-mobile-remote {
+        display: none !important;
+      }
+      .mobile-live-badge {
+        display: flex !important;
       }
       .top-header {
         padding: 10px 12px;
+        gap: 8px;
       }
       .brand-title {
-        font-size: 15px;
+        font-size: 14px;
       }
       .brand-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 16px;
+        width: 30px;
+        height: 30px;
+        font-size: 15px;
         border-radius: 8px;
       }
       .brand-badge {
         display: none;
       }
       .platform-toggle-btn {
-        padding: 6px 12px;
+        padding: 6px 10px;
         font-size: 11px;
       }
       .studio-container {
-        padding: 0 12px;
-        margin-top: 14px;
-        gap: 16px;
+        padding: 0 10px;
+        margin-top: 12px;
+        gap: 14px;
       }
       .card-panel {
-        padding: 16px 12px;
+        padding: 14px 10px;
         border-radius: 14px;
       }
       .card-panel-header {
-        margin-bottom: 12px;
-        padding-bottom: 10px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
       }
       .card-panel-title {
-        font-size: 13px;
+        font-size: 12.5px;
       }
 
-      /* Hero Kartları 2 Sütun */
+      /* Swipeable Tab Menüsü */
+      .studio-tabs-nav {
+        gap: 6px;
+        padding-bottom: 6px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .studio-tabs-nav::-webkit-scrollbar {
+        display: none;
+      }
+      .studio-tab-btn {
+        padding: 8px 12px;
+        font-size: 11.5px;
+        border-radius: 10px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* Hero Kartları: 2 Sütun Dokunmatik Stream Deck Grid */
       .hero-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
       }
       .hero-box {
-        padding: 10px 8px;
-        gap: 8px;
-        border-radius: 12px;
+        padding: 8px !important;
+        gap: 8px !important;
+        border-radius: 12px !important;
+        min-height: 58px;
+        touch-action: manipulation;
+        transition: transform 0.12s, box-shadow 0.12s;
+      }
+      .hero-box:active {
+        transform: scale(0.96) !important;
+      }
+      .hero-box.hero-atlas {
+        grid-column: span 2;
       }
       .hero-avatar-wrap {
-        width: 44px;
-        height: 44px;
-        border-radius: 8px;
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 8px !important;
+        flex-shrink: 0;
       }
       .hero-meta-name {
-        font-size: 12px;
+        font-size: 12px !important;
+        font-weight: 800 !important;
       }
       .hero-meta-role {
-        font-size: 10px;
+        font-size: 9.5px !important;
       }
       .hero-meta-tag {
-        font-size: 8px;
-        padding: 2px 4px;
+        font-size: 8px !important;
+        padding: 2px 4px !important;
       }
 
-      /* Sahne Butonları */
+      /* Sahne Butonları: 2 Sütun Dokunmatik Grid */
       .scene-chips-wrap {
-        grid-template-columns: 1fr;
-        gap: 8px;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
       }
       .scene-chip {
-        padding: 10px 12px;
-        font-size: 12px;
+        padding: 12px 8px !important;
+        font-size: 11.5px !important;
+        font-weight: 700 !important;
+        border-radius: 10px !important;
+        touch-action: manipulation;
+        text-align: center;
+      }
+      .scene-chip:last-child {
+        grid-column: span 2;
+      }
+      .scene-chip:active {
+        transform: scale(0.96) !important;
       }
 
-      /* Alert Butonları */
+      /* Alert Butonları: 2 Sütun */
       .alerts-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
       }
       .alert-btn {
-        padding: 12px;
+        padding: 12px 10px !important;
+        border-radius: 12px !important;
+        touch-action: manipulation;
+      }
+      .alert-btn:active {
+        transform: scale(0.96) !important;
+      }
+      .alert-title {
+        font-size: 12px !important;
+      }
+      .alert-desc {
+        font-size: 9.5px !important;
       }
 
-      /* Form Satırları */
-      .form-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
+      /* Takipçi Stepper Butonları */
       .stepper-bar {
-        gap: 4px;
+        gap: 6px;
+        margin-top: 8px;
       }
       .stepper-btn {
-        padding: 9px 4px;
-        font-size: 13px;
+        height: 44px;
+        font-size: 15px;
+        font-weight: 800;
+        border-radius: 10px;
+        flex: 1;
+        touch-action: manipulation;
+      }
+      .stepper-btn:active {
+        transform: scale(0.94);
       }
 
-      /* Toast Bildirimleri Mobil Düzen */
+      /* Butonlar dokunmatik ve hızlı */
+      .btn-primary {
+        padding: 12px 14px;
+        font-size: 12px;
+        touch-action: manipulation;
+      }
+
+      /* Toast Bildirimleri: EKRANIN ÜSTÜNE ALINDI (Alt Butonları Asla Kapatmaz!) */
       .toast-container {
-        left: 12px;
-        right: 12px;
-        bottom: 12px;
+        top: 10px !important;
+        bottom: auto !important;
+        left: 10px !important;
+        right: 10px !important;
+        z-index: 999999 !important;
       }
       .toast-item {
-        width: 100%;
-        font-size: 12px;
-        padding: 10px 14px;
+        width: 100% !important;
+        font-size: 11.5px !important;
+        padding: 9px 12px !important;
+        border-radius: 10px !important;
+        animation: toastDrop 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      }
+      @keyframes toastDrop {
+        from { opacity: 0; transform: translateY(-16px); }
+        to { opacity: 1; transform: translateY(0); }
       }
     }
 
@@ -1194,16 +1270,11 @@
         flex: 1;
         justify-content: center;
       }
-      .hero-grid {
-        grid-template-columns: 1fr;
-      }
-      .hero-avatar-wrap {
-        width: 48px;
-        height: 48px;
-      }
       .modal-card {
         padding: 18px 12px;
         width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
       }
       .qr-box {
         width: 150px;
@@ -1253,10 +1324,14 @@
     </div>
 
     <!-- Right Header Actions -->
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <button class="btn-primary" style="padding: 7px 14px; font-size: 12px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); color: #fff;" onclick="openMobileRemoteModal()">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button class="btn-primary" id="btn-mobile-remote" style="padding: 7px 14px; font-size: 12px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); color: #fff;" onclick="openMobileRemoteModal()">
         📱 Mobil Kumanda
       </button>
+      <div class="mobile-live-badge" style="display: none; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #a855f7; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.35); padding: 5px 10px; border-radius: 20px;">
+        <span class="pulse-dot" style="background: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
+        <span>KUMANDA</span>
+      </div>
 
       <!-- Platform Toggle -->
       <div class="platform-toggle-pill">
@@ -2082,15 +2157,22 @@
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       if (!container) return;
+
+      // Mobilde ve dar ekranda bildirimlerin yığılmasını önle (en fazla 2 bildirim)
+      while (container.children.length >= 2) {
+        container.removeChild(container.firstChild);
+      }
+
       const toast = document.createElement('div');
       toast.className = `toast-item ${type}`;
       toast.innerHTML = `<span>${type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ')}</span><span>${message}</span>`;
       container.appendChild(toast);
 
+      const dismissTime = window.innerWidth <= 768 ? 2000 : 3200;
       setTimeout(() => {
-        toast.style.animation = 'toastOut 0.3s forwards';
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
+        toast.style.animation = 'toastOut 0.25s forwards';
+        setTimeout(() => toast.remove(), 250);
+      }, dismissTime);
     }
 
     /* Monitor Preview Scale */
@@ -2185,6 +2267,13 @@
     /* Initial Load */
     window.addEventListener('resize', resizePreview);
     window.addEventListener('load', () => {
+      // Mobilde açıldığında kontrollerin hemen parmak altında olması için önizlemeyi kapalı başlat
+      if (window.innerWidth <= 768) {
+        const monitor = document.querySelector('.broadcast-monitor');
+        const btn = document.getElementById('btn-toggle-monitor');
+        if (monitor) monitor.classList.add('monitor-collapsed');
+        if (btn) btn.textContent = '▲';
+      }
       resizePreview();
       updateGoalProgressPreview();
       syncKickFollowersLive();

@@ -63,3 +63,46 @@ window.OVERLAY_CONFIG = {
   // -------------------------------------------------------------
   webcamPosition: "bottom-left" // Sol alt (MLBB minimap ve yetenek butonlarını kapatmaz)
 };
+
+// =============================================================
+// AUTO-FIT 16:9 SCALER (YENİ SEKME / TARAYICI ÖNİZLEME UYUMU)
+// =============================================================
+(function () {
+  'use strict';
+  function applyAutoFit() {
+    // If inside an iframe (like the control panel preview monitor), let parent handle it
+    if (window.self !== window.top) return;
+
+    const target = document.querySelector('.scene-wrapper') ||
+                   document.querySelector('.scene-layout') ||
+                   document.querySelector('.overlay-canvas');
+    if (!target) return;
+
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    if (w === 1920 && h === 1080) {
+      target.style.transform = 'none';
+      return;
+    }
+
+    if (document.documentElement) {
+      document.documentElement.style.backgroundColor = '#07090e';
+    }
+    const scale = Math.min(w / 1920, h / 1080);
+    target.style.transform = `scale(${scale})`;
+    target.style.transformOrigin = 'center center';
+    target.style.flexShrink = '0';
+  }
+
+  window.addEventListener('resize', applyAutoFit);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyAutoFit);
+  } else {
+    applyAutoFit();
+  }
+  window.addEventListener('load', applyAutoFit);
+  setTimeout(applyAutoFit, 60);
+  setTimeout(applyAutoFit, 200);
+})();
+
