@@ -57,8 +57,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1480,
     height: 920,
-    minWidth: 1100,
-    minHeight: 720,
+    minWidth: 380,
+    minHeight: 480,
     title: 'MİRA BROADCAST STUDIO - Professional Stream Deck',
     backgroundColor: '#08090e',
     icon: appIcon,
