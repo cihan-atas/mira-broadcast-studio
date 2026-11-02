@@ -1945,7 +1945,8 @@
     }
 
     function openPreviewTab() {
-      window.open(activeScenePath, '_blank');
+      const fullUrl = `${getHostPrefix()}/${activeScenePath}`;
+      window.open(fullUrl, '_blank');
     }
 
     function refreshPreview() {

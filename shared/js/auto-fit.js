@@ -16,8 +16,8 @@
                    document.querySelector('.scene-layout');
     if (!target) return;
 
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const w = window.innerWidth || document.documentElement.clientWidth || screen.width;
+    const h = window.innerHeight || document.documentElement.clientHeight || screen.height;
 
     // OBS Studio exact 1080p
     if (w === 1920 && h === 1080) {
@@ -29,11 +29,15 @@
 
     // Set cinematic dark letterbox background in browser tabs
     if (document.documentElement) {
-      document.documentElement.style.backgroundColor = '#07090e';
+      document.documentElement.style.setProperty('background-color', '#07090e', 'important');
+      document.documentElement.style.width = '100%';
+      document.documentElement.style.height = '100%';
+      document.documentElement.style.overflow = 'hidden';
     }
     if (document.body) {
-      document.body.style.width = '100vw';
-      document.body.style.height = '100vh';
+      document.body.style.setProperty('background-color', '#07090e', 'important');
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
       document.body.style.overflow = 'hidden';
       document.body.style.display = 'flex';
       document.body.style.alignItems = 'center';
@@ -49,6 +53,16 @@
   }
 
   window.addEventListener('resize', applyFit);
+  window.addEventListener('orientationchange', () => {
+    setTimeout(applyFit, 100);
+    setTimeout(applyFit, 300);
+  });
+  if (screen.orientation) {
+    screen.orientation.addEventListener('change', () => {
+      setTimeout(applyFit, 100);
+      setTimeout(applyFit, 300);
+    });
+  }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', applyFit);
   } else {

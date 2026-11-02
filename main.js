@@ -4,6 +4,7 @@ const http = require('http');
 const { fork } = require('child_process');
 
 let mainWindow = null;
+let previewWindow = null;
 let tray = null;
 let serverProcess = null;
 let isQuitting = false;
@@ -79,6 +80,45 @@ function ensureServer(callback) {
   });
 }
 
+function openPreviewWindow(url) {
+  if (previewWindow && !previewWindow.isDestroyed()) {
+    previewWindow.loadURL(url);
+    if (previewWindow.isMinimized()) previewWindow.restore();
+    previewWindow.show();
+    previewWindow.focus();
+    return;
+  }
+
+  const iconPath = path.join(__dirname, 'assets', 'icon.png');
+  const appIcon = nativeImage.createFromPath(iconPath);
+
+  previewWindow = new BrowserWindow({
+    width: 1280,
+    height: 750,
+    minWidth: 480,
+    minHeight: 270,
+    title: 'MİRA STUDIO - Canlı Sahne Önizleme',
+    backgroundColor: '#07090e',
+    icon: appIcon,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  previewWindow.loadURL(url);
+
+  previewWindow.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+    shell.openExternal(targetUrl);
+    return { action: 'deny' };
+  });
+
+  previewWindow.on('closed', () => {
+    previewWindow = null;
+  });
+}
+
 function createWindow() {
   if (mainWindow && !mainWindow.isDestroyed()) {
     if (mainWindow.isMinimized()) mainWindow.restore();
@@ -107,8 +147,13 @@ function createWindow() {
     }
   });
 
-  // Yeni sekme ve dış bağlantıları harici varsayılan tarayıcıda aç (ikinci sahipsiz pencere oluşmasını engeller)
+  // Stüdyo içi sahneler & Yeni Sekme tıklandığında tarayıcıya atmak yerine stüdyo içi özel önizleme penceresinde aç
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.includes('localhost:8080') || url.includes('127.0.0.1:8080')) {
+      openPreviewWindow(url);
+      return { action: 'deny' };
+    }
+    // Dış web bağlantıları harici varsayılan tarayıcıda açılsın
     shell.openExternal(url);
     return { action: 'deny' };
   });
@@ -117,6 +162,9 @@ function createWindow() {
 
   mainWindow.on('close', () => {
     isQuitting = true;
+    if (previewWindow && !previewWindow.isDestroyed()) {
+      try { previewWindow.close(); } catch (e) {}
+    }
     app.quit();
   });
 
@@ -198,6 +246,10 @@ function createTray() {
 }
 
 function killServerProcess() {
+  if (previewWindow && !previewWindow.isDestroyed()) {
+    try { previewWindow.destroy(); } catch (e) {}
+    previewWindow = null;
+  }
   if (serverProcess) {
     try {
       serverProcess.kill('SIGTERM');

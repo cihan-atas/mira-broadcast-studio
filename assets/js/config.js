@@ -78,8 +78,8 @@ window.OVERLAY_CONFIG = {
                    document.querySelector('.overlay-canvas');
     if (!target) return;
 
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const w = window.innerWidth || document.documentElement.clientWidth || screen.width;
+    const h = window.innerHeight || document.documentElement.clientHeight || screen.height;
 
     if (w === 1920 && h === 1080) {
       target.style.transform = 'none';
@@ -87,8 +87,23 @@ window.OVERLAY_CONFIG = {
     }
 
     if (document.documentElement) {
-      document.documentElement.style.backgroundColor = '#07090e';
+      document.documentElement.style.setProperty('background-color', '#07090e', 'important');
+      document.documentElement.style.width = '100%';
+      document.documentElement.style.height = '100%';
+      document.documentElement.style.overflow = 'hidden';
     }
+    if (document.body) {
+      document.body.style.setProperty('background-color', '#07090e', 'important');
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+      document.body.style.overflow = 'hidden';
+      document.body.style.display = 'flex';
+      document.body.style.alignItems = 'center';
+      document.body.style.justifyContent = 'center';
+      document.body.style.margin = '0';
+      document.body.style.padding = '0';
+    }
+
     const scale = Math.min(w / 1920, h / 1080);
     target.style.transform = `scale(${scale})`;
     target.style.transformOrigin = 'center center';
@@ -96,6 +111,16 @@ window.OVERLAY_CONFIG = {
   }
 
   window.addEventListener('resize', applyAutoFit);
+  window.addEventListener('orientationchange', () => {
+    setTimeout(applyAutoFit, 100);
+    setTimeout(applyAutoFit, 300);
+  });
+  if (screen.orientation) {
+    screen.orientation.addEventListener('change', () => {
+      setTimeout(applyAutoFit, 100);
+      setTimeout(applyAutoFit, 300);
+    });
+  }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', applyAutoFit);
   } else {
