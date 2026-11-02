@@ -7,34 +7,63 @@ let mainWindow = null;
 let tray = null;
 let serverProcess = null;
 let isQuitting = false;
+let isCreatingWindow = false;
+let serverCheckDone = false;
 
 function isServerAlreadyRunning(callback) {
+  let called = false;
+  const finish = (result) => {
+    if (called) return;
+    called = true;
+    callback(result);
+  };
+
   const req = http.get('http://127.0.0.1:8080/api/lan-ip', (res) => {
-    callback(true);
+    res.resume();
+    finish(true);
   });
   req.on('error', () => {
-    callback(false);
+    finish(false);
   });
-  req.setTimeout(1000, () => {
+  req.setTimeout(800, () => {
     req.destroy();
-    callback(false);
+    finish(false);
   });
 }
 
 function checkServerReady(callback, attempts = 0) {
+  let called = false;
+  const finish = (result) => {
+    if (called) return;
+    called = true;
+    callback(result);
+  };
+
   const req = http.get('http://127.0.0.1:8080/api/lan-ip', (res) => {
-    callback(true);
+    res.resume();
+    finish(true);
   });
   req.on('error', () => {
     if (attempts < 30) {
-      setTimeout(() => checkServerReady(callback, attempts + 1), 250);
+      setTimeout(() => checkServerReady(callback, attempts + 1), 200);
     } else {
-      callback(false);
+      finish(false);
+    }
+  });
+  req.setTimeout(800, () => {
+    req.destroy();
+    if (attempts < 30) {
+      setTimeout(() => checkServerReady(callback, attempts + 1), 200);
+    } else {
+      finish(false);
     }
   });
 }
 
 function ensureServer(callback) {
+  if (serverCheckDone) return;
+  serverCheckDone = true;
+
   isServerAlreadyRunning((running) => {
     if (running) {
       console.log('[APP] Port 8080 halihazırda çalışıyor, mevcut sunucu kullanılacak.');
@@ -43,7 +72,7 @@ function ensureServer(callback) {
     console.log('[APP] Arka plan sunucu işlemi başlatılıyor...');
     serverProcess = fork(path.join(__dirname, 'server.js'), [], {
       silent: false,
-      env: { ...process.env, PORT: '8080' }
+      env: { ...process.env, PORT: '8080', ELECTRON_RUN_AS_NODE: '1' }
     });
     serverProcess.on('error', (err) => console.error('[APP Server Error]', err));
     checkServerReady(callback);
@@ -51,6 +80,15 @@ function ensureServer(callback) {
 }
 
 function createWindow() {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.show();
+    mainWindow.focus();
+    return;
+  }
+  if (isCreatingWindow) return;
+  isCreatingWindow = true;
+
   const iconPath = path.join(__dirname, 'assets', 'icon.png');
   const appIcon = nativeImage.createFromPath(iconPath);
 
@@ -69,11 +107,13 @@ function createWindow() {
     }
   });
 
-  checkServerReady(() => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.loadURL('http://localhost:8080/');
-    }
+  // Yeni sekme ve dış bağlantıları harici varsayılan tarayıcıda aç (ikinci sahipsiz pencere oluşmasını engeller)
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
   });
+
+  mainWindow.loadURL('http://localhost:8080/');
 
   mainWindow.on('close', () => {
     isQuitting = true;
@@ -82,10 +122,15 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+    isCreatingWindow = false;
   });
+
+  isCreatingWindow = false;
 }
 
 function createTray() {
+  if (tray) return;
+
   const iconPath = path.join(__dirname, 'assets', 'icon.png');
   const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 22, height: 22 });
 
@@ -98,7 +143,7 @@ function createTray() {
     {
       label: '🪟 Stüdyoyu Aç / Göster',
       click: () => {
-        if (mainWindow) {
+        if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.show();
           mainWindow.focus();
         } else {
@@ -123,7 +168,7 @@ function createTray() {
             } catch(e){}
           });
         });
-        if (mainWindow) mainWindow.show();
+        if (mainWindow && !mainWindow.isDestroyed()) mainWindow.show();
       }
     },
     { type: 'separator' },
@@ -139,7 +184,7 @@ function createTray() {
   tray.setContextMenu(contextMenu);
 
   tray.on('click', () => {
-    if (mainWindow) {
+    if (mainWindow && !mainWindow.isDestroyed()) {
       if (mainWindow.isVisible()) {
         mainWindow.hide();
       } else {
@@ -152,12 +197,21 @@ function createTray() {
   });
 }
 
+function killServerProcess() {
+  if (serverProcess) {
+    try {
+      serverProcess.kill('SIGTERM');
+    } catch (e) {}
+    serverProcess = null;
+  }
+}
+
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
   app.on('second-instance', () => {
-    if (mainWindow) {
+    if (mainWindow && !mainWindow.isDestroyed()) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.show();
       mainWindow.focus();
@@ -171,7 +225,7 @@ if (!gotTheLock) {
     });
 
     app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) {
+      if (!mainWindow && !isCreatingWindow) {
         createWindow();
       }
     });
@@ -179,14 +233,12 @@ if (!gotTheLock) {
 
   app.on('before-quit', () => {
     isQuitting = true;
-    if (serverProcess) {
-      try { serverProcess.kill(); } catch (e) {}
-    }
+    killServerProcess();
   });
 
   app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit();
-    }
+    isQuitting = true;
+    killServerProcess();
+    app.quit();
   });
 }
