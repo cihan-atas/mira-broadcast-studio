@@ -48,6 +48,16 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
 * **Sorun:** Önizleme iframe'inin CSS Grid içinde 1920px genişlik dayatması sebebiyle pencere daraltıldığında Carmilla ve Atlas ekran dışına taşıyordu.
 * **Çözüm:** Iframe mutlak konuma (`position: absolute`) alındı, `.hero-grid` esnek `repeat(auto-fit, minmax(170px, 1fr))` yapısına kavuşturuldu. Artık tüm pencere boyutlarında 5 şampiyon da eksiksiz ve dengeli görüntülenir.
 
+### ✅ Aşama 6: Profesyonel Galeri Sistemi (Kendi Galerim, Ana Galeri & Boş Tuval Stüdyosu)
+* **Açılışta Temiz Başlangıç (Standby Modu):** Uygulama ilk açıldığında sahneler doğrudan hazır ve aktif gelmez; kullanıcı **"🗂️ Kendi Galerim"** sekmesinde temiz bir yayın masasıyla ve sağ monitörde **"Yayın Masanız Hazır (Standby)"** ekranıyla karşılanır.
+* **🏪 Ana Galeri (Uygulama Mağazası - 20 Şablon):**
+  * **5 Şampiyon Sahne Paketi:** Vexana, Zetian, Nana, Carmilla, Atlas.
+  * **5 Yayın Akış Sahnesi:** Yayın Başlıyor, Just Chatting, Kısa Mola (BRB), Yayın Bitti, PC Oyun Sahnesi.
+  * **6 Modüler Kart & Widget:** Hero Vitrin Kartı, Neon Kamera Çerçevesi, Sosyal Medya Kartı, 4'lü Skill Rehberi Kartı, Now Playing Müzik Kartı, Canlı Takipçi Hedef Barı.
+  * **4 Canlı Alert Şablonu:** Yeni Takipçi, VIP Abone, Bağış/Destek, TikTok Hediye.
+* **🗂️ Kendi Galerim & Özelleştirme (Edit):** Kullanıcı Ana Galeri'den beğendiği şablonları kendi galerisine kaydedebilir (`user-gallery.json`), **"✏️ Düzenle"** ile başlıklarını, yayıncı adını, renk paletini, sosyal medya hesaplarını ve görünür modüllerini kendine göre değiştirebilir ve **"▶️ Yayına Ver"** ile tek tıkla yayına alabilir.
+* **🎨 Boş Tuval (1920×1080 Blank Canvas Builder):** Kullanıcı sıfırdan boş bir 1920×1080 tuval açarak istediği modülleri (Oyun çerçevesi, Kamera, Vitrin, Chat, Müzik, Hedef, Yetenekler, Özel Duyuru Kartı) açıp kapatabilir, ekrandaki konumlarını (`Sol Üst`, `Sağ Alt`, `Alt Orta` vb.) ve neon renklerini seçerek tamamen kendine özgü sahneler oluşturabilir ([`custom-overlay.html`](file:///home/zeus/Desktop/yayın/custom-overlay.html)).
+
 ---
 
 ## 💻 3. Çift İşletim Sistemi (Linux & Windows) Mimarisi

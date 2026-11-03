@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Mira Studio — Özel Tuval & Modüler Overlay</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #a855f7;
+      --primary-glow: rgba(168, 85, 247, 0.55);
+      --secondary-color: #10b981;
+      --glass-bg: rgba(13, 15, 24, 0.9);
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+    }
+
+    .overlay-canvas {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+
+    /* Arka Plan Temaları */
+    .canvas-bg-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      transition: all 0.4s ease;
+    }
+    .canvas-bg-layer.bg-transparent {
+      background: radial-gradient(circle at 50% 50%, rgba(15, 18, 30, 0.35), rgba(8, 10, 16, 0.78));
+    }
+    .canvas-bg-layer.bg-nebula {
+      background:
+        radial-gradient(circle at 18% 22%, var(--primary-glow), transparent 45%),
+        radial-gradient(circle at 82% 78%, rgba(16, 185, 129, 0.28), transparent 48%),
+        linear-gradient(135deg, #070910 0%, #111526 50%, #090b12 100%);
+    }
+    .canvas-bg-layer.bg-cybergrid {
+      background-color: #080b12;
+      background-image:
+        linear-gradient(rgba(168, 85, 247, 0.09) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(168, 85, 247, 0.09) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .canvas-bg-layer.bg-darkglass {
+      background: linear-gradient(180deg, rgba(10, 12, 20, 0.92), rgba(5, 7, 12, 0.96));
+    }
+
+    #custom-particles {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* =============================================
+       STANDBY EKRANI (Başlangıçta Sahne Seçilmediğinde)
+       ============================================= */
+    .standby-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(168, 85, 247, 0.22), transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(255, 105, 180, 0.14), transparent 50%),
+        linear-gradient(160deg, #07090f 0%, #0e121d 55%, #07090f 100%);
+      text-align: center;
+      padding: 60px;
+    }
+    .standby-screen.active {
+      display: flex;
+    }
+    .standby-card {
+      max-width: 960px;
+      background: rgba(16, 20, 32, 0.88);
+      border: 2px solid rgba(168, 85, 247, 0.45);
+      border-radius: 28px;
+      padding: 56px 64px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.75), 0 0 50px rgba(168, 85, 247, 0.2);
+      backdrop-filter: blur(20px);
+    }
+    .standby-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px;
+      border-radius: 999px;
+      background: rgba(168, 85, 247, 0.16);
+      border: 1px solid rgba(168, 85, 247, 0.5);
+      color: #d8b4fe;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      margin-bottom: 24px;
+    }
+    .standby-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 44px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      text-shadow: 0 0 28px rgba(168, 85, 247, 0.6);
+    }
+    .standby-sub {
+      font-size: 19px;
+      line-height: 1.65;
+      color: #cbd5e1;
+      margin-bottom: 38px;
+    }
+    .standby-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      text-align: left;
+    }
+    .standby-step-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 22px;
+    }
+    .standby-step-icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+    .standby-step-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .standby-step-desc {
+      font-size: 13.5px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    /* =============================================
+       ÜST HUD BARI (TOP BAR)
+       ============================================= */
+    .custom-top-bar {
+      position: absolute;
+      top: 18px;
+      left: 28px;
+      right: 28px;
+      height: 64px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: var(--glass-bg);
+      border: 1.5px solid var(--primary-color);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 22px var(--primary-glow);
+      backdrop-filter: blur(16px);
+    }
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--secondary-color);
+      box-shadow: 0 0 12px var(--secondary-color);
+      animation: pulseDot 1.6s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.25); opacity: 0.65; }
+    }
+    .brand-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+    .brand-sub {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--secondary-color);
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .top-stats-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .top-stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12.5px;
+    }
+    .top-stat-label {
+      color: #94a3b8;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    .top-stat-val {
+      color: #fff;
+      font-weight: 800;
+    }
+    .top-clock-box {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary-color);
+    }
+
+    /* =============================================
+       POZİSYON SLOT SİSTEMİ (9 YERLEŞİM NOKTASI)
+       ============================================= */
+    .pos-slot {
+      position: absolute;
+      z-index: 15;
+      transition: all 0.3s ease;
+    }
+    .pos-top-left      { top: 100px; left: 28px; }
+    .pos-top-center    { top: 100px; left: 50%; transform: translateX(-50%); }
+    .pos-top-right     { top: 100px; right: 28px; }
+    .pos-middle-left   { top: 410px; left: 28px; }
+    .pos-center        { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .pos-middle-right  { top: 410px; right: 28px; }
+    .pos-bottom-left   { bottom: 28px; left: 28px; }
+    .pos-bottom-center { bottom: 28px; left: 50%; transform: translateX(-50%); }
+    .pos-bottom-right  { bottom: 28px; right: 28px; }
+
+    /* =============================================
+       ORTA 16:9 OYUN ÇERÇEVESİ
+       ============================================= */
+    .custom-game-frame {
+      position: absolute;
+      top: 100px;
+      left: 355px;
+      width: 1170px;
+      height: 675px;
+      border-radius: 18px;
+      border: 2px solid var(--primary-color);
+      box-shadow: 0 0 35px var(--primary-glow);
+      background: rgba(8, 10, 16, 0.25);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .custom-game-header {
+      height: 36px;
+      background: rgba(12, 15, 24, 0.92);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--primary-color);
+    }
+    .custom-game-cutout {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .custom-guide-box {
+      padding: 20px 32px;
+      border-radius: 16px;
+      border: 1.5px dashed var(--primary-color);
+      background: rgba(10, 12, 20, 0.72);
+      color: #e2e8f0;
+      font-size: 14px;
+    }
+
+    /* =============================================
+       MODÜLER KART STİLLERİ
+       ============================================= */
+    .mod-card {
+      background: var(--glass-bg);
+      border: 2px solid var(--primary-color);
+      border-radius: 18px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.65), 0 0 24px var(--primary-glow);
+      backdrop-filter: blur(16px);
+      padding: 18px;
+      color: #fff;
+    }
+
+    /* 1. Vitrin Kartı */
+    .mod-showcase-card {
+      width: 310px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mod-showcase-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .mod-showcase-avatar {
+      width: 68px;
+      height: 68px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 2px solid var(--primary-color);
+    }
+    .mod-showcase-tag {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+    }
+    .mod-showcase-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+    }
+    .mod-showcase-sub {
+      font-size: 12px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+    .mod-badges-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .mod-badge-pill {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--primary-color);
+      color: #fff;
+    }
+    .mod-showcase-quote {
+      font-size: 12px;
+      font-style: italic;
+      color: #cbd5e1;
+      border-left: 3px solid var(--secondary-color);
+      padding-left: 10px;
+      line-height: 1.45;
+    }
+
+    /* 2. Webcam Kartı */
+    .mod-webcam-card {
+      width: 310px;
+      height: 230px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .mod-webcam-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary-color);
+    }
+    .mod-webcam-center {
+      flex: 1;
+      margin: 10px 0;
+      border: 1.5px dashed rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.35);
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+    .mod-webcam-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+
+    /* 3. Sosyal Medya Kartı */
+    .mod-social-card {
+      width: 310px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .mod-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--primary-color);
+    }
+    .mod-social-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    /* 4. Canlı Chat Paneli */
+    .mod-chat-card {
+      width: 340px;
+      height: 675px;
+      display: flex;
+      flex-direction: column;
+    }
+    .mod-chat-feed {
+      flex: 1;
+      margin-top: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+    .mod-chat-msg {
+      padding: 8px 11px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border-left: 3px solid var(--primary-color);
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+    .mod-chat-user {
+      font-weight: 800;
+      color: var(--secondary-color);
+      margin-right: 6px;
+    }
+
+    /* 5. Müzik & Ekolayzer Kartı */
+    .mod-music-card {
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .mod-viz-bars {
+      height: 36px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .mod-viz-bar {
+      flex: 1;
+      background: linear-gradient(180deg, var(--secondary-color), var(--primary-color));
+      border-radius: 4px;
+      height: 30%;
+      transition: height 0.1s ease;
+    }
+    .mod-song-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 6. Hedef Barı Kartı */
+    .mod-goal-card {
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mod-goal-track {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .mod-goal-fill {
+      height: 100%;
+      width: 75%;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    /* 7. Yetenek Rehberi Kartı (Skills) */
+    .mod-skills-card {
+      width: 790px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mod-skills-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .mod-skill-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .mod-skill-name {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--secondary-color);
+      margin-bottom: 4px;
+    }
+    .mod-skill-desc {
+      font-size: 11px;
+      color: #cbd5e1;
+      line-height: 1.35;
+    }
+
+    /* 8. Özel Metin / Duyuru Kartı */
+    .mod-custom-card {
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mod-custom-body {
+      font-size: 13.5px;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    /* =============================================
+       CANLI ALERT BİLDİRİM KARTI
+       ============================================= */
+    .custom-alert-layer {
+      position: absolute;
+      top: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 90;
+      pointer-events: none;
+    }
+    .custom-alert-box {
+      min-width: 480px;
+      padding: 24px 32px;
+      border-radius: 22px;
+      background: rgba(13, 15, 25, 0.96);
+      border: 2.5px solid var(--primary-color);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 40px var(--primary-glow);
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      animation: popAlertIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popAlertIn {
+      0% { transform: scale(0.7) translateY(-30px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .custom-alert-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.07);
+      border: 2px solid var(--secondary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+    .custom-alert-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--secondary-color);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .custom-alert-user {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 26px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .custom-alert-sub {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+    .custom-alert-msg {
+      margin-top: 8px;
+      font-size: 13px;
+      font-style: italic;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay-canvas" id="overlay-root">
+    <div class="canvas-bg-layer bg-transparent" id="bg-layer"></div>
+    <canvas id="custom-particles"></canvas>
+
+    <!-- 1. STANDBY EKRANI (Sahne Seçilmediğinde) -->
+    <div class="standby-screen" id="standby-screen">
+      <div class="standby-card">
+        <div class="standby-badge">✨ MİRA BROADCAST STUDIO • PROFESYONEL GALERİ SİSTEMİ</div>
+        <h1 class="standby-title">YAYIN MASANIZ HAZIR</h1>
+        <p class="standby-sub">
+          Henüz yayına verilmiş aktif bir sahne bulunmuyor.<br>
+          Kendi yayın tarzınızı oluşturmak için aşağıdaki 3 adımdan birini seçin:
+        </p>
+        <div class="standby-steps">
+          <div class="standby-step-box">
+            <div class="standby-step-icon">🗂️</div>
+            <div class="standby-step-title">1. KENDİ GALERİM</div>
+            <div class="standby-step-desc">Kaydettiğiniz sahneleri, kartları ve alertleri tek tıkla yayına verin veya kendinize göre düzenleyin.</div>
+          </div>
+          <div class="standby-step-box">
+            <div class="standby-step-icon">🏪</div>
+            <div class="standby-step-title">2. ANA GALERİ (MAĞAZA)</div>
+            <div class="standby-step-desc">Uygulamanın hazır Hero, Sahne, Kart ve Alert şablonlarını inceleyip beğendiklerinizi kendi galerinize ekleyin.</div>
+          </div>
+          <div class="standby-step-box">
+            <div class="standby-step-icon">🎨</div>
+            <div class="standby-step-title">3. BOŞ TUVAL STÜDYOSU</div>
+            <div class="standby-step-desc">1920×1080 boş tuval üzerinde istediğiniz modülleri, renkleri ve konumları seçerek sıfırdan sahne yaratın.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. DİNAMİK İÇERİK KATMANI -->
+    <div id="dynamic-stage"></div>
+
+    <!-- 3. CANLI ALERT POPUP KATMANI -->
+    <div class="custom-alert-layer" id="alert-layer"></div>
+  </div>
+
+  <script src="shared/js/auto-fit.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      const params = new URLSearchParams(window.location.search);
+      const isStandby = params.get('standby') === '1';
+      const itemId = params.get('id') || params.get('uid') || params.get('tpl');
+
+      const standbyEl = document.getElementById('standby-screen');
+      const stageEl = document.getElementById('dynamic-stage');
+      const alertLayerEl = document.getElementById('alert-layer');
+      const bgLayerEl = document.getElementById('bg-layer');
+
+      let currentItem = null;
+      let particleMode = 'soul';
+
+      // Ses Efekt Motoru
+      const SFX = {
+        ctx: null,
+        tone(freq, type, dur, delay = 0) {
+          try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!this.ctx && AudioCtx) this.ctx = new AudioCtx();
+            if (!this.ctx) return;
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+            setTimeout(() => {
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              osc.type = type;
+              osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+              gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+              osc.connect(gain);
+              gain.connect(this.ctx.destination);
+              osc.start();
+              osc.stop(this.ctx.currentTime + dur);
+            }, delay);
+          } catch (e) {}
+        },
+        play(kind) {
+          if (kind === 'sub') {
+            this.tone(440, 'triangle', 0.2, 0);
+            this.tone(554, 'triangle', 0.2, 100);
+            this.tone(659, 'triangle', 0.2, 200);
+            this.tone(880, 'triangle', 0.5, 310);
+          } else if (kind === 'donation' || kind === 'gift') {
+            this.tone(587, 'sine', 0.15, 0);
+            this.tone(740, 'sine', 0.15, 90);
+            this.tone(880, 'sine', 0.15, 180);
+            this.tone(1174, 'sine', 0.6, 270);
+          } else {
+            this.tone(523, 'sine', 0.22, 0);
+            this.tone(659, 'sine', 0.22, 120);
+            this.tone(784, 'sine', 0.42, 240);
+          }
+        }
+      };
+
+      function esc(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      // Parçacık Motoru
+      function initParticles() {
+        const canvas = document.getElementById('custom-particles');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = 1920;
+        canvas.height = 1080;
+
+        const pts = [];
+        for (let i = 0; i < 40; i++) {
+          pts.push({
+            x: Math.random() * 1920,
+            y: Math.random() * 1080,
+            r: 2.5 + Math.random() * 5,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: -0.5 - Math.random() * 0.8,
+            a: 0.2 + Math.random() * 0.6
+          });
+        }
+
+        function loop() {
+          ctx.clearRect(0, 0, 1920, 1080);
+          if (particleMode !== 'none') {
+            const pColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#a855f7';
+            pts.forEach(p => {
+              p.x += p.vx;
+              p.y += p.vy;
+              if (p.y < -20) p.y = 1100;
+              if (p.x < -20) p.x = 1940;
+              if (p.x > 1940) p.x = -20;
+              ctx.save();
+              ctx.globalAlpha = p.a;
+              ctx.fillStyle = pColor;
+              ctx.shadowBlur = 12;
+              ctx.shadowColor = pColor;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            });
+          }
+          requestAnimationFrame(loop);
+        }
+        loop();
+      }
+
+      // Kart HTML Üreticileri
+      function buildShowcaseHtml(cfg, posClass) {
+        const avatar = cfg.avatarUrl || 'kick/vexana/assets/images/portrait.jpg';
+        return `
+          <div class="pos-slot ${posClass}">
+            <div class="mod-card mod-showcase-card">
+              <div class="mod-showcase-top">
+                <img src="${esc(avatar)}" class="mod-showcase-avatar" alt="Avatar" onerror="this.src='kick/vexana/assets/images/avatar.jpg'">
+                <div>
+                  <span class="mod-showcase-tag">${esc(cfg.streamerName || 'MİRA')} VİTRİNİ</span>
+                  <div class="mod-showcase-title">${esc(cfg.title || 'ÖZEL SAHNE')}</div>
+                  <div class="mod-showcase-sub">${esc(cfg.subtitleText || 'Mythic Glory Streamer')}</div>
+                </div>
+              </div>
+              <div class="mod-badges-row">
+                <span class="mod-badge-pill">${esc(cfg.roleBadge || 'PRO STREAMER')}</span>
+                <span class="mod-badge-pill" style="border-color: var(--secondary-color);">${esc(cfg.laneBadge || 'CANLI YAYIN')}</span>
+              </div>
+              ${cfg.quote ? `<div class="mod-showcase-quote">${esc(cfg.quote)}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      function buildWebcamHtml(cfg, posClass) {
+        return `
+          <div class="pos-slot ${posClass}">
+            <div class="mod-card mod-webcam-card">
+              <div class="mod-webcam-header">
+                <span>📷 ${esc(cfg.title || 'MİRA CAM')}</span>
+                <span style="color: var(--secondary-color);">● LIVE</span>
+              </div>
+              <div class="mod-webcam-center">
+                <strong>KAMERA ALANI</strong>
+                <span style="font-size:11px; margin-top:4px;">OBS Video Yakalama Aygıtı</span>
+              </div>
+              <div class="mod-webcam-footer">
+                <span>${esc(cfg.streamerName || 'MİRA LIVE')}</span>
+                <span style="color: var(--secondary-color);">${esc(cfg.subtitleText || 'MYTHIC GLORY')}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function buildSocialHtml(cfg, posClass) {
+        return `
+          <div class="pos-slot ${posClass}">
+            <div class="mod-card mod-social-card">
+              <div class="mod-card-header">
+                <span>🌐 ${esc(cfg.title || 'SOSYAL MEDYA')}</span>
+                <span style="color: var(--secondary-color);">● AKTİF</span>
+              </div>
+              <div class="mod-social-item">🟢 <span>${esc(cfg.kickHandle || 'kick.com/mira')}</span></div>
+              <div class="mod-social-item">📱 <span>${esc(cfg.tiktokHandle || '@mira_mlbb')}</span></div>
+              <div class="mod-social-item">▶️ <span>${esc(cfg.youtubeHandle || '@mira.gaming')}</span></div>
+            </div>
+          </div>
+        `;
+      }
+
+      function buildMusicHtml(cfg, posClass) {
+        let bars = '';
+        for (let i = 0; i < 16; i++) bars += `<div class="mod-viz-bar"></div>`;
+        return `
+          <div class="pos-slot ${posClass}">
+            <div class="mod-card mod-music-card">
+              <div class="mod-card-header">
+                <span>🎵 ${esc(cfg.title || 'ŞU AN ÇALAN (NOW PLAYING)')}</span>
+                <span style="color: var(--secondary-color);">BGM</span>
+              </div>
+              <div class="mod-viz-bars" id="mod-viz-bars">${bars}</div>
+              <div class="mod-song-title" id="mod-song-title">♪ MLBB Arena - Lo-Fi Chill Beats</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function buildGoalHtml(cfg, posClass) {
+        const cur = parseInt(cfg.goalCurrent || 154, 10);
+        const tar = Math.max(1, parseInt(cfg.goalTarget || 200, 10));
+        const pct = Math.min(100, Math.round((cur / tar) * 100));
+        return `
+          <div class="pos-slot ${posClass}">
+            <div class="mod-card mod-goal-card">
+              <div class="mod-card-header">
+                <span id="custom-goal-title">🎯 ${esc(cfg.goalTitle || cfg.title || 'TAKİPÇİ HEDEFİ')}</span>
+                <span id="custom-goal-counter" style="color: var(--secondary-color);">${cur} / ${tar}</span>
+              </div>
+              <div class="mod-goal-track">
+                <div class="mod-goal-fill" id="custom-goal-fill" style="width:${pct}%;"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function buildSkillsHtml(cfg, posClass) {
+        return `
+          <div class="pos-slot ${posClass}">
+            <div class="mod-card mod-skills-card">
+              <div class="mod-card-header">
+                <span>⚡ ${esc(cfg.title || 'YETENEK & SKILL REHBERİ')}</span>
+                <span style="color: var(--secondary-color);">${esc(cfg.subtitleText || 'COMBAT DECK')}</span>
+              </div>
+              <div class="mod-skills-grid">
+                <div class="mod-skill-box">
+                  <div class="mod-skill-name">${esc(cfg.skillPassiveTitle || 'Pasif Yetenek')}</div>
+                  <div class="mod-skill-desc">${esc(cfg.skillPassiveDesc || 'Düşmanlara büyü mührü uygular.')}</div>
+                </div>
+                <div class="mod-skill-box">
+                  <div class="mod-skill-name">${esc(cfg.skill1Title || '1. Yetenek')}</div>
+                  <div class="mod-skill-desc">${esc(cfg.skill1Desc || 'Hedef yöne kitle kontrolü uygular.')}</div>
+                </div>
+                <div class="mod-skill-box">
+                  <div class="mod-skill-name">${esc(cfg.skill2Title || '2. Yetenek')}</div>
+                  <div class="mod-skill-desc">${esc(cfg.skill2Desc || 'Alan etkili yüksek büyü hasarı vurur.')}</div>
+                </div>
+                <div class="mod-skill-box">
+                  <div class="mod-skill-name">${esc(cfg.skillUltiTitle || 'Ulti Yeteneği')}</div>
+                  <div class="mod-skill-desc">${esc(cfg.skillUltiDesc || 'Savaş alanına muhafız çağırır.')}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function buildChatHtml(cfg, posClass) {
+        return `
+          <div class="pos-slot ${posClass}">
+            <div class="mod-card mod-chat-card">
+              <div class="mod-card-header">
+                <span>💬 CANLI SOHBET</span>
+                <span style="color: var(--secondary-color);">● CANLI</span>
+              </div>
+              <div class="mod-chat-feed" id="custom-chat-feed">
+                <div class="mod-chat-msg"><span class="mod-chat-user">MiraBot:</span>Canlı sohbet bağlantısı aktif!</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function buildCustomCardHtml(cfg, posClass) {
+        return `
+          <div class="pos-slot ${posClass}">
+            <div class="mod-card mod-custom-card">
+              <div class="mod-card-header">
+                <span>📌 ${esc(cfg.customCardTitle || 'DUYURU & BİLGİ')}</span>
+                <span style="color: var(--secondary-color);">● BİLGİ</span>
+              </div>
+              <div class="mod-custom-body">${esc(cfg.customCardBody || 'Yayına hoş geldiniz! Takip etmeyi unutmayın.')}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function showAlertPopup(cfg, overridePayload) {
+        const p = overridePayload || {};
+        const headerTag = p.headerTag || cfg.headerTag || 'CANLI BİLDİRİM!';
+        const user = p.username || cfg.sampleUser || 'SelinGamer';
+        const sub = p.subTitle || cfg.subTitle || 'Ailemize Hoş Geldin!';
+        const msg = p.message !== undefined ? p.message : (cfg.message || '');
+        const iconMap = { follower: '💜', sub: '🌟', donation: '💎', gift: '🌹' };
+        const icon = iconMap[cfg.alertType] || '✨';
+
+        SFX.play(cfg.soundType || cfg.alertType || 'follower');
+
+        alertLayerEl.innerHTML = `
+          <div class="custom-alert-box">
+            <div class="custom-alert-icon">${icon}</div>
+            <div>
+              <span class="custom-alert-tag">${esc(headerTag)}</span>
+              <div class="custom-alert-user">${esc(user)}</div>
+              <div class="custom-alert-sub">${esc(sub)}</div>
+              ${msg ? `<div class="custom-alert-msg">"${esc(msg)}"</div>` : ''}
+            </div>
+          </div>
+        `;
+
+        const dur = Math.max(2, parseInt(cfg.durationSec || 5, 10)) * 1000;
+        setTimeout(() => {
+          alertLayerEl.innerHTML = '';
+        }, dur);
+      }
+
+      function renderItem(item) {
+        currentItem = item;
+        if (!item) {
+          standbyEl.classList.add('active');
+          stageEl.innerHTML = '';
+          return;
+        }
+        standbyEl.classList.remove('active');
+
+        const cfg = item.config || {};
+        if (cfg.primaryColor) {
+          document.documentElement.style.setProperty('--primary-color', cfg.primaryColor);
+          document.documentElement.style.setProperty('--primary-glow', cfg.primaryColor + '88');
+        }
+        if (cfg.secondaryColor) {
+          document.documentElement.style.setProperty('--secondary-color', cfg.secondaryColor);
+        }
+
+        // Arka plan stili
+        const bgStyle = cfg.bgStyle || 'transparent';
+        bgLayerEl.className = `canvas-bg-layer bg-${bgStyle}`;
+        particleMode = cfg.showParticles === false ? 'none' : (cfg.particleType || 'soul');
+
+        // 1. Modüler Tekil Kart Modu
+        if (item.category === 'card') {
+          const posClass = `pos-${cfg.cardPosition || 'center'}`;
+          const cType = cfg.cardType || 'showcase';
+          if (cType === 'showcase') stageEl.innerHTML = buildShowcaseHtml(cfg, posClass);
+          else if (cType === 'webcam') stageEl.innerHTML = buildWebcamHtml(cfg, posClass);
+          else if (cType === 'social') stageEl.innerHTML = buildSocialHtml(cfg, posClass);
+          else if (cType === 'music') stageEl.innerHTML = buildMusicHtml(cfg, posClass);
+          else if (cType === 'goal') stageEl.innerHTML = buildGoalHtml(cfg, posClass);
+          else if (cType === 'skills') stageEl.innerHTML = buildSkillsHtml(cfg, posClass);
+          return;
+        }
+
+        // 2. Tekil Alert Şablonu Modu
+        if (item.category === 'alert') {
+          stageEl.innerHTML = `
+            <div class="pos-slot pos-bottom-center" style="opacity:0.85;">
+              <div class="mod-card" style="padding:12px 24px; font-size:13px;">
+                ⚡ <strong>${esc(item.name)}</strong> Aktif • Canlı bildirim geldiğinde veya test edildiğinde ekranda belirir.
+              </div>
+            </div>
+          `;
+          showAlertPopup(cfg);
+          return;
+        }
+
+        // 3. Boş Tuval (Blank Canvas) Tam Sahne Modu
+        let html = '';
+
+        if (cfg.showTopBar !== false) {
+          html += `
+            <div class="custom-top-bar">
+              <div class="brand-cluster">
+                <div class="brand-dot"></div>
+                <span class="brand-name">${esc(cfg.streamerName || 'MİRA')}</span>
+                <span class="brand-sub">${esc(cfg.title || 'CUSTOM STUDIO')}</span>
+              </div>
+              <div class="top-stats-row">
+                <div class="top-stat-pill">
+                  <span class="top-stat-label">SON TAKİP:</span>
+                  <span class="top-stat-val" id="custom-recent-follower">SelinGamer</span>
+                </div>
+                <div class="top-stat-pill">
+                  <span class="top-stat-label">SON ABONE:</span>
+                  <span class="top-stat-val" id="custom-recent-sub">NecroLord</span>
+                </div>
+                <div class="top-stat-pill">
+                  <span class="top-stat-label">SON DESTEK:</span>
+                  <span class="top-stat-val" id="custom-recent-donation">MiraFan (100₺)</span>
+                </div>
+              </div>
+              <div class="top-clock-box" id="custom-clock">20:00:00</div>
+            </div>
+          `;
+        }
+
+        if (cfg.showGameFrame !== false) {
+          html += `
+            <div class="custom-game-frame">
+              <div class="custom-game-header">
+                <span>🎮 ${esc(cfg.gameHeaderTitle || '16:9 CANLI OYUN EKRANI')}</span>
+                <span>1080P 60FPS PRO</span>
+              </div>
+              <div class="custom-game-cutout">
+                <div class="custom-guide-box" id="custom-guide-box">
+                  <strong>16:9 OYUN YAKALAMA ALANI</strong><br>
+                  <span>OBS Oyun Yakalama kaynağını bu çerçevenin altına yerleştirin (Gizlemek için 'H' tuşu)</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        if (cfg.showShowcase !== false) {
+          html += buildShowcaseHtml(cfg, `pos-${cfg.showcasePos || 'top-left'}`);
+        }
+        if (cfg.showSocial !== false) {
+          html += buildSocialHtml(cfg, `pos-${cfg.socialPos || 'middle-left'}`);
+        }
+        if (cfg.showWebcam !== false) {
+          html += buildWebcamHtml(cfg, `pos-${cfg.webcamPos || 'bottom-left'}`);
+        }
+        if (cfg.showChat !== false) {
+          html += buildChatHtml(cfg, `pos-${cfg.chatPos || 'top-right'}`);
+        }
+        if (cfg.showMusic !== false) {
+          html += buildMusicHtml(cfg, `pos-${cfg.musicPos || 'bottom-center'}`);
+        }
+        if (cfg.showGoal) {
+          html += buildGoalHtml(cfg, `pos-${cfg.goalPos || 'bottom-right'}`);
+        }
+        if (cfg.showSkills) {
+          html += buildSkillsHtml(cfg, `pos-${cfg.skillsPos || 'bottom-center'}`);
+        }
+        if (cfg.showCustomCard) {
+          html += buildCustomCardHtml(cfg, `pos-${cfg.customCardPos || 'bottom-right'}`);
+        }
+
+        stageEl.innerHTML = html;
+      }
+
+      // Ekolayzer ve Saat Döngüsü
+      setInterval(() => {
+        const clockEl = document.getElementById('custom-clock');
+        if (clockEl) {
+          const d = new Date();
+          clockEl.textContent = d.toTimeString().split(' ')[0];
+        }
+        const bars = document.querySelectorAll('.mod-viz-bar');
+        bars.forEach(b => {
+          b.style.height = `${15 + Math.floor(Math.random() * 85)}%`;
+        });
+      }, 150);
+
+      // H Tuşu ile Rehber Gizleme
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'h' || e.key === 'H') {
+          const g = document.getElementById('custom-guide-box');
+          if (g) g.style.display = g.style.display === 'none' ? '' : 'none';
+        }
+      });
+
+      // Canlı Olay & Güncelleme Dinleyicisi
+      function handleEvent(ev) {
+        if (!ev || typeof ev !== 'object') return;
+        if (ev.type === 'USER_ITEM_UPDATED' && ev.item) {
+          if (!itemId || itemId === ev.item.id) {
+            renderItem(ev.item);
+          }
+        } else if (ev.type === 'PREVIEW_CUSTOM_CONFIG' && ev.item) {
+          renderItem(ev.item);
+        } else if (ev.type === 'TEST_ALERT' || ev.type === 'LIVE_ALERT') {
+          const cfg = (currentItem && currentItem.config) || { alertType: ev.alertType };
+          showAlertPopup({ ...cfg, alertType: ev.alertType || cfg.alertType }, ev.payload || {});
+        } else if (ev.type === 'TEST_CHAT' || ev.type === 'CHAT_MESSAGE') {
+          const feed = document.getElementById('custom-chat-feed');
+          if (feed) {
+            const div = document.createElement('div');
+            div.className = 'mod-chat-msg';
+            div.innerHTML = `<span class="mod-chat-user">${esc(ev.username || 'İzleyici')}:</span>${esc(ev.content || ev.text || '')}`;
+            feed.appendChild(div);
+            feed.scrollTop = feed.scrollHeight;
+          }
+        } else if (ev.type === 'UPDATE_SONG' && ev.title) {
+          const sEl = document.getElementById('mod-song-title');
+          if (sEl) sEl.textContent = ev.title.startsWith('♪') ? ev.title : `♪ ${ev.title}`;
+        }
+      }
+
+      window.addEventListener('message', (e) => handleEvent(e.data));
+      try {
+        const b1 = new BroadcastChannel('kick_hero_bus');
+        b1.onmessage = (e) => handleEvent(e.data);
+        const b2 = new BroadcastChannel('kick_stream_bus');
+        b2.onmessage = (e) => handleEvent(e.data);
+      } catch (e) {}
+
+      let lastPoll = Date.now() - 3000;
+      setInterval(() => {
+        fetch(`/api/poll?since=${lastPoll}`)
+          .then(r => r.json())
+          .then(d => {
+            if (d && d.events) {
+              d.events.forEach(ev => {
+                if (ev.time > lastPoll) lastPoll = ev.time;
+                handleEvent(ev);
+              });
+            }
+          })
+          .catch(() => {});
+      }, 1000);
+
+      // Başlatma
+      initParticles();
+      if (isStandby || !itemId) {
+        standbyEl.classList.add('active');
+      } else if (itemId === 'preview_canvas') {
+        renderItem({
+          id: 'preview_canvas',
+          category: 'canvas',
+          name: 'MİRA Özel Yayın Sahnesi',
+          config: {
+            streamerName: 'MİRA',
+            title: 'MİRA LIVE',
+            subtitleText: 'Mythic Glory Streamer',
+            roleBadge: 'PRO STREAMER',
+            laneBadge: 'KICK & TIKTOK',
+            quote: '"Şafak Vadisi\'nde zafer bizim olacak!"',
+            primaryColor: '#a855f7',
+            secondaryColor: '#10b981',
+            bgStyle: 'transparent',
+            showParticles: true,
+            showTopBar: true,
+            showGameFrame: true,
+            showShowcase: true,
+            showcasePos: 'top-left',
+            showSocial: true,
+            socialPos: 'middle-left',
+            showWebcam: true,
+            webcamPos: 'bottom-left',
+            showChat: true,
+            chatPos: 'top-right',
+            showMusic: true,
+            musicPos: 'bottom-center'
+          }
+        });
+      } else {
+        fetch(`/api/gallery/item/${encodeURIComponent(itemId)}`)
+          .then(r => r.json())
+          .then(d => {
+            if (d && d.item) renderItem(d.item);
+            else if (!currentItem) standbyEl.classList.add('active');
+          })
+          .catch(() => {
+            if (!currentItem) standbyEl.classList.add('active');
+          });
+      }
+    })();
+  </script>
+</body>
+</html>

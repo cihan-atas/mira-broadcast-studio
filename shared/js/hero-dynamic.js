@@ -730,6 +730,12 @@
           const badge = eventObj.badge || (eventObj.platform ? eventObj.platform.toLowerCase() : 'sub');
           window.addCustomChatMessage(user, msg, badge);
         }
+      } else if (eventObj.type === 'USER_ITEM_UPDATED' && eventObj.item) {
+        const params = new URLSearchParams(window.location.search);
+        const currentUid = params.get('uid') || params.get('tpl');
+        if (!currentUid || currentUid === eventObj.item.id) {
+          applyUserGalleryOverrides(eventObj.item);
+        }
       }
     }
 
@@ -799,6 +805,99 @@
   }
 
   // =============================================================
+  // 10. KULLANICI GALERİSİ ÖZELLEŞTİRME MOTORU (?uid= / ?tpl=)
+  // =============================================================
+  function applyUserGalleryOverrides(item) {
+    if (!item || !item.config) return;
+    const cfg = item.config;
+
+    // 1. Renk Teması (CSS Variables)
+    if (cfg.primaryColor) {
+      document.documentElement.style.setProperty('--primary-color', cfg.primaryColor);
+      document.documentElement.style.setProperty('--primary-glow', cfg.primaryColor + '99');
+    }
+    if (cfg.secondaryColor) {
+      document.documentElement.style.setProperty('--secondary-color', cfg.secondaryColor);
+    }
+
+    // 2. Yayıncı Adı & Üst Bar
+    if (cfg.streamerName) {
+      const brandUser = document.querySelector('.hero-brand-username');
+      if (brandUser) {
+        brandUser.innerHTML = `${escapeHtml(cfg.streamerName)} <div class="hero-brand-live-dot"></div>`;
+      }
+      const camTop = document.querySelector('.hero-cam-top-badge span:last-child');
+      if (camTop) camTop.textContent = `${cfg.streamerName} CAM`;
+      const camBottom = document.querySelector('.hero-cam-username');
+      if (camBottom) camBottom.textContent = `${cfg.streamerName} LIVE`;
+    }
+
+    // 3. Şampiyon / Kart Başlıkları ve Sözü
+    if (cfg.title) {
+      const showName = document.querySelector('.hero-showcase-name');
+      if (showName) showName.textContent = cfg.title;
+      const brandSub = document.querySelector('.hero-brand-subtag');
+      if (brandSub) brandSub.textContent = `${cfg.title} • LIVE`;
+    }
+    if (cfg.subtitleText) {
+      const showTitle = document.querySelector('.hero-showcase-title');
+      if (showTitle) showTitle.textContent = cfg.subtitleText;
+    }
+    if (cfg.roleBadge) {
+      const roleEl = document.querySelector('.hero-role-pill');
+      if (roleEl) roleEl.textContent = cfg.roleBadge;
+    }
+    if (cfg.laneBadge) {
+      const laneEl = document.querySelector('.hero-lane-pill');
+      if (laneEl) laneEl.textContent = cfg.laneBadge;
+    }
+    if (cfg.quote) {
+      const quoteEl = document.querySelector('.hero-showcase-quote');
+      if (quoteEl) quoteEl.textContent = cfg.quote;
+    }
+
+    // 4. Sosyal Medya Hesapları
+    const socialUsers = document.querySelectorAll('.social-pill-compact .social-user-tag');
+    if (socialUsers.length >= 1 && cfg.kickHandle) socialUsers[0].textContent = cfg.kickHandle;
+    if (socialUsers.length >= 2 && cfg.tiktokHandle) socialUsers[1].textContent = cfg.tiktokHandle;
+    if (socialUsers.length >= 3 && cfg.youtubeHandle) socialUsers[2].textContent = cfg.youtubeHandle;
+
+    // 5. Hedef Çubuğu
+    if (cfg.goalTitle || cfg.goalTarget) {
+      updateGoalDisplay({
+        title: cfg.goalTitle || currentGoal.title,
+        target: cfg.goalTarget ? parseInt(cfg.goalTarget, 10) : currentGoal.target
+      });
+    }
+
+    // 6. Modül Görünürlük Kontrolleri (Aç/Kapa)
+    const toggleEl = (sel, show) => {
+      const el = document.querySelector(sel);
+      if (el && show !== undefined) el.style.display = show ? '' : 'none';
+    };
+    toggleEl('.top-hero-bar', cfg.showTopBar);
+    toggleEl('.hero-webcam-bottom-left', cfg.showWebcam);
+    toggleEl('.hero-chat-panel', cfg.showChat);
+    toggleEl('.hero-showcase-card', cfg.showShowcase);
+    toggleEl('.hero-social-card', cfg.showSocial);
+    toggleEl('.deck-audio-card', cfg.showMusic);
+    toggleEl('.deck-skills-card', cfg.showSkills);
+    toggleEl('#hero-particles', cfg.showParticles);
+  }
+
+  function initUserGalleryCustomization() {
+    const params = new URLSearchParams(window.location.search);
+    const itemId = params.get('uid') || params.get('tpl');
+    if (!itemId) return;
+    fetch(`/api/gallery/item/${encodeURIComponent(itemId)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.item) applyUserGalleryOverrides(d.item);
+      })
+      .catch(() => {});
+  }
+
+  // =============================================================
   // BAŞLATMA DÖNGÜSÜ
   // =============================================================
   document.addEventListener('DOMContentLoaded', () => {
@@ -809,6 +908,7 @@
     initRealTimeMusicSync();
     initEventBus();
     initKeyboardControls();
+    initUserGalleryCustomization();
     updateGoalDisplay(currentGoal);
 
     const savedFollower = localStorage.getItem('recent_follower');

@@ -129,5 +129,82 @@ window.OVERLAY_CONFIG = {
   window.addEventListener('load', applyAutoFit);
   setTimeout(applyAutoFit, 60);
   setTimeout(applyAutoFit, 200);
+
+  // =============================================================
+  // KULLANICI GALERİSİ SAHNE ÖZELLEŞTİRME MOTORU (?uid= / ?tpl=)
+  // =============================================================
+  function applySceneGalleryOverrides(item) {
+    if (!item || !item.config) return;
+    const cfg = item.config;
+
+    if (cfg.primaryColor) {
+      document.documentElement.style.setProperty('--primary-color', cfg.primaryColor);
+      document.documentElement.style.setProperty('--pink-neon', cfg.primaryColor);
+    }
+    if (cfg.secondaryColor) {
+      document.documentElement.style.setProperty('--secondary-color', cfg.secondaryColor);
+      document.documentElement.style.setProperty('--purple-glow', cfg.secondaryColor);
+    }
+
+    if (cfg.title) {
+      const titleEl = document.querySelector('.scene-title') || document.querySelector('.chatting-header-title');
+      if (titleEl) titleEl.textContent = cfg.title;
+    }
+    if (cfg.subtitleText) {
+      const subEl = document.querySelector('.scene-subtitle') || document.querySelector('.chatting-header-sub');
+      if (subEl) subEl.textContent = cfg.subtitleText;
+    }
+
+    const socialEls = document.querySelectorAll('.scene-social-item span:last-child, .scene-social-item span');
+    if (socialEls.length >= 1 && cfg.kickHandle) {
+      const kEl = document.querySelector('.bind-kick-channel');
+      if (kEl) kEl.textContent = cfg.kickHandle;
+    }
+
+    const toggleEl = (sel, show) => {
+      const el = document.querySelector(sel);
+      if (el && show !== undefined) el.style.display = show ? '' : 'none';
+    };
+    toggleEl('.scene-chat-col', cfg.showChat);
+    toggleEl('.scene-music-ticker', cfg.showMusic);
+    toggleEl('.scene-socials', cfg.showSocial);
+  }
+
+  function initSceneGalleryCustomization() {
+    const params = new URLSearchParams(window.location.search);
+    const itemId = params.get('uid') || params.get('tpl');
+    if (itemId) {
+      fetch(`/api/gallery/item/${encodeURIComponent(itemId)}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.item) applySceneGalleryOverrides(d.item);
+        })
+        .catch(() => {});
+    }
+
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'USER_ITEM_UPDATED' && e.data.item) {
+        if (!itemId || itemId === e.data.item.id) {
+          applySceneGalleryOverrides(e.data.item);
+        }
+      }
+    });
+    try {
+      const bus = new BroadcastChannel('kick_stream_bus');
+      bus.onmessage = (e) => {
+        if (e.data && e.data.type === 'USER_ITEM_UPDATED' && e.data.item) {
+          if (!itemId || itemId === e.data.item.id) {
+            applySceneGalleryOverrides(e.data.item);
+          }
+        }
+      };
+    } catch (e) {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSceneGalleryCustomization);
+  } else {
+    initSceneGalleryCustomization();
+  }
 })();
 

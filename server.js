@@ -181,6 +181,532 @@ function handleTiktokConnect(username, callback) {
   activeTiktokConn = conn;
 }
 
+// ==========================================
+// 0.3 ANA GALERİ ŞABLON KATALOĞU & KULLANICI GALERİSİ YÖNETİMİ
+// ==========================================
+const USER_GALLERY_PATH = path.join(__dirname, 'user-gallery.json');
+
+const APP_GALLERY_CATALOG = [
+  // --- 1. ŞAMPİYON SAHNE PAKETLERİ (HERO OVERLAYS) ---
+  {
+    id: 'tpl_hero_vexana',
+    category: 'hero',
+    name: 'Vexana — Necrokeep Sovereign',
+    subtitle: 'Gotik Mor & Zümrüt Ruh Temalı 16:9 Tam Sahne Paketi',
+    icon: '💀',
+    badge: 'BÜYÜCÜ • MID LANE',
+    previewImg: 'kick/vexana/assets/images/avatar.jpg',
+    basePath: '{platform}/vexana/in-game.html',
+    obsKey: 'vexana',
+    config: {
+      heroKey: 'vexana',
+      title: 'VEXANA',
+      streamerName: 'MİRA',
+      roleBadge: 'BÜYÜCÜ (MAGE)',
+      laneBadge: 'MID LANE',
+      subtitleText: 'Necrokeep Sovereign',
+      quote: '"Şafak Vadisi\'nde dirilen ruhlar kaderinizi mühürleyecek!"',
+      primaryColor: '#a855f7',
+      secondaryColor: '#10b981',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      goalTitle: 'TAKİPÇİ HEDEFİ',
+      goalTarget: 200,
+      showTopBar: true,
+      showWebcam: true,
+      showChat: true,
+      showShowcase: true,
+      showSocial: true,
+      showMusic: true,
+      showSkills: true,
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_hero_zetian',
+    category: 'hero',
+    name: 'Zetian — Celestial Empress',
+    subtitle: 'İmparatoriçe Altın & Kızıl Anka Temalı 16:9 Tam Sahne Paketi',
+    icon: '👑',
+    badge: 'BÜYÜCÜ • IMPERIAL MID',
+    previewImg: 'kick/zetian/assets/images/avatar.jpg',
+    basePath: '{platform}/zetian/in-game.html',
+    obsKey: 'zetian',
+    config: {
+      heroKey: 'zetian',
+      title: 'ZETIAN',
+      streamerName: 'MİRA',
+      roleBadge: 'BURST MAGE',
+      laneBadge: 'IMPERIAL MID',
+      subtitleText: 'Celestial Empress',
+      quote: '"Göklerin iradesi ve Anka\'nın ateşi önünde diz çökün!"',
+      primaryColor: '#ffd700',
+      secondaryColor: '#ef4444',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      goalTitle: 'TAKİPÇİ HEDEFİ',
+      goalTarget: 200,
+      showTopBar: true,
+      showWebcam: true,
+      showChat: true,
+      showShowcase: true,
+      showSocial: true,
+      showMusic: true,
+      showSkills: true,
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_hero_nana',
+    category: 'hero',
+    name: 'Nana — Sweet Leonin Mage',
+    subtitle: 'Pastel Pembe & Gökyüzü Mavisi Molina Temalı 16:9 Tam Sahne Paketi',
+    icon: '🐾',
+    badge: 'BÜYÜCÜ / DESTEK',
+    previewImg: 'kick/nana/assets/images/avatar.jpg',
+    basePath: '{platform}/nana/in-game.html',
+    obsKey: 'nana',
+    config: {
+      heroKey: 'nana',
+      title: 'NANA',
+      streamerName: 'MİRA',
+      roleBadge: 'MAGE / SUPPORT',
+      laneBadge: 'ROAM / MID',
+      subtitleText: 'Sweet Leonin Spirit',
+      quote: '"Molina seni yakalarsa sevimli bir پامuk şekere dönüşürsün!"',
+      primaryColor: '#ff85a2',
+      secondaryColor: '#60a5fa',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      goalTitle: 'TAKİPÇİ HEDEFİ',
+      goalTarget: 200,
+      showTopBar: true,
+      showWebcam: true,
+      showChat: true,
+      showShowcase: true,
+      showSocial: true,
+      showMusic: true,
+      showSkills: true,
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_hero_carmilla',
+    category: 'hero',
+    name: 'Carmilla — Shadow of Twilight',
+    subtitle: 'Kan Kırmızısı & Gümüş Gotik Gül Temalı 16:9 Tam Sahne Paketi',
+    icon: '🩸',
+    badge: 'TANK / DESTEK • ROAM',
+    previewImg: 'kick/carmilla/assets/images/avatar.jpg',
+    basePath: '{platform}/carmilla/in-game.html',
+    obsKey: 'carmilla',
+    config: {
+      heroKey: 'carmilla',
+      title: 'CARMILLA',
+      streamerName: 'MİRA',
+      roleBadge: 'TANK / SUPPORT',
+      laneBadge: 'ROAMER',
+      subtitleText: 'Shadow of Twilight',
+      quote: '"Kan Bağı kurulduğunda kaderimiz ve acımız bir olur!"',
+      primaryColor: '#e11d48',
+      secondaryColor: '#94a3b8',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      goalTitle: 'TAKİPÇİ HEDEFİ',
+      goalTarget: 200,
+      showTopBar: true,
+      showWebcam: true,
+      showChat: true,
+      showShowcase: true,
+      showSocial: true,
+      showMusic: true,
+      showSkills: true,
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_hero_atlas',
+    category: 'hero',
+    name: 'Atlas — Ocean Gladiator',
+    subtitle: 'Okyanus Turkuazı & Derin Deniz Neon Temalı 16:9 Tam Sahne Paketi',
+    icon: '⚓',
+    badge: 'TANK • INITIATÖR',
+    previewImg: 'kick/atlas/assets/images/avatar.jpg',
+    basePath: '{platform}/atlas/in-game.html',
+    obsKey: 'atlas',
+    config: {
+      heroKey: 'atlas',
+      title: 'ATLAS',
+      streamerName: 'MİRA',
+      roleBadge: 'TANK / INITIATOR',
+      laneBadge: 'ABYSSAL ROAM',
+      subtitleText: 'Ocean Gladiator',
+      quote: '"Derin okyanusun zincirlerinden kimse kaçamaz!"',
+      primaryColor: '#00f5d4',
+      secondaryColor: '#38bdf8',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      goalTitle: 'TAKİPÇİ HEDEFİ',
+      goalTarget: 200,
+      showTopBar: true,
+      showWebcam: true,
+      showChat: true,
+      showShowcase: true,
+      showSocial: true,
+      showMusic: true,
+      showSkills: true,
+      showParticles: true
+    }
+  },
+
+  // --- 2. YAYIN AKIŞ SAHNELERİ (STREAM SCENES) ---
+  {
+    id: 'tpl_scene_starting',
+    category: 'scene',
+    name: 'Yayın Başlıyor + Canlı Chat',
+    subtitle: '5 Dakikalık Geri Sayım Sayacı, Müzik Ticker ve Sağda Canlı Sohbet Paneli',
+    icon: '⏳',
+    badge: 'BAŞLANGIÇ SAHNESİ',
+    basePath: '{platform}/sahneler/1-yayin-basliyor.html',
+    obsKey: '1-yayin-basliyor.html',
+    config: {
+      sceneKey: 'starting',
+      title: 'YAYIN BAŞLIYOR',
+      subtitleText: 'ŞAFAK VADİSİ\'NE İNİŞ İÇİN HAZIRLANIN...',
+      countdownMinutes: 5,
+      primaryColor: '#ff69b4',
+      secondaryColor: '#a855f7',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      showChat: true,
+      showMusic: true,
+      showSocial: true
+    }
+  },
+  {
+    id: 'tpl_scene_chatting',
+    category: 'scene',
+    name: 'Just Chatting (Tam Ekran Kamera + Chat)',
+    subtitle: 'Geniş Kamera Çerçevesi, Sosyal Medya Barı ve Yan Canlı Sohbet Paneli',
+    icon: '💬',
+    badge: 'SOHBET SAHNESİ',
+    basePath: '{platform}/sahneler/2-sohbet.html',
+    obsKey: '2-sohbet.html',
+    config: {
+      sceneKey: 'chatting',
+      title: 'CANLI SOHBET & ISINMA',
+      subtitleText: 'MİRA • MYTHIC GLORY STREAM',
+      primaryColor: '#ff69b4',
+      secondaryColor: '#a855f7',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      showWebcam: true,
+      showChat: true,
+      showSocial: true
+    }
+  },
+  {
+    id: 'tpl_scene_brb',
+    category: 'scene',
+    name: 'Kısa Mola (BRB) + Canlı Chat',
+    subtitle: 'Yayın Sırasında Kısa Mola Kartı, Durum Rozeti ve Canlı Sohbet Akışı',
+    icon: '☕',
+    badge: 'MOLA SAHNESİ',
+    basePath: '{platform}/sahneler/3-mola.html',
+    obsKey: '3-mola.html',
+    config: {
+      sceneKey: 'brb',
+      title: 'KISA BİR MOLA',
+      subtitleText: 'HEMEN DÖNÜYORUM • AYRILMAYIN!',
+      primaryColor: '#ff69b4',
+      secondaryColor: '#10b981',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      showChat: true,
+      showMusic: true,
+      showSocial: true
+    }
+  },
+  {
+    id: 'tpl_scene_ending',
+    category: 'scene',
+    name: 'Yayın Bitti (Ending) + Canlı Chat',
+    subtitle: 'Yayın Sonu Teşekkür Kartı, Sosyal Medya Hesapları ve Sohbet Paneli',
+    icon: '🎬',
+    badge: 'KAPANIŞ SAHNESİ',
+    basePath: '{platform}/sahneler/4-yayin-bitti.html',
+    obsKey: '4-yayin-bitti.html',
+    config: {
+      sceneKey: 'ending',
+      title: 'YAYIN SONA ERDİ',
+      subtitleText: 'İZLEDİĞİNİZ VE DESTEK OLDUĞUNUZ İÇİN TEŞEKKÜRLER! 💖',
+      primaryColor: '#ff69b4',
+      secondaryColor: '#ffd700',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      showChat: true,
+      showSocial: true
+    }
+  },
+  {
+    id: 'tpl_scene_pc',
+    category: 'scene',
+    name: 'PC Oyun Sahnesi (Minimalist)',
+    subtitle: 'Tam Ekran PC & Emülatör Oyunları İçin Minimalist Üst Bar ve Kamera',
+    icon: '🖥️',
+    badge: 'PC / GENEL OYUN',
+    basePath: '{platform}/sahneler/oyun-pc.html',
+    obsKey: 'oyun-pc.html',
+    config: {
+      sceneKey: 'pc',
+      title: 'MİRA LIVE',
+      subtitleText: 'PRO GAMING STREAM',
+      primaryColor: '#ff69b4',
+      secondaryColor: '#53fc18',
+      showWebcam: true,
+      showTopBar: true,
+      showGoal: true
+    }
+  },
+
+  // --- 3. MODÜLER KARTLAR & WIDGET'LAR (STANDALONE CARDS) ---
+  {
+    id: 'tpl_card_showcase',
+    category: 'card',
+    name: 'Hero & Yayıncı Vitrin Kartı',
+    subtitle: 'Portre Görseli, Rol Rozetleri ve Özel Söz İçeren Şeffaf OBS Kartı',
+    icon: '🃏',
+    badge: 'MODÜLER KART',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'showcase',
+      title: 'VEXANA',
+      streamerName: 'MİRA',
+      subtitleText: 'Necrokeep Sovereign',
+      roleBadge: 'BÜYÜCÜ (MAGE)',
+      laneBadge: 'MID LANE',
+      quote: '"Şafak Vadisi\'nde dirilen ruhlar kaderinizi mühürleyecek!"',
+      avatarUrl: 'kick/vexana/assets/images/portrait.jpg',
+      primaryColor: '#a855f7',
+      secondaryColor: '#10b981',
+      cardPosition: 'center'
+    }
+  },
+  {
+    id: 'tpl_card_webcam',
+    category: 'card',
+    name: 'Neon Kamera Çerçevesi (Webcam)',
+    subtitle: 'Kulak/Taç Süslemeli, Yayıncı İsim ve Rütbe Etiketli Bağımsız Kamera Çerçevesi',
+    icon: '📷',
+    badge: 'WEBCAM WIDGET',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'webcam',
+      title: 'MİRA CAM',
+      streamerName: 'MİRA LIVE',
+      subtitleText: 'MYTHIC GLORY',
+      primaryColor: '#a855f7',
+      secondaryColor: '#ffd700',
+      cardPosition: 'bottom-left'
+    }
+  },
+  {
+    id: 'tpl_card_social',
+    category: 'card',
+    name: 'Sosyal Medya & Topluluk Kartı',
+    subtitle: 'Kick, TikTok ve YouTube Hesaplarını Gösteren Kompakt Neon Kart',
+    icon: '🌐',
+    badge: 'SOSYAL KART',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'social',
+      title: 'SOSYAL MEDYA & TOPLULUK',
+      kickHandle: 'kick.com/mira',
+      tiktokHandle: '@mira_mlbb',
+      youtubeHandle: '@mira.gaming',
+      primaryColor: '#a855f7',
+      secondaryColor: '#53fc18',
+      cardPosition: 'center'
+    }
+  },
+  {
+    id: 'tpl_card_skills',
+    category: 'card',
+    name: '4\'lü Skill & Yetenek Rehberi Kartı',
+    subtitle: 'Pasif, Skill 1, Skill 2 ve Ulti Açıklamalarını Gösteren Geniş Bilgi Masası',
+    icon: '⚡',
+    badge: 'YETENEK REHBERİ',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'skills',
+      title: 'ŞAMPİYON YETENEK REHBERİ',
+      subtitleText: 'ŞAFAK VADİSİ COMBAT',
+      skillPassiveTitle: 'Çürüyen Büyü (Pasif)',
+      skillPassiveDesc: 'Düşmanlara lanet uygular, katledilen birimler patlayarak büyü hasarı verir.',
+      skill1Title: 'Ölümcül Pençe (Skill 1)',
+      skill1Desc: 'Hayalet pençesi fırlatır ve isabet alan hedefi korkutur (CC).',
+      skill2Title: 'Lanetli Patlama (Skill 2)',
+      skill2Desc: 'Hedef alana gölge büyüsü mühürler ve devasa alan hasarı vurur.',
+      skillUltiTitle: 'Ölümsüz Muhafız (Ulti)',
+      skillUltiDesc: 'Devasa muhafız çağırarak rakipleri havaya savurur ve 15 sn savaşır.',
+      primaryColor: '#a855f7',
+      secondaryColor: '#ffd700',
+      cardPosition: 'bottom-center'
+    }
+  },
+  {
+    id: 'tpl_card_music',
+    category: 'card',
+    name: 'Now Playing & Ses Dalgası Kartı',
+    subtitle: 'Tuna / Spotify Canlı Şarkı Adı ve 16 Çubuklu Dinamik Ekolayzer Kartı',
+    icon: '🎵',
+    badge: 'MÜZİK WIDGET',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'music',
+      title: 'ŞU AN ÇALAN (NOW PLAYING)',
+      subtitleText: '48kHz HD Stereo • Canlı Yayın Fon Müziği',
+      primaryColor: '#a855f7',
+      secondaryColor: '#10b981',
+      cardPosition: 'bottom-left'
+    }
+  },
+  {
+    id: 'tpl_card_goal',
+    category: 'card',
+    name: 'Canlı Takipçi & Bağış Hedef Barı',
+    subtitle: 'Otomatik Dolum Efektli ve Yüzde Göstergeli Şeffaf Hedef Çubuğu',
+    icon: '🎯',
+    badge: 'HEDEF WIDGET',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'goal',
+      title: 'TAKİPÇİ HEDEFİ',
+      goalCurrent: 154,
+      goalTarget: 200,
+      primaryColor: '#a855f7',
+      secondaryColor: '#10b981',
+      cardPosition: 'top-right'
+    }
+  },
+
+  // --- 4. CANLI ALERT & BİLDİRİM ŞABLONLARI (ALERTS) ---
+  {
+    id: 'tpl_alert_follower',
+    category: 'alert',
+    name: 'Yeni Takipçi Alert Şablonu',
+    subtitle: 'Takipçi Geldiğinde Ses Efektli ve Neon Parlamalı Kutlama Kartı',
+    icon: '💜',
+    badge: 'TAKİPÇİ ALERTİ',
+    basePath: 'custom-overlay.html',
+    config: {
+      alertType: 'follower',
+      headerTag: 'YENİ TAKİPÇİ!',
+      sampleUser: 'SelinGamer',
+      subTitle: 'Ailemize Hoş Geldin!',
+      message: 'Şafak Vadisi\'ne katıldığın için teşekkürler!',
+      soundType: 'follower',
+      durationSec: 5,
+      primaryColor: '#a855f7',
+      secondaryColor: '#10b981'
+    }
+  },
+  {
+    id: 'tpl_alert_sub',
+    category: 'alert',
+    name: 'Yeni Abone (VIP Sub) Alert Şablonu',
+    subtitle: 'Kick/TikTok Aboneliğinde Çalan Fanfar Sesli Özel Bildirim',
+    icon: '🌟',
+    badge: 'ABONE ALERTİ',
+    basePath: 'custom-overlay.html',
+    config: {
+      alertType: 'sub',
+      headerTag: 'YENİ VIP ABONE!',
+      sampleUser: 'NecroLord',
+      subTitle: '1. Ay VIP Aboneliği Başlattı!',
+      message: 'Harika yayınlar, tam destek!',
+      soundType: 'sub',
+      durationSec: 5,
+      primaryColor: '#53fc18',
+      secondaryColor: '#ffd700'
+    }
+  },
+  {
+    id: 'tpl_alert_donation',
+    category: 'alert',
+    name: 'Bağış & Destek Alert Şablonu',
+    subtitle: 'Bağış Geldiğinde Tutar ve İzleyici Mesajını Gösteren Altın Bildirim',
+    icon: '💎',
+    badge: 'BAĞIŞ ALERTİ',
+    basePath: 'custom-overlay.html',
+    config: {
+      alertType: 'donation',
+      headerTag: 'BAĞIŞ / DESTEK!',
+      sampleUser: 'MiraFan_01',
+      amountText: '250 ₺',
+      subTitle: '250 ₺ Bağış Yaptı!',
+      message: 'Vexana komboların efsane, başarılar!',
+      soundType: 'donation',
+      durationSec: 6,
+      primaryColor: '#ffd700',
+      secondaryColor: '#ef4444'
+    }
+  },
+  {
+    id: 'tpl_alert_gift',
+    category: 'alert',
+    name: 'TikTok Hediye Alert Şablonu',
+    subtitle: 'TikTok Canlı Yayınında Gül, Aslan veya Elmas Geldiğinde Çıkan Özel Alert',
+    icon: '🌹',
+    badge: 'TIKTOK HEDİYE',
+    basePath: 'custom-overlay.html',
+    config: {
+      alertType: 'gift',
+      headerTag: 'TIKTOK HEDİYESİ!',
+      sampleUser: 'Elif_MLBB',
+      giftName: 'Gül Kutusu (x25)',
+      subTitle: 'Gül Kutusu (x25) Gönderdi! 🌹',
+      message: 'TikTok Live üzerinden hediye gönderdi!',
+      soundType: 'donation',
+      durationSec: 5,
+      primaryColor: '#00f2fe',
+      secondaryColor: '#ff0050'
+    }
+  }
+];
+
+function loadUserGallery() {
+  if (!fs.existsSync(USER_GALLERY_PATH)) {
+    return [];
+  }
+  try {
+    const raw = fs.readFileSync(USER_GALLERY_PATH, 'utf-8');
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveUserGallery(items) {
+  try {
+    fs.writeFileSync(USER_GALLERY_PATH, JSON.stringify(items, null, 2), 'utf-8');
+    return true;
+  } catch (e) {
+    console.error('[GALLERY] Kaydetme hatasi:', e.message);
+    return false;
+  }
+}
+
 const MIME_TYPES = {
   '.html': 'text/html; charset=UTF-8',
   '.css': 'text/css; charset=UTF-8',
@@ -196,7 +722,7 @@ const MIME_TYPES = {
 
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -482,6 +1008,160 @@ const server = http.createServer((req, res) => {
       }
     });
     return;
+  }
+
+  // ==========================================
+  // 2.9 API: ANA GALERİ & KULLANICI GALERİSİ (CRUD)
+  // ==========================================
+  // Ana Galeri (Uygulama Şablon Kataloğu)
+  if (pathname === '/api/gallery/catalog' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ items: APP_GALLERY_CATALOG }));
+  }
+
+  // Kullanıcının Kendi Galerisi (Liste)
+  if (pathname === '/api/gallery/user' && req.method === 'GET') {
+    const items = loadUserGallery();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ items }));
+  }
+
+  // Tekil Öğe Getir (Hem kullanıcı galerisi hem ana galeri şablonu destekler)
+  if (pathname.startsWith('/api/gallery/item/') && req.method === 'GET') {
+    const itemId = decodeURIComponent(pathname.replace('/api/gallery/item/', '')).trim();
+    const userItems = loadUserGallery();
+    let found = userItems.find(x => x.id === itemId);
+    if (!found) {
+      found = APP_GALLERY_CATALOG.find(x => x.id === itemId);
+    }
+    if (!found) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Öğe bulunamadı' }));
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ item: found }));
+  }
+
+  // Kullanıcının Galerisine Yeni Öğe Kaydet (Ana Galeriden veya Boş Tuvalden)
+  if (pathname === '/api/gallery/user' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        const userItems = loadUserGallery();
+
+        let newItem = null;
+        if (data.templateId) {
+          const tpl = APP_GALLERY_CATALOG.find(t => t.id === data.templateId);
+          if (!tpl) throw new Error('Şablon bulunamadı');
+          const uid = 'usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+          newItem = {
+            id: uid,
+            templateId: tpl.id,
+            category: tpl.category,
+            name: data.customName || tpl.name,
+            subtitle: data.customSubtitle || tpl.subtitle,
+            icon: data.icon || tpl.icon,
+            badge: data.badge || tpl.badge,
+            previewImg: tpl.previewImg || null,
+            basePath: tpl.basePath,
+            obsKey: tpl.obsKey || null,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            config: JSON.parse(JSON.stringify({ ...tpl.config, ...(data.config || {}) }))
+          };
+        } else {
+          // Boş Tuval (Blank Canvas) veya Özel Oluşturulan Öğe
+          const uid = 'canvas_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+          newItem = {
+            id: uid,
+            templateId: 'blank_canvas',
+            category: data.category || 'canvas',
+            name: data.name || 'Özel Tasarım Sahne',
+            subtitle: data.subtitle || 'Boş Tuval ile Sıfırdan Oluşturuldu',
+            icon: data.icon || '🎨',
+            badge: data.badge || 'ÖZEL TUVAL',
+            previewImg: null,
+            basePath: 'custom-overlay.html',
+            obsKey: null,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            config: data.config || {}
+          };
+        }
+
+        userItems.push(newItem);
+        saveUserGallery(userItems);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, item: newItem, items: userItems }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Kullanıcının Galerisindeki Öğeyi Düzenle / Güncelle
+  if (pathname.startsWith('/api/gallery/user/') && req.method === 'PUT') {
+    const itemId = decodeURIComponent(pathname.replace('/api/gallery/user/', '')).trim();
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const updates = JSON.parse(body);
+        const userItems = loadUserGallery();
+        const idx = userItems.findIndex(x => x.id === itemId);
+        if (idx === -1) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Öğe bulunamadı' }));
+        }
+
+        const current = userItems[idx];
+        const updatedItem = {
+          ...current,
+          name: updates.name !== undefined ? updates.name : current.name,
+          subtitle: updates.subtitle !== undefined ? updates.subtitle : current.subtitle,
+          icon: updates.icon !== undefined ? updates.icon : current.icon,
+          badge: updates.badge !== undefined ? updates.badge : current.badge,
+          updatedAt: Date.now(),
+          config: {
+            ...(current.config || {}),
+            ...(updates.config || {})
+          }
+        };
+
+        userItems[idx] = updatedItem;
+        saveUserGallery(userItems);
+
+        // Canlı yayındaki ve önizlemedeki sahnelere anında bildir
+        eventQueue.push({
+          type: 'USER_ITEM_UPDATED',
+          itemId: updatedItem.id,
+          item: updatedItem,
+          time: Date.now()
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, item: updatedItem, items: userItems }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Kullanıcının Galerisinden Öğe Sil
+  if (pathname.startsWith('/api/gallery/user/') && req.method === 'DELETE') {
+    const itemId = decodeURIComponent(pathname.replace('/api/gallery/user/', '')).trim();
+    const userItems = loadUserGallery();
+    const filtered = userItems.filter(x => x.id !== itemId);
+    saveUserGallery(filtered);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ success: true, items: filtered }));
   }
 
   // 3. Statik Dosyalar

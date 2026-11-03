@@ -491,6 +491,316 @@
       box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
     }
 
+    /* =====================================================
+       GALERİ SİSTEMİ (KENDİ GALERİM & ANA GALERİ & BOŞ TUVAL)
+       ===================================================== */
+    .gallery-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .gallery-filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .gallery-filter-btn {
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .gallery-filter-btn:hover {
+      color: #fff;
+      border-color: rgba(168, 85, 247, 0.45);
+      background: rgba(168, 85, 247, 0.1);
+    }
+    .gallery-filter-btn.active {
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      color: #fff;
+      border-color: #a855f7;
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
+    }
+
+    .gallery-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+      gap: 14px;
+    }
+    .gallery-card {
+      background: rgba(12, 15, 26, 0.85);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.22s ease;
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .gallery-card:hover {
+      border-color: rgba(168, 85, 247, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+    }
+    .gallery-card.active-broadcast {
+      border-color: var(--kick-green);
+      box-shadow: 0 0 22px rgba(83, 252, 24, 0.22);
+      background: linear-gradient(160deg, rgba(83, 252, 24, 0.07), rgba(12, 15, 26, 0.92));
+    }
+    .gallery-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .gallery-card-thumb {
+      width: 54px;
+      height: 54px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .gallery-card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .gallery-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .gallery-card-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+    .gallery-cat-pill {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: rgba(168, 85, 247, 0.18);
+      color: #d8b4fe;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+    .gallery-saved-pill {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .gallery-card-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gallery-card-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-top: 3px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .gallery-card-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #94a3b8;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .color-dots-pair {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .color-dot-preview {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+    .gallery-card-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .btn-gal {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 9px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+    .btn-gal:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-gal.go-live {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #10b981;
+      color: #fff;
+    }
+    .btn-gal.go-live:hover {
+      filter: brightness(1.12);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+    }
+    .btn-gal.save-gal {
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      border-color: #a855f7;
+      color: #fff;
+    }
+    .btn-gal.save-gal:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.4);
+    }
+    .btn-gal.danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* Boş Galeri Karşılama Kartı */
+    .empty-gallery-box {
+      text-align: center;
+      padding: 36px 24px;
+      border-radius: 18px;
+      border: 1.5px dashed rgba(168, 85, 247, 0.4);
+      background: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.12), rgba(10, 13, 22, 0.6));
+    }
+    .empty-gallery-icon {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+    .empty-gallery-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .empty-gallery-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin: 0 auto 20px;
+      line-height: 1.55;
+    }
+    .empty-gallery-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Boş Tuval & Editör Modül Satırları */
+    .module-toggles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .module-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(8, 11, 20, 0.75);
+      border: 1px solid var(--border-subtle);
+    }
+    .module-toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+    .module-toggle-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #a855f7;
+      cursor: pointer;
+    }
+    .module-pos-select {
+      background: rgba(15, 20, 35, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 8px;
+      outline: none;
+    }
+    .preset-colors-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .preset-color-btn {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .preset-color-btn:hover {
+      border-color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
     /* OBS Link Copy Box */
     .obs-url-box {
       display: flex;
@@ -1386,8 +1696,14 @@
 
       <!-- Tab Navigation -->
       <nav class="studio-tabs-nav">
-        <button class="studio-tab-btn active" onclick="switchTab('tab-heroes', this)">
-          🎮 Sahneler & Hero
+        <button class="studio-tab-btn active" id="tab-btn-my-gallery" onclick="switchTab('tab-my-gallery', this)">
+          🗂️ Kendi Galerim (<span id="my-gallery-count">0</span>)
+        </button>
+        <button class="studio-tab-btn" id="tab-btn-app-gallery" onclick="switchTab('tab-app-gallery', this)">
+          🏪 Ana Galeri (Mağaza)
+        </button>
+        <button class="studio-tab-btn" id="tab-btn-canvas-builder" onclick="switchTab('tab-canvas-builder', this)">
+          🎨 Boş Tuval & Editör
         </button>
         <button class="studio-tab-btn" onclick="switchTab('tab-goal', this)">
           🎯 Hedef & İstatistik
@@ -1406,127 +1722,368 @@
         </button>
       </nav>
 
-      <!-- TAB 1: SAHNELER & HERO SEÇİMİ -->
-      <div id="tab-heroes" class="tab-pane active">
-        
-        <!-- 5 MLBB Hero Grid -->
+      <!-- TAB 1: KENDİ GALERİM (KULLANICININ KİŞİSEL YAYIN MASASI) -->
+      <div id="tab-my-gallery" class="tab-pane active">
         <div class="card-panel">
           <div class="card-panel-header">
             <span class="card-panel-title">
-              <span>⚔️</span> MLBB 5-HERO KONSEPTLERİ
+              <span>🗂️</span> KENDİ GALERİM (KAYITLI SAHNE, KART & ALERTLERİM)
             </span>
-            <span class="card-panel-badge" id="active-hero-badge">Aktif: Vexana</span>
+            <span class="card-panel-badge" id="active-hero-badge">Aktif Sahne Yok</span>
           </div>
 
-          <div class="hero-grid">
-            <!-- Vexana -->
-            <div class="hero-box hero-vexana active" onclick="selectHero('vexana', this)">
-              <div class="hero-avatar-wrap">
-                <img src="kick/vexana/assets/images/avatar.jpg" alt="Vexana">
-              </div>
-              <div class="hero-meta">
-                <span class="hero-meta-name">VEXANA</span>
-                <span class="hero-meta-role">Necrokeep Kraliçesi</span>
-                <span class="hero-meta-tag">Ametist Ateşi</span>
-              </div>
+          <div class="gallery-toolbar" id="my-gallery-toolbar" style="display: none;">
+            <div class="gallery-filter-pills">
+              <button class="gallery-filter-btn active" onclick="filterMyGallery('all', this)">Tümü</button>
+              <button class="gallery-filter-btn" onclick="filterMyGallery('hero_scene', this)">⚔️ Hero & Sahneler</button>
+              <button class="gallery-filter-btn" onclick="filterMyGallery('card', this)">🃏 Kartlar & Widget</button>
+              <button class="gallery-filter-btn" onclick="filterMyGallery('alert', this)">⚡ Alertler</button>
+              <button class="gallery-filter-btn" onclick="filterMyGallery('canvas', this)">🎨 Özel Tuval</button>
             </div>
-
-            <!-- Zetian -->
-            <div class="hero-box hero-zetian" onclick="selectHero('zetian', this)">
-              <div class="hero-avatar-wrap">
-                <img src="kick/zetian/assets/images/avatar.jpg" alt="Zetian">
-              </div>
-              <div class="hero-meta">
-                <span class="hero-meta-name">ZETIAN</span>
-                <span class="hero-meta-role">Shendu İmparatoriçesi</span>
-                <span class="hero-meta-tag">Göksel Anka</span>
-              </div>
-            </div>
-
-            <!-- Nana -->
-            <div class="hero-box hero-nana" onclick="selectHero('nana', this)">
-              <div class="hero-avatar-wrap">
-                <img src="kick/nana/assets/images/avatar.jpg" alt="Nana">
-              </div>
-              <div class="hero-meta">
-                <span class="hero-meta-name">NANA</span>
-                <span class="hero-meta-role">Tatlı Peri Leonin</span>
-                <span class="hero-meta-tag">Molina Pembesi</span>
-              </div>
-            </div>
-
-            <!-- Carmilla -->
-            <div class="hero-box hero-carmilla" onclick="selectHero('carmilla', this)">
-              <div class="hero-avatar-wrap">
-                <img src="kick/carmilla/assets/images/avatar.jpg" alt="Carmilla">
-              </div>
-              <div class="hero-meta">
-                <span class="hero-meta-name">CARMILLA</span>
-                <span class="hero-meta-role">Vance Gölgesi</span>
-                <span class="hero-meta-tag">Kan Kırmızısı</span>
-              </div>
-            </div>
-
-            <!-- Atlas -->
-            <div class="hero-box hero-atlas" onclick="selectHero('atlas', this)">
-              <div class="hero-avatar-wrap">
-                <img src="kick/atlas/assets/images/avatar.jpg" alt="Atlas">
-              </div>
-              <div class="hero-meta">
-                <span class="hero-meta-name">ATLAS</span>
-                <span class="hero-meta-role">Okyanus Gladyatörü</span>
-                <span class="hero-meta-tag">Abyssal Turkuaz</span>
-              </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-gal save-gal" onclick="openBlankCanvasBuilder()">
+                🎨 + Boş Tuval Oluştur
+              </button>
+              <button class="btn-gal" onclick="goToAppGallery()">
+                🏪 Ana Galeriye Git
+              </button>
             </div>
           </div>
-        </div>
 
-        <!-- Diğer Yayın Sahneleri -->
-        <div class="card-panel">
-          <div class="card-panel-header">
-            <span class="card-panel-title">
-              <span>📺</span> DİĞER YAYIN SAHNELERİ (CHAT & MOLA)
-            </span>
-            <span class="card-panel-badge">Hazır Overlayler</span>
+          <!-- Kendi Galerim Boşken Gösterilecek Karşılama Ekranı -->
+          <div class="empty-gallery-box" id="my-gallery-empty">
+            <div class="empty-gallery-icon">🗂️✨</div>
+            <div class="empty-gallery-title">KENDİ GALERİNİZ HENÜZ BOŞ</div>
+            <p class="empty-gallery-desc">
+              Uygulama açılışta hazır sahnelerle dolu gelmez. Kendi yayın tarzınızı oluşturmak için <strong>Ana Galeri (Mağaza)</strong>'dan beğendiğiniz Şampiyon, Sahne, Kart veya Alert şablonlarını kendi galerinize kaydedebilir, kendinize göre düzenleyebilir veya <strong>Boş Tuval</strong> ile sıfırdan kendi sahnenizi tasarlayabilirsiniz!
+            </p>
+            <div class="empty-gallery-actions">
+              <button class="btn-primary" onclick="goToAppGallery()">
+                🏪 ANA GALERİDEN ŞABLON SEÇ & KAYDET
+              </button>
+              <button class="btn-primary btn-kick" onclick="openBlankCanvasBuilder()">
+                🎨 BOŞ TUVAL İLE SIFIRDAN OLUŞTUR
+              </button>
+            </div>
           </div>
 
-          <div class="scene-chips-wrap">
-            <button class="scene-chip" onclick="selectScene('1-yayin-basliyor.html', '1. Yayın Başlıyor (Starting Soon)', this)">
-              ⏳ 1. Yayın Başlıyor + Chat
-            </button>
-            <button class="scene-chip" onclick="selectScene('2-sohbet.html', '2. Sohbet & Giriş (Just Chatting)', this)">
-              💬 2. Just Chatting + Chat
-            </button>
-            <button class="scene-chip" onclick="selectScene('3-mola.html', '3. Mola (Be Right Back)', this)">
-              ☕ 3. Mola + Chat
-            </button>
-            <button class="scene-chip" onclick="selectScene('4-yayin-bitti.html', '4. Yayın Bitti (Ending)', this)">
-              🎬 4. Yayın Bitti + Chat
-            </button>
-            <button class="scene-chip" onclick="selectScene('oyun-pc.html', 'PC Oyun Sahnesi (In-Game PC)', this)">
-              🎮 5. PC Oyun Sahnesi
-            </button>
-          </div>
+          <!-- Kendi Galerimdeki Kayıtlı Öğelerin Grid Listesi -->
+          <div class="gallery-cards-grid" id="my-gallery-grid" style="display: none;"></div>
         </div>
 
         <!-- OBS Browser Source Link Box -->
         <div class="card-panel">
           <div class="card-panel-header">
             <span class="card-panel-title">
-              <span>🔗</span> SEÇİLİ SAHNE OBS TARAYICI KAYNAĞI
+              <span>🔗</span> AKTİF ÖĞE OBS TARAYICI KAYNAĞI (1920×1080)
             </span>
           </div>
           <div class="obs-url-box">
-            <div class="obs-url-text" id="current-hero-url">http://localhost:8080/kick/vexana/in-game.html</div>
+            <div class="obs-url-text" id="current-hero-url">http://localhost:8080/custom-overlay.html?standby=1</div>
             <button class="btn-action-copy" onclick="copyCurrentHeroUrl()">
               📋 KOPYALA
             </button>
           </div>
           <div class="info-tip-box" style="margin-top: 14px;">
-            💡 <strong>OBS Kurulumu:</strong> OBS'te yeni bir <strong>Tarayıcı Kaynağı (Browser Source)</strong> ekleyin, yukarıdaki linki yapıştırın ve genişliği <strong>1920</strong>, yüksekliği <strong>1080</strong> yapın.
+            💡 <strong>OBS Kurulumu:</strong> Kendi galerinizden <strong>"▶️ Yayına Ver"</strong> dediğiniz öğenin bağlantısını yukarıdan kopyalayıp OBS <strong>Tarayıcı Kaynağı (1920×1080)</strong> olarak yapıştırın. Yaptığınız tüm düzenlemeler anında yayına yansır!
           </div>
         </div>
+      </div>
 
+      <!-- TAB 2: ANA GALERİ (UYGULAMA ŞABLON MAĞAZASI) -->
+      <div id="tab-app-gallery" class="tab-pane">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>🏪</span> ANA GALERİ (HAZIR SAHNE, HERO, KART VE ALERT KÜTÜPHANESİ)
+            </span>
+            <span class="card-panel-badge">20 Resmi Şablon</span>
+          </div>
+
+          <div class="info-tip-box" style="margin-bottom: 14px;">
+            ✨ <strong>Nasıl Kullanılır?</strong> Aşağıdaki resmi şablonları <strong>"👁️ Önizle"</strong> ile sağdaki monitörde inceleyin. Beğendiklerinizi <strong>"➕ Galerime Kaydet"</strong> diyerek kendi galerinize ekleyin; ardından kendi galerinizden istediğiniz gibi renklerini, yazılarını ve modüllerini düzenleyin!
+          </div>
+
+          <div class="gallery-toolbar">
+            <div class="gallery-filter-pills">
+              <button class="gallery-filter-btn active" onclick="filterAppCatalog('all', this)">Tümü (20)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('hero', this)">⚔️ Şampiyon Sahneleri (5)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('scene', this)">📺 Yayın Sahneleri (5)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('card', this)">🃏 Kartlar & Widget (6)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('alert', this)">⚡ Alert Şablonları (4)</button>
+            </div>
+            <input type="text" id="catalog-search-input" class="form-control" style="max-width: 220px; padding: 7px 12px; font-size: 12px;" placeholder="🔍 Şablon ara..." oninput="renderAppCatalogGrid()">
+          </div>
+
+          <div class="gallery-cards-grid" id="app-catalog-grid"></div>
+        </div>
+      </div>
+
+      <!-- TAB 3: BOŞ TUVAL STÜDYOSU & ÖĞE DÜZENLEYİCİ (CANVAS BUILDER & EDITOR) -->
+      <div id="tab-canvas-builder" class="tab-pane">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-panel-title" id="builder-header-title">
+              <span>🎨</span> BOŞ TUVAL İLE SIFIRDAN OLUŞTUR (1920×1080 STÜDYO)
+            </span>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <span class="card-panel-badge" id="builder-mode-badge">Yeni Özel Tuval</span>
+              <button class="btn-gal" onclick="openBlankCanvasBuilder()" title="Formu sıfırlayıp yeni boş tuval aç">🔄 Yeni Boş Tuval</button>
+            </div>
+          </div>
+
+          <input type="hidden" id="builder-edit-id" value="">
+          <input type="hidden" id="builder-category" value="canvas">
+
+          <!-- 1. Kimlik & Başlık Ayarları -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Galerideki Öğe Adı</label>
+              <input type="text" id="b-item-name" class="form-control" value="MİRA Özel Yayın Sahnesi" oninput="livePreviewBuilder()">
+            </div>
+            <div class="form-group">
+              <label>Yayıncı Adı (Streamer Name)</label>
+              <input type="text" id="b-streamer-name" class="form-control" value="MİRA" oninput="livePreviewBuilder()">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ana Başlık (Hero / Sahne / Kart Başlığı)</label>
+              <input type="text" id="b-title" class="form-control" value="MİRA LIVE" oninput="livePreviewBuilder()">
+            </div>
+            <div class="form-group">
+              <label>Alt Başlık / Unvan / Durum Mesajı</label>
+              <input type="text" id="b-subtitle" class="form-control" value="Mythic Glory Streamer" oninput="livePreviewBuilder()">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Sol Rozet (Rol / Kategori)</label>
+              <input type="text" id="b-role-badge" class="form-control" value="PRO STREAMER" oninput="livePreviewBuilder()">
+            </div>
+            <div class="form-group">
+              <label>Sağ Rozet (Koridor / Etiket)</label>
+              <input type="text" id="b-lane-badge" class="form-control" value="KICK & TIKTOK" oninput="livePreviewBuilder()">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Vitrin Sözü / Alt Açıklama / Alert Mesajı</label>
+            <input type="text" id="b-quote" class="form-control" value="&quot;Şafak Vadisi'nde zafer bizim olacak!&quot;" oninput="livePreviewBuilder()">
+          </div>
+
+          <!-- 2. Renk & Atmosfer Teması -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ana Neon Rengi (Primary Color)</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="color" id="b-primary-color" value="#a855f7" style="width: 48px; height: 38px; border: none; background: transparent; cursor: pointer;" oninput="livePreviewBuilder()">
+                <input type="text" id="b-primary-color-txt" class="form-control" value="#a855f7" oninput="document.getElementById('b-primary-color').value=this.value; livePreviewBuilder()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>İkincil Vurgu Rengi (Secondary Color)</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="color" id="b-secondary-color" value="#10b981" style="width: 48px; height: 38px; border: none; background: transparent; cursor: pointer;" oninput="livePreviewBuilder()">
+                <input type="text" id="b-secondary-color-txt" class="form-control" value="#10b981" oninput="document.getElementById('b-secondary-color').value=this.value; livePreviewBuilder()">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Hızlı Renk Paletleri</label>
+            <div class="preset-colors-bar">
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#a855f7', '#10b981')">💀 Ametist & Zümrüt</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ffd700', '#ef4444')">👑 İmparatoriçe Altın</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ff85a2', '#60a5fa')">🐾 Molina Pembesi</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#e11d48', '#94a3b8')">🩸 Gotik Kan Kırmızısı</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#00f5d4', '#38bdf8')">⚓ Okyanus Turkuazı</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#53fc18', '#a855f7')">🟢 Kick Neon Yeşili</button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tuval Arka Plan Stili</label>
+              <select id="b-bg-style" class="form-control" onchange="livePreviewBuilder()">
+                <option value="transparent">Şeffaf OBS Katmanı (Oyun Üstü)</option>
+                <option value="nebula">Uzay Bulutsusu (Nebula Tam Ekran)</option>
+                <option value="cybergrid">Siber Izgara (CyberGrid)</option>
+                <option value="darkglass">Koyu Stüdyo Camı (DarkGlass)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Canlı Parçacık Efekti</label>
+              <select id="b-particles" class="form-control" onchange="livePreviewBuilder()">
+                <option value="true">✨ Parçacık Efektleri Açık</option>
+                <option value="false">🚫 Parçacık Efektleri Kapalı</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 3. Tuval Üzerindeki Modüller & Konumları -->
+          <div class="card-panel-header" style="margin-top: 12px;">
+            <span class="card-panel-title">
+              <span>🧩</span> SAHNE MODÜLLERİ VE EKRAN KONUMLARI (AÇ / KAPA & YERLEŞTİR)
+            </span>
+          </div>
+
+          <div class="module-toggles-grid">
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-topbar" checked onchange="livePreviewBuilder()">
+                <span>📊 Üst HUD Barı (Saat & Son Olaylar)</span>
+              </label>
+            </div>
+
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-gameframe" checked onchange="livePreviewBuilder()">
+                <span>🎮 16:9 Orta Oyun Çerçevesi</span>
+              </label>
+            </div>
+
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-showcase" checked onchange="livePreviewBuilder()">
+                <span>🃏 Vitrin Kartı</span>
+              </label>
+              <select id="b-pos-showcase" class="module-pos-select" onchange="livePreviewBuilder()">
+                <option value="top-left" selected>Sol Üst</option>
+                <option value="middle-left">Sol Orta</option>
+                <option value="bottom-left">Sol Alt</option>
+                <option value="top-right">Sağ Üst</option>
+                <option value="center">Tam Orta</option>
+              </select>
+            </div>
+
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-social" checked onchange="livePreviewBuilder()">
+                <span>🌐 Sosyal Medya Kartı</span>
+              </label>
+              <select id="b-pos-social" class="module-pos-select" onchange="livePreviewBuilder()">
+                <option value="middle-left" selected>Sol Orta</option>
+                <option value="top-left">Sol Üst</option>
+                <option value="bottom-left">Sol Alt</option>
+                <option value="bottom-right">Sağ Alt</option>
+                <option value="center">Tam Orta</option>
+              </select>
+            </div>
+
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-webcam" checked onchange="livePreviewBuilder()">
+                <span>📷 Kamera (Webcam)</span>
+              </label>
+              <select id="b-pos-webcam" class="module-pos-select" onchange="livePreviewBuilder()">
+                <option value="bottom-left" selected>Sol Alt</option>
+                <option value="top-left">Sol Üst</option>
+                <option value="bottom-right">Sağ Alt</option>
+                <option value="top-right">Sağ Üst</option>
+                <option value="center">Tam Orta</option>
+              </select>
+            </div>
+
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-chat" checked onchange="livePreviewBuilder()">
+                <span>💬 Canlı Sohbet Paneli</span>
+              </label>
+              <select id="b-pos-chat" class="module-pos-select" onchange="livePreviewBuilder()">
+                <option value="top-right" selected>Sağ Kolon</option>
+                <option value="top-left">Sol Kolon</option>
+              </select>
+            </div>
+
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-music" checked onchange="livePreviewBuilder()">
+                <span>🎵 Müzik & Ses Dalgası</span>
+              </label>
+              <select id="b-pos-music" class="module-pos-select" onchange="livePreviewBuilder()">
+                <option value="bottom-center" selected>Alt Orta</option>
+                <option value="bottom-left">Sol Alt</option>
+                <option value="bottom-right">Sağ Alt</option>
+                <option value="top-center">Üst Orta</option>
+              </select>
+            </div>
+
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-goal" onchange="livePreviewBuilder()">
+                <span>🎯 Takipçi Hedef Kartı</span>
+              </label>
+              <select id="b-pos-goal" class="module-pos-select" onchange="livePreviewBuilder()">
+                <option value="bottom-right" selected>Sağ Alt</option>
+                <option value="top-right">Sağ Üst</option>
+                <option value="bottom-center">Alt Orta</option>
+                <option value="top-center">Üst Orta</option>
+              </select>
+            </div>
+
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-skills" onchange="livePreviewBuilder()">
+                <span>⚡ 4'lü Skill Rehberi</span>
+              </label>
+              <select id="b-pos-skills" class="module-pos-select" onchange="livePreviewBuilder()">
+                <option value="bottom-center" selected>Alt Orta</option>
+                <option value="center">Tam Orta</option>
+              </select>
+            </div>
+
+            <div class="module-toggle-row">
+              <label class="module-toggle-label">
+                <input type="checkbox" id="b-show-customcard" onchange="livePreviewBuilder()">
+                <span>📌 Özel Duyuru Kartı</span>
+              </label>
+              <select id="b-pos-customcard" class="module-pos-select" onchange="livePreviewBuilder()">
+                <option value="bottom-right" selected>Sağ Alt</option>
+                <option value="top-center">Üst Orta</option>
+                <option value="center">Tam Orta</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 4. Sosyal Medya ve Özel Duyuru Alanları -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Kick Adresi</label>
+              <input type="text" id="b-kick-handle" class="form-control" value="kick.com/mira" oninput="livePreviewBuilder()">
+            </div>
+            <div class="form-group">
+              <label>TikTok & YouTube Adresleri</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="b-tiktok-handle" class="form-control" value="@mira_mlbb" placeholder="@tiktok" oninput="livePreviewBuilder()">
+                <input type="text" id="b-youtube-handle" class="form-control" value="@mira.gaming" placeholder="@youtube" oninput="livePreviewBuilder()">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Özel Duyuru Kartı Başlığı</label>
+              <input type="text" id="b-customcard-title" class="form-control" value="YAYIN PROGRAMI & DUYURU" oninput="livePreviewBuilder()">
+            </div>
+            <div class="form-group">
+              <label>Özel Duyuru Kartı Metni</label>
+              <input type="text" id="b-customcard-body" class="form-control" value="Her akşam 20:00'de MLBB sıralama maçları! Discord'a katılmayı unutmayın." oninput="livePreviewBuilder()">
+            </div>
+          </div>
+
+          <!-- Kaydet / Güncelle Butonları -->
+          <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;">
+            <button type="button" class="btn-primary" style="flex: 2;" onclick="saveBuilderItemToMyGallery()">
+              💾 KENDİ GALERİME KAYDET VE YAYINA HAZIRLA
+            </button>
+            <button type="button" class="btn-primary btn-kick" style="flex: 1;" onclick="livePreviewBuilder(true)">
+              👁️ ÖNİZLEMEDE GÖR
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- TAB 2: HEDEF & İSTATİSTİK -->
@@ -1759,7 +2316,7 @@
             <span>ON AIR</span>
           </div>
           <div class="monitor-scene-title" id="preview-title">
-            [KICK] Vexana In-Game
+            [STANDBY] Sahne Seçilmedi
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 11px; font-weight: 700; color: #64748b;">1080p60</span>
@@ -1771,13 +2328,13 @@
 
         <!-- 16:9 Screen Viewport -->
         <div class="monitor-viewport-wrap" id="preview-wrap">
-          <iframe src="kick/vexana/in-game.html" id="preview-iframe"></iframe>
+          <iframe src="custom-overlay.html?standby=1" id="preview-iframe"></iframe>
         </div>
 
         <!-- Monitor Bottom Bar -->
         <div class="monitor-bottom-bar">
           <div class="monitor-url-line">
-            <span class="monitor-url-pill" id="monitor-url-pill">http://localhost:8080/kick/vexana/in-game.html</span>
+            <span class="monitor-url-pill" id="monitor-url-pill">http://localhost:8080/custom-overlay.html?standby=1</span>
           </div>
           <div class="monitor-actions">
             <button class="btn-monitor-tool primary" onclick="copyCurrentHeroUrl()">
@@ -1841,7 +2398,13 @@
   <script>
     let activePlatform = 'kick';
     let activeHero = 'vexana';
-    let activeScenePath = 'kick/vexana/in-game.html';
+    let activeScenePath = 'custom-overlay.html?standby=1';
+    let activeGalleryItemId = null;
+
+    let appCatalog = [];
+    let userGallery = [];
+    let myGalleryFilter = 'all';
+    let appCatalogFilter = 'all';
 
     const localSFX = new HeroSoundFX('vexana');
     const localTTS = new HeroTTSManager({ ttsEnabled: true, heroName: 'vexana' });
@@ -1853,14 +2416,27 @@
       return 'http://localhost:8080';
     }
 
+    function escHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     /* Tab Switching */
     function switchTab(tabId, btnEl) {
       document.querySelectorAll('.studio-tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
       
-      if (btnEl) btnEl.classList.add('active');
+      if (btnEl) {
+        btnEl.classList.add('active');
+      } else {
+        const autoBtn = document.querySelector(`.studio-tab-btn[onclick*="${tabId}"]`);
+        if (autoBtn) autoBtn.classList.add('active');
+      }
       const targetPane = document.getElementById(tabId);
       if (targetPane) targetPane.classList.add('active');
+    }
+
+    function goToAppGallery() {
+      switchTab('tab-app-gallery', document.getElementById('tab-btn-app-gallery'));
     }
 
     /* Platform Switching */
@@ -1878,60 +2454,605 @@
         label.style.color = plat === 'kick' ? 'var(--kick-green)' : 'var(--tiktok-red)';
       }
 
-      selectHero(activeHero);
+      if (activeGalleryItemId) {
+        activateMyGalleryItem(activeGalleryItemId);
+      }
       showToast(`Aktif Platform: ${plat.toUpperCase()} LIVE olarak ayarlandı.`, 'success');
     }
 
-    /* Hero Selection */
-    function selectHero(heroName, cardEl) {
-      activeHero = heroName;
-      localSFX.setHero(heroName);
-      localTTS.heroName = heroName;
-
-      document.querySelectorAll('.hero-box, .scene-chip').forEach(c => c.classList.remove('active'));
-      const targetCard = cardEl || document.querySelector(`.hero-${heroName}`);
-      if (targetCard) targetCard.classList.add('active');
-
-      const heroBadge = document.getElementById('active-hero-badge');
-      if (heroBadge) heroBadge.textContent = `Aktif: ${heroName.toUpperCase()}`;
-
-      const path = `${activePlatform}/${heroName}/in-game.html`;
-      activeScenePath = path;
-      document.getElementById('preview-iframe').src = path;
-
-      const titles = {
-        vexana: 'Vexana (Necrokeep Kraliçesi)',
-        zetian: 'Zetian (Shendu İmparatoriçesi)',
-        nana: 'Nana (Tatlı Leonin)',
-        carmilla: 'Carmilla (Vance Gölgesi)',
-        atlas: 'Atlas (Okyanus Gladyatörü)'
-      };
-      const platLabel = activePlatform === 'kick' ? 'KICK' : 'TIKTOK';
-      document.getElementById('preview-title').textContent = `[${platLabel}] ${titles[heroName]} In-Game`;
-
-      const fullUrl = `${getHostPrefix()}/${path}`;
-      document.getElementById('current-hero-url').textContent = fullUrl;
-      document.getElementById('monitor-url-pill').textContent = fullUrl;
-      notifyObsScene(heroName);
+    /* =====================================================
+       ANA GALERİ & KENDİ GALERİM YÖNETİM MOTORU
+       ===================================================== */
+    function resolveItemUrl(item, isUserItem) {
+      if (!item) return 'custom-overlay.html?standby=1';
+      if (item.category === 'canvas' || item.category === 'card' || item.category === 'alert' || item.basePath === 'custom-overlay.html') {
+        const paramKey = isUserItem ? 'id' : 'tpl';
+        return `custom-overlay.html?${paramKey}=${encodeURIComponent(item.id)}&platform=${activePlatform}`;
+      }
+      const base = (item.basePath || '{platform}/vexana/in-game.html').replace('{platform}', activePlatform);
+      const paramKey = isUserItem ? 'uid' : 'tpl';
+      return `${base}?${paramKey}=${encodeURIComponent(item.id)}`;
     }
 
-    /* Scene Selection */
-    function selectScene(sceneFileName, sceneTitle, btnEl) {
-      document.querySelectorAll('.hero-box, .scene-chip').forEach(c => c.classList.remove('active'));
-      if (btnEl) btnEl.classList.add('active');
+    function getCategoryLabel(cat) {
+      const map = {
+        hero: '⚔️ ŞAMPİYON SAHNESİ',
+        scene: '📺 YAYIN SAHNESİ',
+        card: '🃏 KART & WIDGET',
+        alert: '⚡ ALERT ŞABLONU',
+        canvas: '🎨 ÖZEL TUVAL'
+      };
+      return map[cat] || 'SAHNE';
+    }
 
-      const fullPath = `${activePlatform}/sahneler/${sceneFileName}`;
-      activeScenePath = fullPath;
-      document.getElementById('preview-iframe').src = fullPath;
+    function loadGalleries() {
+      Promise.all([
+        fetch('/api/gallery/catalog').then(r => r.json()).catch(() => ({ items: [] })),
+        fetch('/api/gallery/user').then(r => r.json()).catch(() => ({ items: [] }))
+      ]).then(([catData, usrData]) => {
+        appCatalog = catData.items || [];
+        userGallery = usrData.items || [];
+        renderMyGalleryGrid();
+        renderAppCatalogGrid();
+      });
+    }
 
-      const platTag = activePlatform === 'kick' ? 'KICK' : 'TIKTOK';
-      document.getElementById('preview-title').textContent = `[${platTag}] ${sceneTitle}`;
+    function filterMyGallery(filterKey, btnEl) {
+      myGalleryFilter = filterKey;
+      if (btnEl) {
+        btnEl.parentElement.querySelectorAll('.gallery-filter-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
+      renderMyGalleryGrid();
+    }
 
-      const fullUrl = `${getHostPrefix()}/${fullPath}`;
+    function renderMyGalleryGrid() {
+      const countEl = document.getElementById('my-gallery-count');
+      const emptyBox = document.getElementById('my-gallery-empty');
+      const toolbar = document.getElementById('my-gallery-toolbar');
+      const grid = document.getElementById('my-gallery-grid');
+
+      if (countEl) countEl.textContent = userGallery.length;
+
+      if (userGallery.length === 0) {
+        if (emptyBox) emptyBox.style.display = 'block';
+        if (toolbar) toolbar.style.display = 'none';
+        if (grid) {
+          grid.style.display = 'none';
+          grid.innerHTML = '';
+        }
+        return;
+      }
+
+      if (emptyBox) emptyBox.style.display = 'none';
+      if (toolbar) toolbar.style.display = 'flex';
+      if (grid) grid.style.display = 'grid';
+
+      const filtered = userGallery.filter(item => {
+        if (myGalleryFilter === 'all') return true;
+        if (myGalleryFilter === 'hero_scene') return item.category === 'hero' || item.category === 'scene';
+        return item.category === myGalleryFilter;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px;">
+            Bu kategoride henüz kayıtlı öğeniz yok. <strong>Ana Galeri</strong>'den ekleyebilir veya <strong>Boş Tuval</strong> ile oluşturabilirsiniz.
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const cfg = item.config || {};
+        const pCol = cfg.primaryColor || '#a855f7';
+        const sCol = cfg.secondaryColor || '#10b981';
+        const isLive = activeGalleryItemId === item.id;
+        const thumbHtml = item.previewImg
+          ? `<img src="${escHtml(item.previewImg)}" alt="${escHtml(item.name)}">`
+          : `<span>${escHtml(item.icon || '🎨')}</span>`;
+
+        return `
+          <div class="gallery-card ${isLive ? 'active-broadcast' : ''}">
+            <div>
+              <div class="gallery-card-top">
+                <div class="gallery-card-thumb" style="border-color:${escHtml(pCol)};">${thumbHtml}</div>
+                <div class="gallery-card-info">
+                  <div class="gallery-card-badges">
+                    <span class="gallery-cat-pill">${getCategoryLabel(item.category)}</span>
+                    ${isLive ? `<span class="gallery-saved-pill">● YAYINDA</span>` : ''}
+                  </div>
+                  <div class="gallery-card-title" title="${escHtml(item.name)}">${escHtml(item.name)}</div>
+                  <div class="gallery-card-sub">${escHtml(item.subtitle || cfg.subtitleText || '')}</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="gallery-card-meta-row" style="margin-bottom: 8px;">
+                <span>Yayıncı: <strong>${escHtml(cfg.streamerName || 'MİRA')}</strong></span>
+                <span class="color-dots-pair" title="Tema Renkleri">
+                  <span class="color-dot-preview" style="background:${escHtml(pCol)};"></span>
+                  <span class="color-dot-preview" style="background:${escHtml(sCol)};"></span>
+                </span>
+              </div>
+              <div class="gallery-card-actions">
+                <button class="btn-gal go-live" onclick="activateMyGalleryItem('${escHtml(item.id)}')">
+                  ▶️ ${isLive ? 'Yayında' : 'Yayına Ver'}
+                </button>
+                <button class="btn-gal" onclick="editMyGalleryItem('${escHtml(item.id)}')">
+                  ✏️ Düzenle
+                </button>
+                <button class="btn-gal" onclick="duplicateMyGalleryItem('${escHtml(item.id)}')" title="Kopyasını Oluştur">
+                  📋
+                </button>
+                <button class="btn-gal danger" onclick="deleteMyGalleryItem('${escHtml(item.id)}')" title="Galerimden Sil">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterAppCatalog(filterKey, btnEl) {
+      appCatalogFilter = filterKey;
+      if (btnEl) {
+        btnEl.parentElement.querySelectorAll('.gallery-filter-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
+      renderAppCatalogGrid();
+    }
+
+    function renderAppCatalogGrid() {
+      const grid = document.getElementById('app-catalog-grid');
+      if (!grid) return;
+
+      const q = (document.getElementById('catalog-search-input')?.value || '').trim().toLowerCase();
+
+      const filtered = appCatalog.filter(tpl => {
+        if (appCatalogFilter !== 'all' && tpl.category !== appCatalogFilter) return false;
+        if (q) {
+          const hay = `${tpl.name} ${tpl.subtitle} ${tpl.badge || ''}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      grid.innerHTML = filtered.map(tpl => {
+        const cfg = tpl.config || {};
+        const pCol = cfg.primaryColor || '#a855f7';
+        const sCol = cfg.secondaryColor || '#10b981';
+        const alreadySaved = userGallery.some(u => u.templateId === tpl.id);
+        const thumbHtml = tpl.previewImg
+          ? `<img src="${escHtml(tpl.previewImg)}" alt="${escHtml(tpl.name)}">`
+          : `<span>${escHtml(tpl.icon || '✨')}</span>`;
+
+        return `
+          <div class="gallery-card">
+            <div>
+              <div class="gallery-card-top">
+                <div class="gallery-card-thumb" style="border-color:${escHtml(pCol)};">${thumbHtml}</div>
+                <div class="gallery-card-info">
+                  <div class="gallery-card-badges">
+                    <span class="gallery-cat-pill">${getCategoryLabel(tpl.category)}</span>
+                    ${alreadySaved ? `<span class="gallery-saved-pill">✓ Galerinizde</span>` : ''}
+                  </div>
+                  <div class="gallery-card-title" title="${escHtml(tpl.name)}">${escHtml(tpl.name)}</div>
+                  <div class="gallery-card-sub">${escHtml(tpl.subtitle)}</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="gallery-card-meta-row" style="margin-bottom: 8px;">
+                <span>${escHtml(tpl.badge || 'PRO ŞABLON')}</span>
+                <span class="color-dots-pair">
+                  <span class="color-dot-preview" style="background:${escHtml(pCol)};"></span>
+                  <span class="color-dot-preview" style="background:${escHtml(sCol)};"></span>
+                </span>
+              </div>
+              <div class="gallery-card-actions">
+                <button class="btn-gal" onclick="previewCatalogTemplate('${escHtml(tpl.id)}')">
+                  👁️ Önizle
+                </button>
+                <button class="btn-gal save-gal" onclick="saveCatalogTemplateToMyGallery('${escHtml(tpl.id)}')">
+                  ➕ Galerime Kaydet
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* Ana Galerideki Şablonu Monitörde Önizle */
+    function previewCatalogTemplate(tplId) {
+      const tpl = appCatalog.find(t => t.id === tplId);
+      if (!tpl) return;
+
+      const relUrl = resolveItemUrl(tpl, false);
+      activeScenePath = relUrl;
+      document.getElementById('preview-iframe').src = relUrl;
+
+      const platLabel = activePlatform === 'kick' ? 'KICK' : 'TIKTOK';
+      document.getElementById('preview-title').textContent = `[ÖNİZLEME • ${platLabel}] ${tpl.name}`;
+
+      const fullUrl = `${getHostPrefix()}/${relUrl}`;
+      document.getElementById('monitor-url-pill').textContent = fullUrl;
+      showToast(`👁️ Önizleniyor: ${tpl.name}`);
+    }
+
+    /* Ana Galeriden Kendi Galerime Kaydet */
+    function saveCatalogTemplateToMyGallery(tplId) {
+      const tpl = appCatalog.find(t => t.id === tplId);
+      if (!tpl) return;
+
+      fetch('/api/gallery/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId: tpl.id })
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.success && data.item) {
+            userGallery = data.items || userGallery;
+            renderMyGalleryGrid();
+            renderAppCatalogGrid();
+            showToast(`✓ "${tpl.name}" Kendi Galerinize kaydedildi!`, 'success');
+          }
+        })
+        .catch(() => showToast('Kaydetme sırasında hata oluştu', 'error'));
+    }
+
+    /* Kendi Galerimdeki Öğeyi Yayına Ver (Aktifleştir) */
+    function activateMyGalleryItem(itemId) {
+      const item = userGallery.find(x => x.id === itemId);
+      if (!item) return;
+
+      activeGalleryItemId = item.id;
+      if (item.config && item.config.heroKey) {
+        activeHero = item.config.heroKey;
+        localSFX.setHero(activeHero);
+        localTTS.heroName = activeHero;
+      }
+
+      const relUrl = resolveItemUrl(item, true);
+      activeScenePath = relUrl;
+      document.getElementById('preview-iframe').src = relUrl;
+
+      const platLabel = activePlatform === 'kick' ? 'KICK' : 'TIKTOK';
+      document.getElementById('preview-title').textContent = `[${platLabel}] ${item.name}`;
+
+      const heroBadge = document.getElementById('active-hero-badge');
+      if (heroBadge) heroBadge.textContent = `Yayında: ${item.name}`;
+
+      const fullUrl = `${getHostPrefix()}/${relUrl}`;
       document.getElementById('current-hero-url').textContent = fullUrl;
       document.getElementById('monitor-url-pill').textContent = fullUrl;
-      showToast(`Sahne seçildi: ${sceneTitle}`);
-      notifyObsScene(sceneFileName);
+
+      renderMyGalleryGrid();
+      showToast(`▶️ Yayına Verildi: ${item.name}`, 'success');
+
+      if (item.obsKey) {
+        notifyObsScene(item.obsKey);
+      }
+    }
+
+    /* Kendi Galerimdeki Öğeyi Çoğalt */
+    function duplicateMyGalleryItem(itemId) {
+      const item = userGallery.find(x => x.id === itemId);
+      if (!item) return;
+
+      const payload = item.templateId && item.templateId !== 'blank_canvas'
+        ? {
+            templateId: item.templateId,
+            customName: `${item.name} (Kopya)`,
+            customSubtitle: item.subtitle,
+            config: item.config
+          }
+        : {
+            category: item.category,
+            name: `${item.name} (Kopya)`,
+            subtitle: item.subtitle,
+            icon: item.icon,
+            badge: item.badge,
+            config: item.config
+          };
+
+      fetch('/api/gallery/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.success) {
+            userGallery = data.items || userGallery;
+            renderMyGalleryGrid();
+            showToast(`📋 "${item.name}" çoğaltıldı!`, 'success');
+          }
+        });
+    }
+
+    /* Kendi Galerimdeki Öğeyi Sil */
+    function deleteMyGalleryItem(itemId) {
+      const item = userGallery.find(x => x.id === itemId);
+      if (!item) return;
+
+      fetch(`/api/gallery/user/${encodeURIComponent(itemId)}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.success) {
+            userGallery = data.items || [];
+            if (activeGalleryItemId === itemId) {
+              activeGalleryItemId = null;
+              activeScenePath = 'custom-overlay.html?standby=1';
+              document.getElementById('preview-iframe').src = activeScenePath;
+              document.getElementById('preview-title').textContent = '[STANDBY] Sahne Seçilmedi';
+              const fullStandby = `${getHostPrefix()}/${activeScenePath}`;
+              document.getElementById('current-hero-url').textContent = fullStandby;
+              document.getElementById('monitor-url-pill').textContent = fullStandby;
+              const heroBadge = document.getElementById('active-hero-badge');
+              if (heroBadge) heroBadge.textContent = 'Aktif Sahne Yok';
+            }
+            renderMyGalleryGrid();
+            renderAppCatalogGrid();
+            showToast(`🗑️ "${item.name}" galerinizden kaldırıldı.`);
+          }
+        });
+    }
+
+    /* =====================================================
+       BOŞ TUVAL OLUŞTURUCU & ÖĞE DÜZENLEYİCİ (BUILDER)
+       ===================================================== */
+    function openBlankCanvasBuilder() {
+      document.getElementById('builder-edit-id').value = '';
+      document.getElementById('builder-category').value = 'canvas';
+      document.getElementById('builder-header-title').innerHTML = '<span>🎨</span> BOŞ TUVAL İLE SIFIRDAN OLUŞTUR (1920×1080 STÜDYO)';
+      document.getElementById('builder-mode-badge').textContent = 'Yeni Özel Tuval';
+
+      document.getElementById('b-item-name').value = 'MİRA Özel Yayın Sahnesi';
+      document.getElementById('b-streamer-name').value = 'MİRA';
+      document.getElementById('b-title').value = 'MİRA LIVE';
+      document.getElementById('b-subtitle').value = 'Mythic Glory Streamer';
+      document.getElementById('b-role-badge').value = 'PRO STREAMER';
+      document.getElementById('b-lane-badge').value = 'KICK & TIKTOK';
+      document.getElementById('b-quote').value = '"Şafak Vadisi\'nde zafer bizim olacak!"';
+
+      applyBuilderColorPreset('#a855f7', '#10b981');
+      document.getElementById('b-bg-style').value = 'transparent';
+      document.getElementById('b-particles').value = 'true';
+
+      document.getElementById('b-show-topbar').checked = true;
+      document.getElementById('b-show-gameframe').checked = true;
+      document.getElementById('b-show-showcase').checked = true;
+      document.getElementById('b-pos-showcase').value = 'top-left';
+      document.getElementById('b-show-social').checked = true;
+      document.getElementById('b-pos-social').value = 'middle-left';
+      document.getElementById('b-show-webcam').checked = true;
+      document.getElementById('b-pos-webcam').value = 'bottom-left';
+      document.getElementById('b-show-chat').checked = true;
+      document.getElementById('b-pos-chat').value = 'top-right';
+      document.getElementById('b-show-music').checked = true;
+      document.getElementById('b-pos-music').value = 'bottom-center';
+      document.getElementById('b-show-goal').checked = false;
+      document.getElementById('b-show-skills').checked = false;
+      document.getElementById('b-show-customcard').checked = false;
+
+      switchTab('tab-canvas-builder', document.getElementById('tab-btn-canvas-builder'));
+      livePreviewBuilder(true);
+    }
+
+    function editMyGalleryItem(itemId) {
+      const item = userGallery.find(x => x.id === itemId);
+      if (!item) return;
+      const cfg = item.config || {};
+
+      document.getElementById('builder-edit-id').value = item.id;
+      document.getElementById('builder-category').value = item.category || 'canvas';
+      document.getElementById('builder-header-title').innerHTML = `<span>✏️</span> ÖĞEYİ DÜZENLE: ${escHtml(item.name)}`;
+      document.getElementById('builder-mode-badge').textContent = `Düzenleme Modu (${getCategoryLabel(item.category)})`;
+
+      document.getElementById('b-item-name').value = item.name || '';
+      document.getElementById('b-streamer-name').value = cfg.streamerName || 'MİRA';
+      document.getElementById('b-title').value = cfg.title || cfg.headerTag || item.name || '';
+      document.getElementById('b-subtitle').value = cfg.subtitleText || cfg.subTitle || item.subtitle || '';
+      document.getElementById('b-role-badge').value = cfg.roleBadge || 'PRO STREAMER';
+      document.getElementById('b-lane-badge').value = cfg.laneBadge || 'CANLI YAYIN';
+      document.getElementById('b-quote').value = cfg.quote || cfg.message || '';
+
+      const pCol = cfg.primaryColor || '#a855f7';
+      const sCol = cfg.secondaryColor || '#10b981';
+      document.getElementById('b-primary-color').value = pCol;
+      document.getElementById('b-primary-color-txt').value = pCol;
+      document.getElementById('b-secondary-color').value = sCol;
+      document.getElementById('b-secondary-color-txt').value = sCol;
+
+      document.getElementById('b-bg-style').value = cfg.bgStyle || 'transparent';
+      document.getElementById('b-particles').value = cfg.showParticles === false ? 'false' : 'true';
+
+      document.getElementById('b-show-topbar').checked = cfg.showTopBar !== false;
+      document.getElementById('b-show-gameframe').checked = cfg.showGameFrame !== false;
+      document.getElementById('b-show-showcase').checked = cfg.showShowcase !== false;
+      if (cfg.showcasePos) document.getElementById('b-pos-showcase').value = cfg.showcasePos;
+      document.getElementById('b-show-social').checked = cfg.showSocial !== false;
+      if (cfg.socialPos) document.getElementById('b-pos-social').value = cfg.socialPos;
+      document.getElementById('b-show-webcam').checked = cfg.showWebcam !== false;
+      if (cfg.webcamPos) document.getElementById('b-pos-webcam').value = cfg.webcamPos;
+      document.getElementById('b-show-chat').checked = cfg.showChat !== false;
+      if (cfg.chatPos) document.getElementById('b-pos-chat').value = cfg.chatPos;
+      document.getElementById('b-show-music').checked = cfg.showMusic !== false;
+      if (cfg.musicPos) document.getElementById('b-pos-music').value = cfg.musicPos;
+      document.getElementById('b-show-goal').checked = !!cfg.showGoal;
+      if (cfg.goalPos) document.getElementById('b-pos-goal').value = cfg.goalPos;
+      document.getElementById('b-show-skills').checked = !!cfg.showSkills;
+      if (cfg.skillsPos) document.getElementById('b-pos-skills').value = cfg.skillsPos;
+      document.getElementById('b-show-customcard').checked = !!cfg.showCustomCard;
+      if (cfg.customCardPos) document.getElementById('b-pos-customcard').value = cfg.customCardPos;
+
+      document.getElementById('b-kick-handle').value = cfg.kickHandle || 'kick.com/mira';
+      document.getElementById('b-tiktok-handle').value = cfg.tiktokHandle || '@mira_mlbb';
+      document.getElementById('b-youtube-handle').value = cfg.youtubeHandle || '@mira.gaming';
+      if (cfg.customCardTitle) document.getElementById('b-customcard-title').value = cfg.customCardTitle;
+      if (cfg.customCardBody) document.getElementById('b-customcard-body').value = cfg.customCardBody;
+
+      switchTab('tab-canvas-builder', document.getElementById('tab-btn-canvas-builder'));
+      activateMyGalleryItem(item.id);
+      showToast(`✏️ "${item.name}" düzenleme modunda açıldı.`);
+    }
+
+    function applyBuilderColorPreset(primary, secondary) {
+      document.getElementById('b-primary-color').value = primary;
+      document.getElementById('b-primary-color-txt').value = primary;
+      document.getElementById('b-secondary-color').value = secondary;
+      document.getElementById('b-secondary-color-txt').value = secondary;
+      livePreviewBuilder();
+    }
+
+    function buildConfigFromBuilderForm() {
+      const pCol = document.getElementById('b-primary-color').value || '#a855f7';
+      const sCol = document.getElementById('b-secondary-color').value || '#10b981';
+      document.getElementById('b-primary-color-txt').value = pCol;
+      document.getElementById('b-secondary-color-txt').value = sCol;
+
+      return {
+        streamerName: document.getElementById('b-streamer-name').value.trim() || 'MİRA',
+        title: document.getElementById('b-title').value.trim() || 'MİRA LIVE',
+        headerTag: document.getElementById('b-title').value.trim() || 'CANLI BİLDİRİM!',
+        subtitleText: document.getElementById('b-subtitle').value.trim() || 'Mythic Glory Streamer',
+        subTitle: document.getElementById('b-subtitle').value.trim() || 'Ailemize Hoş Geldin!',
+        roleBadge: document.getElementById('b-role-badge').value.trim() || 'PRO STREAMER',
+        laneBadge: document.getElementById('b-lane-badge').value.trim() || 'CANLI YAYIN',
+        quote: document.getElementById('b-quote').value.trim(),
+        message: document.getElementById('b-quote').value.trim(),
+        primaryColor: pCol,
+        secondaryColor: sCol,
+        bgStyle: document.getElementById('b-bg-style').value || 'transparent',
+        showParticles: document.getElementById('b-particles').value === 'true',
+        showTopBar: document.getElementById('b-show-topbar').checked,
+        showGameFrame: document.getElementById('b-show-gameframe').checked,
+        showShowcase: document.getElementById('b-show-showcase').checked,
+        showcasePos: document.getElementById('b-pos-showcase').value,
+        showSocial: document.getElementById('b-show-social').checked,
+        socialPos: document.getElementById('b-pos-social').value,
+        showWebcam: document.getElementById('b-show-webcam').checked,
+        webcamPos: document.getElementById('b-pos-webcam').value,
+        showChat: document.getElementById('b-show-chat').checked,
+        chatPos: document.getElementById('b-pos-chat').value,
+        showMusic: document.getElementById('b-show-music').checked,
+        musicPos: document.getElementById('b-pos-music').value,
+        showGoal: document.getElementById('b-show-goal').checked,
+        goalPos: document.getElementById('b-pos-goal').value,
+        showSkills: document.getElementById('b-show-skills').checked,
+        skillsPos: document.getElementById('b-pos-skills').value,
+        showCustomCard: document.getElementById('b-show-customcard').checked,
+        customCardPos: document.getElementById('b-pos-customcard').value,
+        kickHandle: document.getElementById('b-kick-handle').value.trim(),
+        tiktokHandle: document.getElementById('b-tiktok-handle').value.trim(),
+        youtubeHandle: document.getElementById('b-youtube-handle').value.trim(),
+        customCardTitle: document.getElementById('b-customcard-title').value.trim(),
+        customCardBody: document.getElementById('b-customcard-body').value.trim()
+      };
+    }
+
+    function livePreviewBuilder(forceLoadCanvas = false) {
+      const editId = document.getElementById('builder-edit-id').value;
+      const cat = document.getElementById('builder-category').value || 'canvas';
+      const cfg = buildConfigFromBuilderForm();
+      const itemName = document.getElementById('b-item-name').value.trim() || 'Özel Tasarım Sahne';
+
+      const existing = editId ? userGallery.find(x => x.id === editId) : null;
+      const tempItem = {
+        ...(existing || {}),
+        id: editId || 'preview_canvas',
+        category: cat,
+        name: itemName,
+        subtitle: cfg.subtitleText,
+        config: { ...(existing?.config || {}), ...cfg }
+      };
+
+      const iframe = document.getElementById('preview-iframe');
+      if (forceLoadCanvas && (!editId || cat === 'canvas')) {
+        activeScenePath = 'custom-overlay.html?id=preview_canvas';
+        document.getElementById('preview-title').textContent = `[BOŞ TUVAL ÖNİZLEME] ${itemName}`;
+        if (iframe && !(iframe.getAttribute('src') || '').startsWith('custom-overlay.html')) {
+          iframe.src = activeScenePath;
+        }
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({ type: 'PREVIEW_CUSTOM_CONFIG', item: tempItem }, '*');
+        }
+        setTimeout(() => {
+          if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ type: 'PREVIEW_CUSTOM_CONFIG', item: tempItem }, '*');
+          }
+        }, 250);
+        return;
+      }
+
+      dispatchEventToOverlay({
+        type: 'USER_ITEM_UPDATED',
+        itemId: tempItem.id,
+        item: tempItem
+      });
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'PREVIEW_CUSTOM_CONFIG', item: tempItem }, '*');
+      }
+    }
+
+    function saveBuilderItemToMyGallery() {
+      const editId = document.getElementById('builder-edit-id').value;
+      const cat = document.getElementById('builder-category').value || 'canvas';
+      const itemName = document.getElementById('b-item-name').value.trim() || 'Özel Tasarım Sahne';
+      const cfg = buildConfigFromBuilderForm();
+
+      if (editId) {
+        // Mevcut öğeyi güncelle
+        fetch(`/api/gallery/user/${encodeURIComponent(editId)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: itemName,
+            subtitle: cfg.subtitleText,
+            config: cfg
+          })
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data && data.success && data.item) {
+              userGallery = data.items || userGallery;
+              renderMyGalleryGrid();
+              activateMyGalleryItem(data.item.id);
+              switchTab('tab-my-gallery', document.getElementById('tab-btn-my-gallery'));
+              showToast(`💾 "${data.item.name}" güncellendi ve yayına verildi!`, 'success');
+            }
+          });
+      } else {
+        // Sıfırdan Boş Tuval öğesi olarak kaydet
+        fetch('/api/gallery/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            category: cat,
+            name: itemName,
+            subtitle: cfg.subtitleText,
+            icon: '🎨',
+            badge: 'ÖZEL TUVAL',
+            config: cfg
+          })
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data && data.success && data.item) {
+              userGallery = data.items || userGallery;
+              renderMyGalleryGrid();
+              activateMyGalleryItem(data.item.id);
+              switchTab('tab-my-gallery', document.getElementById('tab-btn-my-gallery'));
+              showToast(`🎨 "${data.item.name}" Kendi Galerinize kaydedildi ve yayına verildi!`, 'success');
+            }
+          });
+      }
     }
 
     /* Copy URL */
@@ -2318,6 +3439,10 @@
         if (btn) btn.textContent = '▲';
       }
       resizePreview();
+      loadGalleries();
+      const initTab = new URLSearchParams(window.location.search).get('tab');
+      if (initTab === 'app-gallery') goToAppGallery();
+      else if (initTab === 'canvas-builder') openBlankCanvasBuilder();
       updateGoalProgressPreview();
       syncKickFollowersLive();
       checkObsWsStatus();
