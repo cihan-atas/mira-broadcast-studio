@@ -52,47 +52,41 @@ Node.js veya kaynak kodla hiç uğraşmak istemeyen yayıncılar için:
 
 ---
 
-### 🐧 2. Linux Kurulum Kılavuzu (Ubuntu / Debian / Arch / Fedora)
+### 🐧 2. Linux Kurulum Kılavuzu (Ubuntu / Debian / Arch / Fedora / Manjaro / Mint)
 
-#### Adım 1: Gerekli Paketleri Yükleyin
-Terminali açarak dağıtımınıza uygun komutla Node.js, npm ve git paketlerini kurun:
+Linux kullanıcıları için de Windows'taki gibi hiçbir teknik zorluk yaşamadan **4 farklı seçenek** sunulmuştur:
 
-* **Ubuntu / Debian / Linux Mint:**
-  ```bash
-  sudo apt update
-  sudo apt install -y nodejs npm git
-  ```
-* **Arch Linux / Manjaro:**
-  ```bash
-  sudo pacman -S nodejs npm git
-  ```
-* **Fedora / RHEL:**
-  ```bash
-  sudo dnf install -y nodejs npm git
-  ```
+#### 🌟 Seçenek 1: Tek Tıkla Otomatik Kurulum Sihirbazı (`kurulum.sh` — En Çok Önerilen)
+Sisteminizde Node.js veya npm olmasa dahi hiçbir komutla uğraşmanıza gerek yoktur:
+1. Repoyu indirin veya klonlayın.
+2. Terminalde sadece şunu çalıştırın (veya dosyaya çift tıklayıp "Terminalde Çalıştır" seçin):
+   ```bash
+   ./kurulum.sh
+   ```
+3. **Sihirbaz tüm işlemleri otomatik yapar:**
+   - Linux dağıtımınızı tespit eder (`apt`, `pacman`, `dnf`, `zypper`).
+   - Sisteminizde Node.js yoksa otomatik kurar (root yetkisi yoksa `~/.local` içine bağımsız Node.js LTS indirir).
+   - Yayın paketlerini (`npm install`) eksiksiz yükler.
+   - Masaüstünüze (`~/Desktop`) ve Uygulama Menünüze (`~/.local/share/applications`) resmi logolu **MİRA Broadcast Studio.desktop** kısayolunu ekler.
+   - Uygulamayı otomatik başlatır!
 
-#### Adım 2: Repoyu Klonlayın ve Klasöre Girin
+#### 📦 Seçenek 2: Bağımsız Taşınabilir Paket (`.AppImage` — Sıfır Kurulum)
+Node.js veya paket yüklemek istemeyen Linux kullanıcıları için:
+1. `dist/` klasöründeki veya Sürümler sayfasındaki **`MİRA Broadcast Studio-1.0.0.AppImage`** dosyasını indirin.
+2. Sağ tıklayıp *Özellikler ➔ İzinler ➔ "Bir program gibi çalışmasına izin ver"* seçeneğini işaretleyin (veya terminalde `chmod +x MİRA*.AppImage`).
+3. Çift tıklayarak doğrudan kullanın! Tüm kütüphaneler dosyanın içine gömülüdür.
+
+#### 🐧 Seçenek 3: Debian / Ubuntu / Mint Paketi (`.deb`)
+Ubuntu veya Debian tabanlı dağıtımlarda tek komutla sisteme entegre kurulum:
 ```bash
-git clone https://github.com/cihan-atas/mira-broadcast-studio.git
-cd mira-broadcast-studio
+sudo dpkg -i "dist/mira-broadcast-studio_1.0.0_amd64.deb"
 ```
 
-#### Adım 3: Çalıştırma İzinlerini Verin ve Başlatın
+#### ⚡ Seçenek 4: Hafif Sunucu & Web Tarayıcı Modu (`baslat-server.sh`)
+Düşük sistem kaynağı tüketimi için masaüstü penceresi açmadan sadece yerel sunucuyu başlatır ve tarayıcınızı açar:
 ```bash
-chmod +x baslat.sh baslat-app.sh
+./baslat-server.sh
 ```
-
-* **Masaüstü Uygulaması (Electron Modu):**
-  ```bash
-  ./baslat.sh
-  # veya
-  npm start
-  ```
-* **Hafif Web & Sunucu Modu:**
-  ```bash
-  node server.js
-  ```
-  Ardından tarayıcınızdan `http://localhost:8080/` adresine gidin.
 
 #### Adım 4: Linux OBS Studio Bağlantısı
 1. OBS Studio'da **Araçlar ➔ WebSocket Sunucusu Ayarları** menüsüne gidin.

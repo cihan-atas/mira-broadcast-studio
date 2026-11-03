@@ -63,7 +63,7 @@
     "kick",
     "tiktok"
   ],
-  "author": "Cihan Ataş",
+  "author": "Cihan Ataş <cihanatas@mira.studio>",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
