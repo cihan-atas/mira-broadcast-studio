@@ -1878,25 +1878,28 @@
           <input type="hidden" id="b-customcard-title" value="YAYIN PROGRAMI & DUYURU">
           <input type="hidden" id="b-customcard-body" value="Her akşam 20:00'de MLBB sıralama maçları!">
 
-          <!-- Kompakt Üst Ayar Satırı: Sahne Adı, Arka Plan, Genel Tema Rengi & Renk Kodu Üretici -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 12px;">
+          <!-- Kompakt Üst Ayar Satırı: Sahne Adı, 1920x1080 Çözünürlük, Arka Plan, Genel Tema Rengi & Renk Kodu Üretici -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px;">
             <div class="form-group" style="margin-bottom: 0;">
               <label>Galerideki Sahne / Öğe Adı</label>
               <input type="text" id="b-item-name" class="form-control" value="MİRA Özel Yayın Sahnesi" oninput="livePreviewBuilder()">
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
-              <label>Tuval Arka Plan Stili & Parçacık</label>
+              <label>📐 Tuval Boyutu & Arka Plan</label>
               <div style="display: flex; gap: 6px;">
+                <select id="b-canvas-res" class="form-control" style="max-width: 155px; font-weight: 800; color: #53fc18;" onchange="livePreviewBuilder()">
+                  <option value="1920x1080" selected>1920×1080 (16:9 HD)</option>
+                </select>
                 <select id="b-bg-style" class="form-control" onchange="livePreviewBuilder()">
                   <option value="transparent">Şeffaf OBS Katmanı</option>
                   <option value="nebula">Uzay Bulutsusu (Nebula)</option>
                   <option value="cybergrid">Siber Izgara (CyberGrid)</option>
                   <option value="darkglass">Koyu Stüdyo Camı</option>
                 </select>
-                <select id="b-particles" class="form-control" style="max-width: 115px;" onchange="livePreviewBuilder()">
-                  <option value="true">✨ Efekt Açık</option>
-                  <option value="false">🚫 Kapalı</option>
+                <select id="b-particles" class="form-control" style="max-width: 105px;" onchange="livePreviewBuilder()">
+                  <option value="true">✨ Efekt</option>
+                  <option value="false">🚫 Yok</option>
                 </select>
               </div>
             </div>
@@ -1923,7 +1926,7 @@
             </div>
           </div>
 
-          <!-- Hızlı Renk Paletleri & Modül Aç/Kapa Çipleri -->
+          <!-- Hızlı Renk Paletleri & Adım Adım Tuvale Kart Ekleme Çipleri -->
           <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.07);">
             <div class="preset-colors-bar" style="margin-top: 0; align-items: center;">
               <span style="font-size: 11px; font-weight: 800; color: #94a3b8; align-self: center;">RENK PALETİ:</span>
@@ -1936,14 +1939,14 @@
             </div>
 
             <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-              <span style="font-size: 11px; font-weight: 800; color: #94a3b8;">KARTLAR:</span>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-topbar" checked onchange="livePreviewBuilder()"> 📊 Üst Bar</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-gameframe" checked onchange="livePreviewBuilder()"> 🎮 Oyun</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-showcase" checked onchange="livePreviewBuilder()"> 🃏 Vitrin</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-social" checked onchange="livePreviewBuilder()"> 🌐 Sosyal</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-webcam" checked onchange="livePreviewBuilder()"> 📷 Kamera</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-chat" checked onchange="livePreviewBuilder()"> 💬 Sohbet</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-music" checked onchange="livePreviewBuilder()"> 🎵 Müzik</label>
+              <span style="font-size: 11px; font-weight: 800; color: #94a3b8;">TUVALE MODÜL EKLE / ÇIKAR:</span>
+              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-topbar" onchange="livePreviewBuilder()"> 📊 Üst Bar</label>
+              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-gameframe" onchange="livePreviewBuilder()"> 🎮 Oyun</label>
+              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-showcase" onchange="livePreviewBuilder()"> 🃏 Vitrin</label>
+              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-social" onchange="livePreviewBuilder()"> 🌐 Sosyal</label>
+              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-webcam" onchange="livePreviewBuilder()"> 📷 Kamera</label>
+              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-chat" onchange="livePreviewBuilder()"> 💬 Sohbet</label>
+              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-music" onchange="livePreviewBuilder()"> 🎵 Müzik</label>
               <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-goal" onchange="livePreviewBuilder()"> 🎯 Hedef</label>
               <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-skills" onchange="livePreviewBuilder()"> ⚡ Skill</label>
               <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-customcard" onchange="livePreviewBuilder()"> 📌 Duyuru</label>
@@ -2783,17 +2786,17 @@
       document.getElementById('b-bg-style').value = 'transparent';
       document.getElementById('b-particles').value = 'true';
 
-      document.getElementById('b-show-topbar').checked = true;
-      document.getElementById('b-show-gameframe').checked = true;
-      document.getElementById('b-show-showcase').checked = true;
+      document.getElementById('b-show-topbar').checked = false;
+      document.getElementById('b-show-gameframe').checked = false;
+      document.getElementById('b-show-showcase').checked = false;
       document.getElementById('b-pos-showcase').value = 'top-left';
-      document.getElementById('b-show-social').checked = true;
+      document.getElementById('b-show-social').checked = false;
       document.getElementById('b-pos-social').value = 'middle-left';
-      document.getElementById('b-show-webcam').checked = true;
+      document.getElementById('b-show-webcam').checked = false;
       document.getElementById('b-pos-webcam').value = 'bottom-left';
-      document.getElementById('b-show-chat').checked = true;
+      document.getElementById('b-show-chat').checked = false;
       document.getElementById('b-pos-chat').value = 'top-right';
-      document.getElementById('b-show-music').checked = true;
+      document.getElementById('b-show-music').checked = false;
       document.getElementById('b-pos-music').value = 'bottom-center';
       document.getElementById('b-show-goal').checked = false;
       document.getElementById('b-show-skills').checked = false;
@@ -2840,17 +2843,18 @@
       document.getElementById('b-bg-style').value = cfg.bgStyle || 'transparent';
       document.getElementById('b-particles').value = cfg.showParticles === false ? 'false' : 'true';
 
-      document.getElementById('b-show-topbar').checked = cfg.showTopBar !== false;
-      document.getElementById('b-show-gameframe').checked = cfg.showGameFrame !== false;
-      document.getElementById('b-show-showcase').checked = cfg.showShowcase !== false;
+      const isCanvasItem = (item.category || 'canvas') === 'canvas';
+      document.getElementById('b-show-topbar').checked = isCanvasItem ? !!cfg.showTopBar : (cfg.showTopBar !== false);
+      document.getElementById('b-show-gameframe').checked = isCanvasItem ? !!cfg.showGameFrame : (cfg.showGameFrame !== false);
+      document.getElementById('b-show-showcase').checked = isCanvasItem ? !!cfg.showShowcase : (cfg.showShowcase !== false);
       if (cfg.showcasePos) document.getElementById('b-pos-showcase').value = cfg.showcasePos;
-      document.getElementById('b-show-social').checked = cfg.showSocial !== false;
+      document.getElementById('b-show-social').checked = isCanvasItem ? !!cfg.showSocial : (cfg.showSocial !== false);
       if (cfg.socialPos) document.getElementById('b-pos-social').value = cfg.socialPos;
-      document.getElementById('b-show-webcam').checked = cfg.showWebcam !== false;
+      document.getElementById('b-show-webcam').checked = isCanvasItem ? !!cfg.showWebcam : (cfg.showWebcam !== false);
       if (cfg.webcamPos) document.getElementById('b-pos-webcam').value = cfg.webcamPos;
-      document.getElementById('b-show-chat').checked = cfg.showChat !== false;
+      document.getElementById('b-show-chat').checked = isCanvasItem ? !!cfg.showChat : (cfg.showChat !== false);
       if (cfg.chatPos) document.getElementById('b-pos-chat').value = cfg.chatPos;
-      document.getElementById('b-show-music').checked = cfg.showMusic !== false;
+      document.getElementById('b-show-music').checked = isCanvasItem ? !!cfg.showMusic : (cfg.showMusic !== false);
       if (cfg.musicPos) document.getElementById('b-pos-music').value = cfg.musicPos;
       document.getElementById('b-show-goal').checked = !!cfg.showGoal;
       if (cfg.goalPos) document.getElementById('b-pos-goal').value = cfg.goalPos;

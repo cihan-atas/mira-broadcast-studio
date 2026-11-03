@@ -1211,7 +1211,9 @@
     widgetOverrides = JSON.parse(JSON.stringify(widgetsMap));
     discoverWidgets();
 
-    if (widgetOverrides.__extraCards && Array.isArray(widgetOverrides.__extraCards)) {
+    if (widgetOverrides.__extraCards && Array.isArray(widgetOverrides.__extraCards) && widgetOverrides.__extraCards.length > 0) {
+      const emptyGuide = document.getElementById('mira-empty-canvas-guide');
+      if (emptyGuide) emptyGuide.remove();
       const root = document.getElementById('dynamic-stage') || getCanvasRoot();
       widgetOverrides.__extraCards.forEach(cDef => {
         if (!document.querySelector(`[data-mira-widget="${cDef.id}"]`)) {
