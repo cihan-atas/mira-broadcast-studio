@@ -806,7 +806,7 @@
       function buildShowcaseHtml(cfg, posClass) {
         const avatar = cfg.avatarUrl || 'kick/vexana/assets/images/portrait.jpg';
         return `
-          <div class="pos-slot ${posClass}">
+          <div class="pos-slot ${posClass}" data-widget-id="showcase" data-widget-label="🃏 Vitrin Kartı">
             <div class="mod-card mod-showcase-card">
               <div class="mod-showcase-top">
                 <img src="${esc(avatar)}" class="mod-showcase-avatar" alt="Avatar" onerror="this.src='kick/vexana/assets/images/avatar.jpg'">
@@ -828,7 +828,7 @@
 
       function buildWebcamHtml(cfg, posClass) {
         return `
-          <div class="pos-slot ${posClass}">
+          <div class="pos-slot ${posClass}" data-widget-id="webcam" data-widget-label="📷 Kamera Çerçevesi">
             <div class="mod-card mod-webcam-card">
               <div class="mod-webcam-header">
                 <span>📷 ${esc(cfg.title || 'MİRA CAM')}</span>
@@ -849,7 +849,7 @@
 
       function buildSocialHtml(cfg, posClass) {
         return `
-          <div class="pos-slot ${posClass}">
+          <div class="pos-slot ${posClass}" data-widget-id="social" data-widget-label="🌐 Sosyal Medya Kartı">
             <div class="mod-card mod-social-card">
               <div class="mod-card-header">
                 <span>🌐 ${esc(cfg.title || 'SOSYAL MEDYA')}</span>
@@ -867,7 +867,7 @@
         let bars = '';
         for (let i = 0; i < 16; i++) bars += `<div class="mod-viz-bar"></div>`;
         return `
-          <div class="pos-slot ${posClass}">
+          <div class="pos-slot ${posClass}" data-widget-id="music" data-widget-label="🎵 Müzik & Ekolayzer Kartı">
             <div class="mod-card mod-music-card">
               <div class="mod-card-header">
                 <span>🎵 ${esc(cfg.title || 'ŞU AN ÇALAN (NOW PLAYING)')}</span>
@@ -885,7 +885,7 @@
         const tar = Math.max(1, parseInt(cfg.goalTarget || 200, 10));
         const pct = Math.min(100, Math.round((cur / tar) * 100));
         return `
-          <div class="pos-slot ${posClass}">
+          <div class="pos-slot ${posClass}" data-widget-id="goal" data-widget-label="🎯 Canlı Hedef Kartı">
             <div class="mod-card mod-goal-card">
               <div class="mod-card-header">
                 <span id="custom-goal-title">🎯 ${esc(cfg.goalTitle || cfg.title || 'TAKİPÇİ HEDEFİ')}</span>
@@ -901,7 +901,7 @@
 
       function buildSkillsHtml(cfg, posClass) {
         return `
-          <div class="pos-slot ${posClass}">
+          <div class="pos-slot ${posClass}" data-widget-id="skills" data-widget-label="⚡ 4'lü Skill Rehberi">
             <div class="mod-card mod-skills-card">
               <div class="mod-card-header">
                 <span>⚡ ${esc(cfg.title || 'YETENEK & SKILL REHBERİ')}</span>
@@ -932,7 +932,7 @@
 
       function buildChatHtml(cfg, posClass) {
         return `
-          <div class="pos-slot ${posClass}">
+          <div class="pos-slot ${posClass}" data-widget-id="chat" data-widget-label="💬 Canlı Sohbet Paneli">
             <div class="mod-card mod-chat-card">
               <div class="mod-card-header">
                 <span>💬 CANLI SOHBET</span>
@@ -948,7 +948,7 @@
 
       function buildCustomCardHtml(cfg, posClass) {
         return `
-          <div class="pos-slot ${posClass}">
+          <div class="pos-slot ${posClass}" data-widget-id="customcard" data-widget-label="📌 Özel Duyuru Kartı">
             <div class="mod-card mod-custom-card">
               <div class="mod-card-header">
                 <span>📌 ${esc(cfg.customCardTitle || 'DUYURU & BİLGİ')}</span>
@@ -1231,5 +1231,6 @@
       }
     })();
   </script>
+  <script src="shared/js/interactive-editor.js"></script>
 </body>
 </html>

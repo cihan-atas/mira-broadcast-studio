@@ -919,5 +919,12 @@
 
     const savedDonation = localStorage.getItem('recent_donation');
     updateRecentStat('donation', savedDonation || '-');
+
+    // Etkileşimli Sürükle-Bırak, Boyutlandır & Kart Düzenleme Motorunu Yükle
+    if (!window.__MIRA_INTERACTIVE_EDITOR_LOADED__) {
+      const s = document.createElement('script');
+      s.src = '/shared/js/interactive-editor.js';
+      document.body.appendChild(s);
+    }
   });
 })();

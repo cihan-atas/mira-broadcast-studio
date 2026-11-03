@@ -58,6 +58,21 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
 * **🗂️ Kendi Galerim & Özelleştirme (Edit):** Kullanıcı Ana Galeri'den beğendiği şablonları kendi galerisine kaydedebilir (`user-gallery.json`), **"✏️ Düzenle"** ile başlıklarını, yayıncı adını, renk paletini, sosyal medya hesaplarını ve görünür modüllerini kendine göre değiştirebilir ve **"▶️ Yayına Ver"** ile tek tıkla yayına alabilir.
 * **🎨 Boş Tuval (1920×1080 Blank Canvas Builder):** Kullanıcı sıfırdan boş bir 1920×1080 tuval açarak istediği modülleri (Oyun çerçevesi, Kamera, Vitrin, Chat, Müzik, Hedef, Yetenekler, Özel Duyuru Kartı) açıp kapatabilir, ekrandaki konumlarını (`Sol Üst`, `Sağ Alt`, `Alt Orta` vb.) ve neon renklerini seçerek tamamen kendine özgü sahneler oluşturabilir ([`custom-overlay.html`](file:///home/zeus/Desktop/yayın/custom-overlay.html)).
 
+### ✅ Aşama 7: Etkileşimli Sürükle-Bırak, 8 Yönlü Boyutlandırma & Karta Tıklayınca Açılan "Kartı Düzenleme Kartı"
+* **Tam Genişlikli İnteraktif Tuval Modu (`studio-visual-editor-mode`):** Kullanıcı **"🎨 Boş Tuval & Editör"** sekmesine geçtiğinde veya galerisindeki herhangi bir sahne/kart üzerinde **"✏️ Düzenle"** butonuna tıkladığında, stüdyo tam genişlikli tek sütun görsel editör moduna geçer ve 1920×1080 canlı tuval fare etkileşimine (`pointer-events: auto`) açılır.
+* **Canlı Sürükle-Bırak (Drag & Drop) ve 8 Yönlü Yeniden Boyutlandırma (Resize):**
+  * Tuval üzerindeki tüm kartlar (`Vitrin Kartı`, `Kamera Çerçevesi`, `Oyun Çerçevesi`, `Üst Yayın Barı`, `Canlı Sohbet`, `Müzik Kartı`, `Sosyal Medya`, `Yetenek Rehberi`, `Takipçi Hedef Barı`, `Özel Kartlar`) fareyle tutulup 1920×1080 tuvalin istenilen noktasına sürüklenebilir.
+  * Merkez hizalama kılavuz çizgileri (`mira-snap-guide-x`, `mira-snap-guide-y`) ile kartlar tuvalin tam ortasına kolayca hizalanır.
+  * Seçilen kartın köşelerinde ve kenarlarında beliren **8 yeşil tutamaç (`nw, n, ne, e, se, s, sw, w`)** ile kartın genişliği ve yüksekliği gerçek zamanlı olarak büyütülüp küçültülebilir ([`shared/js/interactive-editor.js`](file:///home/zeus/Desktop/yayın/shared/js/interactive-editor.js)).
+* **Karta Tıklayınca Açılan "✏️ Kartı Düzenleme Kartı" (`#mira-card-inspector`):**
+  * Tuval üzerindeki herhangi bir karta tıklandığında hemen yanında yüzen **"Kartı Düzenleme Kartı"** açılır:
+    1. **📝 Karttaki Yazılar:** Tıklanan kartın içindeki tüm başlıklar, alt başlıklar, etiketler, sosyal medya linkleri ve açıklamalar otomatik algılanır; kullanıcı yazdıkça kart üzerindeki yazı anında canlı olarak değişir.
+    2. **🔤 Yazı Fontu & Boyutu:** 8 farklı yayıncı fontu (`Plus Jakarta Sans`, `Orbitron`, `Cinzel Decorative`, `Rajdhani`, `Bebas Neue`, `Montserrat`, `Playfair Display`, `JetBrains Mono`) ve `%70 - %160` arası yazı boyutu ölçeklendirme sürgüsü.
+    3. **🎨 Yazı Renkleri:** Ana başlık/metin rengi ve alt başlık rengi için canlı renk seçiciler (Color Picker).
+    4. **🖼️ Kart Çerçeve & Arka Plan Tasarımı:** Çerçeve/neon parlama rengi, arka plan rengi, arka plan saydamlığı (`%0 - %100`) ve köşe yuvarlaklığı (`0px - 44px`).
+    5. **📐 Konum, Boyut & Katman Yönetimi:** Hassas `X`, `Y`, `Genişlik`, `Yükseklik` kutuları, **⬆️ Öne Getir**, **⬇️ Arkaya Gönder**, **🔄 Sıfırla**, **👁️‍🗨️ Gizle** ve **➕ Yeni Kart Ekle** özellikleri.
+  * Tüm sürükleme, boyutlandırma, yazı ve stil değişiklikleri `user-gallery.json` içindeki `config.widgets` altında kalıcı olarak kaydedilir ve OBS Studio'da birebir aynı şekilde görünür.
+
 ---
 
 ## 💻 3. Çift İşletim Sistemi (Linux & Windows) Mimarisi
@@ -92,7 +107,8 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
 ├── tiktok/                  # TikTok Live Studio platformuna özel 5 Hero ve 5 Sahne
 ├── shared/                  # Paylaşılan ortak kütüphaneler
 │   ├── css/base.css         # 1920x1080 merkezlenmiş oyun & cam katmanları
-│   └── js/                  # auto-fit.js, hero-dynamic.js parçacık & ses motoru
+│   └── js/                  # auto-fit.js, hero-dynamic.js, interactive-editor.js (Sürükle-Boyutlandır & Kart Düzenleyici)
+├── custom-overlay.html      # Boş Tuval, Bağımsız Kartlar, Alertler ve Standby Sahne Motoru
 ├── baslat-app.sh            # Linux Electron masaüstü başlatıcı
 ├── baslat.sh                # Linux doğrudan masaüstü app çalıştırıcı
 ├── baslat-app.bat           # Windows Electron masaüstü başlatıcı

@@ -202,9 +202,21 @@ window.OVERLAY_CONFIG = {
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSceneGalleryCustomization);
+    document.addEventListener('DOMContentLoaded', () => {
+      initSceneGalleryCustomization();
+      if (!window.__MIRA_INTERACTIVE_EDITOR_LOADED__) {
+        const s = document.createElement('script');
+        s.src = '/shared/js/interactive-editor.js';
+        document.body.appendChild(s);
+      }
+    });
   } else {
     initSceneGalleryCustomization();
+    if (!window.__MIRA_INTERACTIVE_EDITOR_LOADED__) {
+      const s = document.createElement('script');
+      s.src = '/shared/js/interactive-editor.js';
+      document.body.appendChild(s);
+    }
   }
 })();
 
