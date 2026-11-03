@@ -880,12 +880,21 @@ const server = http.createServer((req, res) => {
       }
     };
     const proxyReq = https.request(options, (proxyRes) => {
-      res.writeHead(proxyRes.statusCode, { 'Content-Type': 'application/json' });
+      if (!res.headersSent) {
+        res.writeHead(proxyRes.statusCode || 200, { 'Content-Type': 'application/json' });
+      }
+      proxyRes.on('error', () => {
+        if (!res.writableEnded) res.end();
+      });
       proxyRes.pipe(res);
     });
     proxyReq.on('error', (e) => {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: e.message }));
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      } else if (!res.writableEnded) {
+        res.end();
+      }
     });
     proxyReq.end();
     return;
