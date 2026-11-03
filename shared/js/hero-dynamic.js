@@ -701,9 +701,10 @@
     const curTimeEl = document.getElementById('music-time-current') || document.querySelector('.audio-time-current');
     const durTimeEl = document.getElementById('music-time-duration') || document.querySelector('.audio-time-duration');
 
-    let currentSeconds = 45;
-    let durationSeconds = 210; // 3 dakika 30 saniye varsayılan
+    let currentSeconds = 0;
+    let durationSeconds = 180;
     let lastSongTitle = '';
+    let isPlaying = true;
 
     function formatTime(sec) {
       if (!sec || isNaN(sec) || sec < 0) sec = 0;
@@ -743,23 +744,31 @@
       if (!data) return;
       if (data.title) updateTitle(data.title);
 
-      if (typeof data.progress === 'number' && data.progress >= 0) {
-        currentSeconds = data.progress;
-      }
-      if (typeof data.duration === 'number' && data.duration > 0) {
-        durationSeconds = data.duration;
+      // Milisaniye veya saniye birimini düzelt
+      let prog = typeof data.progress === 'number' ? data.progress : 0;
+      let dur = typeof data.duration === 'number' ? data.duration : durationSeconds;
+      if (prog > 1000) prog = Math.floor(prog / 1000);
+      if (dur > 1000) dur = Math.floor(dur / 1000);
+
+      if (dur > 0) durationSeconds = dur;
+      if (data.status) isPlaying = (data.status === 'playing');
+
+      // Titreme & geriye sarma engelleme (Anti-jitter):
+      // Sadece 2 saniyeden fazla sapma varsa veya başlangıçsa doğrudan eşitle
+      if (Math.abs(currentSeconds - prog) >= 2 || currentSeconds === 0) {
+        currentSeconds = prog;
       }
       renderProgress();
     }
 
     // Her 1 saniyede yerel akış (Progress barın canlı ve akıcı ilerlemesi)
     setInterval(() => {
-      if (currentSeconds < durationSeconds) {
-        currentSeconds++;
-      } else {
-        currentSeconds = 0;
+      if (isPlaying) {
+        if (currentSeconds < durationSeconds) {
+          currentSeconds++;
+        }
+        renderProgress();
       }
-      renderProgress();
     }, 1000);
 
     function fetchNowPlaying() {

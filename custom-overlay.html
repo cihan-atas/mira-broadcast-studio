@@ -1536,8 +1536,13 @@
         } else if (ev.type === 'UPDATE_SONG' && ev.title) {
           const sEl = document.getElementById('mod-song-title');
           if (sEl) sEl.textContent = ev.title.startsWith('♪') ? ev.title : `♪ ${ev.title}`;
-          if (typeof ev.progress === 'number') overlaySongCur = ev.progress;
-          if (typeof ev.duration === 'number' && ev.duration > 0) overlaySongDur = ev.duration;
+          if (typeof ev.progress === 'number') {
+            let p = ev.progress > 1000 ? Math.floor(ev.progress / 1000) : ev.progress;
+            if (Math.abs(overlaySongCur - p) >= 2 || overlaySongCur === 0) overlaySongCur = p;
+          }
+          if (typeof ev.duration === 'number' && ev.duration > 0) {
+            overlaySongDur = ev.duration > 1000 ? Math.floor(ev.duration / 1000) : ev.duration;
+          }
           renderOverlaySongProgress();
         }
       }

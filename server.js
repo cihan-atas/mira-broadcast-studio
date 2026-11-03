@@ -88,6 +88,118 @@ setInterval(() => {
 }, 5000);
 connectObsWebSocket();
 
+// ========================================================
+// 0.2 TUNA (OBS 1608) VE SPOTIFY CANLI ARKA PLAN SENKRONİZASYONU
+// ========================================================
+let isTunaOnline = false;
+let tunaPort = 1608;
+let lastKnownFileContent = '';
+
+function pollTunaBackground() {
+  const reqTuna = http.get(`http://127.0.0.1:${tunaPort}/`, (tRes) => {
+    let tBody = '';
+    tRes.on('data', chunk => tBody += chunk);
+    tRes.on('end', () => {
+      try {
+        const parsed = JSON.parse(tBody);
+        if (parsed && (parsed.title || parsed.song)) {
+          isTunaOnline = true;
+          const rawTitle = (parsed.title || parsed.song || '').trim();
+          const rawArtist = Array.isArray(parsed.artists) ? parsed.artists.join(', ') : (parsed.artist || '').trim();
+
+          const rawDurMs = typeof parsed.duration === 'number' ? parsed.duration : (parsed.duration_ms || 0);
+          const rawProgMs = typeof parsed.progress === 'number' ? parsed.progress : (parsed.progress_ms || 0);
+
+          const durSec = rawDurMs > 0 ? Math.floor(rawDurMs / 1000) : 210;
+          const progSec = rawProgMs >= 0 ? Math.floor(rawProgMs / 1000) : 0;
+          const status = parsed.status || (rawProgMs > 0 ? 'playing' : 'paused');
+
+          const formattedTitle = rawArtist ? `♪ ${rawArtist} - ${rawTitle}` : `♪ ${rawTitle}`;
+          const titleChanged = (currentSongTitle !== formattedTitle);
+
+          currentSongTitle = formattedTitle;
+          currentSongArtist = rawArtist || 'Spotify Canlı';
+          currentSongDuration = durSec;
+          currentSongProgress = progSec;
+          currentSongStatus = status;
+          currentSongLastUpdate = Date.now();
+
+          // now-playing.txt senkronu
+          const txtPath = path.join(__dirname, 'now-playing.txt');
+          try {
+            if (fs.existsSync(txtPath)) {
+              const curTxt = fs.readFileSync(txtPath, 'utf-8').trim();
+              if (curTxt !== formattedTitle) {
+                fs.writeFileSync(txtPath, formattedTitle, 'utf-8');
+              }
+            }
+          } catch(e) {}
+
+          // OBS Metin kaynağını otomatik güncelle
+          if (titleChanged && obsWsClient && obsWsConnected) {
+            setObsTextSource('Now Playing', currentSongTitle);
+          }
+
+          // Canlı event yayını
+          eventQueue.push({
+            type: 'UPDATE_SONG',
+            title: currentSongTitle,
+            artist: currentSongArtist,
+            progress: currentSongProgress,
+            duration: currentSongDuration,
+            status: currentSongStatus,
+            source: 'tuna',
+            time: Date.now()
+          });
+        }
+      } catch (e) {}
+    });
+  });
+
+  reqTuna.on('error', () => {
+    isTunaOnline = false;
+    checkNowPlayingFileFallback();
+  });
+
+  reqTuna.setTimeout(1200, () => {
+    reqTuna.destroy();
+  });
+}
+
+function checkNowPlayingFileFallback() {
+  const txtPath = path.join(__dirname, 'now-playing.txt');
+  if (fs.existsSync(txtPath)) {
+    try {
+      const content = fs.readFileSync(txtPath, 'utf-8').trim();
+      if (content && content !== lastKnownFileContent) {
+        lastKnownFileContent = content;
+        currentSongTitle = content.startsWith('♪') ? content : `♪ ${content}`;
+        currentSongProgress = 0;
+        currentSongLastUpdate = Date.now();
+        currentSongStatus = 'playing';
+
+        eventQueue.push({
+          type: 'UPDATE_SONG',
+          title: currentSongTitle,
+          artist: currentSongArtist,
+          progress: 0,
+          duration: currentSongDuration || 210,
+          status: 'playing',
+          source: 'file',
+          time: Date.now()
+        });
+
+        if (obsWsClient && obsWsConnected) {
+          setObsTextSource('Now Playing', currentSongTitle);
+        }
+      }
+    } catch(e) {}
+  }
+}
+
+setInterval(pollTunaBackground, 1500);
+pollTunaBackground();
+
 function setObsScene(targetScene, callback) {
   if (!obsWsConnected || !obsWsClient) {
     return callback(new Error('OBS WebSocket bağlı değil'));
@@ -1872,16 +1984,10 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/now-playing') {
     const txtPath = path.join(__dirname, 'now-playing.txt');
     if (req.method === 'GET') {
-      if (fs.existsSync(txtPath)) {
-        try {
-          const content = fs.readFileSync(txtPath, 'utf-8').trim();
-          if (content) currentSongTitle = content;
-        } catch (e) {}
-      }
       let elapsed = currentSongProgress;
-      if (currentSongStatus === 'playing') {
+      if (!isTunaOnline && currentSongStatus === 'playing') {
         const diffSec = Math.floor((Date.now() - currentSongLastUpdate) / 1000);
-        elapsed = (currentSongProgress + diffSec) % (currentSongDuration || 210);
+        elapsed = Math.min(currentSongDuration || 210, currentSongProgress + diffSec);
       }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({
@@ -1890,6 +1996,7 @@ const server = http.createServer((req, res) => {
         progress: elapsed,
         duration: currentSongDuration,
         status: currentSongStatus,
+        isTuna: isTunaOnline,
         obsConnected: obsWsConnected,
         filePath: txtPath
       }));

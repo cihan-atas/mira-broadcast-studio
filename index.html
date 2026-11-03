@@ -9094,8 +9094,16 @@
     }
 
     function updateDeckMusicProgress(prog, dur, status) {
-      if (typeof prog === 'number' && prog >= 0) deckMusicCurrentSec = prog;
-      if (typeof dur === 'number' && dur > 0) deckMusicDurationSec = dur;
+      if (typeof prog === 'number') {
+        if (prog > 1000) prog = Math.floor(prog / 1000);
+        if (Math.abs(deckMusicCurrentSec - prog) >= 2 || deckMusicCurrentSec === 0) {
+          deckMusicCurrentSec = prog;
+        }
+      }
+      if (typeof dur === 'number' && dur > 0) {
+        if (dur > 1000) dur = Math.floor(dur / 1000);
+        deckMusicDurationSec = dur;
+      }
       if (status) deckMusicStatus = status;
 
       const fill = document.getElementById('deck-music-progress-fill');
@@ -9104,7 +9112,7 @@
       const statusEl = document.getElementById('deck-music-time-status');
 
       if (fill) {
-        const pct = deckMusicDurationSec > 0 ? Math.min(100, (deckMusicCurrentSec / deckMusicDurationSec) * 100) : 0;
+        const pct = deckMusicDurationSec > 0 ? Math.min(100, Math.max(0, (deckMusicCurrentSec / deckMusicDurationSec) * 100)) : 0;
         fill.style.width = `${pct.toFixed(1)}%`;
       }
       if (curEl) curEl.textContent = formatDeckTime(deckMusicCurrentSec);
