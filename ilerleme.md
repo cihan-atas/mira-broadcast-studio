@@ -82,8 +82,17 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
        * Kullanıcı **mouse'u palet üzerinde gezdirdikçe (`mousemove`)** piksel hassasiyetinde tüm ara tonları canlı olarak görür, anında **HEX (`#a855f7`)** ve **RGB (`rgb(168, 85, 247)`)** kodunu alır ve palete tıklayarak beğendiği rengi **📌 Sabitleyebilir** (`Tıkla=Sabitle / Çöz`) veya tek tıkla (`🟣 Çerçeveye Ver`, `🔤 Başlığa Ver`, `📝 Alt Yazıya Ver`, `🖼️ Arka Plana Ver`, `⚡ Tüm Karta Ver`) uygulayabilir.
        * **12'li Lüks Neon Renk Paleti:** Tek tıkla uygulanabilen hazır yayıncı renk paleti ve ayrı renk seçiciler.
     4. **🖼️ Kart Çerçeve & Arka Plan Tasarımı:** Çerçeve/neon parlama rengi, arka plan rengi, arka plan saydamlığı (`%0 - %100`) ve köşe yuvarlaklığı (`0px - 44px`).
-    5. **📐 Konum, Boyut & Katman Yönetimi:** Hassas `X`, `Y`, `Genişlik`, `Yükseklik` kutuları, **⬆️ Öne Getir**, **⬇️ Arkaya Gönder** ve **👁️‍🗨️ Kartı Gizle** kontrolleri.
-    6. **🛠️ Hızlı Sıfırlama & Default'a Çekme Merkezi (Seçili Kart veya Tüm Kartlar):**
+    5. **📐 Konum, Boyut, Katman Yönetimi & 🗑️ Kartı Tuvalden Silme:**
+       * Hassas `X`, `Y`, `Genişlik`, `Yükseklik` kutuları, **⬆️ Öne Getir**, **⬇️ Arkaya Gönder**, **👁️‍🗨️ Kartı Gizle** ve **🗑️ Kartı Tuvalden Sil** kontrolleri.
+       * **4 Farklı Yoldan Kart Silme:**
+         1. Seçili kartın yeşil üst etiketindeki **`🗑️ Sil`** butonu (`#mira-selection-del-btn`).
+         2. Yüzen "Kartı Düzenleme Kartı" içindeki **`🗑️ Kartı Tuvalden Sil`** ve alt çubuktaki **`🗑️ Kartı Sil`** butonları (`#mira-insp-delete`, `#mira-insp-footer-del-btn`).
+         3. Tuvalin altındaki **Tuvaldeki Kartlar** listesindeki her kartın yanındaki **`🗑️ Sil`** butonu.
+         4. Kart seçiliyken klavyeden **`Delete` veya `Backspace`** tuşu.
+    6. **🗂️ Tuvalin Altında Tüm Kartlar Listesi (`#mira-bottom-cards-dock` & `#studio-canvas-cards-bar`) — Basınca Direkt O Karta Odaklansın:**
+       * Hem 1920×1080 interaktif tuvalin en altında (`#mira-bottom-cards-dock`) hem de Mira Studio'daki canlı tuval monitörünün hemen altında (`#studio-canvas-cards-bar`) tuval üzerindeki tüm aktif kartlar gerçek zamanlı olarak listelenir.
+       * Kullanıcı listedeki herhangi bir karta tıkladığında (`focusWidgetById` / `focusCardOnCanvasFromStudio`), tuval **anında o kartı seçer, etrafında parlak neon odaklanma animasyonu (`mira-focus-flash`) oynatır ve hemen yanında o kartın "✏️ Kartı Düzenleme Kartı"nı açar**.
+    7. **🛠️ Hızlı Sıfırlama & Default'a Çekme Merkezi (Seçili Kart veya Tüm Kartlar):**
        * **Sadece Seçili Kart İçin:** `📍 Konumu Default'a Çek`, `📐 Boyutu Sıfırla`, `🎨 Tasarımı Sıfırla`, `🔄 Seçili Kartı Sıfırla`.
        * **Tuvaldeki Tüm Kartlar İçin:** `📍 Tüm Konumları Default'a Çek`, `📐 Tüm Boyutları Sıfırla`, `🎨 Tüm Tasarımı Sıfırla`, `🔄 Tüm Tuvali Sıfırla`.
 * **➕ Kendi Galerimden & Ana Mağazadan Yeni Kart Ekleme Modalı (`#mira-add-card-modal`):**

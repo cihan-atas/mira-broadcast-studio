@@ -122,6 +122,103 @@
         align-items: center;
         gap: 8px;
       }
+      .mira-selection-del-btn {
+        background: #ef4444;
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.4);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 800;
+        cursor: pointer;
+        pointer-events: auto;
+        transition: all 0.14s;
+      }
+      .mira-selection-del-btn:hover {
+        background: #dc2626;
+        transform: scale(1.06);
+      }
+      @keyframes miraFocusFlash {
+        0%   { box-shadow: 0 0 0 0 rgba(83, 252, 24, 0.95), 0 0 45px #53fc18; }
+        50%  { box-shadow: 0 0 0 14px rgba(83, 252, 24, 0), 0 0 65px #a855f7; }
+        100% { box-shadow: 0 0 0 0 rgba(83, 252, 24, 0); }
+      }
+      .mira-focus-flash {
+        animation: miraFocusFlash 0.85s ease-out;
+      }
+
+      /* Tuval Altı Aktif Kartlar Listesi Dock Barı */
+      .mira-bottom-cards-dock {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10002;
+        max-width: 1860px;
+        background: rgba(9, 12, 20, 0.96);
+        border: 2px solid rgba(168, 85, 247, 0.72);
+        border-radius: 14px;
+        padding: 6px 12px;
+        display: none;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.9), 0 0 24px rgba(168, 85, 247, 0.38);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        backdrop-filter: blur(16px);
+      }
+      body.mira-edit-mode .mira-bottom-cards-dock {
+        display: flex;
+      }
+      .mira-dock-title {
+        font-size: 11px;
+        font-weight: 800;
+        color: #c084fc;
+        white-space: nowrap;
+        margin-right: 4px;
+      }
+      .mira-dock-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.06);
+        color: #e2e8f0;
+        font-size: 11.5px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .mira-dock-chip:hover {
+        background: rgba(168, 85, 247, 0.25);
+        border-color: #a855f7;
+        color: #fff;
+      }
+      .mira-dock-chip.active {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.32), rgba(5, 150, 105, 0.25));
+        border-color: #53fc18;
+        color: #fff;
+        box-shadow: 0 0 14px rgba(83, 252, 24, 0.35);
+      }
+      .mira-dock-chip-del {
+        background: rgba(239, 68, 68, 0.22);
+        border: 1px solid rgba(239, 68, 68, 0.5);
+        color: #fca5a5;
+        border-radius: 6px;
+        padding: 1px 6px;
+        font-size: 10.5px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.14s;
+      }
+      .mira-dock-chip-del:hover {
+        background: #ef4444;
+        color: #fff;
+      }
 
       /* 8 Yönlü Boyutlandırma Tutamaçları (Resize Handles) */
       .mira-resize-handle {
@@ -1404,13 +1501,14 @@
     updateSelectionBox();
   }
 
-  // Seçim Çerçevesi, Tutamaçlar, Kart Düzenleme Kartı ve Kart Ekleme Modalı UI
+  // Seçim Çerçevesi, Tutamaçlar, Kart Düzenleme Kartı, Alt Kart Listesi ve Kart Ekleme Modalı UI
   let selectionBoxEl = null;
   let selectionTagEl = null;
   let snapXEl = null;
   let snapYEl = null;
   let inspectorEl = null;
   let toolbarEl = null;
+  let bottomCardsDockEl = null;
   let addCardModalBackdropEl = null;
 
   function ensureEditorUI() {
@@ -1458,6 +1556,15 @@
       });
     }
 
+    if (!bottomCardsDockEl) {
+      bottomCardsDockEl = document.createElement('div');
+      bottomCardsDockEl.className = 'mira-bottom-cards-dock';
+      bottomCardsDockEl.id = 'mira-bottom-cards-dock';
+      bottomCardsDockEl.addEventListener('mousedown', (e) => e.stopPropagation());
+      bottomCardsDockEl.addEventListener('click', (e) => e.stopPropagation());
+      root.appendChild(bottomCardsDockEl);
+    }
+
     if (!snapXEl) {
       snapXEl = document.createElement('div');
       snapXEl.className = 'mira-snap-guide-x';
@@ -1471,7 +1578,10 @@
       selectionBoxEl = document.createElement('div');
       selectionBoxEl.className = 'mira-selection-box';
       selectionBoxEl.innerHTML = `
-        <div class="mira-selection-tag" id="mira-selection-tag">🃏 Kart Seçildi</div>
+        <div class="mira-selection-tag" id="mira-selection-tag">
+          <span id="mira-selection-tag-txt">🃏 Kart Seçildi</span>
+          <button type="button" class="mira-selection-del-btn" id="mira-selection-del-btn" title="Bu kartı tuvalden sil">🗑️ Sil</button>
+        </div>
         <div class="mira-resize-handle nw" data-dir="nw"></div>
         <div class="mira-resize-handle n"  data-dir="n"></div>
         <div class="mira-resize-handle ne" data-dir="ne"></div>
@@ -1482,7 +1592,22 @@
         <div class="mira-resize-handle w"  data-dir="w"></div>
       `;
       root.appendChild(selectionBoxEl);
-      selectionTagEl = selectionBoxEl.querySelector('#mira-selection-tag');
+      selectionTagEl = selectionBoxEl.querySelector('#mira-selection-tag-txt');
+
+      const selDelBtn = selectionBoxEl.querySelector('#mira-selection-del-btn');
+      if (selDelBtn) {
+        selDelBtn.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        });
+        selDelBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          if (selectedWidgetEl && selectedWidgetId) {
+            deleteWidgetFromCanvas(selectedWidgetEl, selectedWidgetId);
+          }
+        });
+      }
 
       selectionBoxEl.querySelectorAll('.mira-resize-handle').forEach(handle => {
         handle.addEventListener('mousedown', (e) => {
@@ -1530,10 +1655,143 @@
     };
   }
 
+  // Tuvalden Kart Silme (Hem Ekstra Kartları Hem Sahne Kartlarını Kaldırır)
+  function deleteWidgetFromCanvas(widgetEl, wid) {
+    const targetId = wid || (widgetEl && widgetEl.getAttribute('data-mira-widget'));
+    const targetEl = widgetEl || (targetId && document.querySelector(`[data-mira-widget="${targetId}"]`));
+    if (!targetId) return;
+
+    if (targetId.startsWith('custom_card_')) {
+      if (widgetOverrides.__extraCards && Array.isArray(widgetOverrides.__extraCards)) {
+        widgetOverrides.__extraCards = widgetOverrides.__extraCards.filter(c => c.id !== targetId);
+      }
+      delete widgetOverrides[targetId];
+      if (targetEl) {
+        const lEl = getLayoutTarget(targetEl);
+        if (lEl) lEl.remove();
+        else targetEl.remove();
+      }
+    } else {
+      const ov = widgetOverrides[targetId] || (widgetOverrides[targetId] = {});
+      ov.hidden = true;
+      ov.deleted = true;
+      if (targetEl) {
+        const lEl = getLayoutTarget(targetEl);
+        if (lEl) lEl.style.display = 'none';
+        targetEl.style.display = 'none';
+      }
+    }
+
+    if (selectedWidgetId === targetId) {
+      selectedWidgetEl = null;
+      selectedWidgetId = null;
+      if (inspectorEl) inspectorEl.classList.remove('open');
+      if (selectionBoxEl) selectionBoxEl.classList.remove('active');
+    }
+
+    renderBottomCardsDock();
+    notifyParentOfLiveChange();
+  }
+
+  // Kart ID'sine Göre Direkt O Karta Odaklanma (Seçer + Parlatır + Düzenleme Kartını Açar)
+  function focusWidgetById(wid) {
+    if (!wid) return;
+    discoverWidgets();
+    const el = document.querySelector(`[data-mira-widget="${wid}"]`);
+    if (!el) return;
+
+    const ov = widgetOverrides[wid];
+    if (ov && ov.hidden && !ov.deleted) {
+      ov.hidden = false;
+      applyWidgetOverride(el, wid, ov);
+    }
+
+    selectWidget(el);
+    openCardInspectorForWidget(el);
+
+    const styleTarget = getStyleTarget(el) || el;
+    styleTarget.classList.remove('mira-focus-flash');
+    void styleTarget.offsetWidth;
+    styleTarget.classList.add('mira-focus-flash');
+    setTimeout(() => styleTarget.classList.remove('mira-focus-flash'), 900);
+
+    renderBottomCardsDock();
+    notifyParentOfLiveChange();
+  }
+
+  // Tuvaldeki Tüm Aktif Kartların Listesini Döndürür
+  function getActiveCanvasCardsList() {
+    discoverWidgets();
+    const list = [];
+    const seen = new Set();
+    document.querySelectorAll('[data-mira-widget]').forEach(el => {
+      const wid = el.getAttribute('data-mira-widget');
+      if (!wid || seen.has(wid)) return;
+      const ov = widgetOverrides[wid];
+      if (ov && (ov.deleted || ov.hidden)) return;
+      const lEl = getLayoutTarget(el) || el;
+      if (window.getComputedStyle(lEl).display === 'none' || window.getComputedStyle(el).display === 'none') return;
+      seen.add(wid);
+      const r = getWidgetCanvasRect(el);
+      list.push({
+        id: wid,
+        label: el.getAttribute('data-mira-label') || '🃏 Kart',
+        x: Math.round(r.x),
+        y: Math.round(r.y),
+        w: Math.round(r.w),
+        h: Math.round(r.h),
+        selected: wid === selectedWidgetId
+      });
+    });
+    return list;
+  }
+
+  // Tuvalin Altındaki Aktif Kartlar Barını Günceller
+  function renderBottomCardsDock() {
+    if (!bottomCardsDockEl) return;
+    const cards = getActiveCanvasCardsList();
+    if (cards.length === 0) {
+      bottomCardsDockEl.innerHTML = `
+        <span class="mira-dock-title">🗂️ TUVALDEKİ KARTLAR (0):</span>
+        <span style="font-size:11.5px; color:#94a3b8;">Tuval şu an bomboş. Üstteki <strong>"➕ Yeni Kart Ekle"</strong> butonundan kart ekleyebilirsiniz.</span>
+      `;
+      return;
+    }
+
+    const chipsHtml = cards.map(c => `
+      <div class="mira-dock-chip ${c.selected ? 'active' : ''}" data-focus-wid="${c.id}" title="Tıklayınca direkt bu karta odaklanır ve düzenleme kartını açar">
+        <span>${c.label}</span>
+        <button type="button" class="mira-dock-chip-del" data-del-wid="${c.id}" title="Bu kartı tuvalden sil">🗑️ Sil</button>
+      </div>
+    `).join('');
+
+    bottomCardsDockEl.innerHTML = `
+      <span class="mira-dock-title">🗂️ TUVALDEKİ KARTLAR (${cards.length}) — Tıkla Odaklan:</span>
+      ${chipsHtml}
+    `;
+
+    bottomCardsDockEl.querySelectorAll('.mira-dock-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        if (e.target.closest('.mira-dock-chip-del')) return;
+        const wid = chip.getAttribute('data-focus-wid');
+        focusWidgetById(wid);
+      });
+    });
+
+    bottomCardsDockEl.querySelectorAll('.mira-dock-chip-del').forEach(delBtn => {
+      delBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wid = delBtn.getAttribute('data-del-wid');
+        deleteWidgetFromCanvas(null, wid);
+      });
+    });
+  }
+
   function updateSelectionBox() {
     if (!selectionBoxEl) return;
     if (!isEditMode || !selectedWidgetEl || selectedWidgetEl.style.display === 'none') {
       selectionBoxEl.classList.remove('active');
+      renderBottomCardsDock();
       return;
     }
     const r = getWidgetCanvasRect(selectedWidgetEl);
@@ -1547,6 +1805,7 @@
     if (selectionTagEl) {
       selectionTagEl.textContent = `${label} (${Math.round(r.w)}×${Math.round(r.h)})`;
     }
+    renderBottomCardsDock();
   }
 
   // ============================================================================
@@ -2133,7 +2392,7 @@
           <div style="display:flex; gap:6px;">
             <button type="button" class="mira-mini-btn" id="mira-insp-front" style="flex:1;">⬆️ Öne Getir</button>
             <button type="button" class="mira-mini-btn" id="mira-insp-back" style="flex:1;">⬇️ Arkaya Gönder</button>
-            <button type="button" class="mira-mini-btn danger" id="mira-insp-hide" style="flex:1;">👁️‍🗨️ Kartı Gizle</button>
+            <button type="button" class="mira-mini-btn danger" id="mira-insp-delete" style="flex:1.2; background:rgba(239,68,68,0.2); border-color:#ef4444; color:#fca5a5;">🗑️ Kartı Tuvalden Sil</button>
           </div>
         </div>
 
@@ -2160,8 +2419,9 @@
       </div>
 
       <div class="mira-insp-footer">
+        <button type="button" class="mira-btn danger" id="mira-insp-footer-del-btn" style="flex:0.8; background:rgba(239,68,68,0.18); border-color:#ef4444; color:#fca5a5;">🗑️ Kartı Sil</button>
         <button type="button" class="mira-btn primary" id="mira-insp-add-card-btn">➕ Kart Ekle</button>
-        <button type="button" class="mira-btn success" id="mira-insp-save-btn">💾 DEĞİŞİKLİKLERİ KAYDET</button>
+        <button type="button" class="mira-btn success" id="mira-insp-save-btn">💾 KAYDET</button>
       </div>
     `;
 
@@ -2463,13 +2723,15 @@
       applyWidgetOverride(widgetEl, wid, ov);
       notifyParentOfLiveChange();
     });
-    inspectorEl.querySelector('#mira-insp-hide').addEventListener('click', () => {
-      ov.hidden = true;
-      applyWidgetOverride(widgetEl, wid, ov);
-      inspectorEl.classList.remove('open');
-      selectionBoxEl.classList.remove('active');
-      notifyParentOfLiveChange();
+    inspectorEl.querySelector('#mira-insp-delete').addEventListener('click', () => {
+      deleteWidgetFromCanvas(widgetEl, wid);
     });
+    const footerDelBtn = inspectorEl.querySelector('#mira-insp-footer-del-btn');
+    if (footerDelBtn) {
+      footerDelBtn.addEventListener('click', () => {
+        deleteWidgetFromCanvas(widgetEl, wid);
+      });
+    }
 
     // 5. Sıfırlama & Default'a Çekme Butonları (Seçili Kart & Tüm Kartlar)
     inspectorEl.querySelector('#mira-rst-sel-pos').addEventListener('click', () => executeResetScope('position', 'selected'));
@@ -2652,14 +2914,17 @@
       widgetEl.classList.add('mira-widget-selected');
     }
     updateSelectionBox();
+    notifyParentOfLiveChange();
   }
 
   function notifyParentOfLiveChange() {
+    renderBottomCardsDock();
     if (window.parent && window.parent !== window) {
       window.parent.postMessage({
         type: 'MIRA_WIDGET_OVERRIDES_CHANGED',
         itemId: currentItemId,
-        widgets: widgetOverrides
+        widgets: widgetOverrides,
+        activeCards: getActiveCanvasCardsList()
       }, '*');
     }
   }
@@ -2748,6 +3013,8 @@
       if (inspectorEl) inspectorEl.classList.remove('open');
       if (addCardModalBackdropEl) addCardModalBackdropEl.classList.remove('open');
     } else {
+      renderBottomCardsDock();
+      notifyParentOfLiveChange();
       setTimeout(autoSelectDefaultWidget, 80);
     }
   }
@@ -2759,7 +3026,9 @@
         e.target.closest('.mira-card-inspector') ||
         e.target.closest('.mira-canvas-toolbar') ||
         e.target.closest('.mira-resize-handle') ||
-        e.target.closest('.mira-add-modal-backdrop')
+        e.target.closest('.mira-add-modal-backdrop') ||
+        e.target.closest('.mira-bottom-cards-dock') ||
+        e.target.closest('.mira-selection-del-btn')
       ) {
         return;
       }
@@ -2776,6 +3045,18 @@
         if (inspectorEl) inspectorEl.classList.remove('open');
       }
     }, true);
+
+    document.addEventListener('keydown', (e) => {
+      if (!isEditMode || !selectedWidgetEl || !selectedWidgetId) return;
+      const active = document.activeElement;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable)) {
+        return;
+      }
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        deleteWidgetFromCanvas(selectedWidgetEl, selectedWidgetId);
+      }
+    });
   }
 
   function loadSavedWidgetOverrides() {
@@ -2789,6 +3070,8 @@
           if (d.item.config && d.item.config.widgets) {
             applyAllWidgetOverrides(d.item.config.widgets);
           }
+          renderBottomCardsDock();
+          notifyParentOfLiveChange();
         }
       })
       .catch(() => {});
@@ -2806,6 +3089,8 @@
         if (msg.item.config && msg.item.config.widgets) {
           applyAllWidgetOverrides(msg.item.config.widgets);
         }
+        renderBottomCardsDock();
+        notifyParentOfLiveChange();
       }
     } else if (msg.type === 'PREVIEW_CUSTOM_CONFIG' && msg.item) {
       setTimeout(() => {
@@ -2813,6 +3098,8 @@
         if (msg.item.config && msg.item.config.widgets) {
           applyAllWidgetOverrides(msg.item.config.widgets);
         }
+        renderBottomCardsDock();
+        notifyParentOfLiveChange();
         if (isEditMode) {
           autoSelectDefaultWidget();
         }
@@ -2823,6 +3110,16 @@
     } else if (msg.type === 'MIRA_RESET_CANVAS') {
       setEditMode(true);
       executeResetScope(msg.mode || 'all', msg.scope || 'all');
+    } else if (msg.type === 'MIRA_FOCUS_WIDGET' && msg.widgetId) {
+      setEditMode(true);
+      focusWidgetById(msg.widgetId);
+    } else if (msg.type === 'MIRA_DELETE_WIDGET' && msg.widgetId) {
+      setEditMode(true);
+      deleteWidgetFromCanvas(null, msg.widgetId);
+    } else if (msg.type === 'MIRA_REQUEST_CANVAS_CARDS') {
+      discoverWidgets();
+      renderBottomCardsDock();
+      notifyParentOfLiveChange();
     }
   });
 

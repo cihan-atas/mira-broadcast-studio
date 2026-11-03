@@ -2257,6 +2257,31 @@
           <iframe src="custom-overlay.html?standby=1" id="preview-iframe"></iframe>
         </div>
 
+        <!-- Tuvalin Altında Tüm Kartlar Listesi (Tıkla = Direkt O Karta Odaklansın & Düzenle, 🗑️ = Tuvalden Sil) -->
+        <div id="studio-canvas-cards-bar" style="padding: 12px 16px; background: linear-gradient(135deg, rgba(12, 10, 26, 0.96), rgba(22, 16, 44, 0.96)); border-top: 1px solid rgba(168, 85, 247, 0.35); border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 900; color: #e9d5ff; letter-spacing: 0.8px;">
+                🗂️ TUVALDEKİ TÜM KARTLAR (<span id="studio-canvas-cards-count">0</span>)
+              </span>
+              <span style="font-size: 11px; color: #94a3b8;">
+                👉 Listeden bir karta basınca tuvalde direkt o karta odaklanır ve düzenleme kartını açar!
+              </span>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button type="button" onclick="triggerAddCardOnCanvas('user')" style="padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.16); color: #6ee7b7; font-size: 11px; font-weight: 800; cursor: pointer;">
+                ➕ Galerimden Kart Ekle
+              </button>
+              <button type="button" onclick="requestCanvasCardsRefresh()" style="padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.16); color: #d8b4fe; font-size: 11px; font-weight: 800; cursor: pointer;">
+                🔄 Listeyi Yenile
+              </button>
+            </div>
+          </div>
+          <div id="studio-canvas-cards-list" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; min-height: 34px;">
+            <span style="font-size: 11.5px; color: #94a3b8; font-style: italic;">Tuvalde henüz kart yok veya sahne bekleniyor...</span>
+          </div>
+        </div>
+
         <!-- Monitor Bottom Bar -->
         <div class="monitor-bottom-bar">
           <div class="monitor-url-line">
@@ -2350,6 +2375,13 @@
     function setIframeInteractiveEditMode(enabled, itemId) {
       const iframe = document.getElementById('preview-iframe');
       if (!iframe) return;
+      if (!iframe.__cardsHooked) {
+        iframe.__cardsHooked = true;
+        iframe.addEventListener('load', () => {
+          setTimeout(requestCanvasCardsRefresh, 200);
+          setTimeout(requestCanvasCardsRefresh, 600);
+        });
+      }
       const sendMsg = () => {
         if (iframe.contentWindow) {
           iframe.contentWindow.postMessage({
@@ -2357,6 +2389,7 @@
             enabled: !!enabled,
             itemId: itemId || document.getElementById('builder-edit-id')?.value || activeGalleryItemId || 'preview_canvas'
           }, '*');
+          iframe.contentWindow.postMessage({ type: 'MIRA_REQUEST_CANVAS_CARDS' }, '*');
         }
       };
       sendMsg();
@@ -2536,11 +2569,70 @@
       showToast(`🎨 Renk kodu kopyalandı: ${code}`, 'success');
     }
 
+    function requestCanvasCardsRefresh() {
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'MIRA_REQUEST_CANVAS_CARDS' }, '*');
+      }
+    }
+
+    function focusCardOnCanvasFromStudio(wid) {
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'MIRA_FOCUS_WIDGET', widgetId: wid }, '*');
+      }
+      const wrap = document.getElementById('preview-wrap');
+      if (wrap) {
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function deleteCardOnCanvasFromStudio(wid, label) {
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'MIRA_DELETE_WIDGET', widgetId: wid }, '*');
+        showToast(`🗑️ "${label || wid}" kartı tuvalden silindi!`, 'success');
+      }
+    }
+
+    function renderStudioCanvasCardsBar(cards) {
+      const listEl = document.getElementById('studio-canvas-cards-list');
+      const countEl = document.getElementById('studio-canvas-cards-count');
+      if (!listEl) return;
+      const arr = Array.isArray(cards) ? cards : [];
+      if (countEl) countEl.textContent = String(arr.length);
+      if (arr.length === 0) {
+        listEl.innerHTML = `<span style="font-size: 11.5px; color: #cbd5e1;">✨ Tuval şu an bomboş (0 kart). Sağ üstten <strong>"➕ Galerimden Kart Ekle"</strong> ile kart ekleyebilirsiniz.</span>`;
+        return;
+      }
+      listEl.innerHTML = arr.map((c, idx) => {
+        const isSel = !!c.selected;
+        const borderCol = isSel ? '#00f5a0' : 'rgba(168, 85, 247, 0.45)';
+        const bgCol = isSel ? 'rgba(0, 245, 160, 0.16)' : 'rgba(30, 22, 56, 0.9)';
+        const safeId = escHtml(c.id).replace(/'/g, "\\'");
+        const safeLabel = escHtml(c.label || c.id).replace(/'/g, "\\'");
+        return `
+          <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px 5px 11px; border-radius: 8px; border: 1px solid ${borderCol}; background: ${bgCol}; box-shadow: ${isSel ? '0 0 12px rgba(0, 245, 160, 0.3)' : 'none'}; transition: all 0.15s;">
+            <button type="button" onclick="focusCardOnCanvasFromStudio('${safeId}')" title="Tıkla: Bu Karta Odaklan ve Düzenleme Kartını Aç" style="background: transparent; border: none; color: ${isSel ? '#6ee7b7' : '#f8fafc'}; font-size: 11.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 0;">
+              <span style="opacity: 0.7; font-size: 10px;">#${idx + 1}</span>
+              <span>🎯 ${escHtml(c.label || c.id)}</span>
+            </button>
+            <button type="button" onclick="deleteCardOnCanvasFromStudio('${safeId}', '${safeLabel}')" title="Kartı Tuvalden Sil" style="background: rgba(239, 68, 68, 0.22); border: 1px solid rgba(239, 68, 68, 0.55); color: #fecaca; border-radius: 5px; padding: 2px 6px; font-size: 10px; font-weight: 800; cursor: pointer;">
+              🗑️ Sil
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
     window.addEventListener('message', (e) => {
       const msg = e.data;
       if (!msg || typeof msg !== 'object') return;
-      if (msg.type === 'MIRA_WIDGET_OVERRIDES_CHANGED' && msg.widgets) {
-        currentBuilderWidgets = msg.widgets;
+      if (msg.type === 'MIRA_WIDGET_OVERRIDES_CHANGED') {
+        if (msg.widgets) currentBuilderWidgets = msg.widgets;
+        if (Array.isArray(msg.activeCards)) {
+          renderStudioCanvasCardsBar(msg.activeCards);
+        }
       } else if (msg.type === 'MIRA_REQUEST_SAVE_BUILDER') {
         if (msg.widgets) currentBuilderWidgets = msg.widgets;
         saveBuilderItemToMyGallery();
