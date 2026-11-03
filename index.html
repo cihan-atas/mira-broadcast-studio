@@ -230,7 +230,75 @@
       max-width: 100%;
     }
 
-    /* Modern Tabs Nav */
+    /* Modern Pro Clustered Tabs Nav */
+    .studio-pro-nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: stretch;
+      background: rgba(10, 12, 22, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 8px 10px;
+      backdrop-filter: blur(16px);
+      margin-bottom: 6px;
+    }
+    .nav-cluster {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      flex: 1;
+      min-width: 220px;
+    }
+    .nav-cluster-creative {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(6, 182, 212, 0.05));
+      border-color: rgba(168, 85, 247, 0.28);
+    }
+    .nav-cluster-library {
+      background: rgba(6, 182, 212, 0.04);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+    .nav-cluster-broadcast {
+      background: rgba(255, 255, 255, 0.015);
+      border-color: rgba(255, 255, 255, 0.06);
+      flex: 2;
+    }
+    .nav-cluster-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+    .cluster-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      box-shadow: 0 0 6px currentColor;
+    }
+    .nav-cluster-items {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tab-pill-badge {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 99px;
+      margin-left: 4px;
+    }
+
+    /* Legacy Fallback */
     .studio-tabs-nav {
       display: flex;
       gap: 8px;
@@ -250,26 +318,27 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 18px;
-      border-radius: 10px;
-      background: transparent;
-      border: 1px solid transparent;
+      padding: 8px 14px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12.5px;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
       white-space: nowrap;
     }
     .studio-tab-btn:hover {
       color: #fff;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.15);
     }
     .studio-tab-btn.active {
-      background: rgba(168, 85, 247, 0.15);
-      border-color: rgba(168, 85, 247, 0.4);
-      color: #c084fc;
-      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.15);
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(6, 182, 212, 0.18));
+      border-color: rgba(168, 85, 247, 0.6);
+      color: #f3e8ff;
+      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.25);
     }
 
     /* Tab Panes */
@@ -1153,13 +1222,17 @@
     }
 
     /* Görsel Sürükle-Bırak Editör Modunda Tam Genişlikli Büyük Tuval */
-    body.studio-visual-editor-mode .studio-container {
+    body.studio-visual-editor-mode .studio-container,
+    body.studio-creator-mode .studio-container {
       grid-template-columns: minmax(0, 1fr) !important;
       gap: 16px !important;
     }
     body.studio-visual-editor-mode .monitor-sticky-wrap {
       position: static !important;
       width: 100% !important;
+    }
+    body.studio-creator-mode .monitor-sticky-wrap {
+      display: none !important;
     }
     body.studio-visual-editor-mode .broadcast-monitor {
       border: 2px solid #a855f7 !important;
@@ -1684,16 +1757,307 @@
       color: #fff;
       box-shadow: 0 0 14px rgba(168, 85, 247, 0.3);
     }
-    .creator-studio-grid {
+    /* CANVA PRO ATÖLYESİ MİMARİSİ (Tuval Ortada / Geniş, Ayarlamalar Yanda) */
+    .canva-studio-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr);
+      grid-template-columns: minmax(0, 1.45fr) minmax(380px, 440px);
       gap: 20px;
       align-items: start;
     }
-    @media (max-width: 1100px) {
-      .creator-studio-grid {
+    @media (max-width: 1200px) {
+      .canva-studio-layout {
         grid-template-columns: 1fr;
       }
+    }
+
+    /* 1. Canva Center Stage Workspace (Ortadaki Büyük Tuval) */
+    .canva-stage-workspace {
+      background: #080a14;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(168, 85, 247, 0.12);
+      display: flex;
+      flex-direction: column;
+    }
+    .canva-stage-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 18px;
+      background: linear-gradient(180deg, rgba(20, 24, 40, 0.98), rgba(12, 15, 26, 0.98));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+    }
+    .canva-toolbar-left, .canva-toolbar-center, .canva-toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .canva-canvas-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      color: #c084fc;
+      letter-spacing: 0.8px;
+    }
+    .canva-bg-selector {
+      display: flex;
+      gap: 3px;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 3px 5px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .canva-bg-btn {
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: #94a3b8;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .canva-bg-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .canva-bg-btn.active {
+      color: #fff;
+      background: #7c3aed;
+      box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+    }
+    .canva-tool-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .canva-tool-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #a855f7;
+      color: #fff;
+    }
+    .canva-zoom-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      color: #06b6d4;
+      padding: 0 4px;
+    }
+    .btn-canva-add-canvas {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      border: 1px solid #34d399;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.4);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-canva-add-canvas:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.65);
+    }
+    .btn-canva-save-gallery {
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      color: #fff;
+      border: 1px solid #c084fc;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.35);
+      transition: all 0.2s;
+    }
+    .btn-canva-save-gallery:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.55);
+    }
+
+    /* 2. Canva Stage Viewport (Merkez Tuval Sahnesi) */
+    .canva-stage-viewport {
+      position: relative;
+      min-height: 540px;
+      padding: 48px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #070913;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 32px 32px;
+      overflow: auto;
+      transition: background 0.3s ease;
+    }
+    .canva-stage-viewport.bg-checker {
+      background-color: #121420;
+      background-image: 
+        linear-gradient(45deg, #1c1f30 25%, transparent 25%), 
+        linear-gradient(-45deg, #1c1f30 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #1c1f30 75%), 
+        linear-gradient(-45deg, transparent 75%, #1c1f30 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+    }
+    .canva-stage-viewport.bg-game {
+      background: radial-gradient(circle at center, rgba(168,85,247,0.15) 0%, rgba(6,8,16,0.92) 80%), url('/kick/vexana/assets/images/portrait.jpg') center/cover no-repeat;
+    }
+    .canva-stage-viewport.bg-matte {
+      background: #040508;
+    }
+
+    /* Canva Canvas Surface */
+    .creator-sim-canvas {
+      position: relative;
+      width: 100%;
+      max-width: 620px;
+      min-height: 340px;
+      background: transparent;
+      border: 1.5px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: center center;
+    }
+
+    /* Canva Interactive Elements (Doğrudan Üzerinde Tıkla & Düzenle) */
+    .canva-interactive-elem {
+      cursor: pointer !important;
+      position: relative !important;
+      transition: outline 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease !important;
+      border-radius: 6px;
+    }
+    .canva-interactive-elem:hover {
+      outline: 2px dashed #00f5a0 !important;
+      outline-offset: 4px;
+    }
+    .canva-interactive-elem:hover::after {
+      content: attr(data-canva-hint);
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(6, 8, 16, 0.94);
+      border: 1px solid #00f5a0;
+      color: #00f5a0;
+      font-family: sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 1000;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.75);
+    }
+.canva-interactive-elem.selected {
+      outline: 2px solid #a855f7 !important;
+      outline-offset: 4px;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.55);
+    }
+    @keyframes canvaFocusPulseAnim {
+      0% { box-shadow: 0 0 0 0 rgba(192, 132, 252, 0.7); outline: 2px solid #c084fc; }
+      50% { box-shadow: 0 0 0 8px rgba(192, 132, 252, 0.35); outline: 2px solid #a855f7; }
+      100% { box-shadow: 0 0 0 0 rgba(192, 132, 252, 0); outline: 2px solid transparent; }
+    }
+    .canva-focus-pulse {
+      animation: canvaFocusPulseAnim 1.4s ease-out !important;
+      border-color: #c084fc !important;
+    }
+
+    .canva-stage-bottom-hint {
+      padding: 10px 18px;
+      background: rgba(0, 0, 0, 0.55);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 11.5px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* 3. Canva Side Inspector (Yandaki Ayarlamalar Paneli) */
+    .canva-side-inspector {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 86px;
+      max-height: calc(100vh - 100px);
+    }
+    .canva-inspector-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      padding: 10px;
+      background: #090c16;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .canva-insp-tab {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 4px;
+      color: #94a3b8;
+      font-size: 10.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .canva-insp-tab:hover {
+      background: rgba(168, 85, 247, 0.14);
+      color: #e9d5ff;
+      border-color: rgba(168, 85, 247, 0.35);
+    }
+    .canva-insp-tab.active {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(6, 182, 212, 0.22));
+      border-color: #a855f7;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+    }
+    .canva-inspector-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .canva-insp-panel {
+      display: none;
+    }
+    .canva-insp-panel.active {
+      display: block;
+      animation: fadeInPanel 0.2s ease;
+    }
+    @keyframes fadeInPanel {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .creator-section {
       background: rgba(255, 255, 255, 0.02);
@@ -1994,35 +2358,76 @@
     <!-- Left Workstation Console Deck -->
     <div class="console-section">
 
-      <!-- Tab Navigation -->
-      <nav class="studio-tabs-nav">
-        <button class="studio-tab-btn active" id="tab-btn-my-gallery" onclick="switchTab('tab-my-gallery', this)">
-          🗂️ Kendi Galerim (<span id="my-gallery-count">0</span>)
-        </button>
-        <button class="studio-tab-btn" id="tab-btn-app-gallery" onclick="switchTab('tab-app-gallery', this)">
-          🏪 Ana Galeri (Mağaza)
-        </button>
-        <button class="studio-tab-btn" id="tab-btn-canvas-builder" onclick="openBlankCanvasBuilder()">
-          🎨 Boş Tuval & Editör
-        </button>
-        <button class="studio-tab-btn" id="tab-btn-design-creator" onclick="switchTab('tab-design-creator', this)" style="background: linear-gradient(135deg, rgba(168,85,247,0.22), rgba(6,182,212,0.18)); border-color: rgba(168,85,247,0.55); color: #f3e8ff;">
-          🛠️ Özel Tasarım Atölyesi
-        </button>
-        <button class="studio-tab-btn" onclick="switchTab('tab-goal', this)">
-          🎯 Hedef & İstatistik
-        </button>
-        <button class="studio-tab-btn" onclick="switchTab('tab-alerts', this)">
-          ⚡ Alert & Testler
-        </button>
-        <button class="studio-tab-btn" onclick="switchTab('tab-chat', this)">
-          💬 Sohbet & BotRix
-        </button>
-        <button class="studio-tab-btn" onclick="switchTab('tab-music', this)">
-          🎵 Müzik & Tuna
-        </button>
-        <button class="studio-tab-btn" onclick="switchTab('tab-tiktok', this)">
-          📱 TikTok Canlı
-        </button>
+      <!-- Profesyonel Kümeli Uygulama Gezinme Menüsü (Pro Clustered Navigation) -->
+      <nav class="studio-pro-nav">
+        <!-- 1. KÜME: 🎨 TASARIM & STÜDYO -->
+        <div class="nav-cluster nav-cluster-creative">
+          <div class="nav-cluster-header">
+            <span class="cluster-dot" style="background:#a855f7;"></span>
+            <span>🎨 TASARIM & STÜDYO</span>
+          </div>
+          <div class="nav-cluster-items">
+            <button class="studio-tab-btn" id="tab-btn-canvas-builder" onclick="openBlankCanvasBuilder()">
+              <span>🎨</span>
+              <span>Boş Tuval & Editör</span>
+              <span class="tab-pill-badge" style="background:rgba(56,189,248,0.22); color:#7dd3fc; border:1px solid rgba(56,189,248,0.45);">1080p</span>
+            </button>
+            <button class="studio-tab-btn" id="tab-btn-design-creator" onclick="switchTab('tab-design-creator', this)" style="background: linear-gradient(135deg, rgba(168,85,247,0.28), rgba(6,182,212,0.2)); border-color: rgba(168,85,247,0.6); color: #f3e8ff;">
+              <span>🛠️</span>
+              <span>Özel Tasarım Atölyesi</span>
+              <span class="tab-pill-badge" style="background:rgba(168,85,247,0.3); color:#f5d0fe; border:1px solid #c084fc;">CANVA FORGE</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. KÜME: 🗂️ KÜTÜPHANEM & MAĞAZA -->
+        <div class="nav-cluster nav-cluster-library">
+          <div class="nav-cluster-header">
+            <span class="cluster-dot" style="background:#06b6d4;"></span>
+            <span>🗂️ KÜTÜPHANEM & MAĞAZA</span>
+          </div>
+          <div class="nav-cluster-items">
+            <button class="studio-tab-btn active" id="tab-btn-my-gallery" onclick="switchTab('tab-my-gallery', this)">
+              <span>📁</span>
+              <span>Kendi Galerim</span>
+              <span class="tab-pill-badge" id="my-gallery-count" style="background:rgba(16,185,129,0.22); color:#6ee7b7; border:1px solid rgba(16,185,129,0.45);">0</span>
+            </button>
+            <button class="studio-tab-btn" id="tab-btn-app-gallery" onclick="switchTab('tab-app-gallery', this)">
+              <span>🏪</span>
+              <span>Ana Galeri (Mağaza)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. KÜME: ⚡ CANLI YAYIN MODÜLLERİ -->
+        <div class="nav-cluster nav-cluster-broadcast">
+          <div class="nav-cluster-header">
+            <span class="cluster-dot" style="background:#ef4444;"></span>
+            <span>⚡ CANLI YAYIN MODÜLLERİ</span>
+          </div>
+          <div class="nav-cluster-items">
+            <button class="studio-tab-btn" id="tab-btn-alerts" onclick="switchTab('tab-alerts', this)">
+              <span>⚡</span>
+              <span>Alert & Testler</span>
+            </button>
+            <button class="studio-tab-btn" id="tab-btn-goal" onclick="switchTab('tab-goal', this)">
+              <span>🎯</span>
+              <span>Hedef & İstatistik</span>
+            </button>
+            <button class="studio-tab-btn" id="tab-btn-chat" onclick="switchTab('tab-chat', this)">
+              <span>💬</span>
+              <span>Sohbet & BotRix</span>
+            </button>
+            <button class="studio-tab-btn" id="tab-btn-music" onclick="switchTab('tab-music', this)">
+              <span>🎵</span>
+              <span>Müzik & Tuna</span>
+            </button>
+            <button class="studio-tab-btn" id="tab-btn-tiktok" onclick="switchTab('tab-tiktok', this)">
+              <span>📱</span>
+              <span>TikTok Canlı</span>
+            </button>
+          </div>
+        </div>
       </nav>
 
       <!-- TAB 1: KENDİ GALERİM (KULLANICININ KİŞİSEL YAYIN MASASI) -->
@@ -2343,650 +2748,644 @@
             </div>
           </div>
 
-          <div class="creator-studio-grid">
-            <!-- SOL KOLON: KONTROLLER & ÖZELLEŞTİRME FORMU -->
-            <div class="creator-studio-controls">
-              
-              <!-- 1. KART TASARIM FORMU (MODE: CARD - FORGE ATÖLYESİ) -->
-              <div id="creator-form-card" class="creator-subform">
+                    <div class="canva-studio-layout">
 
-                <!-- 0. İLHAM VEREN ŞEKİL & STİL ŞABLONLARI (1 TIKLA HAZIR DÜNYALAR) -->
-                <div class="creator-section" style="background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(6,182,212,0.08)); border-color: rgba(168,85,247,0.35);">
-                  <div class="creator-sec-title" style="color: #e9d5ff;">
-                    <span>⚡</span> <span>İLHAM VEREN ŞEKİL & STİL ŞABLONLARI (1 TIKLA TÜM DÜNYAYI DEĞİŞTİR)</span>
-                  </div>
-                  <div class="forge-presets-grid" id="forge-presets-container">
-                    <!-- Preset kartları JS ile dinamik doldurulacak -->
+            <!-- SOL/ORTA KOLON: BÜYÜK CANVA ÇALIŞMA ALANI & TUVAL (MAIN STAGE) -->
+            <div class="canva-stage-workspace">
+              <!-- Üst Araç Çubuğu -->
+              <div class="canva-stage-toolbar">
+                <div class="canva-toolbar-left">
+                  <span class="canva-canvas-tag">🎨 CANVA ÇALIŞMA TUVALİ</span>
+                  <div class="canva-bg-selector">
+                    <button type="button" class="canva-bg-btn active" onclick="setCanvaStageBg('darkgrid', this)" title="Karanlık Grid Izgara">🌐 Grid</button>
+                    <button type="button" class="canva-bg-btn" onclick="setCanvaStageBg('checker', this)" title="Dama Tahtası (Saydamlık)">🏁 Şeffaf</button>
+                    <button type="button" class="canva-bg-btn" onclick="setCanvaStageBg('game', this)" title="Oyun Yayını Simülasyonu">🎮 Oyun</button>
+                    <button type="button" class="canva-bg-btn" onclick="setCanvaStageBg('matte', this)" title="Derin Siyah">🌑 Siyah</button>
                   </div>
                 </div>
 
-                <!-- 1. KART GEOMETRİSİ, ŞEKLİ & KESİM DÜZENİ -->
-                <div class="creator-section">
-                  <div class="creator-sec-title">
-                    <span>📐</span> <span>1. KART GEOMETRİSİ, KESİM ŞEKLİ & ORANLARI</span>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label>Kart Şekli & Fütüristik Kesim Türü</label>
-                    <div class="forge-shape-grid" id="forge-shape-cuts-grid">
-                      <button type="button" class="forge-shape-btn active" data-shape="chamfer" onclick="setForgeShapeCut('chamfer', this)">
-                        <div class="forge-shape-icon" style="clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));"></div>
-                        <span>✂️ 45° Çift Kesik</span>
-                      </button>
-                      <button type="button" class="forge-shape-btn" data-shape="bevel" onclick="setForgeShapeCut('bevel', this)">
-                        <div class="forge-shape-icon" style="clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);"></div>
-                        <span>📐 4 Köşe Kesik</span>
-                      </button>
-                      <button type="button" class="forge-shape-btn" data-shape="notch" onclick="setForgeShapeCut('notch', this)">
-                        <div class="forge-shape-icon" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 calc(50% + 5px), 6px 50%, 0 calc(50% - 5px));"></div>
-                        <span>🏷️ Sol Çentikli</span>
-                      </button>
-                      <button type="button" class="forge-shape-btn" data-shape="slanted" onclick="setForgeShapeCut('slanted', this)">
-                        <div class="forge-shape-icon" style="clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 8px, 100% 100%, 0 100%);"></div>
-                        <span>🚩 Asimetrik Eğim</span>
-                      </button>
-                      <button type="button" class="forge-shape-btn" data-shape="hexagon" onclick="setForgeShapeCut('hexagon', this)">
-                        <div class="forge-shape-icon" style="clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);"></div>
-                        <span>🔷 Altıgen (Hex)</span>
-                      </button>
-                      <button type="button" class="forge-shape-btn" data-shape="pill" onclick="setForgeShapeCut('pill', this)">
-                        <div class="forge-shape-icon" style="border-radius: 999px;"></div>
-                        <span>💊 Kapsül / Pill</span>
-                      </button>
-                      <button type="button" class="forge-shape-btn" data-shape="none" onclick="setForgeShapeCut('none', this)">
-                        <div class="forge-shape-icon" style="border-radius: 8px;"></div>
-                        <span>⬛ Dikdörtgen</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Köşe Kesim / Yuvarlaklık Derinliği: <strong id="fg-cut-rad-lbl">22px</strong></label>
-                      <input type="range" id="fg-cut-rad" min="0" max="48" step="2" value="22" oninput="document.getElementById('fg-cut-rad-lbl').textContent = this.value + 'px'; forgeState.cutRadius = parseInt(this.value, 10); updateCreatorLivePreview();">
-                    </div>
-                    <div class="form-group">
-                      <label>Kart Boyut & Oran Ön Ayarı</label>
-                      <select id="fg-size-preset" class="form-control" onchange="onForgeSizePresetChange(this.value)">
-                        <option value="standard" selected>Standart Kart (440 × 230)</option>
-                        <option value="banner">Geniş Banner (480 × 150)</option>
-                        <option value="vertical">Dikey Panel (320 × 420)</option>
-                        <option value="compact">Kompakt Bar (460 × 75)</option>
-                        <option value="square">Kare Vitrin (320 × 320)</option>
-                        <option value="custom">Özel Boyutlandırma</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="form-row" id="fg-custom-size-row" style="display:none;">
-                    <div class="form-group">
-                      <label>Genişlik: <strong id="fg-card-w-lbl">440px</strong></label>
-                      <input type="range" id="fg-card-w" min="260" max="720" step="10" value="440" oninput="document.getElementById('fg-card-w-lbl').textContent = this.value + 'px'; forgeState.cardWidth = parseInt(this.value, 10); updateCreatorLivePreview();">
-                    </div>
-                    <div class="form-group">
-                      <label>Yükseklik: <strong id="fg-card-h-lbl">230px</strong></label>
-                      <input type="range" id="fg-card-h" min="60" max="520" step="10" value="230" oninput="document.getElementById('fg-card-h-lbl').textContent = this.value + 'px'; forgeState.cardHeight = parseInt(this.value, 10); updateCreatorLivePreview();">
-                    </div>
-                  </div>
+                <div class="canva-toolbar-center">
+                  <button type="button" class="canva-tool-btn" onclick="setCanvaZoom(-0.1)" title="Uzaklaştır">🔍 -</button>
+                  <span id="canva-zoom-level" class="canva-zoom-badge">100%</span>
+                  <button type="button" class="canva-tool-btn" onclick="setCanvaZoom(0.1)" title="Yakınlaştır">🔍 +</button>
+                  <button type="button" class="canva-tool-btn" onclick="resetCanvaZoom()" title="Sıfırla (100%)">⟲ %100</button>
                 </div>
 
-                <!-- 2. ÇERÇEVE, KENARLIK & IŞIK EFEKTLERİ -->
-                <div class="creator-section">
-                  <div class="creator-sec-title">
-                    <span>🪟</span> <span>2. ÇERÇEVE, KENARLIK & NEON IŞIK FX</span>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Kenarlık Stili</label>
-                      <select id="fg-border-style" class="form-control" onchange="forgeState.borderStyle = this.value; updateCreatorLivePreview();">
-                        <option value="solid" selected>Düz Neon Çizgi (Solid)</option>
-                        <option value="double">Çift Zırhlı Çerçeve (Double)</option>
-                        <option value="dashed">Fütüristik Kesikli Çizgi (Dashed)</option>
-                        <option value="accent-left">Sol Vurgu Barı (Accent Line)</option>
-                        <option value="none">Çerçevesiz Saf Cam (None)</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>Kenarlık Kalınlığı: <strong id="fg-border-w-lbl">2px</strong></label>
-                      <input type="range" id="fg-border-w" min="0" max="8" step="1" value="2" oninput="document.getElementById('fg-border-w-lbl').textContent = this.value + 'px'; forgeState.borderWidth = parseInt(this.value, 10); updateCreatorLivePreview();">
-                    </div>
-                  </div>
-
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Neon Parlama (Glow): <strong id="fg-glow-lbl">26px</strong></label>
-                      <input type="range" id="fg-glow" min="0" max="45" step="3" value="26" oninput="document.getElementById('fg-glow-lbl').textContent = this.value + 'px'; forgeState.glowIntensity = parseInt(this.value, 10); updateCreatorLivePreview();">
-                    </div>
-                    <div class="form-group" style="display:flex; align-items:center; justify-content:space-between; padding-top:20px;">
-                      <label style="margin:0; cursor:pointer;" for="fg-pulse-chk">⚡ Canlı Nefes Alan Neon Nabız (Pulse FX)</label>
-                      <label class="forge-switch">
-                        <input type="checkbox" id="fg-pulse-chk" onchange="forgeState.neonPulse = this.checked; updateCreatorLivePreview();">
-                        <span class="forge-slider-switch"></span>
-                      </label>
-                    </div>
-                  </div>
+                <div class="canva-toolbar-right">
+                  <button type="button" class="btn-canva-add-canvas" id="creator-direct-add-to-canvas-btn" onclick="directAddCreatedDesignToCanvas()">
+                    🚀 TUVALE EKLE & KULLAN
+                  </button>
+                  <button type="button" class="btn-canva-save-gallery" id="creator-save-to-gallery-btn" onclick="saveCreatorDesignToGallery()">
+                    💾 GALERİME KAYDET
+                  </button>
                 </div>
-
-                <!-- 3. ARKA PLAN, MATERYAL & DOKU LABORATUVARI -->
-                <div class="creator-section">
-                  <div class="creator-sec-title">
-                    <span>🎨</span> <span>3. ARKA PLAN, MATERYAL & DOKU LABORATUVARI</span>
-                  </div>
-                  <div class="form-group">
-                    <label>Kart Materyali / Dokusu</label>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:6px;" id="fg-materials-grid">
-                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="glass" onclick="setForgeMaterial('glass', this)">🪟 Buzlu Cam</button>
-                      <button type="button" class="mira-mini-btn fg-mat-btn active" data-mat="carbon" onclick="setForgeMaterial('carbon', this)" style="background:#7c3aed; border-color:#c084fc; color:#fff;">🏁 Karbon Fiber</button>
-                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="cybergrid" onclick="setForgeMaterial('cybergrid', this)">⚡ Siber Izgara</button>
-                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="scanlines" onclick="setForgeMaterial('scanlines', this)">📺 CRT Scanlines</button>
-                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="gradient" onclick="setForgeMaterial('gradient', this)">🎨 Açısal Gradyan</button>
-                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="matte" onclick="setForgeMaterial('matte', this)">🌑 Koyu Mat Çelik</button>
-                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="custom_img" onclick="setForgeMaterial('custom_img', this)">🖼️ Özel Resim/GIF</button>
-                    </div>
-                  </div>
-
-                  <div class="form-row" id="fg-mat-glass-opts">
-                    <div class="form-group">
-                      <label>Cam Bulanıklığı (Blur): <strong id="fg-blur-lbl">14px</strong></label>
-                      <input type="range" id="fg-blur" min="0" max="30" step="2" value="14" oninput="document.getElementById('fg-blur-lbl').textContent = this.value + 'px'; forgeState.backdropBlur = parseInt(this.value, 10); updateCreatorLivePreview();">
-                    </div>
-                    <div class="form-group">
-                      <label>Şeffaflık / Opaklık: <strong id="fg-op-lbl">85%</strong></label>
-                      <input type="range" id="fg-op" min="10" max="100" step="5" value="85" oninput="document.getElementById('fg-op-lbl').textContent = this.value + '%'; forgeState.bgOpacity = parseInt(this.value, 10); updateCreatorLivePreview();">
-                    </div>
-                  </div>
-
-                  <div class="form-group" id="fg-mat-grad-opts" style="display:none;">
-                    <label>Gradyan Açısı: <strong id="fg-grad-ang-lbl">135°</strong></label>
-                    <input type="range" id="fg-grad-ang" min="0" max="360" step="15" value="135" oninput="document.getElementById('fg-grad-ang-lbl').textContent = this.value + '°'; forgeState.gradientAngle = parseInt(this.value, 10); updateCreatorLivePreview();">
-                  </div>
-
-                  <div id="fg-mat-img-opts" style="display:none; flex-direction:column; gap:8px;">
-                    <div class="form-group">
-                      <label>PC'den Kart Arka Plan Resmi Yükle veya URL Gir</label>
-                      <div style="display:flex; gap:6px;">
-                        <button type="button" class="btn-gal" onclick="uploadForgeCardBg()" style="flex:0 0 auto; padding:8px 12px; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#e9d5ff;">
-                          📤 PC'den Resim Seç
-                        </button>
-                        <input type="text" id="fg-custom-img-url" class="form-control" placeholder="Resim URL..." oninput="forgeState.customImgUrl = this.value; updateCreatorLivePreview();">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 4. MODÜLER KART BİLEŞENLERİ (İÇERİKLERİ AÇ / KAPAT & DÜZENLE) -->
-                <div class="creator-section">
-                  <div class="creator-sec-title">
-                    <span>🧩</span> <span>4. MODÜLER KART BİLEŞENLERİ (AÇ / KAPAT & KİŞİSELLEŞTİR)</span>
-                  </div>
-
-                  <!-- 1. Üst Başlık Şeridi -->
-                  <div class="forge-toggle-row">
-                    <span class="forge-toggle-label"><span>🏷️</span> Üst Başlık Şeridi (Top Banner Tag)</span>
-                    <label class="forge-switch">
-                      <input type="checkbox" id="fg-chk-toptag" checked onchange="forgeState.showTopTag = this.checked; toggleForgeSubOpt('fg-opt-toptag', this.checked); updateCreatorLivePreview();">
-                      <span class="forge-slider-switch"></span>
-                    </label>
-                  </div>
-                  <div class="forge-sub-options" id="fg-opt-toptag">
-                    <div class="form-row">
-                      <div class="form-group" style="flex:0 0 70px;">
-                        <label>İkon</label>
-                        <input type="text" id="fg-toptag-icon" class="form-control" value="⚡" style="text-align:center;" oninput="forgeState.topTagIcon = this.value; updateCreatorLivePreview();">
-                      </div>
-                      <div class="form-group">
-                        <label>Şerit Metni</label>
-                        <input type="text" id="fg-toptag-txt" class="form-control" value="CANLI VİTRİN KARTI" oninput="forgeState.topTagText = this.value; updateCreatorLivePreview();">
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 2. Profil / Portre Görseli -->
-                  <div class="forge-toggle-row">
-                    <span class="forge-toggle-label"><span>🖼️</span> Profil / Portre / Logo Görseli</span>
-                    <label class="forge-switch">
-                      <input type="checkbox" id="fg-chk-avatar" checked onchange="forgeState.showAvatar = this.checked; toggleForgeSubOpt('fg-opt-avatar', this.checked); updateCreatorLivePreview();">
-                      <span class="forge-slider-switch"></span>
-                    </label>
-                  </div>
-                  <div class="forge-sub-options" id="fg-opt-avatar">
-                    <div class="form-row">
-                      <div class="form-group">
-                        <label>Profil Görseli (PC'den veya URL)</label>
-                        <div style="display:flex; gap:6px;">
-                          <button type="button" class="btn-gal" onclick="uploadForgeAvatar()" style="flex:0 0 auto; padding:6px 10px; font-size:11px; background:rgba(56,189,248,0.2); border-color:#38bdf8; color:#bae6fd;">
-                            📤 PC'den Seç
-                          </button>
-                          <input type="text" id="fg-avatar-url" class="form-control" value="/kick/vexana/assets/images/portrait.jpg" oninput="forgeState.avatarUrl = this.value; updateCreatorLivePreview();">
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label>Avatar Kesim Şekli</label>
-                        <select id="fg-avatar-shape" class="form-control" onchange="forgeState.avatarShape = this.value; updateCreatorLivePreview();">
-                          <option value="hex" selected>Siber Altıgen (Hexagon)</option>
-                          <option value="diamond">Elmas (Diamond)</option>
-                          <option value="round">Tam Daire (Circle)</option>
-                          <option value="square">Modern Kare</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 3. Kart Başlığı & Alt Başlık -->
-                  <div class="forge-toggle-row">
-                    <span class="forge-toggle-label"><span>📝</span> Başlık & Alt Başlık Metinleri</span>
-                    <label class="forge-switch">
-                      <input type="checkbox" id="fg-chk-titles" checked disabled>
-                      <span class="forge-slider-switch" style="background:#10b981;"></span>
-                    </label>
-                  </div>
-                  <div class="forge-sub-options">
-                    <div class="form-row">
-                      <div class="form-group">
-                        <label>Kart Başlığı</label>
-                        <input type="text" id="fg-title" class="form-control" value="MİRA CYBER SHOWCASE" oninput="forgeState.title = this.value; updateCreatorLivePreview();">
-                      </div>
-                      <div class="form-group">
-                        <label>Başlık Boyutu: <strong id="fg-title-size-lbl">18px</strong></label>
-                        <input type="range" id="fg-title-size" min="12" max="28" step="1" value="18" oninput="document.getElementById('fg-title-size-lbl').textContent = this.value + 'px'; forgeState.titleSize = parseInt(this.value, 10); updateCreatorLivePreview();">
-                      </div>
-                    </div>
-                    <div class="form-row">
-                      <div class="form-group">
-                        <label>Alt Başlık / Açıklama</label>
-                        <input type="text" id="fg-subtitle" class="form-control" value="Mythic Glory Streamer • Mid Lane" oninput="forgeState.subtitle = this.value; updateCreatorLivePreview();">
-                      </div>
-                      <div class="form-group">
-                        <label>Metin Hizalama</label>
-                        <select id="fg-text-align" class="form-control" onchange="forgeState.textAlign = this.value; updateCreatorLivePreview();">
-                          <option value="left" selected>Sola Hizala</option>
-                          <option value="center">Ortala</option>
-                          <option value="right">Sağa Hizala</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 4. Büyük Sayaç / İstatistik Alanı -->
-                  <div class="forge-toggle-row">
-                    <span class="forge-toggle-label"><span>📊</span> Büyük İstatistik / Sayaç Kutusu</span>
-                    <label class="forge-switch">
-                      <input type="checkbox" id="fg-chk-stat" checked onchange="forgeState.showStatBox = this.checked; toggleForgeSubOpt('fg-opt-stat', this.checked); updateCreatorLivePreview();">
-                      <span class="forge-slider-switch"></span>
-                    </label>
-                  </div>
-                  <div class="forge-sub-options" id="fg-opt-stat">
-                    <div class="form-row">
-                      <div class="form-group">
-                        <label>Sayaç Başlığı</label>
-                        <input type="text" id="fg-stat-label" class="form-control" value="CANLI TAKİPÇİ" oninput="forgeState.statLabel = this.value; updateCreatorLivePreview();">
-                      </div>
-                      <div class="form-group">
-                        <label>Sayaç Değeri</label>
-                        <input type="text" id="fg-stat-val" class="form-control" value="1,450" oninput="forgeState.statValue = this.value; updateCreatorLivePreview();">
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 5. İlerleme Çubuğu (Mini Goal) -->
-                  <div class="forge-toggle-row">
-                    <span class="forge-toggle-label"><span>🎯</span> İlerleme Çubuğu (Progress Bar)</span>
-                    <label class="forge-switch">
-                      <input type="checkbox" id="fg-chk-prog" checked onchange="forgeState.showProgressBar = this.checked; toggleForgeSubOpt('fg-opt-prog', this.checked); updateCreatorLivePreview();">
-                      <span class="forge-slider-switch"></span>
-                    </label>
-                  </div>
-                  <div class="forge-sub-options" id="fg-opt-prog">
-                    <div class="form-row">
-                      <div class="form-group">
-                        <label>Hedef Etiketi</label>
-                        <input type="text" id="fg-prog-label" class="form-control" value="HEDEF: 2,000" oninput="forgeState.progressLabel = this.value; updateCreatorLivePreview();">
-                      </div>
-                      <div class="form-group">
-                        <label>Doluluk: <strong id="fg-prog-val-lbl">%70</strong></label>
-                        <input type="range" id="fg-prog-val" min="0" max="100" step="5" value="70" oninput="document.getElementById('fg-prog-val-lbl').textContent = '%' + this.value; forgeState.progressValue = parseInt(this.value, 10); updateCreatorLivePreview();">
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 6. Rozetler -->
-                  <div class="forge-toggle-row">
-                    <span class="forge-toggle-label"><span>🏷️</span> Rozetler (Badges)</span>
-                    <label class="forge-switch">
-                      <input type="checkbox" id="fg-chk-badges" checked onchange="forgeState.showBadges = this.checked; toggleForgeSubOpt('fg-opt-badges', this.checked); updateCreatorLivePreview();">
-                      <span class="forge-slider-switch"></span>
-                    </label>
-                  </div>
-                  <div class="forge-sub-options" id="fg-opt-badges">
-                    <div class="form-row">
-                      <div class="form-group">
-                        <label>1. Rozet</label>
-                        <input type="text" id="fg-badge-1" class="form-control" value="⚡ PRO STREAMER" oninput="forgeState.badge1 = this.value; updateCreatorLivePreview();">
-                      </div>
-                      <div class="form-group">
-                        <label>2. Rozet</label>
-                        <input type="text" id="fg-badge-2" class="form-control" value="● LIVE" oninput="forgeState.badge2 = this.value; updateCreatorLivePreview();">
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 7. Alıntı / Slogan -->
-                  <div class="forge-toggle-row">
-                    <span class="forge-toggle-label"><span>💬</span> Alıntı / Slogan Kutusu</span>
-                    <label class="forge-switch">
-                      <input type="checkbox" id="fg-chk-quote" checked onchange="forgeState.showQuote = this.checked; toggleForgeSubOpt('fg-opt-quote', this.checked); updateCreatorLivePreview();">
-                      <span class="forge-slider-switch"></span>
-                    </label>
-                  </div>
-                  <div class="forge-sub-options" id="fg-opt-quote">
-                    <div class="form-group">
-                      <label>Alıntı / Slogan Metni</label>
-                      <input type="text" id="fg-quote-text" class="form-control" value='"Şafak Vadisi zaferimizi bekliyor!"' oninput="forgeState.quoteText = this.value; updateCreatorLivePreview();">
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 5. RENK LABORATUVARI & 2D SPEKTRUM SEÇİCİ -->
-                <div class="creator-section">
-                  <div class="creator-sec-title">
-                    <span>🎨</span> <span>5. RENK LABORATUVARI & 2D SPEKTRUM SEÇİCİ</span>
-                  </div>
-                  <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
-                    🎯 Düzenlemek istediğiniz rengi seçin, 2D renk tablasında mouse gezdirerek anında rengi bulun:
-                  </div>
-                  <div class="creator-color-target-pills" id="cr-color-target-pills">
-                    <button type="button" class="creator-target-pill active" data-target="primary" onclick="setCreatorColorTarget('primary', this)">Ana Vurgu Rengi</button>
-                    <button type="button" class="creator-target-pill" data-target="secondary" onclick="setCreatorColorTarget('secondary', this)">İkincil Neon Rengi</button>
-                    <button type="button" class="creator-target-pill" data-target="textColor" onclick="setCreatorColorTarget('textColor', this)">Yazı Rengi</button>
-                    <button type="button" class="creator-target-pill" data-target="bgColor" onclick="setCreatorColorTarget('bgColor', this)">Kart Arka Plan Rengi</button>
-                    <button type="button" class="creator-target-pill" data-target="borderColor" onclick="setCreatorColorTarget('borderColor', this)">Çerçeve Rengi</button>
-                  </div>
-
-                  <!-- 2D Spektrum Pad -->
-                  <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 12px; margin-top: 10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                      <span id="cr-spectrum-rgb" style="font-family: monospace; font-size: 11px; color: #cbd5e1; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 6px;">rgb(168, 85, 247)</span>
-                      <span id="cr-spectrum-lock-badge" onclick="toggleCreatorSpectrumLock()" style="font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 99px; background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #6ee7b7; cursor: pointer;">
-                        🖱️ Mouse Takibi Aktif (Tıkla=Sabitle)
-                      </span>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                      <div id="cr-spectrum-pad" style="position: relative; flex: 1; height: 76px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: hsl(271, 100%, 50%); cursor: crosshair; overflow: hidden; user-select: none;">
-                        <div style="position:absolute; inset:0; background: linear-gradient(to right, #fff, transparent);"></div>
-                        <div style="position:absolute; inset:0; background: linear-gradient(to top, #000, transparent);"></div>
-                        <div id="cr-spectrum-cursor" style="position: absolute; left: 66%; top: 15%; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1.5px rgba(0,0,0,0.85); transform: translate(-50%, -50%); pointer-events: none; background: #a855f7;"></div>
-                      </div>
-                      <div id="cr-hue-bar" style="position: relative; width: 22px; height: 76px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: linear-gradient(to bottom, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%); cursor: pointer; user-select: none;">
-                        <div id="cr-hue-cursor" style="position: absolute; left: 0; right: 0; top: 75%; height: 5px; border: 1.5px solid #fff; box-shadow: 0 0 4px #000; transform: translateY(-50%); pointer-events: none;"></div>
-                      </div>
-                      <div style="width: 80px; display: flex; flex-direction: column; gap: 4px;">
-                        <div id="cr-spectrum-preview-box" style="flex: 1; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: #a855f7; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 11px; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">#a855f7</div>
-                        <input type="text" id="cr-color-hex-inp" class="form-control" value="#a855f7" style="padding: 4px 6px; font-size: 11px; text-align: center; font-family: monospace;" oninput="onCreatorColorHexChange(this.value)">
-                      </div>
-                    </div>
-
-                    <!-- Hızlı Renk Paleti Düğmeleri -->
-                    <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px;">
-                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#a855f7')">💜 Mor</button>
-                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#10b981')">🟢 Zümrüt</button>
-                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#06b6d4')">🌊 Mavi</button>
-                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#ffd700')">👑 Altın</button>
-                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#ef4444')">🔥 Ateş</button>
-                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#ff85a2')">🌸 Pembe</button>
-                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#ffffff')">⚪ Beyaz</button>
-                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#0d0f18')">⚫ Koyu</button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 6. FONT & GALERİ KAYIT ADI -->
-                <div class="creator-section">
-                  <div class="creator-sec-title">
-                    <span>🔤</span> <span>6. YAZI FONTU & GALERİ BİLGİSİ</span>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Yazı Fontu (Font Family)</label>
-                      <select id="fg-card-font" class="form-control" onchange="forgeState.fontFamily = this.value; updateCreatorLivePreview();">
-                        <option value="'Orbitron', sans-serif" selected>Orbitron (Siber / E-Spor)</option>
-                        <option value="'Cinzel Decorative', cursive">Cinzel Decorative (Mistik / Epik)</option>
-                        <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Modern Net)</option>
-                        <option value="'Rajdhani', sans-serif">Rajdhani (Teknolojik)</option>
-                        <option value="'Montserrat', sans-serif">Montserrat (Temiz & Düz)</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>Galeri Kayıt Adı (Kendi Galerinizde Görünecek İsim)</label>
-                      <input type="text" id="cr-card-name" class="form-control" value="Özel Cyberpunk Vitrinim" oninput="forgeState.name = this.value; updateCreatorLivePreview();">
-                    </div>
-                  </div>
-                </div>
-
               </div>
 
-              <!-- 2. ARKA PLAN TASARIM FORMU (MODE: BACKGROUND) -->
-              <div id="creator-form-background" class="creator-subform" style="display:none;">
-                <div class="creator-section">
-                  <div class="creator-sec-title">🌌 ARKA PLAN TÜRÜ & BİLGİLERİ</div>
-                  <div class="form-group">
-                    <label>Arka Plan Adı (Galerinizde görünecek isim)</label>
-                    <input type="text" id="cr-bg-name" class="form-control" value="Siber Karanlık Uzay" oninput="updateCreatorLivePreview()">
-                  </div>
-                  <div class="form-group">
-                    <label>Temel Stil / Görünüm</label>
-                    <select id="cr-bg-base-style" class="form-control" onchange="updateCreatorLivePreview()">
-                      <option value="cybergrid" selected>⚡ CyberGrid (Siber Tron Izgarası)</option>
-                      <option value="nebula">🌌 Nebula (Kozmik Mor & Mavi Parıltı)</option>
-                      <option value="darkglass">🪟 Dark Glass (Koyu Buzlu Cam)</option>
-                      <option value="gradient">🎨 İki Renkli Radyal Gradyan</option>
-                      <option value="custom_img">🖼️ PC'den Özel Resim / Hareketli GIF</option>
-                    </select>
-                  </div>
-                </div>
+              <!-- Ortadaki Geniş Tasarım Tuvali Sahnesi -->
+              <div class="canva-stage-viewport" id="canva-stage-viewport">
+                <div id="creator-sim-canvas" class="creator-sim-canvas canva-canvas-surface">
+                  <div id="creator-sim-bg-layer" style="position:absolute; inset:0; z-index:1; background-size:cover; background-position:center; transition: all 0.25s ease;"></div>
+                  <div id="creator-sim-dim-layer" style="position:absolute; inset:0; z-index:2; background:#000; opacity:0.2; pointer-events:none; transition: opacity 0.25s;"></div>
 
-                <div class="creator-section">
-                  <div class="creator-sec-title">🖼️ ARKA PLAN GÖRSELİ (STREAM ELEMENTS SCENE BG)</div>
-                  <div class="form-group">
-                    <label>PC'den Arka Plan Görseli / GIF Yükle veya URL Gir</label>
-                    <div style="display:flex; gap:6px;">
-                      <button type="button" class="btn-gal" onclick="uploadCreatorSceneBg()" style="flex:0 0 auto; padding:8px 14px; background:linear-gradient(135deg,#0284c7,#2563eb); color:#fff; border:none;">
-                        📤 PC'den Görsel Seç
-                      </button>
-                      <input type="text" id="cr-bg-img-url" class="form-control" placeholder="https://... veya /uploads/..." oninput="updateCreatorLivePreview()">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Sığdırma Modu</label>
-                      <select id="cr-bg-fit" class="form-control" onchange="updateCreatorLivePreview()">
-                        <option value="cover" selected>Kapla (Cover)</option>
-                        <option value="contain">Sığdır (Contain)</option>
-                        <option value="stretch">Tam Uzat (100%)</option>
-                        <option value="repeat">Döşe (Repeat)</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>Parçacık Efekti</label>
-                      <select id="cr-bg-particles" class="form-control" onchange="updateCreatorLivePreview()">
-                        <option value="soul" selected>✨ Ruh Parçacıkları (Soul Glow)</option>
-                        <option value="star">⭐ Yıldız Parıltıları</option>
-                        <option value="snow">❄️ Kar / Toz Tanesi</option>
-                        <option value="none">Kapalı</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Karartma: <strong id="cr-bg-dim-lbl">20%</strong></label>
-                      <input type="range" id="cr-bg-dim" min="0" max="90" step="5" value="20" oninput="document.getElementById('cr-bg-dim-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
-                    </div>
-                    <div class="form-group">
-                      <label>Bulanıklık (Blur): <strong id="cr-bg-blur-lbl">0px</strong></label>
-                      <input type="range" id="cr-bg-blur" min="0" max="20" step="1" value="0" oninput="document.getElementById('cr-bg-blur-lbl').textContent = this.value + 'px'; updateCreatorLivePreview();">
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label>Arka Plan Opaklığı: <strong id="cr-bg-op-lbl">100%</strong></label>
-                    <input type="range" id="cr-bg-op" min="10" max="100" step="5" value="100" oninput="document.getElementById('cr-bg-op-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
-                  </div>
-                </div>
-
-                <div class="creator-section">
-                  <div class="creator-sec-title">🎨 TEMA VE PARILTI RENKLERİ</div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Birincil Parıltı Rengi</label>
-                      <div style="display:flex; gap:6px;">
-                        <input type="color" id="cr-bg-color-prim" value="#a855f7" oninput="document.getElementById('cr-bg-color-prim-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
-                        <input type="text" id="cr-bg-color-prim-txt" class="form-control" value="#a855f7" oninput="document.getElementById('cr-bg-color-prim').value = this.value; updateCreatorLivePreview();">
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label>İkincil Parıltı Rengi</label>
-                      <div style="display:flex; gap:6px;">
-                        <input type="color" id="cr-bg-color-sec" value="#06b6d4" oninput="document.getElementById('cr-bg-color-sec-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
-                        <input type="text" id="cr-bg-color-sec-txt" class="form-control" value="#06b6d4" oninput="document.getElementById('cr-bg-color-sec').value = this.value; updateCreatorLivePreview();">
-                      </div>
-                    </div>
+                  <!-- Simüle edilen nesne (Kart / Alert / Arka Plan) -->
+                  <div id="creator-sim-content-layer" style="position:relative; z-index:3; width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:16px;">
+                    <!-- Dinamik Mockup buraya render edilecek -->
                   </div>
                 </div>
               </div>
 
-              <!-- 3. ALERT TASARIM FORMU (MODE: ALERT) -->
-              <div id="creator-form-alert" class="creator-subform" style="display:none;">
-                <div class="creator-section">
-                  <div class="creator-sec-title">⚡ ALERT TÜRÜ & BİLGİLERİ</div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Alert Türü</label>
-                      <select id="cr-alert-type" class="form-control" onchange="onCreatorAlertTypeChange(this.value)">
-                        <option value="follower" selected>💜 Yeni Takipçi (Follower)</option>
-                        <option value="sub">🌟 Yeni Abone (Subscriber)</option>
-                        <option value="donation">💎 Bağış / Tip (Donation)</option>
-                        <option value="gift">🎁 Hediye (Gift)</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>Galeri Kayıt Adı</label>
-                      <input type="text" id="cr-alert-name" class="form-control" value="Mistik Takipçi Bildirimi" oninput="updateCreatorLivePreview()">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Başlık Etiketi</label>
-                      <input type="text" id="cr-alert-tag" class="form-control" value="CANLI BİLDİRİM!" oninput="updateCreatorLivePreview()">
-                    </div>
-                    <div class="form-group">
-                      <label>Örnek Kullanıcı Adı</label>
-                      <input type="text" id="cr-alert-user" class="form-control" value="SelinGamer" oninput="updateCreatorLivePreview()">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Alt Başlık / Tebrik</label>
-                      <input type="text" id="cr-alert-sub" class="form-control" value="Ailemize Hoş Geldin!" oninput="updateCreatorLivePreview()">
-                    </div>
-                    <div class="form-group">
-                      <label>Özel Mesaj (Opsiyonel)</label>
-                      <input type="text" id="cr-alert-msg" class="form-control" value="Yayın harika gidiyor!" oninput="updateCreatorLivePreview()">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Ses Efekti</label>
-                      <select id="cr-alert-sound" class="form-control">
-                        <option value="follower" selected>🔔 Takipçi Melodisi</option>
-                        <option value="sub">⭐ Abone Coşkusu</option>
-                        <option value="donation">💎 Bağış Çanı</option>
-                        <option value="gift">🎁 Hediye Efekti</option>
-                        <option value="none">Sessiz</option>
-                      </select>
-                    </div>
-                    <div class="form-group" style="display:flex; align-items:flex-end;">
-                      <button type="button" class="btn-gal" onclick="testCreatorAlertSound()" style="width:100%; padding:9px; justify-content:center; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#e9d5ff;">
-                        🔔 Sesi & Efekti Test Et
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="creator-section">
-                  <div class="creator-sec-title">🎨 ALERT RENK & GÖRÜNÜMÜ</div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Vurgu Rengi</label>
-                      <div style="display:flex; gap:6px;">
-                        <input type="color" id="cr-alert-color-prim" value="#a855f7" oninput="document.getElementById('cr-alert-color-prim-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
-                        <input type="text" id="cr-alert-color-prim-txt" class="form-control" value="#a855f7" oninput="document.getElementById('cr-alert-color-prim').value = this.value; updateCreatorLivePreview();">
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label>Kutu Arka Plan Rengi</label>
-                      <div style="display:flex; gap:6px;">
-                        <input type="color" id="cr-alert-color-bg" value="#0d0f18" oninput="document.getElementById('cr-alert-color-bg-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
-                        <input type="text" id="cr-alert-color-bg-txt" class="form-control" value="#0d0f18" oninput="document.getElementById('cr-alert-color-bg').value = this.value; updateCreatorLivePreview();">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- SAĞ KOLON: CANLI ETKİLEŞİMLİ ÖNİZLEME & GALERİYE KAYDET -->
-            <div class="creator-studio-preview-pane">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <span style="font-family:'Orbitron', sans-serif; font-size:12.5px; font-weight:800; color:#fff; letter-spacing:0.8px;">
-                  👁️ CANLI TASARIM ÖNİZLEMESİ
-                </span>
+              <!-- Canva Alt Bilgi / İpucu Çubuğu -->
+              <div class="canva-stage-bottom-hint">
+                <span>💡 <strong>Canva Doğrudan Etkileşimi:</strong> Kart üzerindeki <strong>Avatar, Başlık, Sayaç, Hedef Çubuğu veya Şekle</strong> tıklayarak doğrudan üzerinde düzenleme yapabilirsiniz!</span>
                 <span id="cr-preview-type-badge" style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:99px; background:rgba(168,85,247,0.2); border:1px solid #a855f7; color:#e9d5ff;">
                   🃏 Vitrin Kartı
                 </span>
               </div>
 
-              <!-- 16:9 Simülasyon Sahnesi -->
-              <div id="creator-sim-canvas" class="creator-sim-canvas">
-                <!-- Arka plan simülasyon katmanı -->
-                <div id="creator-sim-bg-layer" style="position:absolute; inset:0; z-index:1; background-size:cover; background-position:center; transition: all 0.25s ease;"></div>
-                <div id="creator-sim-dim-layer" style="position:absolute; inset:0; z-index:2; background:#000; opacity:0.2; pointer-events:none; transition: opacity 0.25s;"></div>
-
-                <!-- Simüle edilen nesne (Kart / Alert) -->
-                <div id="creator-sim-content-layer" style="position:relative; z-index:3; width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:16px;">
-                  <!-- Dinamik Mockup buraya render edilecek -->
+              <div id="creator-saved-success-box" style="display:none; margin:14px; background:rgba(16,185,129,0.12); border:1px solid #10b981; border-radius:12px; padding:12px; text-align:center;">
+                <div style="font-size:12.5px; font-weight:800; color:#6ee7b7; margin-bottom:8px;">
+                  🎉 Tasarımınız Kendi Galerinize Başarıyla Kaydedildi!
                 </div>
-              </div>
-
-              <!-- Kaydet & Tuvale Ekle Butonları -->
-              <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
-                <button type="button" class="btn-primary" id="creator-direct-add-to-canvas-btn" onclick="directAddCreatedDesignToCanvas()" style="width:100%; padding:13px 20px; font-size:13px; font-weight:800; background:linear-gradient(135deg, #7c3aed, #06b6d4); border:none; box-shadow:0 6px 20px rgba(124,58,237,0.35); cursor:pointer;">
-                  🚀 BU KARTI DİREKT TUVALE EKLE & KULLAN
-                </button>
-                <button type="button" class="btn-primary" id="creator-save-to-gallery-btn" onclick="saveCreatorDesignToGallery()" style="width:100%; padding:13px 20px; font-size:13px; font-weight:800; letter-spacing:0.5px; background:linear-gradient(135deg, #10b981, #059669); border:none; box-shadow:0 6px 20px rgba(16,185,129,0.35); cursor:pointer;">
-                  💾 BU TASARIMI KENDİ GALERİME KAYDET
-                </button>
-                
-                <div id="creator-saved-success-box" style="display:none; background:rgba(16,185,129,0.12); border:1px solid #10b981; border-radius:12px; padding:12px; text-align:center;">
-                  <div style="font-size:12.5px; font-weight:800; color:#6ee7b7; margin-bottom:8px;">
-                    🎉 Tasarımınız Kendi Galerinize Başarıyla Kaydedildi!
-                  </div>
-                  <div style="display:flex; gap:8px;">
-                    <button type="button" class="btn-gal" onclick="openBlankCanvasWithCreatedDesign()" style="flex:1; justify-content:center; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#fff;">
-                      ➕ Direkt Tuvale Ekle & Düzenle
-                    </button>
-                    <button type="button" class="btn-gal" onclick="switchTab('tab-my-gallery', document.getElementById('tab-btn-my-gallery'))" style="flex:1; justify-content:center;">
-                      🗂️ Galerime Git
-                    </button>
-                  </div>
-                </div>
-
-                <div style="font-size:11.5px; color:var(--text-muted); line-height:1.45; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 12px;">
-                  💡 <strong>Nasıl Kullanılır?</strong> Buradan kaydettiğiniz kartlar ve arka planlar anında <strong>"🗂️ Kendi Galerim"</strong> sekmenize eklenir. Ayrıca <strong>Boş Tuval Stüdyosu</strong>'nda <em>"🗂️ Kendi Galerimden Seç"</em> penceresinde görünür ve 1 tıkla sahnenize ekleyebilirsiniz.
+                <div style="display:flex; gap:8px;">
+                  <button type="button" class="btn-gal" onclick="openBlankCanvasWithCreatedDesign()" style="flex:1; justify-content:center; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#fff;">
+                    ➕ Direkt Tuvale Ekle & Düzenle
+                  </button>
+                  <button type="button" class="btn-gal" onclick="switchTab('tab-my-gallery', document.getElementById('tab-btn-my-gallery'))" style="flex:1; justify-content:center;">
+                    🗂️ Galerime Git
+                  </button>
                 </div>
               </div>
             </div>
+
+            <!-- SAĞ KOLON: CANVA SIDE INSPECTOR (YANDA AYARLAMALAR) -->
+            <aside class="canva-side-inspector">
+              
+              <!-- Kart Modu İçin Canva Inspector Sekmeleri -->
+              <div id="canva-card-inspector-tabs" class="canva-inspector-tabs">
+                <button type="button" class="canva-insp-tab active" data-tab="presets" onclick="switchCanvaInspectorTab('presets', this)">
+                  <span>⚡</span> Presets
+                </button>
+                <button type="button" class="canva-insp-tab" data-tab="geometry" onclick="switchCanvaInspectorTab('geometry', this)">
+                  <span>📐</span> Şekil
+                </button>
+                <button type="button" class="canva-insp-tab" data-tab="materials" onclick="switchCanvaInspectorTab('materials', this)">
+                  <span>🎨</span> Renk & Doku
+                </button>
+                <button type="button" class="canva-insp-tab" data-tab="border" onclick="switchCanvaInspectorTab('border', this)">
+                  <span>🪟</span> Çerçeve
+                </button>
+                <button type="button" class="canva-insp-tab" data-tab="components" onclick="switchCanvaInspectorTab('components', this)">
+                  <span>🧩</span> Parçalar
+                </button>
+                <button type="button" class="canva-insp-tab" data-tab="typography" onclick="switchCanvaInspectorTab('typography', this)">
+                  <span>🔤</span> Metin
+                </button>
+              </div>
+
+              <!-- Inspector Gövdesi -->
+              <div class="canva-inspector-body">
+                
+                <!-- 1. KART TASARIM FORMU (MODE: CARD - FORGE ATÖLYESİ) -->
+                <div id="creator-form-card" class="creator-subform">
+
+                  <!-- PANEL 1: PRESETS -->
+                  <div id="canva-panel-presets" class="canva-insp-panel active">
+                    <div class="creator-section" style="background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(6,182,212,0.08)); border-color: rgba(168,85,247,0.35);">
+                      <div class="creator-sec-title" style="color: #e9d5ff;">
+                        <span>⚡</span> <span>İLHAM VEREN ŞEKİL & STİL ŞABLONLARI</span>
+                      </div>
+                      <div class="forge-presets-grid" id="forge-presets-container"></div>
+                    </div>
+                  </div>
+
+                  <!-- PANEL 2: GEOMETRY & CUTS -->
+                  <div id="canva-panel-geometry" class="canva-insp-panel">
+                    <div class="creator-section">
+                      <div class="creator-sec-title">
+                        <span>📐</span> <span>KART GEOMETRİSİ, KESİM ŞEKLİ & ORANLARI</span>
+                      </div>
+                      <div class="form-group">
+                        <label>Kart Şekli & Fütüristik Kesim Türü</label>
+                        <div class="forge-shape-grid" id="forge-shape-cuts-grid">
+                          <button type="button" class="forge-shape-btn active" data-shape="chamfer" onclick="setForgeShapeCut('chamfer', this)">
+                            <div class="forge-shape-icon" style="clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));"></div>
+                            <span>✂️ 45° Çift Kesik</span>
+                          </button>
+                          <button type="button" class="forge-shape-btn" data-shape="bevel" onclick="setForgeShapeCut('bevel', this)">
+                            <div class="forge-shape-icon" style="clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);"></div>
+                            <span>📐 4 Köşe Kesik</span>
+                          </button>
+                          <button type="button" class="forge-shape-btn" data-shape="notch" onclick="setForgeShapeCut('notch', this)">
+                            <div class="forge-shape-icon" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 calc(50% + 5px), 6px 50%, 0 calc(50% - 5px));"></div>
+                            <span>🏷️ Sol Çentikli</span>
+                          </button>
+                          <button type="button" class="forge-shape-btn" data-shape="slanted" onclick="setForgeShapeCut('slanted', this)">
+                            <div class="forge-shape-icon" style="clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 8px, 100% 100%, 0 100%);"></div>
+                            <span>🚩 Asimetrik Eğim</span>
+                          </button>
+                          <button type="button" class="forge-shape-btn" data-shape="hexagon" onclick="setForgeShapeCut('hexagon', this)">
+                            <div class="forge-shape-icon" style="clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);"></div>
+                            <span>🔷 Altıgen (Hex)</span>
+                          </button>
+                          <button type="button" class="forge-shape-btn" data-shape="pill" onclick="setForgeShapeCut('pill', this)">
+                            <div class="forge-shape-icon" style="border-radius: 999px;"></div>
+                            <span>💊 Kapsül / Pill</span>
+                          </button>
+                          <button type="button" class="forge-shape-btn" data-shape="none" onclick="setForgeShapeCut('none', this)">
+                            <div class="forge-shape-icon" style="border-radius: 8px;"></div>
+                            <span>⬛ Dikdörtgen</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label>Köşe Kesim Derinliği: <strong id="fg-cut-rad-lbl">22px</strong></label>
+                          <input type="range" id="fg-cut-rad" min="0" max="48" step="2" value="22" oninput="document.getElementById('fg-cut-rad-lbl').textContent = this.value + 'px'; forgeState.cutRadius = parseInt(this.value, 10); updateCreatorLivePreview();">
+                        </div>
+                        <div class="form-group">
+                          <label>Boyut Ön Ayarı</label>
+                          <select id="fg-size-preset" class="form-control" onchange="onForgeSizePresetChange(this.value)">
+                            <option value="standard" selected>Standart Kart (440 × 230)</option>
+                            <option value="banner">Geniş Banner (480 × 150)</option>
+                            <option value="vertical">Dikey Panel (320 × 420)</option>
+                            <option value="compact">Kompakt Bar (460 × 75)</option>
+                            <option value="square">Kare Vitrin (320 × 320)</option>
+                            <option value="custom">Özel Boyutlandırma</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="form-row" id="fg-custom-size-row" style="display:none;">
+                        <div class="form-group">
+                          <label>Genişlik: <strong id="fg-card-w-lbl">440px</strong></label>
+                          <input type="range" id="fg-card-w" min="260" max="720" step="10" value="440" oninput="document.getElementById('fg-card-w-lbl').textContent = this.value + 'px'; forgeState.cardWidth = parseInt(this.value, 10); updateCreatorLivePreview();">
+                        </div>
+                        <div class="form-group">
+                          <label>Yükseklik: <strong id="fg-card-h-lbl">230px</strong></label>
+                          <input type="range" id="fg-card-h" min="60" max="520" step="10" value="230" oninput="document.getElementById('fg-card-h-lbl').textContent = this.value + 'px'; forgeState.cardHeight = parseInt(this.value, 10); updateCreatorLivePreview();">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PANEL 3: MATERIALS & 2D SPECTRUM -->
+                  <div id="canva-panel-materials" class="canva-insp-panel">
+                    <div class="creator-section">
+                      <div class="creator-sec-title">
+                        <span>🎨</span> <span>KART DOKUSU & MATERYALİ</span>
+                      </div>
+                      <div class="form-group">
+                        <label>Kart Materyali</label>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:6px;" id="fg-materials-grid">
+                          <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="glass" onclick="setForgeMaterial('glass', this)">🪟 Buzlu Cam</button>
+                          <button type="button" class="mira-mini-btn fg-mat-btn active" data-mat="carbon" onclick="setForgeMaterial('carbon', this)" style="background:#7c3aed; border-color:#c084fc; color:#fff;">🏁 Karbon</button>
+                          <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="cybergrid" onclick="setForgeMaterial('cybergrid', this)">⚡ Izgara</button>
+                          <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="scanlines" onclick="setForgeMaterial('scanlines', this)">📺 CRT</button>
+                          <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="gradient" onclick="setForgeMaterial('gradient', this)">🎨 Gradyan</button>
+                          <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="matte" onclick="setForgeMaterial('matte', this)">🌑 Mat</button>
+                          <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="custom_img" onclick="setForgeMaterial('custom_img', this)">🖼️ Resim</button>
+                        </div>
+                      </div>
+
+                      <div class="form-row" id="fg-mat-glass-opts">
+                        <div class="form-group">
+                          <label>Cam Bulanıklığı: <strong id="fg-blur-lbl">14px</strong></label>
+                          <input type="range" id="fg-blur" min="0" max="30" step="2" value="14" oninput="document.getElementById('fg-blur-lbl').textContent = this.value + 'px'; forgeState.backdropBlur = parseInt(this.value, 10); updateCreatorLivePreview();">
+                        </div>
+                        <div class="form-group">
+                          <label>Opaklık: <strong id="fg-op-lbl">85%</strong></label>
+                          <input type="range" id="fg-op" min="10" max="100" step="5" value="85" oninput="document.getElementById('fg-op-lbl').textContent = this.value + '%'; forgeState.bgOpacity = parseInt(this.value, 10); updateCreatorLivePreview();">
+                        </div>
+                      </div>
+
+                      <div class="form-group" id="fg-mat-grad-opts" style="display:none;">
+                        <label>Gradyan Açısı: <strong id="fg-grad-ang-lbl">135°</strong></label>
+                        <input type="range" id="fg-grad-ang" min="0" max="360" step="15" value="135" oninput="document.getElementById('fg-grad-ang-lbl').textContent = this.value + '°'; forgeState.gradientAngle = parseInt(this.value, 10); updateCreatorLivePreview();">
+                      </div>
+
+                      <div id="fg-mat-img-opts" style="display:none; flex-direction:column; gap:8px;">
+                        <div class="form-group">
+                          <label>PC'den Kart Arka Plan Resmi</label>
+                          <div style="display:flex; gap:6px;">
+                            <button type="button" class="btn-gal" onclick="uploadForgeCardBg()" style="flex:0 0 auto; padding:6px 10px; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#e9d5ff;">
+                              📤 PC'den Seç
+                            </button>
+                            <input type="text" id="fg-custom-img-url" class="form-control" placeholder="Resim URL..." oninput="forgeState.customImgUrl = this.value; updateCreatorLivePreview();">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 2D Spektrum Renk Paleti -->
+                    <div class="creator-section">
+                      <div class="creator-sec-title">
+                        <span>🌈</span> <span>2D SPEKTRUM RENK PALETİ</span>
+                      </div>
+                      <div class="creator-color-target-pills" id="cr-color-target-pills">
+                        <button type="button" class="creator-target-pill active" data-target="primary" onclick="setCreatorColorTarget('primary', this)">Ana Vurgu</button>
+                        <button type="button" class="creator-target-pill" data-target="secondary" onclick="setCreatorColorTarget('secondary', this)">İkincil Neon</button>
+                        <button type="button" class="creator-target-pill" data-target="textColor" onclick="setCreatorColorTarget('textColor', this)">Yazı</button>
+                        <button type="button" class="creator-target-pill" data-target="bgColor" onclick="setCreatorColorTarget('bgColor', this)">Arka Plan</button>
+                        <button type="button" class="creator-target-pill" data-target="borderColor" onclick="setCreatorColorTarget('borderColor', this)">Çerçeve</button>
+                      </div>
+
+                      <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px; margin-top: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                          <span id="cr-spectrum-rgb" style="font-family: monospace; font-size: 11px; color: #cbd5e1; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px;">rgb(168, 85, 247)</span>
+                          <span id="cr-spectrum-lock-badge" onclick="toggleCreatorSpectrumLock()" style="font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 99px; background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #6ee7b7; cursor: pointer;">
+                            🖱️ Mouse Takibi
+                          </span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                          <div id="cr-spectrum-pad" style="position: relative; flex: 1; height: 72px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: hsl(271, 100%, 50%); cursor: crosshair; overflow: hidden; user-select: none;">
+                            <div style="position:absolute; inset:0; background: linear-gradient(to right, #fff, transparent);"></div>
+                            <div style="position:absolute; inset:0; background: linear-gradient(to top, #000, transparent);"></div>
+                            <div id="cr-spectrum-cursor" style="position: absolute; left: 66%; top: 15%; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1.5px rgba(0,0,0,0.85); transform: translate(-50%, -50%); pointer-events: none; background: #a855f7;"></div>
+                          </div>
+                          <div id="cr-hue-bar" style="position: relative; width: 20px; height: 72px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: linear-gradient(to bottom, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%); cursor: pointer; user-select: none;">
+                            <div id="cr-hue-cursor" style="position: absolute; left: 0; right: 0; top: 75%; height: 5px; border: 1.5px solid #fff; box-shadow: 0 0 4px #000; transform: translateY(-50%); pointer-events: none;"></div>
+                          </div>
+                          <div style="width: 76px; display: flex; flex-direction: column; gap: 4px;">
+                            <div id="cr-spectrum-preview-box" style="flex: 1; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: #a855f7; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 11px; font-weight: 900; color: #fff;">#a855f7</div>
+                            <input type="text" id="cr-color-hex-inp" class="form-control" value="#a855f7" style="padding: 3px 5px; font-size: 10.5px; text-align: center; font-family: monospace;" oninput="onCreatorColorHexChange(this.value)">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PANEL 4: BORDER & GLOW -->
+                  <div id="canva-panel-border" class="canva-insp-panel">
+                    <div class="creator-section">
+                      <div class="creator-sec-title">
+                        <span>🪟</span> <span>ÇERÇEVE, KENARLIK & NEON FX</span>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label>Kenarlık Stili</label>
+                          <select id="fg-border-style" class="form-control" onchange="forgeState.borderStyle = this.value; updateCreatorLivePreview();">
+                            <option value="solid" selected>Düz Neon Çizgi (Solid)</option>
+                            <option value="double">Çift Zırhlı Çerçeve (Double)</option>
+                            <option value="dashed">Fütüristik Kesikli Çizgi (Dashed)</option>
+                            <option value="accent-left">Sol Vurgu Barı (Accent Line)</option>
+                            <option value="none">Çerçevesiz Saf Cam (None)</option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label>Kenarlık Kalınlığı: <strong id="fg-border-w-lbl">2px</strong></label>
+                          <input type="range" id="fg-border-w" min="0" max="8" step="1" value="2" oninput="document.getElementById('fg-border-w-lbl').textContent = this.value + 'px'; forgeState.borderWidth = parseInt(this.value, 10); updateCreatorLivePreview();">
+                        </div>
+                      </div>
+
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label>Neon Parlama (Glow): <strong id="fg-glow-lbl">26px</strong></label>
+                          <input type="range" id="fg-glow" min="0" max="45" step="3" value="26" oninput="document.getElementById('fg-glow-lbl').textContent = this.value + 'px'; forgeState.glowIntensity = parseInt(this.value, 10); updateCreatorLivePreview();">
+                        </div>
+                        <div class="form-group" style="display:flex; align-items:center; justify-content:space-between; padding-top:20px;">
+                          <label style="margin:0; cursor:pointer;" for="fg-pulse-chk">⚡ Canlı Nefes Alan Neon Nabız (Pulse FX)</label>
+                          <label class="forge-switch">
+                            <input type="checkbox" id="fg-pulse-chk" onchange="forgeState.neonPulse = this.checked; updateCreatorLivePreview();">
+                            <span class="forge-slider-switch"></span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PANEL 5: COMPONENTS -->
+                  <div id="canva-panel-components" class="canva-insp-panel">
+                    <div class="creator-section">
+                      <div class="creator-sec-title">
+                        <span>🧩</span> <span>MODÜLER KART BİLEŞENLERİ</span>
+                      </div>
+
+                      <!-- 1. Üst Başlık Şeridi -->
+                      <div class="forge-toggle-row">
+                        <span class="forge-toggle-label"><span>🏷️</span> Üst Başlık Şeridi</span>
+                        <label class="forge-switch">
+                          <input type="checkbox" id="fg-chk-toptag" checked onchange="forgeState.showTopTag = this.checked; toggleForgeSubOpt('fg-opt-toptag', this.checked); updateCreatorLivePreview();">
+                          <span class="forge-slider-switch"></span>
+                        </label>
+                      </div>
+                      <div class="forge-sub-options" id="fg-opt-toptag">
+                        <div class="form-row">
+                          <div class="form-group" style="flex:0 0 70px;">
+                            <label>İkon</label>
+                            <input type="text" id="fg-toptag-icon" class="form-control" value="⚡" style="text-align:center;" oninput="forgeState.topTagIcon = this.value; updateCreatorLivePreview();">
+                          </div>
+                          <div class="form-group">
+                            <label>Şerit Metni</label>
+                            <input type="text" id="fg-toptag-txt" class="form-control" value="CANLI VİTRİN KARTI" oninput="forgeState.topTagText = this.value; updateCreatorLivePreview();">
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 2. Profil / Portre Görseli -->
+                      <div class="forge-toggle-row">
+                        <span class="forge-toggle-label"><span>🖼️</span> Profil / Logo Görseli</span>
+                        <label class="forge-switch">
+                          <input type="checkbox" id="fg-chk-avatar" checked onchange="forgeState.showAvatar = this.checked; toggleForgeSubOpt('fg-opt-avatar', this.checked); updateCreatorLivePreview();">
+                          <span class="forge-slider-switch"></span>
+                        </label>
+                      </div>
+                      <div class="forge-sub-options" id="fg-opt-avatar">
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label>Profil Görseli</label>
+                            <div style="display:flex; gap:6px;">
+                              <button type="button" class="btn-gal" onclick="uploadForgeAvatar()" style="flex:0 0 auto; padding:6px 10px; font-size:11px; background:rgba(56,189,248,0.2); border-color:#38bdf8; color:#bae6fd;">
+                                📤 PC'den Seç
+                              </button>
+                              <input type="text" id="fg-avatar-url" class="form-control" value="/kick/vexana/assets/images/portrait.jpg" oninput="forgeState.avatarUrl = this.value; updateCreatorLivePreview();">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label>Avatar Kesim Şekli</label>
+                            <select id="fg-avatar-shape" class="form-control" onchange="forgeState.avatarShape = this.value; updateCreatorLivePreview();">
+                              <option value="hex" selected>Siber Altıgen (Hexagon)</option>
+                              <option value="diamond">Elmas (Diamond)</option>
+                              <option value="round">Tam Daire (Circle)</option>
+                              <option value="square">Modern Kare</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 3. Sayaç / İstatistik -->
+                      <div class="forge-toggle-row">
+                        <span class="forge-toggle-label"><span>📊</span> Sayaç / İstatistik Kutusu</span>
+                        <label class="forge-switch">
+                          <input type="checkbox" id="fg-chk-stat" checked onchange="forgeState.showStatBox = this.checked; toggleForgeSubOpt('fg-opt-stat', this.checked); updateCreatorLivePreview();">
+                          <span class="forge-slider-switch"></span>
+                        </label>
+                      </div>
+                      <div class="forge-sub-options" id="fg-opt-stat">
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label>Sayaç Başlığı</label>
+                            <input type="text" id="fg-stat-label" class="form-control" value="CANLI TAKİPÇİ" oninput="forgeState.statLabel = this.value; updateCreatorLivePreview();">
+                          </div>
+                          <div class="form-group">
+                            <label>Sayaç Değeri</label>
+                            <input type="text" id="fg-stat-val" class="form-control" value="1,450" oninput="forgeState.statValue = this.value; updateCreatorLivePreview();">
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 4. İlerleme Çubuğu -->
+                      <div class="forge-toggle-row">
+                        <span class="forge-toggle-label"><span>🎯</span> İlerleme Çubuğu (Mini Goal)</span>
+                        <label class="forge-switch">
+                          <input type="checkbox" id="fg-chk-prog" checked onchange="forgeState.showProgressBar = this.checked; toggleForgeSubOpt('fg-opt-prog', this.checked); updateCreatorLivePreview();">
+                          <span class="forge-slider-switch"></span>
+                        </label>
+                      </div>
+                      <div class="forge-sub-options" id="fg-opt-prog">
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label>Hedef Etiketi</label>
+                            <input type="text" id="fg-prog-label" class="form-control" value="HEDEF: 2,000" oninput="forgeState.progressLabel = this.value; updateCreatorLivePreview();">
+                          </div>
+                          <div class="form-group">
+                            <label>Doluluk: <strong id="fg-prog-val-lbl">%70</strong></label>
+                            <input type="range" id="fg-prog-val" min="0" max="100" step="5" value="70" oninput="document.getElementById('fg-prog-val-lbl').textContent = '%' + this.value; forgeState.progressValue = parseInt(this.value, 10); updateCreatorLivePreview();">
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 5. Rozetler -->
+                      <div class="forge-toggle-row">
+                        <span class="forge-toggle-label"><span>🏷️</span> Rozetler (Badges)</span>
+                        <label class="forge-switch">
+                          <input type="checkbox" id="fg-chk-badges" checked onchange="forgeState.showBadges = this.checked; toggleForgeSubOpt('fg-opt-badges', this.checked); updateCreatorLivePreview();">
+                          <span class="forge-slider-switch"></span>
+                        </label>
+                      </div>
+                      <div class="forge-sub-options" id="fg-opt-badges">
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label>1. Rozet</label>
+                            <input type="text" id="fg-badge-1" class="form-control" value="⚡ PRO STREAMER" oninput="forgeState.badge1 = this.value; updateCreatorLivePreview();">
+                          </div>
+                          <div class="form-group">
+                            <label>2. Rozet</label>
+                            <input type="text" id="fg-badge-2" class="form-control" value="● LIVE" oninput="forgeState.badge2 = this.value; updateCreatorLivePreview();">
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 6. Alıntı / Slogan -->
+                      <div class="forge-toggle-row">
+                        <span class="forge-toggle-label"><span>💬</span> Alıntı / Slogan Kutusu</span>
+                        <label class="forge-switch">
+                          <input type="checkbox" id="fg-chk-quote" checked onchange="forgeState.showQuote = this.checked; toggleForgeSubOpt('fg-opt-quote', this.checked); updateCreatorLivePreview();">
+                          <span class="forge-slider-switch"></span>
+                        </label>
+                      </div>
+                      <div class="forge-sub-options" id="fg-opt-quote">
+                        <div class="form-group">
+                          <label>Alıntı / Slogan Metni</label>
+                          <input type="text" id="fg-quote-text" class="form-control" value='"Şafak Vadisi zaferimizi bekliyor!"' oninput="forgeState.quoteText = this.value; updateCreatorLivePreview();">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PANEL 6: TYPOGRAPHY & NAMES -->
+                  <div id="canva-panel-typography" class="canva-insp-panel">
+                    <div class="creator-section">
+                      <div class="creator-sec-title">
+                        <span>🔤</span> <span>BAŞLIK, YAZI & FONT AYARLARI</span>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label>Kart Başlığı</label>
+                          <input type="text" id="fg-title" class="form-control" value="MİRA CYBER SHOWCASE" oninput="forgeState.title = this.value; updateCreatorLivePreview();">
+                        </div>
+                        <div class="form-group">
+                          <label>Başlık Boyutu: <strong id="fg-title-size-lbl">18px</strong></label>
+                          <input type="range" id="fg-title-size" min="12" max="28" step="1" value="18" oninput="document.getElementById('fg-title-size-lbl').textContent = this.value + 'px'; forgeState.titleSize = parseInt(this.value, 10); updateCreatorLivePreview();">
+                        </div>
+                      </div>
+
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label>Alt Başlık / Açıklama</label>
+                          <input type="text" id="fg-subtitle" class="form-control" value="Mythic Glory Streamer • Mid Lane" oninput="forgeState.subtitle = this.value; updateCreatorLivePreview();">
+                        </div>
+                        <div class="form-group">
+                          <label>Metin Hizalama</label>
+                          <select id="fg-text-align" class="form-control" onchange="forgeState.textAlign = this.value; updateCreatorLivePreview();">
+                            <option value="left" selected>Sola Hizala</option>
+                            <option value="center">Ortala</option>
+                            <option value="right">Sağa Hizala</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label>Yazı Fontu</label>
+                          <select id="fg-card-font" class="form-control" onchange="forgeState.fontFamily = this.value; updateCreatorLivePreview();">
+                            <option value="'Orbitron', sans-serif" selected>Orbitron (Siber / E-Spor)</option>
+                            <option value="'Cinzel Decorative', cursive">Cinzel Decorative (Mistik / Epik)</option>
+                            <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Modern Net)</option>
+                            <option value="'Rajdhani', sans-serif">Rajdhani (Teknolojik)</option>
+                            <option value="'Montserrat', sans-serif">Montserrat (Temiz & Düz)</option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label>Galeri Kayıt Adı</label>
+                          <input type="text" id="cr-card-name" class="form-control" value="Özel Cyberpunk Vitrinim" oninput="forgeState.name = this.value; updateCreatorLivePreview();">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- 2. ARKA PLAN TASARIM FORMU (MODE: BACKGROUND) -->
+                <div id="creator-form-background" class="creator-subform" style="display:none;">
+                  <div class="creator-section">
+                    <div class="creator-sec-title">🌌 ARKA PLAN TÜRÜ & BİLGİLERİ</div>
+                    <div class="form-group">
+                      <label>Arka Plan Adı (Galerinizde görünecek isim)</label>
+                      <input type="text" id="cr-bg-name" class="form-control" value="Siber Karanlık Uzay" oninput="updateCreatorLivePreview()">
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Temel Stil</label>
+                        <select id="cr-bg-base-style" class="form-control" onchange="onCreatorBgStyleChange(this.value)">
+                          <option value="cybergrid" selected>Matrix Siber Izgara</option>
+                          <option value="nebula">Derin Kozmik Nebula</option>
+                          <option value="darkglass">Buzlu Füme Cam</option>
+                          <option value="gradient">Çift Renkli Gradyan</option>
+                          <option value="custom_img">Özel Resim / Fotoğraf</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Parçacık Efekti</label>
+                        <select id="cr-bg-particles" class="form-control" onchange="updateCreatorLivePreview()">
+                          <option value="false" selected>Kapalı (Sade & Temiz)</option>
+                          <option value="true">Açık (Yüzen Kozmik Işıklar)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group" id="cr-bg-img-row" style="display: none;">
+                      <label>Arka Plan Resmi (PC'den veya URL)</label>
+                      <div style="display: flex; gap: 6px;">
+                        <button type="button" class="btn-gal" onclick="uploadCreatorBgImage()" style="flex: 0 0 auto; padding: 6px 12px;">📤 Resim Seç</button>
+                        <input type="text" id="cr-bg-img-url" class="form-control" placeholder="https://... veya yükleyin" oninput="updateCreatorLivePreview()">
+                      </div>
+                    </div>
+                    <div class="form-row" id="cr-bg-fit-row" style="display: none;">
+                      <div class="form-group">
+                        <label>Resim Yerleşimi</label>
+                        <select id="cr-bg-fit" class="form-control" onchange="updateCreatorLivePreview()">
+                          <option value="cover" selected>Tam Kapla (Cover)</option>
+                          <option value="contain">Orantılı Sığdır (Contain)</option>
+                          <option value="stretch">Esneme (Stretch 100%)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Karartma / Dim: <strong id="cr-bg-dim-lbl">20%</strong></label>
+                        <input type="range" id="cr-bg-dim" min="0" max="90" step="5" value="20" oninput="document.getElementById('cr-bg-dim-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
+                      </div>
+                      <div class="form-group">
+                        <label>Bulanıklık: <strong id="cr-bg-blur-lbl">0px</strong></label>
+                        <input type="range" id="cr-bg-blur" min="0" max="25" step="1" value="0" oninput="document.getElementById('cr-bg-blur-lbl').textContent = this.value + 'px'; updateCreatorLivePreview();">
+                      </div>
+                      <div class="form-group">
+                        <label>Opaklık: <strong id="cr-bg-op-lbl">100%</strong></label>
+                        <input type="range" id="cr-bg-op" min="10" max="100" step="5" value="100" oninput="document.getElementById('cr-bg-op-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Birincil Renk</label>
+                        <div style="display:flex; gap:6px;">
+                          <input type="color" id="cr-bg-color-prim" value="#a855f7" oninput="document.getElementById('cr-bg-color-prim-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
+                          <input type="text" id="cr-bg-color-prim-txt" class="form-control" value="#a855f7" oninput="document.getElementById('cr-bg-color-prim').value = this.value; updateCreatorLivePreview();">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label>İkincil Renk</label>
+                        <div style="display:flex; gap:6px;">
+                          <input type="color" id="cr-bg-color-sec" value="#06b6d4" oninput="document.getElementById('cr-bg-color-sec-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
+                          <input type="text" id="cr-bg-color-sec-txt" class="form-control" value="#06b6d4" oninput="document.getElementById('cr-bg-color-sec').value = this.value; updateCreatorLivePreview();">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. ALERT TASARIM FORMU (MODE: ALERT) -->
+                <div id="creator-form-alert" class="creator-subform" style="display:none;">
+                  <div class="creator-section">
+                    <div class="creator-sec-title">⚡ ALERT TÜRÜ & BİLGİLERİ</div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Alert Türü</label>
+                        <select id="cr-alert-type" class="form-control" onchange="onCreatorAlertTypeChange(this.value)">
+                          <option value="follower" selected>💜 Yeni Takipçi Bildirimi</option>
+                          <option value="sub">👑 Yeni Abone Bildirimi</option>
+                          <option value="donation">💎 Bağış Bildirimi</option>
+                          <option value="gift">🌹 Hediye Bildirimi</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Şablon Adı</label>
+                        <input type="text" id="cr-alert-name" class="form-control" value="Mistik Takipçi Bildirimi">
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Üst Rozet / Etiket</label>
+                        <input type="text" id="cr-alert-tag" class="form-control" value="CANLI BİLDİRİM!" oninput="updateCreatorLivePreview()">
+                      </div>
+                      <div class="form-group">
+                        <label>Örnek Kullanıcı Adı</label>
+                        <input type="text" id="cr-alert-user" class="form-control" value="SelinGamer" oninput="updateCreatorLivePreview()">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>Alt Açıklama Metni</label>
+                      <input type="text" id="cr-alert-sub" class="form-control" value="Ailemize Hoş Geldin!" oninput="updateCreatorLivePreview()">
+                    </div>
+                    <div class="form-group">
+                      <label>Örnek Bağış / Mesaj Metni</label>
+                      <input type="text" id="cr-alert-msg" class="form-control" placeholder="Yayında başarılar dilerim!" oninput="updateCreatorLivePreview()">
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Vurgu Rengi</label>
+                        <div style="display:flex; gap:6px;">
+                          <input type="color" id="cr-alert-color-prim" value="#a855f7" oninput="document.getElementById('cr-alert-color-prim-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
+                          <input type="text" id="cr-alert-color-prim-txt" class="form-control" value="#a855f7" oninput="document.getElementById('cr-alert-color-prim').value = this.value; updateCreatorLivePreview();">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label>Kutu Arka Plan Rengi</label>
+                        <div style="display:flex; gap:6px;">
+                          <input type="color" id="cr-alert-color-bg" value="#0d0f18" oninput="document.getElementById('cr-alert-color-bg-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
+                          <input type="text" id="cr-alert-color-bg-txt" class="form-control" value="#0d0f18" oninput="document.getElementById('cr-alert-color-bg').value = this.value; updateCreatorLivePreview();">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </aside>
+
           </div>
         </div>
       </div>
+
 
       <!-- TAB 2: HEDEF & İSTATİSTİK -->
       <div id="tab-goal" class="tab-pane">
@@ -4043,6 +4442,143 @@
       });
     }
 
+    
+    /* ========================================================
+       CANVA FORGE STUDIO ENGINE: ZOOM, STAGE & DIRECT CLICK-TO-EDIT
+       ======================================================== */
+    let canvaZoomLevel = 1.0;
+    let canvaCurrentInspectorTab = 'presets';
+
+    function switchCanvaInspectorTab(tabKey, btnEl) {
+      canvaCurrentInspectorTab = tabKey;
+      document.querySelectorAll('.canva-insp-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.canva-insp-panel').forEach(p => p.classList.remove('active'));
+
+      if (btnEl) {
+        btnEl.classList.add('active');
+      } else {
+        const btn = document.querySelector(`.canva-insp-tab[data-tab="${tabKey}"]`);
+        if (btn) btn.classList.add('active');
+      }
+
+      const panel = document.getElementById(`canva-panel-${tabKey}`);
+      if (panel) {
+        panel.classList.add('active');
+        const inspectorBody = document.querySelector('.canva-inspector-body');
+        if (inspectorBody) inspectorBody.scrollTop = 0;
+      }
+    }
+
+    function setCanvaZoom(delta) {
+      canvaZoomLevel = Math.max(0.5, Math.min(2.0, Math.round((canvaZoomLevel + delta) * 10) / 10));
+      applyCanvaZoom();
+    }
+
+    function resetCanvaZoom() {
+      canvaZoomLevel = 1.0;
+      applyCanvaZoom();
+    }
+
+    function applyCanvaZoom() {
+      const badge = document.getElementById('canva-zoom-level');
+      if (badge) badge.textContent = `${Math.round(canvaZoomLevel * 100)}%`;
+      const canvasEl = document.getElementById('creator-sim-canvas');
+      if (canvasEl) {
+        canvasEl.style.transform = `scale(${canvaZoomLevel})`;
+        canvasEl.style.transformOrigin = 'center center';
+        canvasEl.style.transition = 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+      }
+    }
+
+    function setCanvaStageBg(bgType, btnEl) {
+      document.querySelectorAll('.canva-bg-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      const stage = document.getElementById('canva-stage-viewport');
+      if (!stage) return;
+
+      if (bgType === 'darkgrid') {
+        stage.style.background = '#0a0d16 radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px) 0 0 / 24px 24px';
+      } else if (bgType === 'checker') {
+        stage.style.background = 'repeating-conic-gradient(#141824 0% 25%, #0e121d 0% 50%) 50% / 20px 20px';
+      } else if (bgType === 'game') {
+        stage.style.background = 'radial-gradient(ellipse at 50% 30%, rgba(16, 185, 129, 0.2), transparent 70%), linear-gradient(180deg, #09121a 0%, #030712 100%)';
+      } else if (bgType === 'matte') {
+        stage.style.background = '#03050a';
+      }
+    }
+
+    function highlightInspectorInput(targetElOrId) {
+      const el = typeof targetElOrId === 'string' ? document.getElementById(targetElOrId) : targetElOrId;
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('canva-focus-pulse');
+      setTimeout(() => {
+        el.classList.remove('canva-focus-pulse');
+      }, 1600);
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+        setTimeout(() => el.focus(), 150);
+      }
+    }
+
+    function onCanvaElementClick(elementType, event) {
+      if (event) {
+        event.stopPropagation();
+      }
+
+      document.querySelectorAll('.canva-interactive-elem').forEach(el => el.classList.remove('selected'));
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.add('selected');
+        setTimeout(() => {
+          if (event && event.currentTarget) event.currentTarget.classList.remove('selected');
+        }, 1800);
+      }
+
+      if (elementType === 'avatar') {
+        switchCanvaInspectorTab('components');
+        highlightInspectorInput('fg-opt-avatar');
+        showToast("📷 Profil görseli ayarları açıldı. PC'den yeni resim seçebilir veya URL değiştirebilirsiniz.", "info");
+      } else if (elementType === 'typography' || elementType === 'title') {
+        switchCanvaInspectorTab('typography');
+        highlightInspectorInput('fg-title');
+        showToast("✏️ Kart başlığı & alt metin ayarları açıldı.", "info");
+      } else if (elementType === 'stat') {
+        switchCanvaInspectorTab('components');
+        highlightInspectorInput('fg-opt-stat');
+        showToast("🔢 Sayaç / İstatistik ayarları açıldı.", "info");
+      } else if (elementType === 'progress') {
+        switchCanvaInspectorTab('components');
+        highlightInspectorInput('fg-opt-prog');
+        showToast("📊 Hedef çubuğu & % oran ayarları açıldı.", "info");
+      } else if (elementType === 'badges') {
+        switchCanvaInspectorTab('components');
+        highlightInspectorInput('fg-opt-badges');
+        showToast("🎖️ Rozetler ve etiket ayarları açıldı.", "info");
+      } else if (elementType === 'socials') {
+        switchCanvaInspectorTab('components');
+        highlightInspectorInput('fg-opt-socials');
+        showToast("📱 Sosyal medya kullanıcı adları açıldı.", "info");
+      } else if (elementType === 'quote') {
+        switchCanvaInspectorTab('components');
+        highlightInspectorInput('fg-opt-quote');
+        showToast("💬 Slogan & yayıncı sözü açıldı.", "info");
+      } else if (elementType === 'topTag') {
+        switchCanvaInspectorTab('components');
+        highlightInspectorInput('fg-opt-toptag');
+        showToast("⚡ Üst şerit başlığı & ikon ayarları açıldı.", "info");
+      } else if (elementType === 'card') {
+        if (canvaCurrentInspectorTab === 'geometry') {
+          switchCanvaInspectorTab('materials');
+          highlightInspectorInput('fg-materials-grid');
+          showToast("🎨 Kart materyali & renk ayarları açıldı.", "info");
+        } else {
+          switchCanvaInspectorTab('geometry');
+          highlightInspectorInput('forge-shape-cuts-grid');
+          showToast("📐 Kart kesim şekli & boyut ayarları açıldı.", "info");
+        }
+      }
+    }
+
     function setCreatorMode(mode, btnEl) {
       creatorActiveMode = mode;
       document.querySelectorAll('.creator-mode-tab').forEach(b => b.classList.remove('active'));
@@ -4051,7 +4587,9 @@
       const cardForm = document.getElementById('creator-form-card');
       const bgForm = document.getElementById('creator-form-background');
       const alertForm = document.getElementById('creator-form-alert');
+      const cardTabs = document.getElementById('canva-card-inspector-tabs');
 
+      if (cardTabs) cardTabs.style.display = mode === 'card' ? 'grid' : 'none';
       if (cardForm) cardForm.style.display = mode === 'card' ? 'block' : 'none';
       if (bgForm) bgForm.style.display = mode === 'background' ? 'block' : 'none';
       if (alertForm) alertForm.style.display = mode === 'alert' ? 'block' : 'none';
@@ -4296,8 +4834,8 @@
       const blur = forgeState.backdropBlur !== undefined ? forgeState.backdropBlur : 14;
       const op = forgeState.bgOpacity !== undefined ? forgeState.bgOpacity : 85;
       const gradAng = forgeState.gradientAngle !== undefined ? forgeState.gradientAngle : 135;
-      const cardW = Math.min(520, forgeState.cardWidth || 440);
-      const cardH = forgeState.cardHeight || 230;
+      const cardW = Math.max(460, Math.min(560, forgeState.cardWidth || 480));
+      const cardH = forgeState.cardHeight || 240;
 
       const clip = getForgeClipPath(shape, cutRad);
       const isClipped = clip !== 'none';
@@ -4306,7 +4844,7 @@
       let topTagHtml = '';
       if (forgeState.showTopTag) {
         topTagHtml = `
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid ${prim}33; padding-bottom:5px;">
+          <div class="canva-interactive-elem" data-canva-hint="⚡ Tıkla: Üst Başlık Şeridi" onclick="onCanvaElementClick('topTag', event)" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid ${prim}33; padding:4px 6px; border-radius:6px; cursor:pointer;">
             <div style="display:flex; align-items:center; gap:6px; font-size:10px; font-weight:900; letter-spacing:1px; color:${sec};">
               <span>${escHtml(forgeState.topTagIcon || '⚡')}</span>
               <span>${escHtml(forgeState.topTagText || 'CANLI VİTRİN KARTI')}</span>
@@ -4322,7 +4860,7 @@
         const avShape = forgeState.avatarShape || 'hex';
         const avClip = getForgeAvatarClip(avShape);
         avatarHtml = `
-          <div style="width:58px; height:58px; flex-shrink:0; clip-path:${avClip}; -webkit-clip-path:${avClip}; border-radius:${avShape === 'round' ? '50%' : (avShape === 'square' ? '10px' : '0')}; border:2px solid ${prim}; box-shadow:0 0 12px ${prim}66; overflow:hidden;">
+          <div class="canva-interactive-elem" data-canva-hint="📷 Tıkla: Profil Resmi / Avatar Değiştir" onclick="onCanvaElementClick('avatar', event)" style="width:62px; height:62px; flex-shrink:0; clip-path:${avClip}; -webkit-clip-path:${avClip}; border-radius:${avShape === 'round' ? '50%' : (avShape === 'square' ? '10px' : '0')}; border:2px solid ${prim}; box-shadow:0 0 12px ${prim}66; overflow:hidden; cursor:pointer; position:relative;">
             <img src="${escHtml(avUrl)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/kick/vexana/assets/images/portrait.jpg'">
           </div>
         `;
@@ -4333,7 +4871,7 @@
       const tSize = forgeState.titleSize || 18;
       const tAlign = forgeState.textAlign || 'left';
       const titlesHtml = `
-        <div style="flex:1; min-width:0; text-align:${tAlign};">
+        <div class="canva-interactive-elem" data-canva-hint="✏️ Tıkla: Başlığı & Metni Düzenle" onclick="onCanvaElementClick('typography', event)" style="flex:1; min-width:0; text-align:${tAlign}; padding:4px 6px; border-radius:6px; cursor:pointer;">
           <div style="font-family:${fontFam}; font-size:${tSize}px; font-weight:900; color:${textCol}; text-shadow:0 0 10px ${prim}88; line-height:1.2; word-break:break-word;">
             ${escHtml(titleText)}
           </div>
@@ -4346,7 +4884,7 @@
       let statHtml = '';
       if (forgeState.showStatBox) {
         statHtml = `
-          <div style="background:rgba(0,0,0,0.45); border:1px solid ${prim}44; border-radius:10px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center;">
+          <div class="canva-interactive-elem" data-canva-hint="🔢 Tıkla: Sayacı & İstatistiği Değiştir" onclick="onCanvaElementClick('stat', event)" style="background:rgba(0,0,0,0.45); border:1px solid ${prim}44; border-radius:10px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
             <span style="font-size:10px; font-weight:800; color:${sec}; letter-spacing:0.8px;">${escHtml(forgeState.statLabel || 'CANLI TAKİPÇİ')}</span>
             <span style="font-family:'Orbitron', sans-serif; font-size:15px; font-weight:900; color:#fff; text-shadow:0 0 8px ${prim};">${escHtml(forgeState.statValue || '1,450')}</span>
           </div>
@@ -4357,7 +4895,7 @@
       if (forgeState.showProgressBar) {
         const pVal = forgeState.progressValue !== undefined ? forgeState.progressValue : 70;
         progressHtml = `
-          <div style="display:flex; flex-direction:column; gap:4px;">
+          <div class="canva-interactive-elem" data-canva-hint="📊 Tıkla: Hedef Çubuğunu & % Oranını Ayarla" onclick="onCanvaElementClick('progress', event)" style="display:flex; flex-direction:column; gap:4px; padding:4px 6px; border-radius:6px; cursor:pointer;">
             <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:800; color:#e2e8f0;">
               <span>${escHtml(forgeState.progressLabel || 'HEDEF: 2,000')}</span>
               <span style="color:${sec};">%${pVal}</span>
@@ -4373,7 +4911,7 @@
       if (forgeState.showBadges) {
         const bRad = forgeState.badgeStyle === 'pill' ? '99px' : '6px';
         badgesHtml = `
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <div class="canva-interactive-elem" data-canva-hint="🎖️ Tıkla: Rozetleri & Etiketleri Düzenle" onclick="onCanvaElementClick('badges', event)" style="display:flex; gap:6px; flex-wrap:wrap; padding:2px; border-radius:6px; cursor:pointer;">
             <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:${bRad}; background:${prim}25; border:1px solid ${prim}; color:#e9d5ff;">${escHtml(forgeState.badge1 || '⚡ PRO STREAMER')}</span>
             <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:${bRad}; background:${sec}22; border:1px solid ${sec}; color:${sec};">${escHtml(forgeState.badge2 || '● LIVE')}</span>
           </div>
@@ -4383,7 +4921,7 @@
       let socialsHtml = '';
       if (forgeState.showSocials) {
         socialsHtml = `
-          <div style="display:flex; gap:12px; font-size:11px; font-weight:700; color:#cbd5e1; flex-wrap:wrap;">
+          <div class="canva-interactive-elem" data-canva-hint="📱 Tıkla: Sosyal Medya Linkleri" onclick="onCanvaElementClick('socials', event)" style="display:flex; gap:12px; font-size:11px; font-weight:700; color:#cbd5e1; flex-wrap:wrap; padding:2px; border-radius:6px; cursor:pointer;">
             <span>🟢 kick.com/${escHtml(forgeState.kickHandle || 'cihanatas')}</span>
             <span>📱 ${escHtml(forgeState.tiktokHandle || '@mira')}</span>
           </div>
@@ -4393,7 +4931,7 @@
       let quoteHtml = '';
       if (forgeState.showQuote && forgeState.quoteText) {
         quoteHtml = `
-          <div style="font-size:11px; font-style:italic; color:#cbd5e1; border-left:3px solid ${prim}; padding-left:8px; line-height:1.4;">
+          <div class="canva-interactive-elem" data-canva-hint="💬 Tıkla: Sloganı Düzenle" onclick="onCanvaElementClick('quote', event)" style="font-size:11px; font-style:italic; color:#cbd5e1; border-left:3px solid ${prim}; padding:4px 8px; line-height:1.4; border-radius:0 6px 6px 0; cursor:pointer;">
             ${escHtml(forgeState.quoteText)}
           </div>
         `;
@@ -4404,8 +4942,8 @@
 
       if (isClipped) {
         return `
-          <div class="mod-card mod-forge-card ${pulseClass}" style="max-width:100%; width:${cardW}px; min-height:${cardH ? cardH + 'px' : 'auto'}; position:relative; box-sizing:border-box; clip-path:${clip}; -webkit-clip-path:${clip}; background:${borderCol}; padding:${bWidth}px; ${glowFilter} transition: all 0.2s ease;">
-            <div style="clip-path:${clip}; -webkit-clip-path:${clip}; width:100%; height:100%; box-sizing:border-box; ${matCss} padding:16px 20px; display:flex; flex-direction:column; gap:10px; font-family:${fontFam}; color:${textCol}; overflow:hidden;">
+          <div class="mod-card mod-forge-card canva-interactive-elem ${pulseClass}" data-canva-hint="📐 Tıkla: Kart Şekli, Kesim & Doku" onclick="onCanvaElementClick('card', event)" style="max-width:100%; width:${cardW}px; min-height:${cardH ? cardH + 'px' : 'auto'}; position:relative; box-sizing:border-box; clip-path:${clip}; -webkit-clip-path:${clip}; background:${borderCol}; padding:${bWidth}px; ${glowFilter} transition: all 0.2s ease; cursor:pointer;">
+            <div style="clip-path:${clip}; -webkit-clip-path:${clip}; width:100%; height:100%; box-sizing:border-box; ${matCss} padding:18px 22px; display:flex; flex-direction:column; gap:12px; font-family:${fontFam}; color:${textCol}; overflow:hidden;">
               ${topTagHtml}
               <div style="display:flex; gap:12px; align-items:center;">
                 ${avatarHtml}
@@ -4429,7 +4967,7 @@
           : 'box-shadow: 0 10px 30px rgba(0,0,0,0.65);';
 
         return `
-          <div class="mod-card mod-forge-card ${pulseClass}" style="max-width:100%; width:${cardW}px; min-height:${cardH ? cardH + 'px' : 'auto'}; position:relative; box-sizing:border-box; border-radius:${radCss}; ${borderCss} ${shadowCss} ${matCss} padding:16px 20px; display:flex; flex-direction:column; gap:10px; font-family:${fontFam}; color:${textCol}; overflow:hidden; transition: all 0.2s ease;">
+          <div class="mod-card mod-forge-card canva-interactive-elem ${pulseClass}" data-canva-hint="📐 Tıkla: Kart Şekli, Kesim & Doku" onclick="onCanvaElementClick('card', event)" style="max-width:100%; width:${cardW}px; min-height:${cardH ? cardH + 'px' : 'auto'}; position:relative; box-sizing:border-box; border-radius:${radCss}; ${borderCss} ${shadowCss} ${matCss} padding:18px 22px; display:flex; flex-direction:column; gap:12px; font-family:${fontFam}; color:${textCol}; overflow:hidden; transition: all 0.2s ease; cursor:pointer;">
             ${topTagHtml}
             <div style="display:flex; gap:12px; align-items:center;">
               ${avatarHtml}
@@ -4867,8 +5405,14 @@
       if (targetPane) targetPane.classList.add('active');
 
       const isVisualBuilder = tabId === 'tab-canvas-builder';
+      const isDesignCreator = tabId === 'tab-design-creator';
       document.body.classList.toggle('studio-visual-editor-mode', isVisualBuilder);
+      document.body.classList.toggle('studio-creator-mode', isDesignCreator);
       renderStudioCanvasCardsBar(cachedCanvasCards);
+      if (isDesignCreator) {
+        updateCreatorLivePreview();
+        setTimeout(applyCanvaZoom, 20);
+      }
       setTimeout(resizePreview, 30);
       setTimeout(resizePreview, 150);
 
