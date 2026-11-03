@@ -2731,6 +2731,247 @@
       color: #00f5a0;
     }
 
+    /* MÜZİK & TUNA KONTROL MERKEZİ STİLLERİ */
+    .music-dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .music-dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .music-now-card {
+      background: linear-gradient(135deg, rgba(20, 24, 46, 0.95), rgba(10, 14, 28, 0.95));
+      border: 1.5px solid rgba(168, 85, 247, 0.35);
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.15);
+    }
+
+    .music-now-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .music-disc-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #2e1065 0%, #090d1a 70%);
+      border: 2px solid #a855f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+      animation: spinDisc 8s linear infinite;
+      flex-shrink: 0;
+    }
+    .music-disc-icon.paused {
+      animation-play-state: paused;
+      border-color: #64748b;
+      box-shadow: none;
+    }
+
+    @keyframes spinDisc {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .music-now-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .music-now-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .music-source-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(168, 85, 247, 0.2);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      letter-spacing: 0.5px;
+    }
+
+    .music-obs-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(0, 245, 160, 0.15);
+      color: #00f5a0;
+      border: 1px solid rgba(0, 245, 160, 0.35);
+    }
+    .music-obs-badge.offline {
+      background: rgba(148, 163, 184, 0.12);
+      color: #94a3b8;
+      border-color: rgba(148, 163, 184, 0.25);
+    }
+
+    .music-now-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14.5px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 480px;
+    }
+
+    .music-now-artist {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    /* Neon Equalizer Çubukları */
+    .music-eq-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 18px;
+      padding: 0 2px;
+    }
+    .eq-bar {
+      width: 3.5px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #00f5a0, #a855f7);
+      animation: eqBounce 1.2s ease-in-out infinite alternate;
+    }
+    .eq-bar:nth-child(1) { height: 6px; animation-delay: 0.1s; }
+    .eq-bar:nth-child(2) { height: 16px; animation-delay: 0.3s; }
+    .eq-bar:nth-child(3) { height: 10px; animation-delay: 0.5s; }
+    .eq-bar:nth-child(4) { height: 18px; animation-delay: 0.2s; }
+    .eq-bar:nth-child(5) { height: 12px; animation-delay: 0.4s; }
+    .eq-bar:nth-child(6) { height: 8px; animation-delay: 0.6s; }
+
+    @keyframes eqBounce {
+      0% { height: 3px; }
+      100% { height: 18px; }
+    }
+
+    .music-now-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-music-sync-obs {
+      background: linear-gradient(135deg, #a855f7, #06b6d4);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11.5px;
+      font-weight: 900;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);
+    }
+    .btn-music-sync-obs:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+    }
+
+    .btn-music-mute {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 9px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-music-mute:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border-color: #ef4444;
+    }
+
+    .music-preset-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .music-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .music-chip:hover {
+      background: rgba(168, 85, 247, 0.18);
+      border-color: #a855f7;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .music-marquee-preview {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px dashed rgba(168, 85, 247, 0.35);
+      border-radius: 8px;
+      padding: 8px 12px;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      margin-top: 8px;
+    }
+    .music-marquee-inner {
+      display: inline-block;
+      animation: musicMarquee 16s linear infinite;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #00f5a0;
+      font-family: monospace;
+    }
+    @keyframes musicMarquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
   </style>
 </head>
 <body>
@@ -4002,30 +4243,175 @@
         </div>
       </div>
 
-      <!-- TAB 5: MÜZİK & TUNA -->
+      <!-- TAB 5: MÜZİK & TUNA KONTROL MERKEZİ -->
       <div id="tab-music" class="tab-pane">
-        <div class="card-panel">
-          <div class="card-panel-header">
-            <span class="card-panel-title">
-              <span>🎵</span> SPOTIFY & NOW PLAYING (TUNA)
-            </span>
-            <span class="card-panel-badge">Otomatik Senkron</span>
-          </div>
-
-          <div class="form-group">
-            <label>Şu An Çalan Şarkı Adı (Manuel Giriş)</label>
-            <div style="display: flex; gap: 8px;">
-              <input type="text" id="live-song-input" class="form-control" value="♪ MLBB Arena - Necrokeep Lo-Fi Chill Beats">
-              <button class="btn-primary" style="white-space: nowrap;" onclick="updateLiveSongTitle()">
-                GÜNCELLE
-              </button>
+        
+        <!-- 1. Canlı Çalan Şarkı & Ekolayzer Hero Kartı -->
+        <div class="music-now-card">
+          <div class="music-now-left">
+            <div class="music-disc-icon" id="music-disc-spin">
+              🎵
+            </div>
+            <div class="music-now-meta">
+              <div class="music-now-tag-row">
+                <span class="music-source-badge" id="music-active-source-badge">🟢 OBS Tuna & Spotify</span>
+                <span class="music-obs-badge" id="music-obs-status-badge">📡 OBS WS Senkronu</span>
+                <div class="music-eq-bars" id="music-eq-anim">
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                </div>
+              </div>
+              <div class="music-now-title" id="music-card-title">♪ MLBB Arena - Necrokeep Lo-Fi Chill Beats</div>
+              <div class="music-now-artist" id="music-card-artist">MİRA Broadcast Studio • Canlı Yayın Müziği</div>
             </div>
           </div>
 
-          <div class="info-tip-box">
-            🎵 <strong>OBS Tuna Eklentisi:</strong> Bilgisayarınızda OBS Tuna eklentisi kuruldu. OBS içinden <strong>Araçlar -> Tuna</strong> menüsünden Spotify'ı seçtiğinizde veya arka planda müzik çaldığında <code>yayın/now-playing.txt</code> dosyası saniyesinde otomatik güncellenir ve yayında döner.
+          <div class="music-now-actions">
+            <button type="button" class="btn-music-sync-obs" onclick="syncMusicToObsAndStream()" title="Şarkıyı OBS Metin Kaynağına, Dosyaya ve Canlı Yayına Aktar">
+              <span>🚀</span> OBS'E & YAYINA AKTAR
+            </button>
+            <button type="button" class="btn-music-mute" onclick="muteStreamMusic()" title="Yayında Müziği Gizle / Sessiz">
+              <span>⏹️</span> Müziği Gizle
+            </button>
           </div>
         </div>
+
+        <!-- 2. İki Kolonlu Panel: Müzik Ayarları + Tuna & OBS Entegrasyonu -->
+        <div class="music-dashboard-grid">
+          
+          <!-- SOL KART: Müzik & Şarkı Ayarları -->
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <span class="card-panel-title">
+                <span>🎛️</span> MÜZİK & ŞARKI AYARLARI
+              </span>
+              <span class="card-panel-badge">Canlı Çalma Listesi</span>
+            </div>
+
+            <div class="form-group">
+              <label>Şarkı Adı (Title)</label>
+              <input type="text" id="music-song-input" class="form-control" value="Necrokeep Lo-Fi Chill Beats" oninput="onMusicInputsChange()">
+            </div>
+
+            <div class="form-group">
+              <label>Sanatçı / Açıklama (Artist / Album)</label>
+              <input type="text" id="music-artist-input" class="form-control" value="MLBB Arena" oninput="onMusicInputsChange()">
+            </div>
+
+            <div class="form-group">
+              <label>Yayındaki Gösterim Formatı (Biçim Şablonu)</label>
+              <select id="music-format-select" class="form-control" onchange="onMusicInputsChange()">
+                <option value="symbol_title_artist" selected>♪ {şarkı} - {sanatçı}</option>
+                <option value="calan_title">🎵 Çalan: {şarkı} ({sanatçı})</option>
+                <option value="headphones_title">🎧 {şarkı} - {sanatçı}</option>
+                <option value="only_title">♪ {şarkı}</option>
+                <option value="custom_raw">Ham Metin (Olduğu Gibi)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Hızlı Yayın Mood'u & Çalma Listesi (Tek Tıkla Seç)</label>
+              <div class="music-preset-chips">
+                <button type="button" class="music-chip" onclick="applyMusicPreset('Necrokeep Lo-Fi Chill Beats', 'MLBB Arena')">
+                  🎧 MLBB Chill Lo-Fi
+                </button>
+                <button type="button" class="music-chip" onclick="applyMusicPreset('Mythic Glory Hype Phonk', 'Arena Beats')">
+                  ⚡ Mythic Gaming Phonk
+                </button>
+                <button type="button" class="music-chip" onclick="applyMusicPreset('Victory Symphony', 'Dawn Valley')">
+                  👑 Zafer Senfonisi
+                </button>
+                <button type="button" class="music-chip" onclick="applyMusicPreset('Kahve & Sohbet Lo-Fi', 'MİRA Acoustic')">
+                  ☕ Mola & Sohbet Akustik
+                </button>
+                <button type="button" class="music-chip" onclick="applyMusicPreset('Cyber Neon Synthwave', 'Retro Wave')">
+                  ✨ Cyber Neon Synthwave
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Canlı Sahne Önizleme Şeridi</label>
+              <div class="music-marquee-preview">
+                <span class="music-marquee-inner" id="music-marquee-display">
+                  🎵 ŞU AN ÇALAN: ♪ MLBB Arena - Necrokeep Lo-Fi Chill Beats • CANLI YAYIN MÜZİĞİ
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SAĞ KART: OBS & TUNA ENTEGRASYON MERKEZİ -->
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <span class="card-panel-title">
+                <span>⚙️</span> OBS & TUNA ENTEGRASYONU
+              </span>
+              <span class="card-panel-badge" style="background: rgba(0, 245, 160, 0.15); color:#00f5a0; border-color:rgba(0,245,160,0.3);">OBS 5.0 Hazır</span>
+            </div>
+
+            <!-- OBS Metin Kaynağı (WebSocket) -->
+            <div class="form-group">
+              <label>OBS Metin Kaynağınızın Adı (Text Source)</label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="obs-music-source-name" class="form-control" value="Now Playing" placeholder="Now Playing">
+                <button type="button" class="btn-secondary" style="white-space:nowrap;" onclick="testObsTextPush()">
+                  📡 OBS'e Bas
+                </button>
+              </div>
+              <small style="font-size:10.5px; color:#94a3b8; display:block; margin-top:4px;">
+                OBS'te eklediğiniz <strong>Metin (GDI+)</strong> veya <strong>Metin (FreeType 2)</strong> kaynağının adını girin. MİRA, OBS WebSocket üzerinden metni anında doğrudan günceller.
+              </small>
+            </div>
+
+            <!-- Tuna Otomatik Tarama & Port -->
+            <div class="form-group" style="background:rgba(0,0,0,0.3); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <label style="margin:0; font-weight:800; color:#c084fc;">OBS Tuna Otomatik Senkronizasyon</label>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span id="tuna-toggle-label" style="font-size:11px; font-weight:700; color:#00f5a0;">AÇIK</span>
+                  <input type="checkbox" id="tuna-autosync-toggle" checked onchange="onTunaAutoSyncToggle(this.checked)" style="width:16px; height:16px; accent-color:#00f5a0; cursor:pointer;">
+                </div>
+              </div>
+
+              <div style="display:flex; gap:8px; align-items:center;">
+                <span style="font-size:11px; color:#cbd5e1; white-space:nowrap;">Tuna Web Portu:</span>
+                <input type="number" id="tuna-port-input" class="form-control" style="width:90px; padding:6px 10px; height:auto;" value="1608">
+                <button type="button" class="btn-primary" style="padding:6px 14px; font-size:11.5px; white-space:nowrap; background:#a855f7;" onclick="checkTunaLiveStatus()">
+                  ⚡ Tuna'yı Tara
+                </button>
+              </div>
+              <small id="tuna-status-tip" style="font-size:10.5px; color:#94a3b8; display:block; margin-top:6px;">
+                OBS Tuna web sunucusu (Varsayılan Port: 1608) açık olduğunda Spotify şarkıları MİRA'ya saniyesinde otomatik akar.
+              </small>
+            </div>
+
+            <!-- OBS now-playing.txt Dosya Bağlantısı -->
+            <div class="form-group">
+              <label>OBS Metin Dosyası Yolu (now-playing.txt)</label>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="now-playing-filepath" class="form-control" style="font-family:monospace; font-size:11px;" value="yayın/now-playing.txt" readonly>
+                <button type="button" class="btn-clean-subtle" style="white-space:nowrap;" onclick="copyNowPlayingPath()">
+                  📋 Kopyala
+                </button>
+              </div>
+              <small style="font-size:10.5px; color:#94a3b8; display:block; margin-top:4px;">
+                OBS'te metin kaynağınıza <strong>"Dosyadan oku"</strong> işaretleyip bu dosya yolunu seçtiğinizde müzik daima senkronize kalır.
+              </small>
+            </div>
+
+            <!-- Hızlı İpucu Kutusu -->
+            <div class="info-tip-box" style="margin-top:10px;">
+              💡 <strong>Otomatik Tuna Kılavuzu:</strong> OBS menüsünden <strong>Araçlar -> Tuna</strong> penceresini açın. <em>Outputs</em> sekmesinden metin dosyası olarak <code>yayın/now-playing.txt</code> dosyasını seçin. MİRA hem dosyayı hem de OBS WebSocket'i otomatik dinleyerek yayınınızı canlı tutar.
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
 
       <!-- TAB 6: TIKTOK CANLI -->
@@ -7333,20 +7719,271 @@
       showToast(`Chat mesajı iletildi: ${author}`);
     }
 
-    function updateLiveSongTitle() {
-      const song = document.getElementById('live-song-input').value.trim();
-      if (!song) return;
+    /* ========================================================
+       MÜZİK & TUNA KONTROL MERKEZİ MOTORU (OBS WEBSOCKET + DOSYA)
+       ======================================================== */
+    let isMusicMuted = false;
+    let tunaPollInterval = null;
+
+    function formatSongTitle(song, artist, formatKey) {
+      song = (song || '').trim();
+      artist = (artist || '').trim();
+      if (!song) return '';
+      switch (formatKey) {
+        case 'symbol_title_artist':
+          return artist ? `♪ ${song} - ${artist}` : `♪ ${song}`;
+        case 'calan_title':
+          return artist ? `🎵 Çalan: ${song} (${artist})` : `🎵 Çalan: ${song}`;
+        case 'headphones_title':
+          return artist ? `🎧 ${song} - ${artist}` : `🎧 ${song}`;
+        case 'only_title':
+          return `♪ ${song}`;
+        case 'custom_raw':
+          return artist ? `${song} - ${artist}` : song;
+        default:
+          return artist ? `♪ ${song} - ${artist}` : `♪ ${song}`;
+      }
+    }
+
+    function onMusicInputsChange() {
+      const songInput = document.getElementById('music-song-input');
+      const artistInput = document.getElementById('music-artist-input');
+      const formatSelect = document.getElementById('music-format-select');
+      if (!songInput) return;
+
+      const song = songInput.value;
+      const artist = artistInput ? artistInput.value : '';
+      const format = formatSelect ? formatSelect.value : 'symbol_title_artist';
+      const full = formatSongTitle(song, artist, format);
+
+      const cardTitle = document.getElementById('music-card-title');
+      const cardArtist = document.getElementById('music-card-artist');
+      const marquee = document.getElementById('music-marquee-display');
+
+      if (cardTitle) cardTitle.textContent = full || 'Müzik Kapalı / Sessiz';
+      if (cardArtist) cardArtist.textContent = artist ? `${artist} • MİRA Canlı Müzik` : 'MİRA Broadcast Studio';
+      if (marquee) marquee.textContent = `🎵 ŞU AN ÇALAN: ${full || 'Sessiz'} • CANLI YAYIN MÜZİĞİ`;
+    }
+
+    function applyMusicPreset(song, artist) {
+      const sInp = document.getElementById('music-song-input');
+      const aInp = document.getElementById('music-artist-input');
+      if (sInp) sInp.value = song;
+      if (aInp) aInp.value = artist;
+      onMusicInputsChange();
+      syncMusicToObsAndStream();
+    }
+
+    function syncMusicToObsAndStream() {
+      const songInput = document.getElementById('music-song-input');
+      const artistInput = document.getElementById('music-artist-input');
+      const formatSelect = document.getElementById('music-format-select');
+      const obsInput = document.getElementById('obs-music-source-name');
+
+      const song = songInput ? songInput.value : 'Necrokeep Lo-Fi Chill Beats';
+      const artist = artistInput ? artistInput.value : 'MLBB Arena';
+      const format = formatSelect ? formatSelect.value : 'symbol_title_artist';
+      const obsSource = obsInput ? obsInput.value.trim() : 'Now Playing';
+      const full = formatSongTitle(song, artist, format);
+
+      isMusicMuted = false;
+      const disc = document.getElementById('music-disc-spin');
+      const eq = document.getElementById('music-eq-anim');
+      if (disc) disc.classList.remove('paused');
+      if (eq) eq.style.opacity = '1';
+
       fetch('/api/now-playing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: song })
-      }).then(r => r.json()).then(data => {
-        dispatchEventToOverlay({ type: 'UPDATE_SONG', title: song });
-        showToast(`Şarkı güncellendi: ${song}`, 'success');
-      }).catch(() => {
-        dispatchEventToOverlay({ type: 'UPDATE_SONG', title: song });
-        showToast(`Şarkı iletildi: ${song}`, 'success');
+        body: JSON.stringify({
+          title: full,
+          artist: artist,
+          obsSourceName: obsSource,
+          source: 'mira'
+        })
+      })
+      .then(r => r.json())
+      .then(data => {
+        dispatchEventToOverlay({ type: 'UPDATE_SONG', title: full, artist: artist });
+        
+        const obsBadge = document.getElementById('music-obs-status-badge');
+        if (obsBadge) {
+          if (data.obsConnected) {
+            obsBadge.textContent = `🟢 OBS WS: ${obsSource} Güncellendi`;
+            obsBadge.className = 'music-obs-badge';
+          } else {
+            obsBadge.textContent = '⚪ now-playing.txt Yazıldı (Dosya Modu)';
+            obsBadge.className = 'music-obs-badge offline';
+          }
+        }
+
+        showToast(`✓ Müzik OBS'e ve canlı yayına aktarıldı: ${full}`, 'success');
+      })
+      .catch(() => {
+        dispatchEventToOverlay({ type: 'UPDATE_SONG', title: full, artist: artist });
+        showToast(`Müzik sahnelerine iletildi: ${full}`, 'info');
       });
+    }
+
+    function updateLiveSongTitle() {
+      syncMusicToObsAndStream();
+    }
+
+    function muteStreamMusic() {
+      isMusicMuted = true;
+      const disc = document.getElementById('music-disc-spin');
+      const eq = document.getElementById('music-eq-anim');
+      if (disc) disc.classList.add('paused');
+      if (eq) eq.style.opacity = '0.2';
+
+      const obsSource = document.getElementById('obs-music-source-name')?.value.trim() || 'Now Playing';
+
+      fetch('/api/now-playing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: '',
+          obsSourceName: obsSource,
+          source: 'mira'
+        })
+      }).catch(() => {});
+
+      dispatchEventToOverlay({ type: 'UPDATE_SONG', title: '' });
+      
+      const cardTitle = document.getElementById('music-card-title');
+      if (cardTitle) cardTitle.textContent = '⏹️ Müzik Yayında Gizlendi';
+      showToast('Şarkı bilgisi yayından gizlendi.');
+    }
+
+    function copyNowPlayingPath() {
+      const inp = document.getElementById('now-playing-filepath');
+      if (!inp) return;
+      navigator.clipboard.writeText(inp.value).then(() => {
+        showToast('✓ Dosya yolu panoya kopyalandı! OBS Metin kaynağınıza yapıştırabilirsiniz.', 'success');
+      }).catch(() => {
+        prompt('OBS için dosya yolunu kopyalayın:', inp.value);
+      });
+    }
+
+    function checkTunaLiveStatus() {
+      const port = document.getElementById('tuna-port-input')?.value || '1608';
+      const tip = document.getElementById('tuna-status-tip');
+      const badge = document.getElementById('music-active-source-badge');
+
+      if (tip) tip.textContent = `Tuna (Port: ${port}) taranıyor...`;
+
+      fetch(`/api/tuna/check?port=${port}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.active) {
+            if (tip) tip.textContent = `🟢 OBS Tuna Aktif! Port: ${port} dinleniyor.`;
+            if (badge) badge.textContent = `🟢 OBS Tuna Bağlı (Port: ${port})`;
+            showToast('✓ OBS Tuna eklentisine başarıyla bağlanıldı!', 'success');
+            
+            if (data.data) {
+              const tTitle = data.data.title || data.data.song || '';
+              const tArtist = Array.isArray(data.data.artists) ? data.data.artists.join(', ') : (data.data.artist || '');
+              if (tTitle) {
+                const sInp = document.getElementById('music-song-input');
+                const aInp = document.getElementById('music-artist-input');
+                if (sInp) sInp.value = tTitle;
+                if (aInp) aInp.value = tArtist;
+                onMusicInputsChange();
+                syncMusicToObsAndStream();
+              }
+            }
+          } else {
+            if (tip) tip.textContent = `⚪ Tuna Port: ${port} şu an kapalı. OBS Studio'da Araçlar -> Tuna menüsünü açın.`;
+            if (badge) badge.textContent = `🟣 MİRA Stüdyo Modu`;
+            showToast('Tuna portu çevrimdışı. OBS Studio açık olduğunda otomatik bağlanılır.', 'info');
+          }
+        })
+        .catch(() => {
+          if (tip) tip.textContent = 'Tuna kontrolü başarısız.';
+        });
+    }
+
+    function testObsTextPush() {
+      syncMusicToObsAndStream();
+    }
+
+    function onTunaAutoSyncToggle(enabled) {
+      const lbl = document.getElementById('tuna-toggle-label');
+      if (lbl) {
+        lbl.textContent = enabled ? 'AÇIK' : 'KAPALI';
+        lbl.style.color = enabled ? '#00f5a0' : '#94a3b8';
+      }
+      if (enabled) {
+        startTunaAutoPoll();
+        showToast('Tuna otomatik taraması başlatıldı.', 'info');
+      } else {
+        stopTunaAutoPoll();
+        showToast('Tuna otomatik taraması durduruldu.');
+      }
+    }
+
+    function startTunaAutoPoll() {
+      stopTunaAutoPoll();
+      tunaPollInterval = setInterval(() => {
+        const port = document.getElementById('tuna-port-input')?.value || '1608';
+        fetch(`/api/tuna/check?port=${port}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data && data.active && data.data) {
+              const tTitle = data.data.title || data.data.song || '';
+              const tArtist = Array.isArray(data.data.artists) ? data.data.artists.join(', ') : (data.data.artist || '');
+              const cur = document.getElementById('music-song-input')?.value;
+              if (tTitle && tTitle !== cur) {
+                const sInp = document.getElementById('music-song-input');
+                const aInp = document.getElementById('music-artist-input');
+                if (sInp) sInp.value = tTitle;
+                if (aInp) aInp.value = tArtist;
+                onMusicInputsChange();
+                syncMusicToObsAndStream();
+              }
+            }
+          }).catch(() => {});
+      }, 4000);
+    }
+
+    function stopTunaAutoPoll() {
+      if (tunaPollInterval) {
+        clearInterval(tunaPollInterval);
+        tunaPollInterval = null;
+      }
+    }
+
+    function initMusicDashboard() {
+      fetch('/api/now-playing')
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.title) {
+            const raw = data.title;
+            const cardTitle = document.getElementById('music-card-title');
+            if (cardTitle) cardTitle.textContent = raw;
+            const marquee = document.getElementById('music-marquee-display');
+            if (marquee) marquee.textContent = `🎵 ŞU AN ÇALAN: ${raw} • CANLI YAYIN MÜZİĞİ`;
+          }
+          if (data && data.filePath) {
+            const fInp = document.getElementById('now-playing-filepath');
+            if (fInp) fInp.value = data.filePath;
+          }
+          const obsBadge = document.getElementById('music-obs-status-badge');
+          if (obsBadge) {
+            if (data && data.obsConnected) {
+              obsBadge.textContent = '🟢 OBS WebSocket Bağlı';
+              obsBadge.className = 'music-obs-badge';
+            } else {
+              obsBadge.textContent = '⚪ now-playing.txt (Dosya Modu)';
+              obsBadge.className = 'music-obs-badge offline';
+            }
+          }
+        }).catch(() => {});
+      
+      const chk = document.getElementById('tuna-autosync-toggle');
+      if (chk && chk.checked) {
+        startTunaAutoPoll();
+      }
     }
 
     function applyRealChatWidget() {
@@ -7565,6 +8202,9 @@
       else if (initTab === 'chat' || initTab === 'tab-chat') {
         switchTab('tab-chat', document.getElementById('tab-btn-chat'));
       }
+      else if (initTab === 'music' || initTab === 'tab-music') {
+        switchTab('tab-music', document.getElementById('tab-btn-music'));
+      }
       if (urlParams.get('openChat') === '1') {
         setTimeout(openFloatingChatWidget, 100);
       }
@@ -7582,6 +8222,7 @@
       syncKickFollowersLive();
       checkObsWsStatus();
       setInterval(checkObsWsStatus, 4000);
+      initMusicDashboard();
 
       // Chat widget url yükle
       fetch('/api/chat-widget')

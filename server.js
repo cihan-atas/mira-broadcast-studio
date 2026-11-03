@@ -93,6 +93,31 @@ function setObsScene(targetScene, callback) {
     .catch(err => callback(err));
 }
 
+function setObsTextSource(sourceName, text, callback) {
+  if (!obsWsConnected || !obsWsClient) {
+    if (callback) callback(new Error('OBS WebSocket bağlı değil'));
+    return;
+  }
+  const targets = [sourceName, 'Now Playing', 'Müzik Başlığı', 'Music Title', 'NowPlaying'].filter(Boolean);
+  let updated = false;
+  let remaining = targets.length;
+
+  targets.forEach(target => {
+    obsWsClient.call('SetInputSettings', {
+      inputName: target,
+      inputSettings: { text: text }
+    }).then(() => {
+      updated = true;
+    }).catch(() => {})
+    .finally(() => {
+      remaining--;
+      if (remaining === 0 && callback) {
+        callback(null, { success: updated });
+      }
+    });
+  });
+}
+
 let TikTokLiveConnection = null;
 try {
   const tklib = require('tiktok-live-connector');
@@ -1405,20 +1430,39 @@ const server = http.createServer((req, res) => {
         } catch (e) {}
       }
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify({ title: currentSongTitle }));
+      return res.end(JSON.stringify({
+        title: currentSongTitle,
+        obsConnected: obsWsConnected,
+        filePath: txtPath
+      }));
     } else if (req.method === 'POST') {
       let body = '';
       req.on('data', chunk => body += chunk);
       req.on('end', () => {
         try {
           const data = JSON.parse(body);
-          if (data.title) {
+          if (data.title !== undefined) {
             currentSongTitle = data.title;
             try { fs.writeFileSync(txtPath, currentSongTitle, 'utf-8'); } catch(e){}
-            eventQueue.push({ type: 'UPDATE_SONG', title: currentSongTitle, time: Date.now() });
+            eventQueue.push({
+              type: 'UPDATE_SONG',
+              title: currentSongTitle,
+              artist: data.artist || '',
+              source: data.source || 'mira',
+              time: Date.now()
+            });
+
+            // OBS WebSocket üzerinden metin kaynağını otomatik güncelle
+            if (obsWsClient && obsWsConnected) {
+              setObsTextSource(data.obsSourceName || 'Now Playing', currentSongTitle);
+            }
           }
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: true, title: currentSongTitle }));
+          res.end(JSON.stringify({
+            success: true,
+            title: currentSongTitle,
+            obsConnected: obsWsConnected
+          }));
         } catch (err) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: err.message }));
@@ -1426,6 +1470,35 @@ const server = http.createServer((req, res) => {
       });
       return;
     }
+  }
+
+  // 2.15 API: Tuna Web Sunucusu Kontrolü & Canlı Şarkı Çekme
+  if (pathname === '/api/tuna/check' && req.method === 'GET') {
+    const port = parsedUrl.searchParams.get('port') || '1608';
+    const reqTuna = http.get(`http://127.0.0.1:${port}/`, (tRes) => {
+      let tBody = '';
+      tRes.on('data', chunk => tBody += chunk);
+      tRes.on('end', () => {
+        try {
+          const parsed = JSON.parse(tBody);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ active: true, port, data: parsed }));
+        } catch(e) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ active: true, port, raw: tBody.trim() }));
+        }
+      });
+    });
+    reqTuna.on('error', (err) => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ active: false, port, error: err.message }));
+    });
+    reqTuna.setTimeout(1200, () => {
+      reqTuna.destroy();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ active: false, port, error: 'Zaman aşımı' }));
+    });
+    return;
   }
 
   // 2.5 API: Chat Widget URL Al & Güncelle (BotRix / TikFinity kalıcılığı)
