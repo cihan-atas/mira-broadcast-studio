@@ -2700,6 +2700,37 @@
       box-shadow: 0 10px 30px rgba(124, 58, 237, 0.8);
     }
 
+
+    .botrix-drawer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      background: linear-gradient(135deg, rgba(20, 26, 46, 0.98), rgba(12, 16, 30, 0.98));
+      border-bottom: 1px solid rgba(0, 245, 160, 0.25);
+      animation: fadeInPanel 0.15s ease-out;
+      flex-wrap: wrap;
+    }
+    .btn-clean-subtle {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .btn-clean-subtle:hover {
+      background: rgba(0, 245, 160, 0.15);
+      border-color: #00f5a0;
+      color: #00f5a0;
+    }
+
   </style>
 </head>
 <body>
@@ -3915,10 +3946,15 @@
             <div class="mira-chat-header-title">
               <span class="live-dot" style="width:9px; height:9px; background:#00f5a0; box-shadow:0 0 10px #00f5a0; border-radius:50%;"></span>
               <span>CANLI SOHBET</span>
-              <span class="chat-status-pill">🟢 Kick: cihanatas</span>
+              <span class="chat-status-pill" id="mira-chat-conn-status">🟢 Kick: cihanatas</span>
             </div>
 
             <div class="mira-chat-header-actions">
+              <!-- BotRix Linki Ayarlama Butonu -->
+              <button type="button" class="btn-clean-subtle" onclick="toggleBotrixConfigDrawer()" title="BotRix / TikFinity Widget Linkini Düzenle">
+                🔗 BotRix Linki
+              </button>
+
               <!-- Opaklık Slider'ı -->
               <div class="chat-opacity-control" title="Sohbet zemininin saydamlığını ayarlar">
                 <span>🪟 Opaklık:</span>
@@ -3933,6 +3969,22 @@
 
               <button type="button" class="btn-clear-chat" onclick="clearStudioChatFeed()" title="Sohbeti Temizle">
                 🗑️ Temizle
+              </button>
+            </div>
+          </div>
+
+          <!-- BotRix / TikFinity Widget Link Çekmecesi -->
+          <div id="botrix-config-drawer" class="botrix-drawer" style="display: none;">
+            <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:280px;">
+              <span style="font-size:11px; font-weight:800; color:#00f5a0; white-space:nowrap;">🔗 BotRix / Widget URL:</span>
+              <input type="text" id="live-chat-url-input" class="form-control" style="font-size:12px; padding:7px 11px; height:auto; background:rgba(0,0,0,0.55); border-color:rgba(0,245,160,0.3); color:#fff;" placeholder="https://botrix.live/widgets/chat/?bid=...">
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-primary" style="padding:7px 15px; font-size:11.5px; font-weight:800; white-space:nowrap; background:#00f5a0; color:#060911;" onclick="applyRealChatWidget()">
+                Kaydet & Bağla
+              </button>
+              <button type="button" class="btn-secondary" style="padding:7px 12px; font-size:11.5px; white-space:nowrap;" onclick="resetToSimulatedChat()">
+                Sıfırla
               </button>
             </div>
           </div>
@@ -6664,8 +6716,10 @@
 
     
     /* ========================================================
-       CLEAN MİRA CHAT & IN-APP FLOATING WIDGET ENGINE
+       CLEAN MİRA CHAT & IN-APP FLOATING WIDGET ENGINE (DEDUPLICATED)
        ======================================================== */
+    const MIRA_TAB_SESSION_ID = 'session_' + Math.random().toString(36).substr(2, 9);
+    const seenChatMessageIds = new Set();
     let studioChatOpacity = 95;
     let floatingWidgetOpacity = 95;
 
@@ -6686,23 +6740,80 @@
       if (lbl) lbl.textContent = `%${val}`;
     }
 
-    // 2. Yüzen Kart Açma / Kapatma / Küçültme (BROWSER AÇMAZ!)
+    // 2. BotRix Çekmecesi Aç/Kapat
+    function toggleBotrixConfigDrawer(force) {
+      const drawer = document.getElementById('botrix-config-drawer');
+      if (!drawer) return;
+      const isVisible = drawer.style.display !== 'none';
+      const show = typeof force === 'boolean' ? force : !isVisible;
+      drawer.style.display = show ? 'flex' : 'none';
+      if (show) {
+        const inp = document.getElementById('live-chat-url-input');
+        if (inp) setTimeout(() => inp.focus(), 60);
+      }
+    }
+
+    function applyRealChatWidget() {
+      const input = document.getElementById('live-chat-url-input');
+      if (!input) return;
+      const url = input.value.trim();
+      if (!url) return alert('Lütfen geçerli bir BotRix veya TikFinity widget linki yapıştırın!');
+      
+      dispatchEventToOverlay({ type: 'SET_CHAT_WIDGET', url: url });
+      localStorage.setItem('stream_chat_widget_url', url);
+
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/chat-widget', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        }).catch(() => {});
+      }
+
+      const statusPill = document.getElementById('mira-chat-conn-status');
+      if (statusPill) statusPill.textContent = '🟢 Kick: cihanatas | 🔗 BotRix Bağlı';
+
+      showToast('BotRix widget linki kaydedildi ve canlı yayın sahnelerine aktarıldı!', 'success');
+      toggleBotrixConfigDrawer(false);
+    }
+
+    function resetToSimulatedChat() {
+      const input = document.getElementById('live-chat-url-input');
+      if (input) input.value = '';
+
+      dispatchEventToOverlay({ type: 'SET_CHAT_WIDGET', url: '' });
+      localStorage.removeItem('stream_chat_widget_url');
+
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/chat-widget', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: '' })
+        }).catch(() => {});
+      }
+
+      const statusPill = document.getElementById('mira-chat-conn-status');
+      if (statusPill) statusPill.textContent = '🟢 Kick: cihanatas';
+
+      showToast('BotRix widget linki sıfırlandı.');
+      toggleBotrixConfigDrawer(false);
+    }
+
+    // 3. Yüzen Kart Açma / Kapatma / Küçültme (BROWSER AÇMAZ!)
     function openFloatingChatWidget() {
       const widget = document.getElementById('mira-floating-chat-widget');
       const bubble = document.getElementById('mira-chat-bubble');
       if (bubble) bubble.style.display = 'none';
       if (widget) {
         widget.style.display = 'flex';
-        // Otomatik odaklan
         const inp = document.getElementById('floating-widget-input');
         if (inp) setTimeout(() => inp.focus(), 100);
       }
       initFloatingChatDrag();
-      showToast('📌 Sohbet ekranda yüzen karta alındı! Başlığından tutarak istediğiniz yere sürükleyebilirsiniz.', 'info');
+      showToast('📌 Sohbet ekranda yüzen karta alındı! İstediğiniz yere sürükleyebilirsiniz.', 'info');
     }
 
     function openAlwaysOnTopChat() {
-      // Header butonuna basıldığında da browser açmak yerine doğrudan yüzen kartı aç
       openFloatingChatWidget();
     }
 
@@ -6728,7 +6839,7 @@
       if (widget) widget.style.display = 'flex';
     }
 
-    // 3. Sürükleme (Drag & Drop)
+    // 4. Sürükleme (Drag & Drop)
     let isFloatDragging = false;
     let floatStartX = 0, floatStartY = 0;
     let floatInitLeft = 0, floatInitTop = 0;
@@ -6774,7 +6885,7 @@
       });
     }
 
-    // 4. Sohbeti Temizle
+    // 5. Sohbeti Temizle
     function clearStudioChatFeed() {
       const feed1 = document.getElementById('studio-chat-feed');
       const feed2 = document.getElementById('floating-chat-feed');
@@ -6783,17 +6894,31 @@
       showToast('Sohbet akışı temizlendi.');
     }
 
-    // 5. Mesaj Ekleme Motoru (Her iki akışa senkron ekler)
+    // 6. Mesaj Ekleme Motoru (DEDUPLICATED — ASLA ÇİFT EKLENMEZ)
     function appendStudioChatMessage(item) {
+      if (!item) return;
+      const content = item.content || item.text || '';
+      if (!content) return;
+      const user = item.username || 'İzleyici';
+
+      // Çift mesaj engelleme anahtarı
+      const msgKey = item.id || (user + '_' + content + '_' + Math.floor((item.time || Date.now()) / 1200));
+      if (seenChatMessageIds.has(msgKey)) {
+        return; // Zaten eklendi, mükerrer mesajı engelle!
+      }
+      seenChatMessageIds.add(msgKey);
+      if (seenChatMessageIds.size > 200) {
+        const oldest = seenChatMessageIds.values().next().value;
+        seenChatMessageIds.delete(oldest);
+      }
+
       const feed1 = document.getElementById('studio-chat-feed');
       const feed2 = document.getElementById('floating-chat-feed');
 
-      const isStreamer = !!item.isStreamer || item.username === 'MİRA (Yayıncı)' || item.username === 'MİRA';
+      const isStreamer = !!item.isStreamer || user === 'MİRA (Yayıncı)' || user === 'MİRA';
       const d = new Date();
       const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
       const badge = isStreamer ? 'YAYINCI' : (item.badge === 'tiktok' ? 'TIKTOK' : 'KICK');
-      const user = item.username || 'İzleyici';
-      const content = item.content || item.text || '';
 
       const html = `
         <span class="clean-msg-time">${timeStr}</span>
@@ -6826,7 +6951,7 @@
       });
     }
 
-    // 6. Mesaj Gönderme
+    // 7. Mesaj Gönderme
     function sendStudioChatReply() {
       const inp = document.getElementById('studio-chat-input');
       if (!inp) return;
@@ -6834,6 +6959,8 @@
       if (!text) return;
 
       const payload = {
+        id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+        senderSession: MIRA_TAB_SESSION_ID,
         type: 'TEST_CHAT',
         username: 'MİRA (Yayıncı)',
         content: text,
@@ -6843,8 +6970,8 @@
         time: Date.now()
       };
 
-      dispatchEventToOverlay(payload);
       appendStudioChatMessage(payload);
+      dispatchEventToOverlay(payload);
       inp.value = '';
       inp.focus();
     }
@@ -6856,6 +6983,8 @@
       if (!text) return;
 
       const payload = {
+        id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+        senderSession: MIRA_TAB_SESSION_ID,
         type: 'TEST_CHAT',
         username: 'MİRA (Yayıncı)',
         content: text,
@@ -6865,8 +6994,8 @@
         time: Date.now()
       };
 
-      dispatchEventToOverlay(payload);
       appendStudioChatMessage(payload);
+      dispatchEventToOverlay(payload);
       inp.value = '';
       inp.focus();
     }
@@ -7120,6 +7249,9 @@
       if (urlParams.get('openChat') === '1') {
         setTimeout(openFloatingChatWidget, 100);
       }
+      if (urlParams.get('botrix') === '1') {
+        setTimeout(() => toggleBotrixConfigDrawer(true), 120);
+      }
       else if (initTab === 'design-creator' || initTab === 'tab-design-creator') {
         switchTab('tab-design-creator', document.getElementById('tab-btn-design-creator'));
         if (initMode) {
@@ -7171,6 +7303,10 @@
         const bus = new BroadcastChannel('kick_stream_bus');
         bus.addEventListener('message', (e) => {
           if (e.data && (e.data.type === 'TEST_CHAT' || e.data.type === 'CHAT_MESSAGE')) {
+            // Eğer mesaj bu sekmeden yollandıysa, zaten doğrudan eklendi; mükerrer ekleme!
+            if (e.data.senderSession && e.data.senderSession === MIRA_TAB_SESSION_ID) {
+              return;
+            }
             appendStudioChatMessage(e.data);
           }
         });
