@@ -16,36 +16,29 @@ Her iki platform için sahneler **`kick/`** ve **`tiktok/`** klasörlerine ayrı
 
 ### 🪟 1. Windows Kurulum Kılavuzu (Windows 10 / 11)
 
-Windows'ta sıfırdan kurulum yapmak ve stüdyoyu yayına hazır hale getirmek oldukça kolaydır:
+Windows kullanıcıları için hiçbir teknik bilgi gerektirmeyen **3 farklı seçenek** mevcuttur:
 
-#### Adım 1: Ön Gereksinimleri Yükleyin
-1. **Node.js (Zorunlu):**
-   - [nodejs.org](https://nodejs.org/) adresine gidin ve **LTS (Uzun Vadeli Destek)** sürümünü indirip kurun (Örn: v20 veya v22).
-   - Kurulum sihirbazındaki tüm adımları varsayılan ayarlarla ("Next") tamamlayın.
-2. **OBS Studio:**
-   - [obsproject.com](https://obsproject.com/) adresinden güncel OBS Studio'yu (v28 veya üzeri) indirin.
-3. **Git (İsteğe Bağlı):**
-   - Projeyi Git ile klonlamak istiyorsanız [git-scm.com](https://git-scm.com/) kurabilirsiniz veya projeyi GitHub'dan doğrudan ZIP olarak indirebilirsiniz.
+#### 🌟 Seçenek 1: Tek Tıkla Otomatik Kurulum Sihirbazı (`kurulum.bat` — En Çok Önerilen)
+Bilgisayarınızda Node.js, Git veya geliştirici araçları olmasa dahi **hiçbir şey yüklemenize gerek yoktur**:
+1. Repoyu GitHub'dan **ZIP** olarak indirip bir klasöre çıkartın.
+2. Klasördeki **`kurulum.bat`** (veya `baslat.bat`) dosyasına çift tıklayın.
+3. **Sihirbaz tüm işlemleri otomatik yapar:**
+   - Bilgisayarınızda Node.js yoksa, resmi Microsoft Paket Yöneticisi (`winget`) veya doğrudan resmi Node.js LTS sunucusundan sessizce indirip kurar.
+   - Bilgisayarı yeniden başlatmanıza gerek kalmadan ortam değişkenlerini anında günceller.
+   - Gerekli yayın kütüphanelerini (`npm install`) kurar.
+   - Masaüstünüze yüksek çözünürlüklü **MİRA Broadcast Studio** kısayolunu ekler.
+   - Stüdyoyu açarak hemen yayına hazır hale getirir!
 
-#### Adım 2: Projeyi Bilgisayarınıza İndirin
-* **Seçenek A (ZIP ile - En Kolay):**
-  - GitHub reposundaki yeşil **`Code`** butonuna tıklayın ve **`Download ZIP`** seçin.
-  - İndirilen ZIP dosyasını masaüstünüze veya istediğiniz bir klasöre çıkartın.
-* **Seçenek B (Git ile):**
-  - Komut İstemi (CMD) veya PowerShell açıp şu komutu yazın:
-    ```cmd
-    git clone https://github.com/cihan-atas/mira-broadcast-studio.git
-    cd mira-broadcast-studio
-    ```
+#### 📦 Seçenek 2: Doğrudan Kurulum Programı (`MİRA Broadcast Studio Setup.exe`)
+Node.js veya kaynak kodla hiç uğraşmak istemeyen yayıncılar için:
+1. `dist/` klasöründeki veya Sürümler (Releases) sayfasındaki **`MİRA Broadcast Studio Setup 1.0.0.exe`** dosyasına çift tıklayın.
+2. Klasik bir Windows programı gibi kurulumu tamamlayın.
+3. Başlat menüsünden veya Masaüstü simgesinden doğrudan açın.
 
-#### Adım 3: Tek Tıkla Başlatın
-Klasör içerisindeki hazır başlatıcılardan size uygun olanına çift tıklayın:
-* **🌸 [`baslat.bat`](file:///home/zeus/Desktop/yayın/baslat.bat) (Önerilen — Masaüstü Uygulaması):**
-  - Node.js durumunu ve bağımlılıkları otomatik kontrol eder.
-  - İlk açılışta gerekli kütüphaneleri otomatik kurar (`npm install`).
-  - MİRA Broadcast Studio'yu bağımsız, şık bir masaüstü uygulaması (Electron) olarak açar.
-* **⚡ [`baslat-server.bat`](file:///home/zeus/Desktop/yayın/baslat-server.bat) (Hafif Sunucu & Web Tarayıcı Modu):**
-  - Masaüstü penceresi yerine yerel Node.js sunucusunu başlatır ve varsayılan tarayıcınızda (Chrome, Edge, Brave) `http://localhost:8080/` adresini açar. Düşük sistem kaynağı tüketimi için idealdir.
+#### 🛠️ Seçenek 3: Manuel Geliştirici Kurulumu
+1. [nodejs.org](https://nodejs.org/) adresinden LTS sürümünü kurun.
+2. Klasörde `npm install` çalıştırın.
+3. `baslat.bat` veya `npm start` ile başlatın.
 
 #### Adım 4: Windows OBS Studio WebSocket Bağlantısını Açın
 1. OBS Studio'yu açın.
