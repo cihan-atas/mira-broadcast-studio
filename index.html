@@ -1166,6 +1166,15 @@
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(168, 85, 247, 0.3) !important;
     }
 
+    /* Tuval Kartları Çubuğu: Varsayılan olarak (sağdaki normal önizlemede) gizlidir.
+       Sadece Görsel Editör Modunda (studio-visual-editor-mode) ve tuvalde kart varsa en altta gösterilir. */
+    #studio-canvas-cards-bar {
+      display: none !important;
+    }
+    body.studio-visual-editor-mode #studio-canvas-cards-bar.has-cards {
+      display: block !important;
+    }
+
     .monitor-bottom-bar {
       background: #0b0e17;
       border-top: 1px solid var(--border-subtle);
@@ -3224,8 +3233,8 @@
           <iframe src="custom-overlay.html?standby=1" id="preview-iframe"></iframe>
         </div>
 
-        <!-- Tuvalin Altında Tüm Kartlar Listesi (Tıkla = Direkt O Karta Odaklansın & Düzenle, 🗑️ = Tuvalden Sil) -->
-        <div id="studio-canvas-cards-bar" style="padding: 12px 16px; background: linear-gradient(135deg, rgba(12, 10, 26, 0.96), rgba(22, 16, 44, 0.96)); border-top: 1px solid rgba(168, 85, 247, 0.35); border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+        <!-- Tuvalin Altında Tüm Kartlar Listesi (Yalnızca Görsel Editör Modunda ve Kart Varsa Görünür) -->
+        <div id="studio-canvas-cards-bar" style="display: none; padding: 12px 16px; background: linear-gradient(135deg, rgba(12, 10, 26, 0.96), rgba(22, 16, 44, 0.96)); border-top: 1px solid rgba(168, 85, 247, 0.35); border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 900; color: #e9d5ff; letter-spacing: 0.8px;">
@@ -4780,16 +4789,32 @@
       }
     }
 
+    let cachedCanvasCards = [];
+
     function renderStudioCanvasCardsBar(cards) {
+      const barEl = document.getElementById('studio-canvas-cards-bar');
       const listEl = document.getElementById('studio-canvas-cards-list');
       const countEl = document.getElementById('studio-canvas-cards-count');
-      if (!listEl) return;
-      const arr = Array.isArray(cards) ? cards : [];
-      if (countEl) countEl.textContent = String(arr.length);
-      if (arr.length === 0) {
-        listEl.innerHTML = `<span style="font-size: 11.5px; color: #cbd5e1;">✨ Tuval şu an bomboş (0 kart). Sağ üstten <strong>"➕ Galerimden Kart Ekle"</strong> ile kart ekleyebilirsiniz.</span>`;
+      if (!barEl || !listEl) return;
+
+      if (Array.isArray(cards)) {
+        cachedCanvasCards = cards;
+      }
+      const arr = cachedCanvasCards || [];
+      const isVisualBuilder = document.body.classList.contains('studio-visual-editor-mode');
+
+      // Önizleme sağ panelinde ASLA görünmesin.
+      // YALNIZCA Görsel Editör / Boş Tuval modunda VE tuvalde kart varsa (veya eklendikçe) en altta görünsün.
+      if (!isVisualBuilder || arr.length === 0) {
+        barEl.style.display = 'none';
+        barEl.classList.remove('has-cards');
         return;
       }
+
+      barEl.style.display = 'block';
+      barEl.classList.add('has-cards');
+      if (countEl) countEl.textContent = String(arr.length);
+
       listEl.innerHTML = arr.map((c, idx) => {
         const isSel = !!c.selected;
         const borderCol = isSel ? '#00f5a0' : 'rgba(168, 85, 247, 0.45)';
@@ -4843,6 +4868,7 @@
 
       const isVisualBuilder = tabId === 'tab-canvas-builder';
       document.body.classList.toggle('studio-visual-editor-mode', isVisualBuilder);
+      renderStudioCanvasCardsBar(cachedCanvasCards);
       setTimeout(resizePreview, 30);
       setTimeout(resizePreview, 150);
 
@@ -5253,6 +5279,8 @@
        BOŞ TUVAL OLUŞTURUCU & ÖĞE DÜZENLEYİCİ (BUILDER)
        ===================================================== */
     function openBlankCanvasBuilder() {
+      cachedCanvasCards = [];
+      renderStudioCanvasCardsBar([]);
       currentBuilderWidgets = {};
       document.getElementById('builder-edit-id').value = '';
       document.getElementById('builder-category').value = 'canvas';
