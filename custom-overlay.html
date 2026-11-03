@@ -1597,6 +1597,29 @@
             overlaySongDur = ev.duration > 1000 ? Math.floor(ev.duration / 1000) : ev.duration;
           }
           renderOverlaySongProgress();
+        } else if (ev.type === 'UPDATE_GOAL' && ev.goal) {
+          const tEl = document.getElementById('custom-goal-title');
+          const cEl = document.getElementById('custom-goal-counter');
+          const fEl = document.getElementById('custom-goal-fill');
+          if (tEl) tEl.textContent = `🎯 ${ev.goal.title || 'TAKİPÇİ HEDEFİ'}`;
+          if (cEl) cEl.textContent = `${ev.goal.current} / ${ev.goal.target}`;
+          if (fEl) {
+            const pct = Math.min(100, Math.max(0, Math.round((ev.goal.current / (ev.goal.target || 1)) * 100)));
+            fEl.style.width = `${pct}%`;
+          }
+        } else if (ev.type === 'UPDATE_STATS' && ev.stats) {
+          if (ev.stats.follower) {
+            const fEl = document.getElementById('custom-recent-follower');
+            if (fEl) fEl.textContent = ev.stats.follower;
+          }
+          if (ev.stats.sub) {
+            const sEl = document.getElementById('custom-recent-sub');
+            if (sEl) sEl.textContent = ev.stats.sub;
+          }
+          if (ev.stats.donation) {
+            const dEl = document.getElementById('custom-recent-donation');
+            if (dEl) dEl.textContent = ev.stats.donation;
+          }
         }
       }
 
@@ -1661,6 +1684,17 @@
               duration: data.duration,
               coverUrl: data.coverUrl
             });
+          }
+        })
+        .catch(() => {});
+      fetch('/api/stream-stats')
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.goal) {
+            handleEvent({ type: 'UPDATE_GOAL', goal: d.goal });
+          }
+          if (d && d.recent) {
+            handleEvent({ type: 'UPDATE_STATS', stats: d.recent });
           }
         })
         .catch(() => {});

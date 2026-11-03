@@ -3066,6 +3066,213 @@
     }
 
     /* ========================================================
+       HEDEF & İSTATİSTİK KONTROL MASASI (GOAL & STATS CSS)
+       ======================================================== */
+    .goal-hero-card {
+      background: linear-gradient(135deg, rgba(20, 24, 46, 0.95), rgba(10, 14, 28, 0.95));
+      border: 1.5px solid rgba(0, 245, 160, 0.35);
+      border-radius: 16px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 245, 160, 0.12);
+      margin-bottom: 14px;
+    }
+    .goal-hero-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+      flex: 1;
+    }
+    .goal-disc-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: radial-gradient(circle, #064e3b 0%, #0b1329 80%);
+      border: 2px solid #00f5a0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 18px rgba(0, 245, 160, 0.4);
+      flex-shrink: 0;
+    }
+    .goal-hero-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .goal-hero-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .goal-hero-sub {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .goal-hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .goal-dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+    @media (max-width: 960px) {
+      .goal-dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .goal-type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .goal-type-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #cbd5e1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .goal-type-btn:hover {
+      background: rgba(0, 245, 160, 0.1);
+      border-color: rgba(0, 245, 160, 0.4);
+      color: #00f5a0;
+    }
+    .goal-type-btn.active {
+      background: rgba(0, 245, 160, 0.18);
+      border-color: #00f5a0;
+      color: #00f5a0;
+      box-shadow: 0 0 12px rgba(0, 245, 160, 0.25);
+    }
+    .quick-preset-chips {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .preset-chip {
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #c084fc;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .preset-chip:hover {
+      background: rgba(168, 85, 247, 0.25);
+      border-color: #a855f7;
+      color: #fff;
+    }
+    .stat-edit-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stat-edit-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+    }
+    .stat-edit-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stat-edit-input-row input {
+      flex: 1;
+      height: 34px;
+      font-size: 12px;
+    }
+    .btn-stat-sync {
+      background: rgba(0, 245, 160, 0.12);
+      border: 1px solid rgba(0, 245, 160, 0.35);
+      color: #00f5a0;
+      border-radius: 8px;
+      padding: 0 12px;
+      height: 34px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .btn-stat-sync:hover {
+      background: #00f5a0;
+      color: #0b1329;
+    }
+    .session-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 600px) {
+      .session-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .session-stat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .session-stat-num {
+      font-size: 18px;
+      font-weight: 900;
+      color: #00f5a0;
+    }
+    .session-stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+
+    /* ========================================================
        ALERT & SESLİ OKUMA (TTS) KONTROL MASASI STİLLERİ
        ======================================================== */
     .alerts-dashboard-grid {
@@ -4474,57 +4681,245 @@
       </div>
 
 
-      <!-- TAB 2: HEDEF & İSTATİSTİK -->
+      <!-- TAB 2: HEDEF & İSTATİSTİK KONTROL MASASI -->
       <div id="tab-goal" class="tab-pane">
-        <div class="card-panel">
-          <div class="card-panel-header">
-            <span class="card-panel-title">
-              <span>🎯</span> CANLI HEDEF ÇUBUĞU (FOLLOWER GOAL)
-            </span>
-            <span class="card-panel-badge">Canlı Senkron</span>
-          </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Hedef Başlığı</label>
-              <input type="text" id="goal-title-input" class="form-control" value="TAKİPÇİ HEDEFİ">
+        <!-- 1. ÜST HERO KART: CANLI DURUM & HIZLI İSTATİSTİKLER -->
+        <div class="goal-hero-card">
+          <div class="goal-hero-left">
+            <div class="goal-disc-icon" id="goal-hero-disc-icon">
+              🎯
             </div>
-            <div class="form-group">
-              <label>Hedef Sayı (Target)</label>
-              <input type="number" id="goal-target-input" class="form-control" value="50" onchange="updateGoalProgressPreview()">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Mevcut Takipçi Sayısı (Current)</label>
-            <input type="number" id="goal-current-input" class="form-control" value="1" onchange="updateGoalProgressPreview()">
-            <div class="stepper-bar">
-              <button class="stepper-btn" onclick="stepGoal(-5)">-5</button>
-              <button class="stepper-btn" onclick="stepGoal(-1)">-1</button>
-              <button class="stepper-btn" onclick="stepGoal(1)">+1</button>
-              <button class="stepper-btn" onclick="stepGoal(5)">+5</button>
+            <div class="goal-hero-meta">
+              <div class="tts-status-tag-row">
+                <span class="tts-pill pill-on" id="goal-hero-sync-pill">🟢 Canlı Senkron: AKTİF</span>
+                <span class="tts-pill pill-purple" id="goal-hero-type-pill">🎯 Tür: Takipçi Hedefi</span>
+                <span class="tts-pill pill-on" id="goal-hero-pct-pill">📈 %0 Tamamlandı</span>
+              </div>
+              <div class="goal-hero-title">⚡ CANLI YAYIN HEDEF VE İSTATİSTİK KONTROL MERKEZİ</div>
+              <div class="goal-hero-sub">Takipçi, abone ve bağış hedeflerini canlı yönetin; yayın üst barındaki (HUD) istatistikleri sahnelere anında aktarın.</div>
             </div>
           </div>
 
-          <!-- Progress Preview -->
-          <div class="goal-progress-wrap">
-            <div class="goal-progress-labels">
-              <span id="preview-goal-text">TAKİPÇİ HEDEFİ</span>
-              <span><strong id="preview-goal-numbers">1 / 50</strong> (<span id="preview-goal-percent">2%</span>)</span>
-            </div>
-            <div class="goal-progress-bar-bg">
-              <div class="goal-progress-fill" id="preview-goal-fill"></div>
-            </div>
-          </div>
-
-          <div style="display: flex; gap: 10px; margin-top: 18px;">
-            <button class="btn-primary" style="flex: 1;" onclick="applyLiveGoal()">
-              ⚡ YAYINA GÖNDER (CANLI GÜNCELLE)
+          <div class="goal-hero-actions">
+            <button type="button" class="btn-tts-quick-test" onclick="syncKickFollowersLive()" title="Kick kanalından gerçek takipçi sayısını çeker">
+              <span>🔄</span> Kick'ten Senkronize Et
             </button>
-            <button class="btn-primary btn-kick" style="flex: 1;" onclick="syncKickFollowersLive()">
-              🔄 KICK'TEN GERÇEK VERİYİ ÇEK
+            <button type="button" class="btn-primary" style="padding: 10px 18px; font-size: 12px;" onclick="celebrateGoalReward()" title="Hedefe ulaşıldığında sahnelere kutlama efekti ve ses gönderir">
+              <span>🎉</span> Hedefi Kutla
             </button>
           </div>
+        </div>
+
+        <!-- 2. İKİ KOLONLU KONTROL MASASI: SOL (HEDEF ÇUBUĞU), SAĞ (HUD İSTATİSTİKLERİ & SAYAÇLAR) -->
+        <div class="goal-dashboard-grid">
+
+          <!-- SOL KOLON: 🎯 CANLI HEDEF ÇUBUĞU YÖNETİMİ -->
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <span class="card-panel-title">
+                <span>🎯</span> CANLI HEDEF ÇUBUĞU (STREAM GOAL)
+              </span>
+              <span class="card-panel-badge">Yayında Canlı Bar</span>
+            </div>
+
+            <!-- Hedef Türü Seçici -->
+            <label style="font-size:11px; font-weight:800; color:#94a3b8; display:block; margin-bottom:6px;">HEDEF TÜRÜNÜ SEÇİN</label>
+            <div class="goal-type-grid">
+              <button type="button" class="goal-type-btn active" id="goal-type-follower" onclick="setGoalTypePreset('follower')">
+                <span>💜</span> Takipçi
+              </button>
+              <button type="button" class="goal-type-btn" id="goal-type-sub" onclick="setGoalTypePreset('sub')">
+                <span>⭐</span> Abone
+              </button>
+              <button type="button" class="goal-type-btn" id="goal-type-donation" onclick="setGoalTypePreset('donation')">
+                <span>💎</span> Kicks
+              </button>
+              <button type="button" class="goal-type-btn" id="goal-type-gift" onclick="setGoalTypePreset('gift')">
+                <span>🎁</span> Hediye Sub
+              </button>
+              <button type="button" class="goal-type-btn" id="goal-type-custom" onclick="setGoalTypePreset('custom')">
+                <span>🏆</span> Özel
+              </button>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group" style="flex: 1.4;">
+                <label>Hedef Başlığı (Ekranda Görünen)</label>
+                <input type="text" id="goal-title-input" class="form-control" value="TAKİPÇİ HEDEFİ" oninput="updateGoalProgressPreview()">
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label>Hedef Sayı (Target)</label>
+                <input type="number" id="goal-target-input" class="form-control" value="50" onchange="updateGoalProgressPreview()" oninput="updateGoalProgressPreview()">
+              </div>
+            </div>
+
+            <!-- Hızlı Hedef Presetleri -->
+            <div style="margin-bottom: 12px;">
+              <span style="font-size: 11px; color: #94a3b8; font-weight: 700;">Hızlı Hedef Seçimi:</span>
+              <div class="quick-preset-chips" id="goal-preset-chips">
+                <span class="preset-chip" onclick="setTargetValue(25)">25</span>
+                <span class="preset-chip" onclick="setTargetValue(50)">50</span>
+                <span class="preset-chip" onclick="setTargetValue(100)">100</span>
+                <span class="preset-chip" onclick="setTargetValue(250)">250</span>
+                <span class="preset-chip" onclick="setTargetValue(500)">500</span>
+                <span class="preset-chip" onclick="setTargetValue(1000)">1000</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <label style="margin-bottom:0;">Mevcut Sayı (Current Progress)</label>
+                <span id="goal-auto-sync-status" style="font-size:11px; color:#00f5a0; font-weight:700;">Kick Senkronu Aktif</span>
+              </div>
+              <input type="number" id="goal-current-input" class="form-control" value="1" onchange="updateGoalProgressPreview()" oninput="updateGoalProgressPreview()">
+              <div class="stepper-bar">
+                <button type="button" class="stepper-btn" onclick="stepGoal(-10)">-10</button>
+                <button type="button" class="stepper-btn" onclick="stepGoal(-5)">-5</button>
+                <button type="button" class="stepper-btn" onclick="stepGoal(-1)">-1</button>
+                <button type="button" class="stepper-btn" onclick="stepGoal(1)">+1</button>
+                <button type="button" class="stepper-btn" onclick="stepGoal(5)">+5</button>
+                <button type="button" class="stepper-btn" onclick="stepGoal(10)">+10</button>
+              </div>
+            </div>
+
+            <!-- Canlı Hedef Çubuğu Önizlemesi -->
+            <div class="goal-progress-wrap" style="margin-top: 14px;">
+              <div class="goal-progress-labels">
+                <span id="preview-goal-text">TAKİPÇİ HEDEFİ</span>
+                <span><strong id="preview-goal-numbers">1 / 50</strong> (<span id="preview-goal-percent">2%</span>)</span>
+              </div>
+              <div class="goal-progress-bar-bg">
+                <div class="goal-progress-fill" id="preview-goal-fill" style="width: 2%;"></div>
+              </div>
+            </div>
+
+            <!-- Kick Otomatik Senkronizasyon Anahtarı -->
+            <div class="tts-master-switch-card" style="margin-top: 14px; margin-bottom: 14px;">
+              <div class="tts-switch-label">
+                <span class="tts-switch-title">Kick Takipçileriyle Otomatik Senkronize Et</span>
+                <span class="tts-switch-desc">Yayındayken yeni takipçi geldiğinde hedef çubuğu elle müdahaleye gerek kalmadan anında artar.</span>
+              </div>
+              <label class="switch-ui">
+                <input type="checkbox" id="goal-autosync-toggle" checked onchange="onGoalAutoSyncToggle(this.checked)">
+                <span class="slider-round"></span>
+              </label>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 14px;">
+              <button type="button" class="btn-primary" style="flex: 1;" onclick="applyLiveGoal()">
+                ⚡ YAYINA GÖNDER (CANLI GÜNCELLE)
+              </button>
+              <button type="button" class="btn-primary btn-kick" style="flex: 1;" onclick="syncKickFollowersLive()">
+                🔄 KICK'TEN GERÇEK VERİYİ ÇEK
+              </button>
+            </div>
+          </div>
+
+          <!-- SAĞ KOLON: 📊 HUD İSTATİSTİKLERİ & YAYIN SAYAÇLARI -->
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <span class="card-panel-title">
+                <span>📊</span> HUD İSTATİSTİKLERİ & SAYAÇLAR
+              </span>
+              <span class="card-panel-badge">Üst Bar Canlı HUD</span>
+            </div>
+
+            <p style="font-size: 11.5px; color: #94a3b8; margin-top: 0; margin-bottom: 12px; line-height: 1.4;">
+              Oyun içi ve sohbet sahnelerinin en üstünde yer alan <strong>SON TAKİP</strong>, <strong>SON ABONE</strong> ve <strong>SON DESTEK</strong> verilerini canlı yayın masanızdan anında yönetin.
+            </p>
+
+            <!-- 1. Son Takipçi Düzenleme -->
+            <div class="stat-edit-item">
+              <div class="stat-edit-header">
+                <span style="color:#c084fc;">💜 SON TAKİPÇİ (RECENT FOLLOWER)</span>
+                <span style="font-size:10px; color:#94a3b8;">Üst Bar: #recent-follower</span>
+              </div>
+              <div class="stat-edit-input-row">
+                <input type="text" id="stat-follower-input" class="form-control" value="SelinGamer" placeholder="Takipçi adı...">
+                <button type="button" class="btn-stat-sync" onclick="applySingleStat('follower')">
+                  <span>⚡</span> Gönder
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Son Abone Düzenleme -->
+            <div class="stat-edit-item">
+              <div class="stat-edit-header">
+                <span style="color:#53fc18;">⭐ SON ABONE (RECENT SUBSCRIBER)</span>
+                <span style="font-size:10px; color:#94a3b8;">Üst Bar: #recent-sub</span>
+              </div>
+              <div class="stat-edit-input-row">
+                <input type="text" id="stat-sub-input" class="form-control" value="NecroLord" placeholder="Abone adı & ay...">
+                <button type="button" class="btn-stat-sync" onclick="applySingleStat('sub')">
+                  <span>⚡</span> Gönder
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Son Destek / Kicks Düzenleme -->
+            <div class="stat-edit-item">
+              <div class="stat-edit-header">
+                <span style="color:#ffd700;">💎 SON DESTEK / KICKS (RECENT DONATION)</span>
+                <span style="font-size:10px; color:#94a3b8;">Üst Bar: #recent-donation</span>
+              </div>
+              <div class="stat-edit-input-row">
+                <input type="text" id="stat-donation-input" class="form-control" value="EmrePro (500 Kicks)" placeholder="Destekçi adı & miktar...">
+                <button type="button" class="btn-stat-sync" onclick="applySingleStat('donation')">
+                  <span>⚡</span> Gönder
+                </button>
+              </div>
+            </div>
+
+            <!-- 4. Son Hediye Abonelik Düzenleme -->
+            <div class="stat-edit-item">
+              <div class="stat-edit-header">
+                <span style="color:#fe2c55;">🎁 SON HEDİYE SUB (GIFTED SUBS)</span>
+                <span style="font-size:10px; color:#94a3b8;">TikTok & Kick: #recent-gift</span>
+              </div>
+              <div class="stat-edit-input-row">
+                <input type="text" id="stat-gift-input" class="form-control" value="MiraFan_01 (5x Hediye)" placeholder="Hediye eden & adet...">
+                <button type="button" class="btn-stat-sync" onclick="applySingleStat('gift')">
+                  <span>⚡</span> Gönder
+                </button>
+              </div>
+            </div>
+
+            <!-- Canlı Oturum Sayaçları -->
+            <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-size: 11px; font-weight: 800; color: #fff;">📊 BU YAYINDAKİ TOPLAM İSTATİSTİKLER</span>
+                <button type="button" onclick="resetSessionStats()" style="background:none; border:none; color:#ef4444; font-size:11px; font-weight:700; cursor:pointer;">
+                  🔄 Sıfırla
+                </button>
+              </div>
+              <div class="session-stats-grid">
+                <div class="session-stat-card">
+                  <span class="session-stat-num" id="session-count-followers">+0</span>
+                  <span class="session-stat-label">Yeni Takip</span>
+                </div>
+                <div class="session-stat-card">
+                  <span class="session-stat-num" id="session-count-subs" style="color:#c084fc;">+0</span>
+                  <span class="session-stat-label">Yeni Abone</span>
+                </div>
+                <div class="session-stat-card">
+                  <span class="session-stat-num" id="session-count-kicks" style="color:#ffd700;">+0</span>
+                  <span class="session-stat-label">Toplam Kicks</span>
+                </div>
+                <div class="session-stat-card">
+                  <span class="session-stat-num" id="session-count-gifts" style="color:#fe2c55;">+0</span>
+                  <span class="session-stat-label">Hediye Sub</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 14px;">
+              <button type="button" class="btn-primary" style="flex: 1;" onclick="applyAllStatsLive()">
+                ⚡ TÜM İSTATİSTİKLERİ YAYINA GÖNDER
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -7718,7 +8113,80 @@
       }
     }
 
-    /* Goal Functions */
+    /* ========================================================
+       HEDEF & İSTATİSTİK KONTROL MASASI ENGINE
+       ======================================================== */
+    let currentGoalType = 'follower';
+    let isGoalAutoSyncKick = true;
+    let studioStatsData = {
+      goal: { title: 'TAKİPÇİ HEDEFİ', current: 1, target: 50, type: 'follower', autoSyncKick: true },
+      recent: { follower: 'SelinGamer', sub: 'NecroLord', donation: 'EmrePro (500 Kicks)', gift: 'MiraFan_01 (5x Hediye)' },
+      session: { followers: 0, subs: 0, kicks: 0, gifts: 0 }
+    };
+
+    const goalTypeConfigs = {
+      follower: {
+        title: 'TAKİPÇİ HEDEFİ',
+        target: 50,
+        presets: [25, 50, 100, 250, 500, 1000],
+        pillText: '🎯 Tür: Takipçi Hedefi'
+      },
+      sub: {
+        title: 'ABONE HEDEFİ',
+        target: 25,
+        presets: [5, 10, 25, 50, 100, 250],
+        pillText: '⭐ Tür: Abone Hedefi'
+      },
+      donation: {
+        title: 'KICKS & DESTEK HEDEFİ',
+        target: 1000,
+        presets: [250, 500, 1000, 2500, 5000, 10000],
+        pillText: '💎 Tür: Kicks & Destek'
+      },
+      gift: {
+        title: 'HEDİYE SUB HEDEFİ',
+        target: 20,
+        presets: [5, 10, 20, 50, 100, 200],
+        pillText: '🎁 Tür: Hediye Sub'
+      },
+      custom: {
+        title: 'YAYIN HEDEFİ',
+        target: 100,
+        presets: [10, 25, 50, 100, 200, 500],
+        pillText: '🏆 Tür: Özel Hedef'
+      }
+    };
+
+    function setGoalTypePreset(type) {
+      currentGoalType = type;
+      document.querySelectorAll('.goal-type-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`goal-type-${type}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const cfg = goalTypeConfigs[type] || goalTypeConfigs.follower;
+      const tInput = document.getElementById('goal-title-input');
+      const tarInput = document.getElementById('goal-target-input');
+      const pill = document.getElementById('goal-hero-type-pill');
+      if (tInput) tInput.value = cfg.title;
+      if (tarInput) tarInput.value = cfg.target;
+      if (pill) pill.textContent = cfg.pillText;
+
+      const chipsBox = document.getElementById('goal-preset-chips');
+      if (chipsBox) {
+        chipsBox.innerHTML = cfg.presets.map(v => `<span class="preset-chip" onclick="setTargetValue(${v})">${v}</span>`).join('');
+      }
+
+      updateGoalProgressPreview();
+      applyLiveGoal();
+    }
+
+    function setTargetValue(val) {
+      const tarInput = document.getElementById('goal-target-input');
+      if (tarInput) tarInput.value = val;
+      updateGoalProgressPreview();
+      applyLiveGoal();
+    }
+
     function stepGoal(step) {
       const input = document.getElementById('goal-current-input');
       let val = parseInt(input.value, 10) || 0;
@@ -7728,30 +8196,224 @@
       applyLiveGoal();
     }
 
+    function onGoalAutoSyncToggle(enabled) {
+      isGoalAutoSyncKick = enabled;
+      const statusEl = document.getElementById('goal-auto-sync-status');
+      if (statusEl) {
+        statusEl.textContent = enabled ? 'Kick Senkronu Aktif' : 'Manuel Mod';
+        statusEl.style.color = enabled ? '#00f5a0' : '#94a3b8';
+      }
+      if (enabled && currentGoalType === 'follower') {
+        syncKickFollowersLive();
+      }
+      fetch('/api/stream-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal: { autoSyncKick: enabled } })
+      }).catch(() => {});
+    }
+
     function updateGoalProgressPreview() {
-      const title = document.getElementById('goal-title-input').value || 'TAKİPÇİ HEDEFİ';
-      const current = parseInt(document.getElementById('goal-current-input').value, 10) || 0;
-      const target = Math.max(1, parseInt(document.getElementById('goal-target-input').value, 10) || 1);
+      const title = document.getElementById('goal-title-input')?.value || 'TAKİPÇİ HEDEFİ';
+      const current = parseInt(document.getElementById('goal-current-input')?.value, 10) || 0;
+      const target = Math.max(1, parseInt(document.getElementById('goal-target-input')?.value, 10) || 1);
       const percent = Math.min(100, Math.round((current / target) * 100));
 
-      document.getElementById('preview-goal-text').textContent = title;
-      document.getElementById('preview-goal-numbers').textContent = `${current} / ${target}`;
-      document.getElementById('preview-goal-percent').textContent = `${percent}%`;
-      document.getElementById('preview-goal-fill').style.width = `${percent}%`;
+      const pText = document.getElementById('preview-goal-text');
+      const pNum = document.getElementById('preview-goal-numbers');
+      const pPct = document.getElementById('preview-goal-percent');
+      const pFill = document.getElementById('preview-goal-fill');
+      const heroPct = document.getElementById('goal-hero-pct-pill');
+
+      if (pText) pText.textContent = title;
+      if (pNum) pNum.textContent = `${current} / ${target}`;
+      if (pPct) pPct.textContent = `${percent}%`;
+      if (pFill) pFill.style.width = `${percent}%`;
+      if (heroPct) heroPct.textContent = `📈 %${percent} Tamamlandı`;
     }
 
     function applyLiveGoal() {
-      const title = document.getElementById('goal-title-input').value;
-      const current = parseInt(document.getElementById('goal-current-input').value, 10) || 0;
-      const target = parseInt(document.getElementById('goal-target-input').value, 10) || 1;
+      const title = document.getElementById('goal-title-input')?.value || 'TAKİPÇİ HEDEFİ';
+      const current = parseInt(document.getElementById('goal-current-input')?.value, 10) || 0;
+      const target = parseInt(document.getElementById('goal-target-input')?.value, 10) || 1;
 
       updateGoalProgressPreview();
 
+      const goalPayload = {
+        title,
+        current,
+        target,
+        type: currentGoalType,
+        autoSyncKick: isGoalAutoSyncKick
+      };
+
       dispatchEventToOverlay({
         type: 'UPDATE_GOAL',
-        goal: { title, current, target }
+        goal: goalPayload
       });
-      showToast(`Hedef yayına yollandı: ${current} / ${target}`, 'success');
+
+      fetch('/api/stream-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal: goalPayload })
+      }).catch(() => {});
+
+      showToast(`✓ Hedef yayına aktarıldı: ${title} (${current} / ${target})`, 'success');
+    }
+
+    function applySingleStat(type) {
+      let val = '';
+      if (type === 'follower') val = document.getElementById('stat-follower-input')?.value.trim();
+      else if (type === 'sub') val = document.getElementById('stat-sub-input')?.value.trim();
+      else if (type === 'donation') val = document.getElementById('stat-donation-input')?.value.trim();
+      else if (type === 'gift') val = document.getElementById('stat-gift-input')?.value.trim();
+
+      if (!val) return;
+
+      const statObj = { [type]: val };
+      dispatchEventToOverlay({
+        type: 'UPDATE_STATS',
+        stats: statObj
+      });
+
+      fetch('/api/stream-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recent: statObj })
+      }).catch(() => {});
+
+      showToast(`✓ ${type.toUpperCase()} HUD verisi güncellendi: ${val}`, 'success');
+    }
+
+    function applyAllStatsLive() {
+      const follower = document.getElementById('stat-follower-input')?.value.trim() || 'SelinGamer';
+      const sub = document.getElementById('stat-sub-input')?.value.trim() || 'NecroLord';
+      const donation = document.getElementById('stat-donation-input')?.value.trim() || 'EmrePro (500 Kicks)';
+      const gift = document.getElementById('stat-gift-input')?.value.trim() || 'MiraFan_01 (5x)';
+
+      const allStats = { follower, sub, donation, gift };
+      dispatchEventToOverlay({
+        type: 'UPDATE_STATS',
+        stats: allStats
+      });
+
+      fetch('/api/stream-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recent: allStats })
+      }).catch(() => {});
+
+      showToast('✓ Tüm HUD istatistikleri canlı sahnelere aktarıldı!', 'success');
+    }
+
+    function resetSessionStats() {
+      fetch('/api/stream-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resetSession: true })
+      })
+      .then(r => r.json())
+      .then(() => {
+        const fEl = document.getElementById('session-count-followers');
+        const sEl = document.getElementById('session-count-subs');
+        const kEl = document.getElementById('session-count-kicks');
+        const gEl = document.getElementById('session-count-gifts');
+        if (fEl) fEl.textContent = '+0';
+        if (sEl) sEl.textContent = '+0';
+        if (kEl) kEl.textContent = '+0';
+        if (gEl) gEl.textContent = '+0';
+        showToast('Yayın oturum sayaçları sıfırlandı.', 'info');
+      }).catch(() => {});
+    }
+
+    function celebrateGoalReward() {
+      const title = document.getElementById('goal-title-input')?.value || 'Hedefimiz';
+      const target = document.getElementById('goal-target-input')?.value || '50';
+
+      dispatchEventToOverlay({
+        type: 'TEST_ALERT',
+        alertType: 'follower',
+        payload: {
+          username: '🏆 HEDEF TAMAMLANDI!',
+          message: `${title} (${target}) başarıyla tamamlandı! Teşekkürler ailemiz!`
+        }
+      });
+
+      if (localTTS && typeof localTTS.speakCustom === 'function') {
+        localTTS.speakCustom(`Tebrikler! ${title} başarıyla tamamlandı! Destek veren tüm izleyicilerimize sonsuz teşekkürler!`);
+      } else if (localTTS && typeof localTTS.speakAlert === 'function') {
+        localTTS.speakAlert('follower', { username: 'Tebrikler!', message: `${title} tamamlandı!` });
+      }
+
+      showToast(`🎉 "${title}" hedef kutlaması canlı yayına gönderildi!`, 'success');
+    }
+
+    function initGoalAndStats() {
+      fetch('/api/stream-stats')
+        .then(r => r.json())
+        .then(d => {
+          if (!d) return;
+          if (d.goal) {
+            studioStatsData.goal = d.goal;
+            if (d.goal.type) {
+              currentGoalType = d.goal.type;
+              document.querySelectorAll('.goal-type-btn').forEach(b => b.classList.remove('active'));
+              const activeBtn = document.getElementById(`goal-type-${d.goal.type}`);
+              if (activeBtn) activeBtn.classList.add('active');
+            }
+            if (d.goal.title) {
+              const tInp = document.getElementById('goal-title-input');
+              if (tInp) tInp.value = d.goal.title;
+            }
+            if (typeof d.goal.target === 'number') {
+              const tarInp = document.getElementById('goal-target-input');
+              if (tarInp) tarInp.value = d.goal.target;
+            }
+            if (typeof d.goal.current === 'number') {
+              const curInp = document.getElementById('goal-current-input');
+              if (curInp) curInp.value = d.goal.current;
+            }
+            if (typeof d.goal.autoSyncKick === 'boolean') {
+              isGoalAutoSyncKick = d.goal.autoSyncKick;
+              const chk = document.getElementById('goal-autosync-toggle');
+              if (chk) chk.checked = isGoalAutoSyncKick;
+            }
+            updateGoalProgressPreview();
+          }
+
+          if (d.recent) {
+            studioStatsData.recent = d.recent;
+            if (d.recent.follower) {
+              const fInp = document.getElementById('stat-follower-input');
+              if (fInp) fInp.value = d.recent.follower;
+            }
+            if (d.recent.sub) {
+              const sInp = document.getElementById('stat-sub-input');
+              if (sInp) sInp.value = d.recent.sub;
+            }
+            if (d.recent.donation) {
+              const dInp = document.getElementById('stat-donation-input');
+              if (dInp) dInp.value = d.recent.donation;
+            }
+            if (d.recent.gift) {
+              const gInp = document.getElementById('stat-gift-input');
+              if (gInp) gInp.value = d.recent.gift;
+            }
+          }
+
+          if (d.session) {
+            studioStatsData.session = d.session;
+            const fEl = document.getElementById('session-count-followers');
+            const sEl = document.getElementById('session-count-subs');
+            const kEl = document.getElementById('session-count-kicks');
+            const gEl = document.getElementById('session-count-gifts');
+            if (fEl) fEl.textContent = `+${d.session.followers || 0}`;
+            if (sEl) sEl.textContent = `+${d.session.subs || 0}`;
+            if (kEl) kEl.textContent = `+${d.session.kicks || 0}`;
+            if (gEl) gEl.textContent = `+${d.session.gifts || 0}`;
+          }
+        })
+        .catch(() => {});
     }
 
     function syncKickFollowersLive() {
@@ -7760,8 +8422,10 @@
         .then(data => {
           const count = data.followers_count ?? data.followersCount;
           if (typeof count === 'number') {
-            document.getElementById('goal-current-input').value = count;
-            document.getElementById('kick-follower-badge').textContent = count;
+            const curInput = document.getElementById('goal-current-input');
+            if (curInput) curInput.value = count;
+            const badge = document.getElementById('kick-follower-badge');
+            if (badge) badge.textContent = count;
             updateGoalProgressPreview();
             applyLiveGoal();
             showToast(`Kick Canlı Takipçi Alındı: ${count}`, 'success');
@@ -7769,6 +8433,26 @@
         })
         .catch(() => showToast('Kick API bağlantı hatası', 'error'));
     }
+
+    // 30 saniyede bir otomatik Kick takipçi senkronizasyonu
+    setInterval(() => {
+      if (isGoalAutoSyncKick && currentGoalType === 'follower') {
+        fetch('/api/kick/channel?slug=cihanatas')
+          .then(r => r.json())
+          .then(data => {
+            const count = data.followers_count ?? data.followersCount;
+            if (typeof count === 'number') {
+              const curInput = document.getElementById('goal-current-input');
+              if (curInput && parseInt(curInput.value, 10) !== count) {
+                curInput.value = count;
+                updateGoalProgressPreview();
+                applyLiveGoal();
+              }
+            }
+          })
+          .catch(() => {});
+      }
+    }, 30000);
 
     /* ========================================================
        ALERT & SESLİ OKUMA (TTS) KONTROL MASASI ENGINE
@@ -9629,6 +10313,9 @@
       else if (initTab === 'alerts' || initTab === 'tab-alerts') {
         switchTab('tab-alerts', document.getElementById('tab-btn-alerts'));
       }
+      else if (initTab === 'goal' || initTab === 'tab-goal') {
+        switchTab('tab-goal', document.getElementById('tab-btn-goal'));
+      }
       if (urlParams.get('openChat') === '1') {
         setTimeout(openFloatingChatWidget, 100);
       }
@@ -9646,6 +10333,7 @@
       syncKickFollowersLive();
       checkObsWsStatus();
       setInterval(checkObsWsStatus, 4000);
+      initGoalAndStats();
       initMusicDashboard();
       initTtsDashboard();
 
@@ -9739,6 +10427,37 @@
             updateTtsUI();
           } else if (e.data && e.data.type === 'STOP_TTS') {
             localTTS.stop();
+          } else if (e.data && e.data.type === 'UPDATE_GOAL' && e.data.goal) {
+            if (typeof e.data.goal.current === 'number') {
+              const cInp = document.getElementById('goal-current-input');
+              if (cInp) cInp.value = e.data.goal.current;
+            }
+            if (typeof e.data.goal.target === 'number') {
+              const tInp = document.getElementById('goal-target-input');
+              if (tInp) tInp.value = e.data.goal.target;
+            }
+            if (e.data.goal.title) {
+              const tiInp = document.getElementById('goal-title-input');
+              if (tiInp) tiInp.value = e.data.goal.title;
+            }
+            updateGoalProgressPreview();
+          } else if (e.data && e.data.type === 'UPDATE_STATS' && e.data.stats) {
+            if (e.data.stats.follower) {
+              const fInp = document.getElementById('stat-follower-input');
+              if (fInp) fInp.value = e.data.stats.follower;
+            }
+            if (e.data.stats.sub) {
+              const sInp = document.getElementById('stat-sub-input');
+              if (sInp) sInp.value = e.data.stats.sub;
+            }
+            if (e.data.stats.donation) {
+              const dInp = document.getElementById('stat-donation-input');
+              if (dInp) dInp.value = e.data.stats.donation;
+            }
+            if (e.data.stats.gift) {
+              const gInp = document.getElementById('stat-gift-input');
+              if (gInp) gInp.value = e.data.stats.gift;
+            }
           } else if (e.data && e.data.type === 'UPDATE_SONG') {
             if (e.data.coverUrl) updateDeckCover(e.data.coverUrl);
             if (e.data.title) {
@@ -9765,6 +10484,22 @@
               d.events.forEach(ev => {
                 if (ev.time > lastStudioPoll) lastStudioPoll = ev.time;
                 if (ev.type === 'TEST_ALERT' || ev.type === 'LIVE_ALERT') {
+                  const aType = ev.alertType || 'follower';
+                  if (aType === 'follower') {
+                    const fEl = document.getElementById('session-count-followers');
+                    if (fEl) fEl.textContent = `+${(parseInt(fEl.textContent.replace('+', ''), 10) || 0) + 1}`;
+                  } else if (aType === 'sub') {
+                    const sEl = document.getElementById('session-count-subs');
+                    if (sEl) sEl.textContent = `+${(parseInt(sEl.textContent.replace('+', ''), 10) || 0) + 1}`;
+                  } else if (aType === 'donation' || aType === 'kicks') {
+                    const kEl = document.getElementById('session-count-kicks');
+                    const amt = parseInt(ev.payload?.amount || 500, 10) || 500;
+                    if (kEl) kEl.textContent = `+${(parseInt(kEl.textContent.replace('+', ''), 10) || 0) + amt}`;
+                  } else if (aType === 'gift') {
+                    const gEl = document.getElementById('session-count-gifts');
+                    if (gEl) gEl.textContent = `+${(parseInt(gEl.textContent.replace('+', ''), 10) || 0) + 1}`;
+                  }
+
                   if (ev.payload && ev.payload.username && ev.senderSession !== MIRA_TAB_SESSION_ID) {
                     if (miraTtsConfig.ttsAlertsEnabled !== false) {
                       localTTS.speakAlert(ev.alertType || 'follower', ev.payload);
@@ -9773,6 +10508,37 @@
                 } else if (ev.type === 'TEST_CHAT' || ev.type === 'CHAT_MESSAGE') {
                   if (ev.senderSession !== MIRA_TAB_SESSION_ID) {
                     appendStudioChatMessage(ev);
+                  }
+                } else if (ev.type === 'UPDATE_GOAL' && ev.goal) {
+                  if (typeof ev.goal.current === 'number') {
+                    const cInp = document.getElementById('goal-current-input');
+                    if (cInp) cInp.value = ev.goal.current;
+                  }
+                  if (typeof ev.goal.target === 'number') {
+                    const tInp = document.getElementById('goal-target-input');
+                    if (tInp) tInp.value = ev.goal.target;
+                  }
+                  if (ev.goal.title) {
+                    const tiInp = document.getElementById('goal-title-input');
+                    if (tiInp) tiInp.value = ev.goal.title;
+                  }
+                  updateGoalProgressPreview();
+                } else if (ev.type === 'UPDATE_STATS' && ev.stats) {
+                  if (ev.stats.follower) {
+                    const fInp = document.getElementById('stat-follower-input');
+                    if (fInp) fInp.value = ev.stats.follower;
+                  }
+                  if (ev.stats.sub) {
+                    const sInp = document.getElementById('stat-sub-input');
+                    if (sInp) sInp.value = ev.stats.sub;
+                  }
+                  if (ev.stats.donation) {
+                    const dInp = document.getElementById('stat-donation-input');
+                    if (dInp) dInp.value = ev.stats.donation;
+                  }
+                  if (ev.stats.gift) {
+                    const gInp = document.getElementById('stat-gift-input');
+                    if (gInp) gInp.value = ev.stats.gift;
                   }
                 } else if (ev.type === 'UPDATE_SONG') {
                   if (ev.coverUrl) updateDeckCover(ev.coverUrl);

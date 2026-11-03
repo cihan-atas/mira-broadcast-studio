@@ -377,8 +377,11 @@
   }
 
   function updateRecentStat(type, value) {
+    if (!value) return;
     let el = document.getElementById(`recent-${type}`) || document.getElementById(type);
-    if (!el && type === 'top-donor') el = document.getElementById('top-donor');
+    if (!el && type === 'top-donor') el = document.getElementById('top-donor') || document.getElementById('recent-donation');
+    if (!el && type === 'donation') el = document.getElementById('recent-donation') || document.getElementById('top-donor');
+    if (!el && type === 'gift') el = document.getElementById('recent-gift') || document.getElementById('recent-sub');
     const card = el ? el.closest('.hero-stat-card') : null;
     if (el) el.textContent = value;
     if (card) {
@@ -815,6 +818,23 @@
         triggerAlertBanner(eventObj.alertType, eventObj.payload || {});
       } else if (eventObj.type === 'UPDATE_GOAL' && eventObj.goal) {
         updateGoalDisplay(eventObj.goal);
+      } else if (eventObj.type === 'UPDATE_STATS' && eventObj.stats) {
+        if (eventObj.stats.follower) {
+          updateRecentStat('follower', eventObj.stats.follower);
+          localStorage.setItem('recent_follower', eventObj.stats.follower);
+        }
+        if (eventObj.stats.sub) {
+          updateRecentStat('sub', eventObj.stats.sub);
+          localStorage.setItem('recent_sub', eventObj.stats.sub);
+        }
+        if (eventObj.stats.donation) {
+          updateRecentStat('donation', eventObj.stats.donation);
+          localStorage.setItem('recent_donation', eventObj.stats.donation);
+        }
+        if (eventObj.stats.gift) {
+          updateRecentStat('gift', eventObj.stats.gift);
+          localStorage.setItem('recent_gift', eventObj.stats.gift);
+        }
       } else if (eventObj.type === 'UPDATE_SONG' && eventObj.title) {
         if (window.syncMusicData) {
           window.syncMusicData(eventObj);
@@ -1024,6 +1044,19 @@
 
     const savedDonation = localStorage.getItem('recent_donation');
     updateRecentStat('donation', savedDonation || '-');
+
+    fetch('/api/stream-stats')
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.goal) updateGoalDisplay(d.goal);
+        if (d && d.recent) {
+          if (d.recent.follower) updateRecentStat('follower', d.recent.follower);
+          if (d.recent.sub) updateRecentStat('sub', d.recent.sub);
+          if (d.recent.donation) updateRecentStat('donation', d.recent.donation);
+          if (d.recent.gift) updateRecentStat('gift', d.recent.gift);
+        }
+      })
+      .catch(() => {});
 
     // Etkileşimli Sürükle-Bırak, Boyutlandır & Kart Düzenleme Motorunu Yükle
     if (!window.__MIRA_INTERACTIVE_EDITOR_LOADED__) {

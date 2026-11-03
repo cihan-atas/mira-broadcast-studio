@@ -203,6 +203,55 @@ function checkNowPlayingFileFallback() {
 setInterval(pollTunaBackground, 1500);
 pollTunaBackground();
 
+// ========================================================
+// 0.3 CANLI YAYIN HEDEF & İSTATİSTİK (STREAM STATS & GOALS)
+// ========================================================
+const streamStatsFile = path.join(__dirname, 'stream-stats.json');
+let studioStats = {
+  goal: {
+    title: 'TAKİPÇİ HEDEFİ',
+    current: 1,
+    target: 50,
+    type: 'follower',
+    autoSyncKick: true
+  },
+  recent: {
+    follower: 'SelinGamer',
+    sub: 'NecroLord',
+    donation: 'EmrePro (500 Kicks)',
+    gift: 'MiraFan_01 (5x Hediye)'
+  },
+  session: {
+    followers: 0,
+    subs: 0,
+    kicks: 0,
+    gifts: 0,
+    startedAt: Date.now()
+  }
+};
+
+function loadStreamStats() {
+  try {
+    if (fs.existsSync(streamStatsFile)) {
+      const raw = fs.readFileSync(streamStatsFile, 'utf-8');
+      const parsed = JSON.parse(raw);
+      studioStats = {
+        goal: { ...studioStats.goal, ...(parsed.goal || {}) },
+        recent: { ...studioStats.recent, ...(parsed.recent || {}) },
+        session: { ...studioStats.session, ...(parsed.session || {}) }
+      };
+    }
+  } catch(e) {}
+}
+
+function saveStreamStats() {
+  try {
+    fs.writeFileSync(streamStatsFile, JSON.stringify(studioStats, null, 2), 'utf-8');
+  } catch(e) {}
+}
+
+loadStreamStats();
+
 function setObsScene(targetScene, callback) {
   if (!obsWsConnected || !obsWsClient) {
     return callback(new Error('OBS WebSocket bağlı değil'));
@@ -368,6 +417,15 @@ function handleTiktokConnect(username, callback) {
 
   conn.on('follow', data => {
     console.log(`[TIKTOK LIVE] Yeni Takipci: ${data.uniqueId}`);
+    studioStats.recent.follower = data.uniqueId;
+    studioStats.session.followers = (studioStats.session.followers || 0) + 1;
+    if (studioStats.goal.type === 'follower') {
+      studioStats.goal.current = (studioStats.goal.current || 0) + 1;
+      eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+    }
+    eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
+    saveStreamStats();
+
     eventQueue.push({
       type: 'LIVE_ALERT',
       alertType: 'follower',
@@ -382,6 +440,19 @@ function handleTiktokConnect(username, callback) {
     const count = data.repeatCount || 1;
     const diamonds = (data.diamondCount || 1) * count;
     console.log(`[TIKTOK LIVE] Hediye: ${data.uniqueId} -> ${giftName} x${count}`);
+    studioStats.recent.gift = `${data.uniqueId} (${giftName} x${count})`;
+    studioStats.session.gifts = (studioStats.session.gifts || 0) + count;
+    if (diamonds > 0) {
+      studioStats.session.kicks = (studioStats.session.kicks || 0) + diamonds;
+      studioStats.recent.donation = `${data.uniqueId} (${diamonds} 💎)`;
+    }
+    if (studioStats.goal.type === 'gift') {
+      studioStats.goal.current = (studioStats.goal.current || 0) + count;
+      eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+    }
+    eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
+    saveStreamStats();
+
     eventQueue.push({
       type: 'LIVE_ALERT',
       alertType: 'gift',
@@ -569,6 +640,16 @@ function startKickPusherBridge(slug = 'cihanatas') {
             const updatedCount = evData.followersCount || evData.followers_count;
             if (typeof updatedCount === 'number') activeKickStatus.followersCount = updatedCount;
 
+            studioStats.recent.follower = newFollowerName;
+            studioStats.session.followers = (studioStats.session.followers || 0) + 1;
+            if (studioStats.goal.type === 'follower') {
+              if (typeof updatedCount === 'number') studioStats.goal.current = updatedCount;
+              else studioStats.goal.current = (studioStats.goal.current || 0) + 1;
+              eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+            }
+            eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
+            saveStreamStats();
+
             const alertItem = {
               type: 'LIVE_ALERT',
               alertType: 'follower',
@@ -587,6 +668,16 @@ function startKickPusherBridge(slug = 'cihanatas') {
             const sData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
             const subUser = sData.username || sData.sender?.username || 'Abonemiz';
             const months = sData.months || 1;
+
+            studioStats.recent.sub = `${subUser} (${months}. Ay)`;
+            studioStats.session.subs = (studioStats.session.subs || 0) + 1;
+            if (studioStats.goal.type === 'sub') {
+              studioStats.goal.current = (studioStats.goal.current || 0) + 1;
+              eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+            }
+            eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
+            saveStreamStats();
+
             const alertItem = {
               type: 'LIVE_ALERT',
               alertType: 'sub',
@@ -605,6 +696,18 @@ function startKickPusherBridge(slug = 'cihanatas') {
             const gData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
             const gifter = gData.gifter_username || gData.username || 'Destekçi';
             const count = gData.gifted_usernames?.length || gData.count || 5;
+
+            studioStats.recent.gift = `${gifter} (${count}x Hediye)`;
+            studioStats.recent.sub = `${gifter} (Hediye Dağıttı)`;
+            studioStats.session.gifts = (studioStats.session.gifts || 0) + count;
+            studioStats.session.subs = (studioStats.session.subs || 0) + count;
+            if (studioStats.goal.type === 'gift' || studioStats.goal.type === 'sub') {
+              studioStats.goal.current = (studioStats.goal.current || 0) + count;
+              eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+            }
+            eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
+            saveStreamStats();
+
             const alertItem = {
               type: 'LIVE_ALERT',
               alertType: 'gift',
@@ -1734,6 +1837,15 @@ const server = http.createServer((req, res) => {
           try { fs.writeFileSync(widgetTxtPath, (data.url || '').trim(), 'utf-8'); } catch(e){}
         }
 
+        if (data.type === 'UPDATE_GOAL' && data.goal) {
+          studioStats.goal = { ...studioStats.goal, ...data.goal };
+          saveStreamStats();
+        }
+        if (data.type === 'UPDATE_STATS' && data.stats) {
+          studioStats.recent = { ...studioStats.recent, ...data.stats };
+          saveStreamStats();
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
       } catch (err) {
@@ -2181,6 +2293,57 @@ const server = http.createServer((req, res) => {
           });
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: true, config: data }));
+        } catch (err) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+      return;
+    }
+  }
+
+  // 2.16B API: Canlı Yayın Hedef & İstatistik (Stream Stats & Goals)
+  if (pathname === '/api/stream-stats') {
+    if (req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify(studioStats));
+    } else if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const data = JSON.parse(body);
+          if (data.goal) {
+            studioStats.goal = { ...studioStats.goal, ...data.goal };
+            eventQueue.push({
+              type: 'UPDATE_GOAL',
+              goal: studioStats.goal,
+              time: Date.now()
+            });
+          }
+          if (data.recent) {
+            studioStats.recent = { ...studioStats.recent, ...data.recent };
+            eventQueue.push({
+              type: 'UPDATE_STATS',
+              stats: studioStats.recent,
+              time: Date.now()
+            });
+          }
+          if (data.session) {
+            studioStats.session = { ...studioStats.session, ...data.session };
+          }
+          if (data.resetSession) {
+            studioStats.session = {
+              followers: 0,
+              subs: 0,
+              kicks: 0,
+              gifts: 0,
+              startedAt: Date.now()
+            };
+          }
+          saveStreamStats();
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, stats: studioStats }));
         } catch (err) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: err.message }));
