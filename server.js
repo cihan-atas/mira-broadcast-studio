@@ -9,6 +9,11 @@ const { spawn } = require('child_process');
 let PORT = process.env.PORT || 8080;
 const eventQueue = [];
 let currentSongTitle = "♪ MLBB Arena - Necrokeep Lo-Fi Chill Beats";
+let currentSongArtist = "MİRA Broadcast Studio";
+let currentSongProgress = 45; // Saniye cinsinden
+let currentSongDuration = 210; // Saniye cinsinden (3:30)
+let currentSongStatus = "playing";
+let currentSongLastUpdate = Date.now();
 
 // ==========================================
 // 0.1 LAN IP Yardımcısı (Mobil Kumanda İçin)
@@ -1873,9 +1878,18 @@ const server = http.createServer((req, res) => {
           if (content) currentSongTitle = content;
         } catch (e) {}
       }
+      let elapsed = currentSongProgress;
+      if (currentSongStatus === 'playing') {
+        const diffSec = Math.floor((Date.now() - currentSongLastUpdate) / 1000);
+        elapsed = (currentSongProgress + diffSec) % (currentSongDuration || 210);
+      }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({
         title: currentSongTitle,
+        artist: currentSongArtist,
+        progress: elapsed,
+        duration: currentSongDuration,
+        status: currentSongStatus,
         obsConnected: obsWsConnected,
         filePath: txtPath
       }));
@@ -1885,26 +1899,37 @@ const server = http.createServer((req, res) => {
       req.on('end', () => {
         try {
           const data = JSON.parse(body);
-          if (data.title !== undefined) {
-            currentSongTitle = data.title;
-            try { fs.writeFileSync(txtPath, currentSongTitle, 'utf-8'); } catch(e){}
-            eventQueue.push({
-              type: 'UPDATE_SONG',
-              title: currentSongTitle,
-              artist: data.artist || '',
-              source: data.source || 'mira',
-              time: Date.now()
-            });
+          if (data.title !== undefined) currentSongTitle = data.title;
+          if (data.artist !== undefined) currentSongArtist = data.artist;
+          if (data.progress !== undefined) currentSongProgress = Number(data.progress);
+          if (data.duration !== undefined) currentSongDuration = Number(data.duration);
+          if (data.status !== undefined) currentSongStatus = data.status;
+          currentSongLastUpdate = Date.now();
 
-            // OBS WebSocket üzerinden metin kaynağını otomatik güncelle
-            if (obsWsClient && obsWsConnected) {
-              setObsTextSource(data.obsSourceName || 'Now Playing', currentSongTitle);
-            }
+          try { fs.writeFileSync(txtPath, currentSongTitle, 'utf-8'); } catch(e){}
+          eventQueue.push({
+            type: 'UPDATE_SONG',
+            title: currentSongTitle,
+            artist: currentSongArtist,
+            progress: currentSongProgress,
+            duration: currentSongDuration,
+            status: currentSongStatus,
+            source: data.source || 'mira',
+            time: Date.now()
+          });
+
+          // OBS WebSocket üzerinden metin kaynağını otomatik güncelle
+          if (obsWsClient && obsWsConnected) {
+            setObsTextSource(data.obsSourceName || 'Now Playing', currentSongTitle);
           }
+
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             success: true,
             title: currentSongTitle,
+            artist: currentSongArtist,
+            progress: currentSongProgress,
+            duration: currentSongDuration,
             obsConnected: obsWsConnected
           }));
         } catch (err) {
@@ -1925,6 +1950,18 @@ const server = http.createServer((req, res) => {
       tRes.on('end', () => {
         try {
           const parsed = JSON.parse(tBody);
+          if (parsed && (parsed.title || parsed.song)) {
+            const tTitle = parsed.title || parsed.song;
+            const tArtist = Array.isArray(parsed.artists) ? parsed.artists.join(', ') : (parsed.artist || '');
+            const tDur = parsed.duration ? Math.floor(parsed.duration / 1000) : (parsed.duration_ms ? Math.floor(parsed.duration_ms / 1000) : currentSongDuration);
+            const tProg = parsed.progress ? Math.floor(parsed.progress / 1000) : (parsed.progress_ms ? Math.floor(parsed.progress_ms / 1000) : 0);
+            if (tTitle) currentSongTitle = tTitle;
+            if (tArtist) currentSongArtist = tArtist;
+            if (tDur) currentSongDuration = tDur;
+            currentSongProgress = tProg;
+            currentSongLastUpdate = Date.now();
+            currentSongStatus = parsed.status || 'playing';
+          }
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ active: true, port, data: parsed }));
         } catch(e) {

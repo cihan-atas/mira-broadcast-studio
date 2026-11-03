@@ -513,6 +513,38 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    .mod-progress-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-top: 4px;
+      width: 100%;
+    }
+    .mod-progress-bar {
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.09);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .mod-progress-fill {
+      height: 100%;
+      width: 35%;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      border-radius: 999px;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 8px var(--secondary-color);
+    }
+    .mod-progress-time {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      font-family: monospace, sans-serif;
+      font-weight: 700;
+    }
 
     /* 6. Hedef Barı Kartı */
     .mod-goal-card {
@@ -1149,6 +1181,15 @@
               </div>
               <div class="mod-viz-bars" id="mod-viz-bars">${bars}</div>
               <div class="mod-song-title" id="mod-song-title">♪ MLBB Arena - Lo-Fi Chill Beats</div>
+              <div class="mod-progress-wrap">
+                <div class="mod-progress-bar">
+                  <div class="mod-progress-fill" id="mod-song-progress-fill" style="width: 35%;"></div>
+                </div>
+                <div class="mod-progress-time">
+                  <span id="mod-song-time-cur" style="color:#fff;">01:14</span>
+                  <span id="mod-song-time-dur" style="color: var(--secondary-color);">03:30</span>
+                </div>
+              </div>
             </div>
           </div>
         `;
@@ -1494,8 +1535,36 @@
         } else if (ev.type === 'UPDATE_SONG' && ev.title) {
           const sEl = document.getElementById('mod-song-title');
           if (sEl) sEl.textContent = ev.title.startsWith('♪') ? ev.title : `♪ ${ev.title}`;
+          if (typeof ev.progress === 'number') overlaySongCur = ev.progress;
+          if (typeof ev.duration === 'number' && ev.duration > 0) overlaySongDur = ev.duration;
+          renderOverlaySongProgress();
         }
       }
+
+      let overlaySongCur = 45;
+      let overlaySongDur = 210;
+      function formatOverlayTime(sec) {
+        sec = Math.max(0, Math.floor(sec || 0));
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
+      function renderOverlaySongProgress() {
+        const fill = document.getElementById('mod-song-progress-fill');
+        const curEl = document.getElementById('mod-song-time-cur');
+        const durEl = document.getElementById('mod-song-time-dur');
+        if (fill) {
+          const pct = overlaySongDur > 0 ? Math.min(100, (overlaySongCur / overlaySongDur) * 100) : 0;
+          fill.style.width = `${pct.toFixed(1)}%`;
+        }
+        if (curEl) curEl.textContent = formatOverlayTime(overlaySongCur);
+        if (durEl) durEl.textContent = formatOverlayTime(overlaySongDur);
+      }
+      setInterval(() => {
+        if (overlaySongCur < overlaySongDur) overlaySongCur++;
+        else overlaySongCur = 0;
+        renderOverlaySongProgress();
+      }, 1000);
 
       window.addEventListener('message', (e) => handleEvent(e.data));
       try {

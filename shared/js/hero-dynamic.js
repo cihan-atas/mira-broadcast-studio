@@ -670,11 +670,56 @@
   }
 
   // =============================================================
-  // 7. CANLI MÜZİK SENKRONİZASYONU (Spotify / Snip / Tuna / API)
+  // 7. CANLI MÜZİK & PROGRESS BAR SENKRONİZASYONU (Spotify / Snip / Tuna / API)
   // =============================================================
   function initRealTimeMusicSync() {
     const trackEl = document.querySelector('.audio-track-title');
-    if (!trackEl) return;
+    const deckMusic = document.querySelector('.deck-music-card, .deck-audio-card');
+
+    // DOM'da yoksa progress bar kapsayıcısını otomatik ekle
+    let progressWrap = document.querySelector('.audio-progress-wrap');
+    if (!progressWrap && deckMusic) {
+      const trackInfo = deckMusic.querySelector('.audio-track-info');
+      if (trackInfo) {
+        progressWrap = document.createElement('div');
+        progressWrap.className = 'audio-progress-wrap';
+        progressWrap.innerHTML = `
+          <div class="audio-progress-bar">
+            <div class="audio-progress-fill" id="music-progress-fill" style="width: 35%;"></div>
+          </div>
+          <div class="audio-progress-time">
+            <span class="audio-time-current" id="music-time-current">01:14</span>
+            <span class="audio-time-badge">CANLI BGM</span>
+            <span class="audio-time-duration" id="music-time-duration">03:30</span>
+          </div>
+        `;
+        trackInfo.insertAdjacentElement('afterend', progressWrap);
+      }
+    }
+
+    const fillEl = document.getElementById('music-progress-fill') || document.querySelector('.audio-progress-fill');
+    const curTimeEl = document.getElementById('music-time-current') || document.querySelector('.audio-time-current');
+    const durTimeEl = document.getElementById('music-time-duration') || document.querySelector('.audio-time-duration');
+
+    let currentSeconds = 45;
+    let durationSeconds = 210; // 3 dakika 30 saniye varsayılan
+    let lastSongTitle = '';
+
+    function formatTime(sec) {
+      if (!sec || isNaN(sec) || sec < 0) sec = 0;
+      sec = Math.floor(sec);
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function renderProgress() {
+      if (!fillEl) return;
+      const pct = durationSeconds > 0 ? Math.min(100, Math.max(0, (currentSeconds / durationSeconds) * 100)) : 0;
+      fillEl.style.width = `${pct.toFixed(1)}%`;
+      if (curTimeEl) curTimeEl.textContent = formatTime(currentSeconds);
+      if (durTimeEl) durTimeEl.textContent = formatTime(durationSeconds);
+    }
 
     function updateTitle(title) {
       if (trackEl && title && trackEl.textContent !== title) {
@@ -684,14 +729,44 @@
           trackEl.textContent = title.startsWith('♪') ? title : `♪ ${title}`;
           trackEl.style.opacity = '1';
         }, 200);
+
+        // Şarkı değiştiğinde süre sıfırlanıp baştan başlasın
+        if (lastSongTitle && lastSongTitle !== title) {
+          currentSeconds = 0;
+          renderProgress();
+        }
+        lastSongTitle = title;
       }
     }
+
+    function syncMusicData(data) {
+      if (!data) return;
+      if (data.title) updateTitle(data.title);
+
+      if (typeof data.progress === 'number' && data.progress >= 0) {
+        currentSeconds = data.progress;
+      }
+      if (typeof data.duration === 'number' && data.duration > 0) {
+        durationSeconds = data.duration;
+      }
+      renderProgress();
+    }
+
+    // Her 1 saniyede yerel akış (Progress barın canlı ve akıcı ilerlemesi)
+    setInterval(() => {
+      if (currentSeconds < durationSeconds) {
+        currentSeconds++;
+      } else {
+        currentSeconds = 0;
+      }
+      renderProgress();
+    }, 1000);
 
     function fetchNowPlaying() {
       fetch('/api/now-playing')
         .then(res => res.json())
         .then(data => {
-          if (data && data.title) updateTitle(data.title);
+          syncMusicData(data);
         })
         .catch(() => {});
     }
@@ -699,6 +774,7 @@
     setInterval(fetchNowPlaying, 2500);
 
     window.updateNowPlayingTitle = updateTitle;
+    window.syncMusicData = syncMusicData;
   }
 
   // =============================================================
@@ -713,7 +789,11 @@
       } else if (eventObj.type === 'UPDATE_GOAL' && eventObj.goal) {
         updateGoalDisplay(eventObj.goal);
       } else if (eventObj.type === 'UPDATE_SONG' && eventObj.title) {
-        if (window.updateNowPlayingTitle) window.updateNowPlayingTitle(eventObj.title);
+        if (window.syncMusicData) {
+          window.syncMusicData(eventObj);
+        } else if (window.updateNowPlayingTitle) {
+          window.updateNowPlayingTitle(eventObj.title);
+        }
       } else if (eventObj.type === 'SET_CHAT_WIDGET') {
         if (eventObj.url) {
           localStorage.setItem('stream_chat_widget_url', eventObj.url);

@@ -2848,6 +2848,75 @@
       font-weight: 600;
     }
 
+    /* MİRA Deck Canlı Şarkı İlerleme Çubuğu & Saniye Sayacı */
+    .music-now-progress-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 8px;
+      width: 100%;
+      min-width: 300px;
+      max-width: 520px;
+    }
+    .music-now-progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    .music-now-progress-fill {
+      height: 100%;
+      width: 35%;
+      background: linear-gradient(90deg, #a855f7, #00f5a0);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 245, 160, 0.5);
+      position: relative;
+    }
+    .music-now-progress-fill::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 6px #ffffff, 0 0 12px #00f5a0;
+    }
+    .music-now-progress-times {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', 'Orbitron', monospace, sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .music-time-curr {
+      color: #00f5a0;
+      text-shadow: 0 0 6px rgba(0, 245, 160, 0.4);
+    }
+    .music-time-status {
+      font-size: 9.5px;
+      letter-spacing: 1px;
+      color: #c084fc;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: rgba(168, 85, 247, 0.12);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(168, 85, 247, 0.25);
+    }
+    .music-time-dur {
+      color: #94a3b8;
+    }
+
     /* Neon Equalizer Çubukları */
     .music-eq-bars {
       display: flex;
@@ -4853,6 +4922,18 @@
               </div>
               <div class="music-now-title" id="music-card-title">♪ MLBB Arena - Necrokeep Lo-Fi Chill Beats</div>
               <div class="music-now-artist" id="music-card-artist">MİRA Broadcast Studio • Canlı Yayın Müziği</div>
+              
+              <!-- Canlı Şarkı İlerleme Çubuğu & Saniye Sayacı -->
+              <div class="music-now-progress-box">
+                <div class="music-now-progress-track">
+                  <div class="music-now-progress-fill" id="deck-music-progress-fill" style="width: 35%;"></div>
+                </div>
+                <div class="music-now-progress-times">
+                  <span class="music-time-curr" id="deck-music-time-curr">01:14</span>
+                  <span class="music-time-status" id="deck-music-time-status">CANLI ÇALIYOR</span>
+                  <span class="music-time-dur" id="deck-music-time-dur">03:30</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -8991,6 +9072,51 @@
       syncMusicToObsAndStream();
     }
 
+    let deckMusicCurrentSec = 45;
+    let deckMusicDurationSec = 210;
+    let deckMusicStatus = 'playing';
+
+    function formatDeckTime(sec) {
+      sec = Math.max(0, Math.floor(sec || 0));
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateDeckMusicProgress(prog, dur, status) {
+      if (typeof prog === 'number' && prog >= 0) deckMusicCurrentSec = prog;
+      if (typeof dur === 'number' && dur > 0) deckMusicDurationSec = dur;
+      if (status) deckMusicStatus = status;
+
+      const fill = document.getElementById('deck-music-progress-fill');
+      const curEl = document.getElementById('deck-music-time-curr');
+      const durEl = document.getElementById('deck-music-time-dur');
+      const statusEl = document.getElementById('deck-music-time-status');
+
+      if (fill) {
+        const pct = deckMusicDurationSec > 0 ? Math.min(100, (deckMusicCurrentSec / deckMusicDurationSec) * 100) : 0;
+        fill.style.width = `${pct.toFixed(1)}%`;
+      }
+      if (curEl) curEl.textContent = formatDeckTime(deckMusicCurrentSec);
+      if (durEl) durEl.textContent = formatDeckTime(deckMusicDurationSec);
+      if (statusEl) {
+        statusEl.textContent = deckMusicStatus === 'paused' ? 'DURAKLATILDI' : 'CANLI ÇALIYOR';
+        statusEl.style.color = deckMusicStatus === 'paused' ? '#94a3b8' : '#00f5a0';
+      }
+    }
+
+    // Her saniye akıcı saniye ilerletme
+    setInterval(() => {
+      if (deckMusicStatus !== 'paused') {
+        if (deckMusicCurrentSec < deckMusicDurationSec) {
+          deckMusicCurrentSec++;
+        } else {
+          deckMusicCurrentSec = 0;
+        }
+        updateDeckMusicProgress();
+      }
+    }, 1000);
+
     function syncMusicToObsAndStream() {
       const songInput = document.getElementById('music-song-input');
       const artistInput = document.getElementById('music-artist-input');
@@ -9015,13 +9141,21 @@
         body: JSON.stringify({
           title: full,
           artist: artist,
+          progress: deckMusicCurrentSec,
+          duration: deckMusicDurationSec,
           obsSourceName: obsSource,
           source: 'mira'
         })
       })
       .then(r => r.json())
       .then(data => {
-        dispatchEventToOverlay({ type: 'UPDATE_SONG', title: full, artist: artist });
+        dispatchEventToOverlay({
+          type: 'UPDATE_SONG',
+          title: full,
+          artist: artist,
+          progress: deckMusicCurrentSec,
+          duration: deckMusicDurationSec
+        });
         
         const obsBadge = document.getElementById('music-obs-status-badge');
         if (obsBadge) {
@@ -9037,7 +9171,13 @@
         showToast(`✓ Müzik OBS'e ve canlı yayına aktarıldı: ${full}`, 'success');
       })
       .catch(() => {
-        dispatchEventToOverlay({ type: 'UPDATE_SONG', title: full, artist: artist });
+        dispatchEventToOverlay({
+          type: 'UPDATE_SONG',
+          title: full,
+          artist: artist,
+          progress: deckMusicCurrentSec,
+          duration: deckMusicDurationSec
+        });
         showToast(`Müzik sahnelerine iletildi: ${full}`, 'info');
       });
     }
@@ -9100,6 +9240,10 @@
             if (data.data) {
               const tTitle = data.data.title || data.data.song || '';
               const tArtist = Array.isArray(data.data.artists) ? data.data.artists.join(', ') : (data.data.artist || '');
+              const tDur = data.data.duration ? Math.floor(data.data.duration / 1000) : (data.data.duration_ms ? Math.floor(data.data.duration_ms / 1000) : 210);
+              const tProg = data.data.progress ? Math.floor(data.data.progress / 1000) : (data.data.progress_ms ? Math.floor(data.data.progress_ms / 1000) : 0);
+              updateDeckMusicProgress(tProg, tDur, data.data.status || 'playing');
+
               if (tTitle) {
                 const sInp = document.getElementById('music-song-input');
                 const aInp = document.getElementById('music-artist-input');
@@ -9149,6 +9293,10 @@
             if (data && data.active && data.data) {
               const tTitle = data.data.title || data.data.song || '';
               const tArtist = Array.isArray(data.data.artists) ? data.data.artists.join(', ') : (data.data.artist || '');
+              const tDur = data.data.duration ? Math.floor(data.data.duration / 1000) : (data.data.duration_ms ? Math.floor(data.data.duration_ms / 1000) : 210);
+              const tProg = data.data.progress ? Math.floor(data.data.progress / 1000) : (data.data.progress_ms ? Math.floor(data.data.progress_ms / 1000) : 0);
+              updateDeckMusicProgress(tProg, tDur, data.data.status || 'playing');
+
               const cur = document.getElementById('music-song-input')?.value;
               if (tTitle && tTitle !== cur) {
                 const sInp = document.getElementById('music-song-input');
@@ -9180,6 +9328,9 @@
             if (cardTitle) cardTitle.textContent = raw;
             const marquee = document.getElementById('music-marquee-display');
             if (marquee) marquee.textContent = `🎵 ŞU AN ÇALAN: ${raw} • CANLI YAYIN MÜZİĞİ`;
+          }
+          if (data && (typeof data.progress === 'number' || typeof data.duration === 'number')) {
+            updateDeckMusicProgress(data.progress, data.duration, data.status);
           }
           if (data && data.filePath) {
             const fInp = document.getElementById('now-playing-filepath');
