@@ -752,6 +752,157 @@
         }
       };
 
+      // TTS (Sesli Okuma) Motoru — OBS Canlı Yayın Seslendirmesi
+      const OverlayTTS = {
+        config: {
+          ttsAlertsEnabled: true,
+          ttsChatEnabled: false,
+          outputMode: 'all',
+          volume: 1.0,
+          rate: 1.0,
+          pitch: 1.0,
+          voiceName: '',
+          chatFormat: '{user} diyor ki: {message}',
+          readStreamerSelf: false,
+          filterBotCommands: true,
+          filterUrls: true,
+          maxChatLength: 100,
+          alertTemplates: {
+            follower: '{user} aramıza katıldı, hoş geldin!',
+            sub: 'Teşekkürler {user}, {months}. ayında abone oldu!',
+            donation: '{user}, {amount} destek gönderdi: {message}',
+            gift: '{user}, {gift} hediyesi gönderdi!'
+          }
+        },
+        selectedVoice: null,
+        queue: [],
+        isSpeaking: false,
+        init() {
+          this.loadConfig();
+          this.initVoices();
+        },
+        loadConfig() {
+          try {
+            const saved = localStorage.getItem('mira_tts_config');
+            if (saved) this.config = { ...this.config, ...JSON.parse(saved) };
+          } catch(e) {}
+          if (window.location.protocol.startsWith('http')) {
+            fetch('/api/tts/config')
+              .then(r => r.json())
+              .then(cfg => {
+                if (cfg) {
+                  this.config = { ...this.config, ...cfg };
+                  this.initVoices();
+                }
+              }).catch(() => {});
+          }
+        },
+        initVoices() {
+          if (!('speechSynthesis' in window)) return;
+          const setV = () => {
+            const voices = window.speechSynthesis.getVoices();
+            if (!voices || voices.length === 0) return;
+            if (this.config.voiceName) {
+              const found = voices.find(v => v.name === this.config.voiceName);
+              if (found) { this.selectedVoice = found; return; }
+            }
+            const trVoices = voices.filter(v => v.lang.includes('tr') || v.lang.includes('TR'));
+            const femaleTr = trVoices.find(v => {
+              const n = (v.name || '').toLowerCase();
+              return n.includes('filiz') || n.includes('yelda') || n.includes('seda') || n.includes('female');
+            });
+            this.selectedVoice = femaleTr || trVoices[0] || voices[0];
+          };
+          setV();
+          if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = setV;
+          }
+        },
+        applyConfig(newCfg) {
+          this.config = { ...this.config, ...newCfg };
+          this.initVoices();
+        },
+        speak(text) {
+          if (!('speechSynthesis' in window)) return;
+          if (this.config.outputMode === 'studio') return; // Yalnızca stüdyo modundaysa OBS overlay sessiz kalır
+          if (!text || !text.trim()) return;
+
+          this.queue.push(text.trim());
+          this.process();
+        },
+        process() {
+          if (this.isSpeaking || this.queue.length === 0) return;
+          this.isSpeaking = true;
+          const txt = this.queue.shift();
+          const utterance = new SpeechSynthesisUtterance(txt);
+          if (this.selectedVoice) utterance.voice = this.selectedVoice;
+          utterance.volume = typeof this.config.volume === 'number' ? this.config.volume : 1.0;
+          utterance.rate = typeof this.config.rate === 'number' ? this.config.rate : 1.0;
+          utterance.pitch = typeof this.config.pitch === 'number' ? this.config.pitch : 1.0;
+          utterance.onend = () => {
+            this.isSpeaking = false;
+            setTimeout(() => this.process(), 250);
+          };
+          utterance.onerror = () => {
+            this.isSpeaking = false;
+            this.process();
+          };
+          window.speechSynthesis.speak(utterance);
+        },
+        stop() {
+          this.queue = [];
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          this.isSpeaking = false;
+        },
+        speakAlert(alertType, data = {}) {
+          if (this.config.ttsAlertsEnabled === false) return;
+          const tpls = this.config.alertTemplates || {};
+          let tpl = tpls[alertType];
+          if (!tpl) {
+            if (alertType === 'follower') tpl = '{user} aramıza katıldı, hoş geldin!';
+            else if (alertType === 'sub') tpl = 'Teşekkürler {user}, {months}. ayında abone oldu!';
+            else if (alertType === 'donation') tpl = '{user}, {amount} destek gönderdi: {message}';
+            else if (alertType === 'gift') tpl = '{user}, {gift} hediyesi gönderdi!';
+            else tpl = '{user} bildirim gönderdi!';
+          }
+          const user = data.username || data.user || 'İzleyici';
+          const amount = data.amount || '100₺';
+          const months = data.months || 1;
+          const gift = data.giftName || data.gift || 'Hediye';
+          const message = data.message || '';
+
+          const text = tpl
+            .replace(/\{user\}/g, user)
+            .replace(/\{amount\}/g, amount)
+            .replace(/\{months\}/g, months)
+            .replace(/\{gift\}/g, gift)
+            .replace(/\{message\}/g, message);
+
+          setTimeout(() => this.speak(text), 350);
+        },
+        speakChat(username, message, isStreamer = false) {
+          if (!this.config.ttsChatEnabled) return;
+          if (isStreamer && !this.config.readStreamerSelf) return;
+
+          let clean = (message || '').trim();
+          if (!clean) return;
+          if (this.config.filterBotCommands && /^[!\/\.\?]/.test(clean)) return;
+          if (this.config.filterUrls) {
+            clean = clean.replace(/https?:\/\/\S+/gi, '').trim();
+          }
+          if (!clean) return;
+          clean = clean.replace(/(.)\1{3,}/gi, '$1$1');
+          if (this.config.maxChatLength && clean.length > this.config.maxChatLength) {
+            clean = clean.substring(0, this.config.maxChatLength) + '...';
+          }
+
+          const tpl = this.config.chatFormat || '{user} diyor ki: {message}';
+          const text = tpl.replace(/\{user\}/g, username || 'İzleyici').replace(/\{message\}/g, clean);
+          this.speak(text);
+        }
+      };
+      OverlayTTS.init();
+
       function esc(str) {
         return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
@@ -1028,6 +1179,7 @@
         const icon = iconMap[cfg.alertType] || '✨';
 
         SFX.play(cfg.soundType || cfg.alertType || 'follower');
+        OverlayTTS.speakAlert(cfg.alertType || 'follower', { ...cfg, ...p });
 
         alertLayerEl.innerHTML = `
           <div class="custom-alert-box">
@@ -1190,6 +1342,11 @@
             feed.appendChild(div);
             feed.scrollTop = feed.scrollHeight;
           }
+          OverlayTTS.speakChat(ev.username || 'İzleyici', ev.content || ev.text || '', ev.isStreamer);
+        } else if (ev.type === 'UPDATE_TTS_CONFIG' && ev.config) {
+          OverlayTTS.applyConfig(ev.config);
+        } else if (ev.type === 'STOP_TTS') {
+          OverlayTTS.stop();
         } else if (ev.type === 'UPDATE_SONG' && ev.title) {
           const sEl = document.getElementById('mod-song-title');
           if (sEl) sEl.textContent = ev.title.startsWith('♪') ? ev.title : `♪ ${ev.title}`;

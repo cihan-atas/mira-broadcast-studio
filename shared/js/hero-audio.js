@@ -174,10 +174,25 @@ class HeroSoundFX {
 class HeroTTSManager {
   constructor(options = {}) {
     this.enabled = options.ttsEnabled !== undefined ? options.ttsEnabled : true;
+    this.ttsAlertsEnabled = options.ttsAlertsEnabled !== undefined ? options.ttsAlertsEnabled : true;
+    this.ttsChatEnabled = options.ttsChatEnabled !== undefined ? options.ttsChatEnabled : false;
+    this.outputMode = options.outputMode || 'all';
     this.heroName = (options.heroName || 'vexana').toLowerCase();
-    this.volume = options.volume || 1.0;
-    this.rate = options.rate || 1.05;
-    this.pitch = options.pitch || 1.1;
+    this.volume = options.volume !== undefined ? options.volume : 1.0;
+    this.rate = options.rate !== undefined ? options.rate : 1.0;
+    this.pitch = options.pitch !== undefined ? options.pitch : 1.0;
+    this.voiceName = options.voiceName || '';
+    this.readStreamerSelf = options.readStreamerSelf || false;
+    this.filterBotCommands = options.filterBotCommands !== false;
+    this.filterUrls = options.filterUrls !== false;
+    this.maxChatLength = options.maxChatLength || 100;
+    this.chatFormat = options.chatFormat || '{user} diyor ki: {message}';
+    this.alertTemplates = options.alertTemplates || {
+      follower: '{user} aramıza katıldı, hoş geldin!',
+      sub: 'Teşekkürler {user}, {months}. ayında abone oldu!',
+      donation: '{user}, {amount} destek gönderdi: {message}',
+      gift: '{user}, {gift} hediyesi gönderdi!'
+    };
 
     this.selectedVoice = null;
     this.queue = [];
@@ -189,6 +204,16 @@ class HeroTTSManager {
     if (!('speechSynthesis' in window)) return;
     const setVoice = () => {
       const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return;
+
+      if (this.voiceName) {
+        const found = voices.find(v => v.name === this.voiceName);
+        if (found) {
+          this.selectedVoice = found;
+          return;
+        }
+      }
+
       const trVoices = voices.filter(v => v.lang.includes('tr') || v.lang.includes('TR'));
       const femaleTr = trVoices.find(v => {
         const name = (v.name || '').toLowerCase();
@@ -202,12 +227,91 @@ class HeroTTSManager {
     }
   }
 
+  setVoiceByName(name) {
+    this.voiceName = name;
+    if (!('speechSynthesis' in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    const found = voices.find(v => v.name === name);
+    if (found) this.selectedVoice = found;
+  }
+
+  applyConfig(cfg = {}) {
+    if (cfg.ttsAlertsEnabled !== undefined) this.ttsAlertsEnabled = !!cfg.ttsAlertsEnabled;
+    if (cfg.ttsChatEnabled !== undefined) this.ttsChatEnabled = !!cfg.ttsChatEnabled;
+    if (cfg.outputMode !== undefined) this.outputMode = cfg.outputMode;
+    if (cfg.volume !== undefined) this.volume = parseFloat(cfg.volume);
+    if (cfg.rate !== undefined) this.rate = parseFloat(cfg.rate);
+    if (cfg.pitch !== undefined) this.pitch = parseFloat(cfg.pitch);
+    if (cfg.voiceName !== undefined) this.setVoiceByName(cfg.voiceName);
+    if (cfg.chatFormat !== undefined) this.chatFormat = cfg.chatFormat;
+    if (cfg.readStreamerSelf !== undefined) this.readStreamerSelf = !!cfg.readStreamerSelf;
+    if (cfg.filterBotCommands !== undefined) this.filterBotCommands = !!cfg.filterBotCommands;
+    if (cfg.filterUrls !== undefined) this.filterUrls = !!cfg.filterUrls;
+    if (cfg.maxChatLength !== undefined) this.maxChatLength = parseInt(cfg.maxChatLength, 10);
+    if (cfg.alertTemplates) this.alertTemplates = { ...this.alertTemplates, ...cfg.alertTemplates };
+  }
+
+  sanitizeText(text) {
+    if (!text) return null;
+    let clean = String(text).trim();
+    if (this.filterBotCommands && /^[!\/\.\?]/.test(clean)) return null;
+    if (this.filterUrls) {
+      clean = clean.replace(/https?:\/\/\S+/gi, '').trim();
+    }
+    if (!clean) return null;
+    clean = clean.replace(/(.)\1{3,}/gi, '$1$1');
+    if (this.maxChatLength && clean.length > this.maxChatLength) {
+      clean = clean.substring(0, this.maxChatLength) + '...';
+    }
+    return clean.trim();
+  }
+
   speak(text) {
     if (!this.enabled || !('speechSynthesis' in window)) return;
-    if (!text || text.trim().length === 0) return;
+    if (this.outputMode === 'overlay') return; // Sadece OBS overlay konuşacak şekilde ayarlanmışsa stüdyoda ses çıkarma
+    if (!text || !text.trim()) return;
 
     this.queue.push(text.trim());
     this.processQueue();
+  }
+
+  speakAlert(alertType, data = {}) {
+    if (!this.ttsAlertsEnabled) return;
+    const tpl = this.alertTemplates[alertType] || '{user} aramıza katıldı!';
+    const user = data.username || data.user || 'İzleyici';
+    const amount = data.amount || '100₺';
+    const months = data.months || 1;
+    const gift = data.giftName || data.gift || 'Hediye';
+    const message = data.message || '';
+
+    let text = tpl
+      .replace(/\{user\}/g, user)
+      .replace(/\{amount\}/g, amount)
+      .replace(/\{months\}/g, months)
+      .replace(/\{gift\}/g, gift)
+      .replace(/\{message\}/g, message);
+
+    this.speak(text);
+  }
+
+  speakChat(username, message, isStreamer = false) {
+    if (!this.ttsChatEnabled) return;
+    if (isStreamer && !this.readStreamerSelf) return;
+
+    const clean = this.sanitizeText(message);
+    if (!clean) return;
+
+    const tpl = this.chatFormat || '{user} diyor ki: {message}';
+    const text = tpl.replace(/\{user\}/g, username || 'İzleyici').replace(/\{message\}/g, clean);
+    this.speak(text);
+  }
+
+  stop() {
+    this.queue = [];
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    this.isSpeaking = false;
   }
 
   processQueue() {
@@ -217,9 +321,9 @@ class HeroTTSManager {
     const rawText = this.queue.shift();
     const utterance = new SpeechSynthesisUtterance(rawText);
     if (this.selectedVoice) utterance.voice = this.selectedVoice;
-    utterance.volume = this.volume;
-    utterance.rate = this.rate;
-    utterance.pitch = this.pitch;
+    utterance.volume = typeof this.volume === 'number' ? this.volume : 1.0;
+    utterance.rate = typeof this.rate === 'number' ? this.rate : 1.0;
+    utterance.pitch = typeof this.pitch === 'number' ? this.pitch : 1.0;
 
     utterance.onend = () => {
       this.isSpeaking = false;

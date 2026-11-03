@@ -146,6 +146,32 @@
       color: #fca5a5;
     }
 
+    .btn-tts {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .btn-tts:hover {
+      background: rgba(0, 245, 160, 0.12);
+      border-color: #00f5a0;
+      color: #00f5a0;
+    }
+    .btn-tts.active {
+      background: rgba(0, 245, 160, 0.18);
+      border-color: #00f5a0;
+      color: #00f5a0;
+      box-shadow: 0 0 10px rgba(0, 245, 160, 0.25);
+    }
+
     /* Mesaj Akış Alanı */
     .chat-feed {
       flex: 1;
@@ -297,6 +323,9 @@
       </div>
 
       <div class="chat-header-actions">
+        <button type="button" class="btn-tts" id="floating-tts-btn" onclick="toggleFloatingTTS()" title="Sohbet Sesli Okuma (TTS) Aç/Kapat">
+          <span>🔊</span> <span id="floating-tts-text">TTS: KAPALI</span>
+        </button>
         <button type="button" class="btn-clear" onclick="clearFeed()" title="Sohbeti Temizle">
           🗑️ Temizle
         </button>
@@ -434,6 +463,49 @@
         }
       });
 
+      // TTS Yönetimi (Yüzen Pencere)
+      let floatTtsEnabled = false;
+      function syncFloatTtsUI() {
+        const btn = document.getElementById('floating-tts-btn');
+        const txt = document.getElementById('floating-tts-text');
+        if (!btn || !txt) return;
+        if (floatTtsEnabled) {
+          btn.classList.add('active');
+          txt.textContent = 'TTS: AÇIK';
+        } else {
+          btn.classList.remove('active');
+          txt.textContent = 'TTS: KAPALI';
+        }
+      }
+
+      try {
+        const savedCfg = localStorage.getItem('mira_tts_config');
+        if (savedCfg) {
+          const c = JSON.parse(savedCfg);
+          floatTtsEnabled = !!c.ttsChatEnabled;
+        }
+      } catch(e) {}
+      syncFloatTtsUI();
+
+      window.toggleFloatingTTS = function() {
+        floatTtsEnabled = !floatTtsEnabled;
+        syncFloatTtsUI();
+        try {
+          let c = {};
+          const s = localStorage.getItem('mira_tts_config');
+          if (s) c = JSON.parse(s);
+          c.ttsChatEnabled = floatTtsEnabled;
+          localStorage.setItem('mira_tts_config', JSON.stringify(c));
+          const bus = new BroadcastChannel('kick_stream_bus');
+          bus.postMessage({ type: 'UPDATE_TTS_CONFIG', config: c });
+          fetch('/api/tts/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(c)
+          }).catch(() => {});
+        } catch(e) {}
+      };
+
       // BroadcastChannel Dinleme (Diğer pencerelerden gelen mesajlar)
       try {
         const bus = new BroadcastChannel('kick_stream_bus');
@@ -441,6 +513,9 @@
           if (e.data && (e.data.type === 'TEST_CHAT' || e.data.type === 'CHAT_MESSAGE')) {
             if (e.data.senderSession && e.data.senderSession === SESSION_ID) return;
             appendMessage(e.data);
+          } else if (e.data && e.data.type === 'UPDATE_TTS_CONFIG' && e.data.config) {
+            floatTtsEnabled = !!e.data.config.ttsChatEnabled;
+            syncFloatTtsUI();
           }
         });
       } catch (e) {}

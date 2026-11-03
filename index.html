@@ -2972,6 +2972,317 @@
       100% { transform: translateX(-100%); }
     }
 
+    /* ========================================================
+       ALERT & SESLİ OKUMA (TTS) KONTROL MASASI STİLLERİ
+       ======================================================== */
+    .alerts-dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+    @media (max-width: 960px) {
+      .alerts-dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .tts-hero-card {
+      background: linear-gradient(135deg, rgba(22, 28, 52, 0.95), rgba(12, 16, 32, 0.95));
+      border: 1.5px solid rgba(168, 85, 247, 0.35);
+      border-radius: 16px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.15);
+      margin-bottom: 14px;
+    }
+
+    .tts-hero-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .tts-wave-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: radial-gradient(circle, #3b0764 0%, #0f172a 80%);
+      border: 2px solid #a855f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .tts-hero-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .tts-status-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tts-pill {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .tts-pill.pill-on {
+      background: rgba(0, 245, 160, 0.15);
+      color: #00f5a0;
+      border-color: rgba(0, 245, 160, 0.4);
+    }
+    .tts-pill.pill-off {
+      background: rgba(148, 163, 184, 0.12);
+      color: #94a3b8;
+      border-color: rgba(148, 163, 184, 0.25);
+    }
+    .tts-pill.pill-purple {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border-color: rgba(168, 85, 247, 0.4);
+    }
+
+    .tts-hero-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .tts-hero-sub {
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    .tts-hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-tts-stop {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1.5px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 9px 15px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-tts-stop:hover {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: #ef4444;
+      color: #fff;
+      box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-tts-quick-test {
+      background: linear-gradient(135deg, #a855f7, #06b6d4);
+      border: none;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 9px 15px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-tts-quick-test:hover {
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* Master Switch Box */
+    .tts-master-switch-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 20, 36, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      gap: 12px;
+    }
+    .tts-switch-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tts-switch-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .tts-switch-desc {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* Toggle Switch */
+    .switch-ui {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch-ui input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider-round {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .25s;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .slider-round:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .25s;
+      border-radius: 50%;
+    }
+    input:checked + .slider-round {
+      background-color: #00f5a0;
+      box-shadow: 0 0 10px rgba(0, 245, 160, 0.4);
+    }
+    input:checked + .slider-round:before {
+      transform: translateX(20px);
+      background-color: #060911;
+    }
+
+    /* Filter Checkbox Row */
+    .tts-filter-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .tts-checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      color: #cbd5e1;
+      cursor: pointer;
+    }
+    .tts-checkbox-item input[type="checkbox"] {
+      accent-color: #00f5a0;
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    /* Format Seçim Çipleri */
+    .tts-chip-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      margin-bottom: 12px;
+    }
+    .tts-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tts-chip:hover {
+      background: rgba(0, 245, 160, 0.12);
+      border-color: #00f5a0;
+      color: #00f5a0;
+    }
+    .tts-chip.active {
+      background: rgba(0, 245, 160, 0.2);
+      border-color: #00f5a0;
+      color: #00f5a0;
+      font-weight: 800;
+    }
+
+    /* Özel Alert Simülatörü */
+    .sim-card-box {
+      background: rgba(14, 18, 32, 0.85);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 14px;
+    }
+
+    /* Ses Motoru Slider Grid */
+    .voice-engine-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .range-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+    }
+    .range-val-badge {
+      color: #00f5a0;
+      font-family: monospace;
+    }
+
   </style>
 </head>
 <body>
@@ -3089,7 +3400,7 @@
           <div class="nav-cluster-items">
             <button class="studio-tab-btn" id="tab-btn-alerts" onclick="switchTab('tab-alerts', this)">
               <span>⚡</span>
-              <span>Alert & Testler</span>
+              <span>Alert & Sesli Okuma</span>
             </button>
             <button class="studio-tab-btn" id="tab-btn-goal" onclick="switchTab('tab-goal', this)">
               <span>🎯</span>
@@ -4122,60 +4433,317 @@
         </div>
       </div>
 
-      <!-- TAB 3: ALERT & TESTLER -->
+      <!-- TAB 3: ALERT & SESLİ OKUMA (TTS) KONTROL MERKEZİ -->
       <div id="tab-alerts" class="tab-pane">
-        <div class="card-panel">
-          <div class="card-panel-header">
-            <span class="card-panel-title">
-              <span>⚡</span> ANLIK ALERT VE SES TESTLERİ
-            </span>
-            <span class="card-panel-badge">Gerçek Zamanlı Simülasyon</span>
-          </div>
 
-          <div class="alerts-grid">
-            <button class="alert-btn alert-follower" onclick="triggerTestAlert('follower')">
-              <div class="alert-icon-wrap">💜</div>
-              <div>
-                <div class="alert-title">Yeni Takipçi (+1)</div>
-                <div class="alert-desc">Hedef çubuğunu artırır & ses çalar</div>
+        <!-- 1. ÜST HERO KART: CANLI DURUM & SES GÖRSELLEŞTİRİCİ -->
+        <div class="tts-hero-card">
+          <div class="tts-hero-left">
+            <div class="tts-wave-icon" id="tts-hero-wave-icon">
+              📢
+            </div>
+            <div class="tts-hero-meta">
+              <div class="tts-status-tag-row">
+                <span class="tts-pill pill-on" id="tts-pill-alert">🔔 Alert TTS: AÇIK</span>
+                <span class="tts-pill pill-off" id="tts-pill-chat">💬 Chat TTS: KAPALI</span>
+                <span class="tts-pill pill-purple" id="tts-pill-voice">🎙️ Ses: Türkçe Kadın</span>
+                <div class="music-eq-bars" id="tts-active-eq" style="display: inline-flex;">
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                  <div class="eq-bar"></div>
+                </div>
               </div>
-            </button>
-
-            <button class="alert-btn alert-sub" onclick="triggerTestAlert('sub')">
-              <div class="alert-icon-wrap">⭐</div>
-              <div>
-                <div class="alert-title">Yeni Abone (3. Ay)</div>
-                <div class="alert-desc">Özel ses efekti & TTS anonsu</div>
-              </div>
-            </button>
-
-            <button class="alert-btn alert-donation" onclick="triggerTestAlert('donation')">
-              <div class="alert-icon-wrap">💎</div>
-              <div>
-                <div class="alert-title">Bağış Testi (250₺)</div>
-                <div class="alert-desc">Büyük bağış görseli & efekt</div>
-              </div>
-            </button>
-
-            <button class="alert-btn alert-gift" onclick="triggerTestAlert('gift')">
-              <div class="alert-icon-wrap">🎁</div>
-              <div>
-                <div class="alert-title">TikTok Gül (x10)</div>
-                <div class="alert-desc">TikTok hediye animasyonu</div>
-              </div>
-            </button>
-          </div>
-
-          <div class="form-group" style="margin-top: 8px;">
-            <label>Özel İsimle Takipçi Test Et</label>
-            <div style="display: flex; gap: 8px;">
-              <input type="text" id="custom-test-name" class="form-control" value="Aylin_Mage" placeholder="Kullanıcı adı...">
-              <button class="btn-primary" style="white-space: nowrap;" onclick="triggerCustomFollower()">
-                GÖNDER
-              </button>
+              <div class="tts-hero-title">⚡ CANLI ALERT VE SESLİ OKUMA (TTS) KONTROL MASASI</div>
+              <div class="tts-hero-sub">Bildirimler ve canlı sohbet mesajları OBS sahnesinde ve yayında yapay zeka sesiyle seslendirilir.</div>
             </div>
           </div>
+
+          <div class="tts-hero-actions">
+            <button type="button" class="btn-tts-stop" onclick="stopAllTts()" title="Devam eden veya sıradaki tüm sesli okumaları anında keser">
+              <span>⏹️</span> Sustur (Durdur)
+            </button>
+            <button type="button" class="btn-tts-quick-test" onclick="testAlertTTSVoice()" title="Hoparlörden test anonsu dinle">
+              <span>🔊</span> Hızlı Ses Testi
+            </button>
+          </div>
         </div>
+
+        <!-- 2. İKİ KOLONLU KONTROL MASASI: SOL (ALERT TTS), SAĞ (CHAT TTS) -->
+        <div class="alerts-dashboard-grid">
+
+          <!-- SOL KOLON: 🔔 ALERT BİLDİRİMLERİ & SESLİ ANONS -->
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <span class="card-panel-title">
+                <span>🔔</span> ALERT BİLDİRİMLERİ & SESLİ ANONS
+              </span>
+              <span class="card-panel-badge">Yayında Canlı TTS</span>
+            </div>
+
+            <!-- Alert TTS Anahtarı -->
+            <div class="tts-master-switch-card">
+              <div class="tts-switch-label">
+                <span class="tts-switch-title">Alertleri Yayında Sesli Oku (TTS)</span>
+                <span class="tts-switch-desc">Takipçi, abone, bağış ve hediye geldiğinde canlı yayında sesli anons edilir.</span>
+              </div>
+              <label class="switch-ui">
+                <input type="checkbox" id="tts-alerts-toggle" checked onchange="onTtsAlertsToggle(this.checked)">
+                <span class="slider-round"></span>
+              </label>
+            </div>
+
+            <!-- Hızlı Test Butonları Grid -->
+            <label style="font-size:12px; font-weight:800; color:#fff; display:block; margin-bottom:8px;">⚡ Hızlı Test Bildirimleri</label>
+            <div class="alerts-grid">
+              <button type="button" class="alert-btn alert-follower" onclick="triggerEnhancedTestAlert('follower')">
+                <div class="alert-icon-wrap">💜</div>
+                <div>
+                  <div class="alert-title">Yeni Takipçi (+1)</div>
+                  <div class="alert-desc">Aylin_MLBB • Sesli karşılama</div>
+                </div>
+              </button>
+
+              <button type="button" class="alert-btn alert-sub" onclick="triggerEnhancedTestAlert('sub')">
+                <div class="alert-icon-wrap">⭐</div>
+                <div>
+                  <div class="alert-title">Yeni Abone (3. Ay)</div>
+                  <div class="alert-desc">Gamer_Deniz • Özel fanfar & anons</div>
+                </div>
+              </button>
+
+              <button type="button" class="alert-btn alert-donation" onclick="triggerEnhancedTestAlert('donation')">
+                <div class="alert-icon-wrap">💎</div>
+                <div>
+                  <div class="alert-title">Bağış Testi (250₺)</div>
+                  <div class="alert-desc">Emre_Pro • Mesajı sesli oku</div>
+                </div>
+              </button>
+
+              <button type="button" class="alert-btn alert-gift" onclick="triggerEnhancedTestAlert('gift')">
+                <div class="alert-icon-wrap">🎁</div>
+                <div>
+                  <div class="alert-title">TikTok Gül (x10)</div>
+                  <div class="alert-desc">MiraFan_01 • Hediye seslendirme</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Özel Alert Simülatörü Formu -->
+            <div class="sim-card-box">
+              <label style="font-size:12px; font-weight:800; color:#c084fc; display:flex; align-items:center; gap:6px; margin-bottom:10px;">
+                <span>🎯</span> Özel İsim & Mesajla Canlı Test Gönder
+              </label>
+              
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-size:11px;">Bildirim Türü</label>
+                  <select id="sim-alert-type" class="form-control" onchange="onSimAlertTypeChange()">
+                    <option value="follower">💜 Yeni Takipçi</option>
+                    <option value="sub">⭐ Yeni Abone</option>
+                    <option value="donation" selected>💎 Bağış & Destek</option>
+                    <option value="gift">🎁 TikTok Canlı Hediye</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-size:11px;">Kullanıcı Adı</label>
+                  <input type="text" id="sim-user" class="form-control" value="Aylin_Mage" placeholder="Kullanıcı adı...">
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-size:11px;" id="sim-meta-label">Tutar / Ay / Hediye</label>
+                  <input type="text" id="sim-meta" class="form-control" value="250₺" placeholder="250₺, 3. Ay, Gül vb.">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="font-size:11px;">Bağış & Tebrik Mesajı</label>
+                  <input type="text" id="sim-msg" class="form-control" value="Mükemmel ulti, tebrikler!" placeholder="Okunacak özel mesaj...">
+                </div>
+              </div>
+
+              <button type="button" class="btn-primary" style="width:100%; margin-top:8px; font-weight:900; background:linear-gradient(135deg, #a855f7, #06b6d4); color:#fff;" onclick="sendCustomSimulatedAlert()">
+                🚀 YAYINA & EKRANA SESLİ GÖNDER
+              </button>
+            </div>
+
+            <!-- Alert TTS Metin Şablonları -->
+            <div style="margin-top:14px;">
+              <details style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 12px;">
+                <summary style="font-size:11.5px; font-weight:800; color:#94a3b8; cursor:pointer; user-select:none;">
+                  📝 Alert Sesli Okuma Cümle Şablonlarını Düzenle
+                </summary>
+                <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:10.5px;">Takipçi Şablonu ({user})</label>
+                    <input type="text" id="tpl-follower" class="form-control" style="font-size:11.5px;" value="{user} aramıza katıldı, hoş geldin!" oninput="onTtsTemplateChange()">
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:10.5px;">Abone Şablonu ({user}, {months})</label>
+                    <input type="text" id="tpl-sub" class="form-control" style="font-size:11.5px;" value="Teşekkürler {user}, {months}. ayında abone oldu!" oninput="onTtsTemplateChange()">
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:10.5px;">Bağış Şablonu ({user}, {amount}, {message})</label>
+                    <input type="text" id="tpl-donation" class="form-control" style="font-size:11.5px;" value="{user}, {amount} destek gönderdi: {message}" oninput="onTtsTemplateChange()">
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:10.5px;">TikTok Hediye Şablonu ({user}, {gift})</label>
+                    <input type="text" id="tpl-gift" class="form-control" style="font-size:11.5px;" value="{user}, {gift} hediyesi gönderdi!" oninput="onTtsTemplateChange()">
+                  </div>
+                </div>
+              </details>
+            </div>
+
+          </div>
+
+          <!-- SAĞ KOLON: 💬 CANLI SOHBET (CHAT) SESLİ OKUMA & FİLTRELER -->
+          <div class="card-panel">
+            <div class="card-panel-header">
+              <span class="card-panel-title">
+                <span>💬</span> SOHBET (CHAT) SESLİ OKUMA
+              </span>
+              <span class="card-panel-badge">İsteğe Bağlı Chat TTS</span>
+            </div>
+
+            <!-- Chat TTS Anahtarı -->
+            <div class="tts-master-switch-card">
+              <div class="tts-switch-label">
+                <span class="tts-switch-title">Canlı Sohbeti Sesli Oku (Chat TTS)</span>
+                <span class="tts-switch-desc">Kick ve TikTok'tan gelen izleyici mesajları yapay zeka sesiyle yayında canlı okunur.</span>
+              </div>
+              <label class="switch-ui">
+                <input type="checkbox" id="tts-chat-toggle" onchange="onTtsChatToggle(this.checked)">
+                <span class="slider-round"></span>
+              </label>
+            </div>
+
+            <!-- Okuma Formatı Çipleri -->
+            <label style="font-size:12px; font-weight:800; color:#fff; display:block;">🗣️ Sohbet Okuma Cümle Formatı</label>
+            <div class="tts-chip-group" id="chat-format-chip-group">
+              <button type="button" class="tts-chip active" data-fmt="{user} diyor ki: {message}" onclick="selectChatFormat(this)">
+                "{user} diyor ki: {message}"
+              </button>
+              <button type="button" class="tts-chip" data-fmt="{user}: {message}" onclick="selectChatFormat(this)">
+                "{user}: {message}"
+              </button>
+              <button type="button" class="tts-chip" data-fmt="{message}" onclick="selectChatFormat(this)">
+                Sadece Mesaj "{message}"
+              </button>
+            </div>
+
+            <!-- Yayıncı Güvenlik & Spam Filtreleri -->
+            <label style="font-size:12px; font-weight:800; color:#fff; display:block; margin-top:10px;">🛡️ Yayıncı Koruma & Spam Filtreleri</label>
+            <div class="tts-filter-grid">
+              <label class="tts-checkbox-item">
+                <input type="checkbox" id="tts-filter-self" onchange="onTtsFilterChange()">
+                <span>Kendi Mesajlarımı Oku (cihanatas) — <em>Kapalı: Yayıncının kendi yazdığı seslendirilmez</em></span>
+              </label>
+              <label class="tts-checkbox-item">
+                <input type="checkbox" id="tts-filter-bots" checked onchange="onTtsFilterChange()">
+                <span>Bot ve Komutları Filtrele (!, /, ., ? ile başlayan bot komutları okunmaz)</span>
+              </label>
+              <label class="tts-checkbox-item">
+                <input type="checkbox" id="tts-filter-urls" checked onchange="onTtsFilterChange()">
+                <span>Web Linklerini ve URL'leri Temizle (http, https ve www linkleri atlanır)</span>
+              </label>
+              <label class="tts-checkbox-item">
+                <input type="checkbox" id="tts-filter-spam" checked onchange="onTtsFilterChange()">
+                <span>Spam & Aşırı Uzunluk Koruması (Maks 100 karakter, harf uzatmaları kısaltılır)</span>
+              </label>
+            </div>
+
+            <!-- Chat TTS Test Alanı -->
+            <div class="sim-card-box" style="margin-top:14px;">
+              <label style="font-size:12px; font-weight:800; color:#00f5a0; display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                <span>💬</span> Chat TTS Simülasyon Testi
+              </label>
+              <div style="display:grid; grid-template-columns: 140px 1fr; gap:8px; margin-bottom:8px;">
+                <input type="text" id="test-chat-author" class="form-control" value="NecroFan" placeholder="İzleyici adı...">
+                <input type="text" id="test-chat-msg" class="form-control" value="Selamlar, yayının kalitesi harika olmuş başarılar!" placeholder="Yazılacak test mesajı...">
+              </div>
+              <button type="button" class="btn-primary" style="width:100%; font-weight:800; background:#00f5a0; color:#060911;" onclick="testCustomChatTTS()">
+                🔊 SOHBET TTS'İNİ TEST ET
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- 3. ALT GENİŞ PANEL: SES MOTORU, PERDE, HIZ & OBS ÇIKIŞ AYARLARI -->
+        <div class="card-panel" style="margin-top: 14px;">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>🎙️</span> SES MOTORU, PERDE & OBS ÇIKIŞ AYARLARI
+            </span>
+            <span class="card-panel-badge">Yapay Zeka Seslendirici</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:16px; align-items:start; flex-wrap:wrap;">
+            
+            <!-- Sol: Ses Seçimi ve Çıkış Konumu -->
+            <div>
+              <div class="form-group">
+                <label>TTS Seslendirici Sesi (Voice)</label>
+                <select id="tts-voice-select" class="form-control" onchange="onTtsVoiceSelectChange()">
+                  <option value="">Varsayılan Türkçe Ses (Otomatik Algılanıyor...)</option>
+                </select>
+                <div style="font-size:10.5px; color:#94a3b8; margin-top:4px;">
+                  Tarayıcınızdaki Türkçe sesler (Filiz, Seda, Tolga, Google Türkçe vb.) otomatik listelenir.
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Ses Çıkış Konumu (Audio Destination)</label>
+                <select id="tts-output-mode" class="form-control" onchange="onTtsOutputModeChange()">
+                  <option value="all" selected>🔊 OBS Overlay & MİRA Stüdyo (Tüm Sahneler)</option>
+                  <option value="studio">💻 Yalnızca MİRA Stüdyo (OBS Masaüstü Sesini Alır)</option>
+                  <option value="overlay">📡 Yalnızca OBS Tarayıcı Kaynağı (custom-overlay.html)</option>
+                </select>
+                <div style="font-size:10.5px; color:#94a3b8; margin-top:4px;">
+                  Çift ses yankısını önlemek için sesi yalnızca OBS tarayıcısından veya stüdyodan verebilirsiniz.
+                </div>
+              </div>
+            </div>
+
+            <!-- Sağ: Ses Seviyesi, Hız, Ton Kaydırıcıları -->
+            <div class="voice-engine-grid" style="margin-top:0;">
+              <div>
+                <div class="range-label-row">
+                  <span>🔊 Ses Seviyesi</span>
+                  <span class="range-val-badge" id="val-tts-vol">100%</span>
+                </div>
+                <input type="range" id="tts-volume-range" class="form-control" style="padding:0; height:auto; accent-color:#00f5a0;" min="0" max="1" step="0.05" value="1.0" oninput="onTtsVolumeChange(this.value)">
+              </div>
+
+              <div>
+                <div class="range-label-row">
+                  <span>⚡ Okuma Hızı</span>
+                  <span class="range-val-badge" id="val-tts-rate">1.0x</span>
+                </div>
+                <input type="range" id="tts-rate-range" class="form-control" style="padding:0; height:auto; accent-color:#00f5a0;" min="0.7" max="1.5" step="0.05" value="1.0" oninput="onTtsRateChange(this.value)">
+              </div>
+
+              <div>
+                <div class="range-label-row">
+                  <span>🎵 Ses Tonu / Perde</span>
+                  <span class="range-val-badge" id="val-tts-pitch">1.0</span>
+                </div>
+                <input type="range" id="tts-pitch-range" class="form-control" style="padding:0; height:auto; accent-color:#00f5a0;" min="0.8" max="1.3" step="0.05" value="1.0" oninput="onTtsPitchChange(this.value)">
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Kaydet & Senkronize Et Butonu -->
+          <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:8px;">
+            <button type="button" class="btn-primary" style="padding:10px 22px; font-weight:900; background:linear-gradient(135deg, #a855f7, #00f5a0); color:#060911;" onclick="saveTtsConfigAndSync(true)">
+              💾 AYARLARI KAYDET & OBS'E AKTAR
+            </button>
+          </div>
+
+        </div>
+
       </div>
 
       <!-- TAB 4: SOHBET & CANLI CHAT -->
@@ -4194,6 +4762,11 @@
               <!-- BotRix Linki Ayarlama Butonu -->
               <button type="button" class="btn-clean-subtle" onclick="toggleBotrixConfigDrawer()" title="BotRix / TikFinity Widget Linkini Düzenle">
                 🔗 BotRix Linki
+              </button>
+
+              <!-- Chat TTS Hızlı Aç/Kapat Butonu -->
+              <button type="button" class="btn-clean-subtle" id="chat-tab-tts-btn" onclick="toggleChatTTSQuick()" title="Sohbet Sesli Okumayı (TTS) Aç/Kapat">
+                <span id="chat-tab-tts-icon">🔊</span> <span id="chat-tab-tts-label">Chat TTS: KAPALI</span>
               </button>
 
               <!-- Yüzen Karta Çıkar Butonu (Browser açmaz, ekranda üstte tutar) -->
@@ -7040,8 +7613,411 @@
         .catch(() => showToast('Kick API bağlantı hatası', 'error'));
     }
 
-    /* Test Alerts */
-    function triggerTestAlert(type) {
+    /* ========================================================
+       ALERT & SESLİ OKUMA (TTS) KONTROL MASASI ENGINE
+       ======================================================== */
+    let miraTtsConfig = {
+      ttsAlertsEnabled: true,
+      ttsChatEnabled: false,
+      outputMode: 'all',
+      volume: 1.0,
+      rate: 1.0,
+      pitch: 1.0,
+      voiceName: '',
+      voiceLang: 'tr-TR',
+      chatFormat: '{user} diyor ki: {message}',
+      readStreamerSelf: false,
+      filterBotCommands: true,
+      filterUrls: true,
+      maxChatLength: 100,
+      alertTemplates: {
+        follower: '{user} aramıza katıldı, hoş geldin!',
+        sub: 'Teşekkürler {user}, {months}. ayında abone oldu!',
+        donation: '{user}, {amount} destek gönderdi: {message}',
+        gift: '{user}, {gift} hediyesi gönderdi!'
+      }
+    };
+
+    function initTtsDashboard() {
+      loadTtsConfig();
+      populateVoiceList();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => populateVoiceList();
+      }
+    }
+
+    function loadTtsConfig() {
+      try {
+        const saved = localStorage.getItem('mira_tts_config');
+        if (saved) {
+          miraTtsConfig = { ...miraTtsConfig, ...JSON.parse(saved) };
+          localTTS.applyConfig(miraTtsConfig);
+          updateTtsUI();
+        }
+      } catch(e) {}
+
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/tts/config')
+          .then(r => r.json())
+          .then(cfg => {
+            if (cfg) {
+              miraTtsConfig = { ...miraTtsConfig, ...cfg };
+              localTTS.applyConfig(miraTtsConfig);
+              updateTtsUI();
+            }
+          })
+          .catch(() => {});
+      }
+    }
+
+    function populateVoiceList() {
+      const select = document.getElementById('tts-voice-select');
+      if (!select || !('speechSynthesis' in window)) return;
+
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return;
+
+      const currentVal = miraTtsConfig.voiceName || select.value;
+      select.innerHTML = '<option value="">Varsayılan Türkçe Ses (Otomatik En İyi Kadın/Erkek)</option>';
+
+      // Önce Türkçe sesleri grupla, sonra diğerleri
+      const trGroup = document.createElement('optgroup');
+      trGroup.label = '🇹🇷 Türkçe Sesler (Speech)';
+      const otherGroup = document.createElement('optgroup');
+      otherGroup.label = '🌐 Diğer Sistem Sesleri';
+
+      voices.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.name;
+        opt.textContent = `${v.name} (${v.lang})`;
+        if (v.lang.includes('tr') || v.lang.includes('TR')) {
+          trGroup.appendChild(opt);
+        } else {
+          otherGroup.appendChild(opt);
+        }
+      });
+
+      if (trGroup.children.length > 0) select.appendChild(trGroup);
+      if (otherGroup.children.length > 0) select.appendChild(otherGroup);
+
+      if (currentVal) {
+        select.value = currentVal;
+      }
+    }
+
+    function updateTtsUI() {
+      // Toggle switches
+      const alertToggle = document.getElementById('tts-alerts-toggle');
+      if (alertToggle) alertToggle.checked = miraTtsConfig.ttsAlertsEnabled !== false;
+
+      const chatToggle = document.getElementById('tts-chat-toggle');
+      if (chatToggle) chatToggle.checked = !!miraTtsConfig.ttsChatEnabled;
+
+      // Hero Badges
+      const pillAlert = document.getElementById('tts-pill-alert');
+      if (pillAlert) {
+        const on = miraTtsConfig.ttsAlertsEnabled !== false;
+        pillAlert.className = `tts-pill ${on ? 'pill-on' : 'pill-off'}`;
+        pillAlert.textContent = `🔔 Alert TTS: ${on ? 'AÇIK' : 'KAPALI'}`;
+      }
+
+      const pillChat = document.getElementById('tts-pill-chat');
+      if (pillChat) {
+        const on = !!miraTtsConfig.ttsChatEnabled;
+        pillChat.className = `tts-pill ${on ? 'pill-on' : 'pill-off'}`;
+        pillChat.textContent = `💬 Chat TTS: ${on ? 'AÇIK' : 'KAPALI'}`;
+      }
+
+      const pillVoice = document.getElementById('tts-pill-voice');
+      if (pillVoice) {
+        const vName = miraTtsConfig.voiceName || (localTTS.selectedVoice ? localTTS.selectedVoice.name : 'Türkçe Kadın');
+        pillVoice.textContent = `🎙️ Ses: ${vName.substring(0, 18)}`;
+      }
+
+      // Quick Chat Tab Buttons
+      const tabChatBtn = document.getElementById('chat-tab-tts-btn');
+      const tabChatLabel = document.getElementById('chat-tab-tts-label');
+      if (tabChatBtn && tabChatLabel) {
+        const on = !!miraTtsConfig.ttsChatEnabled;
+        tabChatLabel.textContent = `Chat TTS: ${on ? 'AÇIK 🔊' : 'KAPALI'}`;
+        tabChatBtn.style.color = on ? '#00f5a0' : '#cbd5e1';
+        tabChatBtn.style.borderColor = on ? '#00f5a0' : 'rgba(255,255,255,0.12)';
+      }
+
+      const floatChatLabel = document.getElementById('float-tts-label');
+      const floatChatBtn = document.getElementById('float-tts-toggle-btn');
+      if (floatChatLabel && floatChatBtn) {
+        const on = !!miraTtsConfig.ttsChatEnabled;
+        floatChatLabel.textContent = `TTS: ${on ? 'AÇIK' : 'KAPALI'}`;
+        floatChatBtn.style.color = on ? '#00f5a0' : '#cbd5e1';
+      }
+
+      // Sliders & Range Badges
+      const volRange = document.getElementById('tts-volume-range');
+      if (volRange) volRange.value = miraTtsConfig.volume ?? 1.0;
+      const volBadge = document.getElementById('val-tts-vol');
+      if (volBadge) volBadge.textContent = `${Math.round((miraTtsConfig.volume ?? 1.0) * 100)}%`;
+
+      const rateRange = document.getElementById('tts-rate-range');
+      if (rateRange) rateRange.value = miraTtsConfig.rate ?? 1.0;
+      const rateBadge = document.getElementById('val-tts-rate');
+      if (rateBadge) rateBadge.textContent = `${(miraTtsConfig.rate ?? 1.0).toFixed(1)}x`;
+
+      const pitchRange = document.getElementById('tts-pitch-range');
+      if (pitchRange) pitchRange.value = miraTtsConfig.pitch ?? 1.0;
+      const pitchBadge = document.getElementById('val-tts-pitch');
+      if (pitchBadge) pitchBadge.textContent = (miraTtsConfig.pitch ?? 1.0).toFixed(1);
+
+      // Output Mode
+      const outMode = document.getElementById('tts-output-mode');
+      if (outMode && miraTtsConfig.outputMode) outMode.value = miraTtsConfig.outputMode;
+
+      // Templates
+      const tpls = miraTtsConfig.alertTemplates || {};
+      if (document.getElementById('tpl-follower')) document.getElementById('tpl-follower').value = tpls.follower || '';
+      if (document.getElementById('tpl-sub')) document.getElementById('tpl-sub').value = tpls.sub || '';
+      if (document.getElementById('tpl-donation')) document.getElementById('tpl-donation').value = tpls.donation || '';
+      if (document.getElementById('tpl-gift')) document.getElementById('tpl-gift').value = tpls.gift || '';
+
+      // Filters
+      if (document.getElementById('tts-filter-self')) document.getElementById('tts-filter-self').checked = !!miraTtsConfig.readStreamerSelf;
+      if (document.getElementById('tts-filter-bots')) document.getElementById('tts-filter-bots').checked = miraTtsConfig.filterBotCommands !== false;
+      if (document.getElementById('tts-filter-urls')) document.getElementById('tts-filter-urls').checked = miraTtsConfig.filterUrls !== false;
+      if (document.getElementById('tts-filter-spam')) document.getElementById('tts-filter-spam').checked = miraTtsConfig.maxChatLength !== 0;
+
+      // Format Chips
+      document.querySelectorAll('.tts-chip').forEach(chip => {
+        const fmt = chip.getAttribute('data-fmt');
+        if (fmt === (miraTtsConfig.chatFormat || '{user} diyor ki: {message}')) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+    }
+
+    function saveTtsConfigAndSync(showToastMsg = false) {
+      // Gather inputs
+      const alertToggle = document.getElementById('tts-alerts-toggle');
+      if (alertToggle) miraTtsConfig.ttsAlertsEnabled = alertToggle.checked;
+
+      const chatToggle = document.getElementById('tts-chat-toggle');
+      if (chatToggle) miraTtsConfig.ttsChatEnabled = chatToggle.checked;
+
+      const outMode = document.getElementById('tts-output-mode');
+      if (outMode) miraTtsConfig.outputMode = outMode.value;
+
+      const voiceSelect = document.getElementById('tts-voice-select');
+      if (voiceSelect) miraTtsConfig.voiceName = voiceSelect.value;
+
+      const volRange = document.getElementById('tts-volume-range');
+      if (volRange) miraTtsConfig.volume = parseFloat(volRange.value);
+
+      const rateRange = document.getElementById('tts-rate-range');
+      if (rateRange) miraTtsConfig.rate = parseFloat(rateRange.value);
+
+      const pitchRange = document.getElementById('tts-pitch-range');
+      if (pitchRange) miraTtsConfig.pitch = parseFloat(pitchRange.value);
+
+      miraTtsConfig.alertTemplates = {
+        follower: document.getElementById('tpl-follower')?.value || '{user} aramıza katıldı, hoş geldin!',
+        sub: document.getElementById('tpl-sub')?.value || 'Teşekkürler {user}, {months}. ayında abone oldu!',
+        donation: document.getElementById('tpl-donation')?.value || '{user}, {amount} destek gönderdi: {message}',
+        gift: document.getElementById('tpl-gift')?.value || '{user}, {gift} hediyesi gönderdi!'
+      };
+
+      miraTtsConfig.readStreamerSelf = !!document.getElementById('tts-filter-self')?.checked;
+      miraTtsConfig.filterBotCommands = !!document.getElementById('tts-filter-bots')?.checked;
+      miraTtsConfig.filterUrls = !!document.getElementById('tts-filter-urls')?.checked;
+      miraTtsConfig.maxChatLength = document.getElementById('tts-filter-spam')?.checked ? 100 : 300;
+
+      // Apply locally
+      localTTS.applyConfig(miraTtsConfig);
+      localStorage.setItem('mira_tts_config', JSON.stringify(miraTtsConfig));
+
+      // Push to server & overlay
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/tts/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(miraTtsConfig)
+        }).catch(() => {});
+      }
+
+      dispatchEventToOverlay({
+        type: 'UPDATE_TTS_CONFIG',
+        config: miraTtsConfig
+      });
+
+      try {
+        const bus = new BroadcastChannel('kick_stream_bus');
+        bus.postMessage({ type: 'UPDATE_TTS_CONFIG', config: miraTtsConfig });
+      } catch(e) {}
+
+      updateTtsUI();
+
+      if (showToastMsg) {
+        showToast('TTS ayarları kaydedildi ve canlı yayına aktarıldı!', 'success');
+      }
+    }
+
+    function onTtsAlertsToggle(checked) {
+      miraTtsConfig.ttsAlertsEnabled = checked;
+      saveTtsConfigAndSync(false);
+      showToast('Alert Sesli Okuma: ' + (checked ? 'AÇIK 🔊' : 'KAPALI 🔇'));
+      if (checked) {
+        localTTS.speak('Alert sesli okuma aktif.');
+      }
+    }
+
+    function onTtsChatToggle(checked) {
+      miraTtsConfig.ttsChatEnabled = checked;
+      saveTtsConfigAndSync(false);
+      showToast('Sohbet (Chat) Sesli Okuma: ' + (checked ? 'AÇIK 🔊' : 'KAPALI 🔇'));
+      if (checked) {
+        localTTS.speak('Sohbet sesli okuma aktif.');
+      }
+    }
+
+    function toggleChatTTSQuick() {
+      const newVal = !miraTtsConfig.ttsChatEnabled;
+      onTtsChatToggle(newVal);
+    }
+
+    function onTtsVoiceSelectChange() {
+      const select = document.getElementById('tts-voice-select');
+      if (select) {
+        miraTtsConfig.voiceName = select.value;
+        saveTtsConfigAndSync(false);
+        localTTS.setVoiceByName(select.value);
+        localTTS.speak('Yeni ses başarıyla seçildi.');
+      }
+    }
+
+    function onTtsOutputModeChange() {
+      const select = document.getElementById('tts-output-mode');
+      if (select) {
+        miraTtsConfig.outputMode = select.value;
+        saveTtsConfigAndSync(false);
+        showToast(`Ses çıkışı: ${select.options[select.selectedIndex].text}`, 'info');
+      }
+    }
+
+    function onTtsVolumeChange(val) {
+      miraTtsConfig.volume = parseFloat(val);
+      document.getElementById('val-tts-vol').textContent = `${Math.round(val * 100)}%`;
+      localTTS.volume = parseFloat(val);
+    }
+
+    function onTtsRateChange(val) {
+      miraTtsConfig.rate = parseFloat(val);
+      document.getElementById('val-tts-rate').textContent = `${parseFloat(val).toFixed(1)}x`;
+      localTTS.rate = parseFloat(val);
+    }
+
+    function onTtsPitchChange(val) {
+      miraTtsConfig.pitch = parseFloat(val);
+      document.getElementById('val-tts-pitch').textContent = parseFloat(val).toFixed(1);
+      localTTS.pitch = parseFloat(val);
+    }
+
+    function onTtsTemplateChange() {
+      saveTtsConfigAndSync(false);
+    }
+
+    function onTtsFilterChange() {
+      saveTtsConfigAndSync(false);
+    }
+
+    function selectChatFormat(btn) {
+      const fmt = btn.getAttribute('data-fmt');
+      if (fmt) {
+        miraTtsConfig.chatFormat = fmt;
+        document.querySelectorAll('#chat-format-chip-group .tts-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        saveTtsConfigAndSync(false);
+        showToast(`Format güncellendi: ${fmt}`);
+      }
+    }
+
+    function stopAllTts() {
+      localTTS.stop();
+      dispatchEventToOverlay({ type: 'STOP_TTS' });
+      try {
+        const bus = new BroadcastChannel('kick_stream_bus');
+        bus.postMessage({ type: 'STOP_TTS' });
+      } catch(e) {}
+      showToast('Sesli okuma durduruldu (Susturuldu).', 'info');
+    }
+
+    function testAlertTTSVoice() {
+      localTTS.speak('MİRA Studio canlı yayın ses sistemi devrede. Alertler ve izleyici mesajları yayında net olarak okunur.');
+    }
+
+    function onSimAlertTypeChange() {
+      const type = document.getElementById('sim-alert-type').value;
+      const metaLabel = document.getElementById('sim-meta-label');
+      const metaInput = document.getElementById('sim-meta');
+      const msgInput = document.getElementById('sim-msg');
+
+      if (type === 'follower') {
+        metaLabel.textContent = 'Açıklama / Seviye';
+        metaInput.value = 'Şafak Vadisi';
+        msgInput.value = 'Yayına katıldı!';
+      } else if (type === 'sub') {
+        metaLabel.textContent = 'Abonelik Süresi';
+        metaInput.value = '3. Ay';
+        msgInput.value = 'Rozeti parıldıyor!';
+      } else if (type === 'donation') {
+        metaLabel.textContent = 'Bağış Tutarı';
+        metaInput.value = '250₺';
+        msgInput.value = 'Mükemmel ulti, tebrikler!';
+      } else if (type === 'gift') {
+        metaLabel.textContent = 'TikTok Hediyesi';
+        metaInput.value = 'Gül (x10)';
+        msgInput.value = 'Canlı yayın hediyesi gönderdi!';
+      }
+    }
+
+    function sendCustomSimulatedAlert() {
+      const type = document.getElementById('sim-alert-type').value || 'follower';
+      const user = document.getElementById('sim-user').value || 'Aylin_Mage';
+      const meta = document.getElementById('sim-meta').value || '100₺';
+      const msg = document.getElementById('sim-msg').value || '';
+
+      let payload = { username: user, message: msg };
+      if (type === 'donation') {
+        payload.amount = meta;
+        localSFX.playDonationSound();
+      } else if (type === 'sub') {
+        payload.months = meta;
+        localSFX.playSubscriberSound();
+      } else if (type === 'gift') {
+        payload.giftName = meta;
+        payload.amount = meta;
+        localSFX.playDonationSound();
+        stepGoal(1);
+      } else {
+        localSFX.playFollowerSound();
+        stepGoal(1);
+      }
+
+      // Stüdyoda seslendir
+      if (miraTtsConfig.ttsAlertsEnabled !== false) {
+        localTTS.speakAlert(type, payload);
+      }
+
+      // Canlı yayına ve overlay sahnelerine aktar
+      dispatchEventToOverlay({
+        type: 'TEST_ALERT',
+        alertType: type,
+        payload: payload
+      });
+
+      showToast(`Özel ${type.toUpperCase()} alerti yayına sesli gönderildi!`, 'success');
+    }
+
+    function triggerEnhancedTestAlert(type) {
       let payload = {};
       const heroNamesTr = {
         vexana: 'Vexana',
@@ -7054,21 +8030,22 @@
       if (type === 'follower') {
         payload = { username: 'Aylin_MLBB' };
         localSFX.playFollowerSound();
-        localTTS.speak(`Yeni takipçi: Aylin MLBB, ${heroNamesTr[activeHero]} yayınına katıldı!`);
         stepGoal(1);
       } else if (type === 'sub') {
         payload = { username: 'Gamer_Deniz', months: 3 };
         localSFX.playSubscriberSound();
-        localTTS.speak(`Teşekkürler Gamer Deniz, ${activeHero} ile 3. ay abone oldu!`);
       } else if (type === 'donation') {
         payload = { username: 'Emre_Pro', amount: '250₺', message: 'Mükemmel ulti zamanlaması!' };
         localSFX.playDonationSound();
-        localTTS.speak(`Emre Pro, 250 lira destek gönderdi: Mükemmel ulti zamanlaması!`);
       } else if (type === 'gift') {
         payload = { username: 'MiraFan_01', giftName: 'Gül (x10)', message: 'Harika oyun tebrikler!' };
         localSFX.playDonationSound();
-        localTTS.speak(`MiraFan 01, TikTok Gül hediyesi gönderdi!`);
         stepGoal(1);
+      }
+
+      // Sesli oku
+      if (miraTtsConfig.ttsAlertsEnabled !== false) {
+        localTTS.speakAlert(type, payload);
       }
 
       dispatchEventToOverlay({
@@ -7076,21 +8053,47 @@
         alertType: type,
         payload: payload
       });
-      showToast(`${type.toUpperCase()} alerti gönderildi!`, 'success');
+
+      showToast(`${type.toUpperCase()} alerti yayına sesli gönderildi!`, 'success');
     }
 
+    // Geriye dönük uyumluluk
+    function triggerTestAlert(type) {
+      triggerEnhancedTestAlert(type);
+    }
     function triggerCustomFollower() {
-      const name = document.getElementById('custom-test-name').value || 'YeniOyuncu';
-      localSFX.playFollowerSound();
-      localTTS.speak(`Yeni takipçi: ${name}!`);
-      stepGoal(1);
+      sendCustomSimulatedAlert();
+    }
 
-      dispatchEventToOverlay({
-        type: 'TEST_ALERT',
-        alertType: 'follower',
-        payload: { username: name }
-      });
-      showToast(`${name} takipçi olarak eklendi!`, 'success');
+    function testCustomChatTTS() {
+      const author = document.getElementById('test-chat-author').value || 'NecroFan';
+      const text = document.getElementById('test-chat-msg').value || 'Selamlar, yayının kalitesi harika olmuş başarılar!';
+
+      const payload = {
+        id: 'msg_test_' + Date.now(),
+        senderSession: MIRA_TAB_SESSION_ID,
+        type: 'TEST_CHAT',
+        username: author,
+        content: text,
+        badge: 'kick',
+        isStreamer: false,
+        platform: 'kick',
+        time: Date.now()
+      };
+
+      appendStudioChatMessage(payload);
+      dispatchEventToOverlay(payload);
+
+      // TTS konuş
+      localTTS.speakChat(author, text, false);
+      showToast(`Chat TTS test edildi: ${author}`);
+    }
+
+    function handleStudioChatTTS(item, isStreamer, displayUser, content) {
+      if (!miraTtsConfig.ttsChatEnabled) return;
+      if (isStreamer && !miraTtsConfig.readStreamerSelf) return;
+
+      localTTS.speakChat(displayUser, content, isStreamer);
     }
 
     
@@ -7640,6 +8643,11 @@
             pipFeed.scrollTop = pipFeed.scrollHeight;
           }
         } catch (e) {}
+      }
+
+      // Canlı Sohbet Sesli Okuma (Chat TTS)
+      if (typeof handleStudioChatTTS === 'function') {
+        handleStudioChatTTS(item, isStreamer, displayUser, content);
       }
     }
 
@@ -8205,6 +9213,9 @@
       else if (initTab === 'music' || initTab === 'tab-music') {
         switchTab('tab-music', document.getElementById('tab-btn-music'));
       }
+      else if (initTab === 'alerts' || initTab === 'tab-alerts') {
+        switchTab('tab-alerts', document.getElementById('tab-btn-alerts'));
+      }
       if (urlParams.get('openChat') === '1') {
         setTimeout(openFloatingChatWidget, 100);
       }
@@ -8223,6 +9234,7 @@
       checkObsWsStatus();
       setInterval(checkObsWsStatus, 4000);
       initMusicDashboard();
+      initTtsDashboard();
 
       // Chat widget url yükle
       fetch('/api/chat-widget')
@@ -8268,9 +9280,42 @@
               return;
             }
             appendStudioChatMessage(e.data);
+          } else if (e.data && e.data.type === 'UPDATE_TTS_CONFIG' && e.data.config) {
+            miraTtsConfig = { ...miraTtsConfig, ...e.data.config };
+            localTTS.applyConfig(miraTtsConfig);
+            updateTtsUI();
+          } else if (e.data && e.data.type === 'STOP_TTS') {
+            localTTS.stop();
           }
         });
       } catch (e) {}
+
+      // Sunucudan canlı olayları çekme (TikTok Live hediye & takip & chat olayları)
+      let lastStudioPoll = Date.now() - 3000;
+      setInterval(() => {
+        if (!window.location.protocol.startsWith('http')) return;
+        fetch(`/api/poll?since=${lastStudioPoll}`)
+          .then(r => r.json())
+          .then(d => {
+            if (d && d.events) {
+              d.events.forEach(ev => {
+                if (ev.time > lastStudioPoll) lastStudioPoll = ev.time;
+                if (ev.type === 'TEST_ALERT' || ev.type === 'LIVE_ALERT') {
+                  if (ev.payload && ev.payload.username && ev.senderSession !== MIRA_TAB_SESSION_ID) {
+                    if (miraTtsConfig.ttsAlertsEnabled !== false) {
+                      localTTS.speakAlert(ev.alertType || 'follower', ev.payload);
+                    }
+                  }
+                } else if (ev.type === 'TEST_CHAT' || ev.type === 'CHAT_MESSAGE') {
+                  if (ev.senderSession !== MIRA_TAB_SESSION_ID) {
+                    appendStudioChatMessage(ev);
+                  }
+                }
+              });
+            }
+          })
+          .catch(() => {});
+      }, 1200);
     });
 
 </script>
@@ -8285,6 +9330,9 @@
       </div>
 
       <div class="mira-float-actions">
+        <button type="button" class="btn-clean-subtle" id="float-tts-toggle-btn" style="padding:2px 7px; font-size:10px;" onclick="toggleChatTTSQuick()" title="Sohbet Sesli Okuma (TTS) Aç/Kapat">
+          <span id="float-tts-icon">🔊</span> <span id="float-tts-label">TTS</span>
+        </button>
         <button type="button" class="mira-float-btn" onclick="minimizeFloatingWidget()" title="Simge Durumuna Küçült">−</button>
         <button type="button" class="mira-float-btn btn-close" onclick="closeFloatingWidget()" title="Kapat">✕</button>
       </div>

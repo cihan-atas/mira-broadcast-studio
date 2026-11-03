@@ -1501,6 +1501,63 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // 2.16 API: TTS (Sesli Okuma) Ayarları Kalıcılığı & Senkronizasyon
+  if (pathname === '/api/tts/config') {
+    const ttsConfigPath = path.join(__dirname, 'tts-config.json');
+    if (req.method === 'GET') {
+      try {
+        if (fs.existsSync(ttsConfigPath)) {
+          const raw = fs.readFileSync(ttsConfigPath, 'utf-8');
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(raw);
+        }
+      } catch(e) {}
+      const defaultTts = {
+        ttsAlertsEnabled: true,
+        ttsChatEnabled: false,
+        outputMode: 'all',
+        volume: 1.0,
+        rate: 1.0,
+        pitch: 1.0,
+        voiceName: '',
+        voiceLang: 'tr-TR',
+        chatFormat: '{user} diyor ki: {message}',
+        readStreamerSelf: false,
+        filterBotCommands: true,
+        filterUrls: true,
+        maxChatLength: 100,
+        alertTemplates: {
+          follower: '{user} aramıza katıldı, hoş geldin!',
+          sub: 'Teşekkürler {user}, {months}. ayında abone oldu!',
+          donation: '{user}, {amount} destek gönderdi: {message}',
+          gift: '{user}, {gift} hediyesi gönderdi!'
+        }
+      };
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify(defaultTts));
+    } else if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const data = JSON.parse(body);
+          fs.writeFileSync(ttsConfigPath, JSON.stringify(data, null, 2), 'utf-8');
+          eventQueue.push({
+            type: 'UPDATE_TTS_CONFIG',
+            config: data,
+            time: Date.now()
+          });
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, config: data }));
+        } catch (err) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+      return;
+    }
+  }
+
   // 2.5 API: Chat Widget URL Al & Güncelle (BotRix / TikFinity kalıcılığı)
   if (pathname === '/api/chat-widget') {
     const widgetTxtPath = path.join(__dirname, 'chat-widget.txt');
