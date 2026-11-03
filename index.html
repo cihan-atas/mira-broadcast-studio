@@ -7644,6 +7644,15 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.onvoiceschanged = () => populateVoiceList();
       }
+      // Kullanıcı sayfaya ilk tıkladığında ses çalma izinlerini aç
+      try {
+        const unlock = () => {
+          const silent = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+          silent.play().catch(() => {});
+        };
+        document.addEventListener('click', unlock, { once: true });
+        document.addEventListener('keydown', unlock, { once: true });
+      } catch(e){}
     }
 
     function loadTtsConfig() {
@@ -7672,37 +7681,39 @@
 
     function populateVoiceList() {
       const select = document.getElementById('tts-voice-select');
-      if (!select || !('speechSynthesis' in window)) return;
+      if (!select) return;
 
-      const voices = window.speechSynthesis.getVoices();
-      if (!voices || voices.length === 0) return;
+      const currentVal = miraTtsConfig.voiceName || 'mira_natural_tr';
+      select.innerHTML = `
+        <option value="mira_natural_tr">🌟 MİRA Doğal Türkçe Kadın Sesi (Bulut & OBS Uyumlu - Önerilen)</option>
+        <option value="mira_natural_male">🌟 MİRA Doğal Türkçe Alternatif Sesi</option>
+      `;
 
-      const currentVal = miraTtsConfig.voiceName || select.value;
-      select.innerHTML = '<option value="">Varsayılan Türkçe Ses (Otomatik En İyi Kadın/Erkek)</option>';
+      if ('speechSynthesis' in window) {
+        const voices = window.speechSynthesis.getVoices() || [];
+        if (voices.length > 0) {
+          const trGroup = document.createElement('optgroup');
+          trGroup.label = '🇹🇷 Tarayıcı İçi Türkçe Sesler';
+          const otherGroup = document.createElement('optgroup');
+          otherGroup.label = '🌐 Diğer Sistem Sesleri';
 
-      // Önce Türkçe sesleri grupla, sonra diğerleri
-      const trGroup = document.createElement('optgroup');
-      trGroup.label = '🇹🇷 Türkçe Sesler (Speech)';
-      const otherGroup = document.createElement('optgroup');
-      otherGroup.label = '🌐 Diğer Sistem Sesleri';
+          voices.forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v.name;
+            opt.textContent = `${v.name} (${v.lang})`;
+            if (v.lang.includes('tr') || v.lang.includes('TR')) {
+              trGroup.appendChild(opt);
+            } else {
+              otherGroup.appendChild(opt);
+            }
+          });
 
-      voices.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v.name;
-        opt.textContent = `${v.name} (${v.lang})`;
-        if (v.lang.includes('tr') || v.lang.includes('TR')) {
-          trGroup.appendChild(opt);
-        } else {
-          otherGroup.appendChild(opt);
+          if (trGroup.children.length > 0) select.appendChild(trGroup);
+          if (otherGroup.children.length > 0) select.appendChild(otherGroup);
         }
-      });
-
-      if (trGroup.children.length > 0) select.appendChild(trGroup);
-      if (otherGroup.children.length > 0) select.appendChild(otherGroup);
-
-      if (currentVal) {
-        select.value = currentVal;
       }
+
+      select.value = currentVal;
     }
 
     function updateTtsUI() {
@@ -7730,8 +7741,13 @@
 
       const pillVoice = document.getElementById('tts-pill-voice');
       if (pillVoice) {
-        const vName = miraTtsConfig.voiceName || (localTTS.selectedVoice ? localTTS.selectedVoice.name : 'Türkçe Kadın');
-        pillVoice.textContent = `🎙️ Ses: ${vName.substring(0, 18)}`;
+        if (!miraTtsConfig.voiceName || miraTtsConfig.voiceName === 'mira_natural_tr') {
+          pillVoice.textContent = '🎙️ Ses: Doğal Türkçe Kadın';
+        } else if (miraTtsConfig.voiceName === 'mira_natural_male') {
+          pillVoice.textContent = '🎙️ Ses: Doğal Türkçe Alternatif';
+        } else {
+          pillVoice.textContent = `🎙️ Ses: ${miraTtsConfig.voiceName.substring(0, 16)}`;
+        }
       }
 
       // Quick Chat Tab Buttons

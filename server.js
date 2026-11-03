@@ -3,6 +3,8 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const crypto = require('crypto');
+const { spawn } = require('child_process');
 
 let PORT = process.env.PORT || 8080;
 const eventQueue = [];
@@ -1556,6 +1558,97 @@ const server = http.createServer((req, res) => {
       });
       return;
     }
+  }
+
+  // 2.17 API: TTS Ses Akışı (OBS, Linux ve Tüm Tarayıcılarda %100 Çalışan Doğal Türkçe Ses)
+  if (pathname === '/api/tts/audio' && req.method === 'GET') {
+    let text = (parsedUrl.searchParams.get('text') || '').trim();
+    const lang = (parsedUrl.searchParams.get('lang') || 'tr').toLowerCase();
+    if (!text) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Text parametresi gerekli' }));
+    }
+
+    if (text.length > 250) {
+      text = text.substring(0, 250);
+    }
+
+    const ttsCacheDir = path.join(__dirname, 'shared', 'tts_cache');
+    try {
+      if (!fs.existsSync(ttsCacheDir)) {
+        fs.mkdirSync(ttsCacheDir, { recursive: true });
+      }
+    } catch(e) {}
+
+    const textHash = crypto.createHash('md5').update(`${lang}_${text}`).digest('hex');
+    const cachedFilePath = path.join(ttsCacheDir, `${textHash}.mp3`);
+
+    // 1. Önbellekte varsa doğrudan diskten sun
+    if (fs.existsSync(cachedFilePath)) {
+      try {
+        const stat = fs.statSync(cachedFilePath);
+        res.writeHead(200, {
+          'Content-Type': 'audio/mpeg',
+          'Content-Length': stat.size,
+          'Cache-Control': 'public, max-age=86400'
+        });
+        return fs.createReadStream(cachedFilePath).pipe(res);
+      } catch (e) {}
+    }
+
+    // 2. Önbellekte yoksa Doğal Bulut TTS Servisinden çek ve önbelleğe al
+    const googleTtsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+    const ttsReq = https.get(googleTtsUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'audio/mpeg, audio/*; q=0.9, */*; q=0.1'
+      }
+    }, (googleRes) => {
+      if (googleRes.statusCode === 200) {
+        const fileStream = fs.createWriteStream(cachedFilePath);
+        res.writeHead(200, {
+          'Content-Type': 'audio/mpeg',
+          'Cache-Control': 'public, max-age=86400'
+        });
+        googleRes.pipe(fileStream);
+        googleRes.pipe(res);
+      } else {
+        // Çevrimdışı/Yedek Sentezleyici (espeak fallback)
+        try {
+          const espeak = spawn('espeak', ['-v', lang === 'tr' ? 'tr' : 'en', text, '--stdout']);
+          res.writeHead(200, { 'Content-Type': 'audio/wav' });
+          espeak.stdout.pipe(res);
+          espeak.on('error', () => { try { res.end(); } catch(e){} });
+        } catch(e) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'TTS ses sentezi başarısız' }));
+        }
+      }
+    });
+
+    ttsReq.on('error', () => {
+      try {
+        const espeak = spawn('espeak', ['-v', lang === 'tr' ? 'tr' : 'en', text, '--stdout']);
+        res.writeHead(200, { 'Content-Type': 'audio/wav' });
+        espeak.stdout.pipe(res);
+        espeak.on('error', () => { try { res.end(); } catch(e){} });
+      } catch(e) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'TTS ses sentezi hatası' }));
+      }
+    });
+
+    ttsReq.setTimeout(4000, () => {
+      ttsReq.destroy();
+      try {
+        const espeak = spawn('espeak', ['-v', lang === 'tr' ? 'tr' : 'en', text, '--stdout']);
+        res.writeHead(200, { 'Content-Type': 'audio/wav' });
+        espeak.stdout.pipe(res);
+      } catch(e) {
+        try { res.end(); } catch(err){}
+      }
+    });
+    return;
   }
 
   // 2.5 API: Chat Widget URL Al & Güncelle (BotRix / TikFinity kalıcılığı)

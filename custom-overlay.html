@@ -761,7 +761,7 @@
           volume: 1.0,
           rate: 1.0,
           pitch: 1.0,
-          voiceName: '',
+          voiceName: 'mira_natural_tr',
           chatFormat: '{user} diyor ki: {message}',
           readStreamerSelf: false,
           filterBotCommands: true,
@@ -776,7 +776,8 @@
         },
         selectedVoice: null,
         queue: [],
-        isSpeaking: false,
+        isPlaying: false,
+        currentAudio: null,
         init() {
           this.loadConfig();
           this.initVoices();
@@ -802,7 +803,7 @@
           const setV = () => {
             const voices = window.speechSynthesis.getVoices();
             if (!voices || voices.length === 0) return;
-            if (this.config.voiceName) {
+            if (this.config.voiceName && this.config.voiceName !== 'mira_natural_tr') {
               const found = voices.find(v => v.name === this.config.voiceName);
               if (found) { this.selectedVoice = found; return; }
             }
@@ -823,7 +824,6 @@
           this.initVoices();
         },
         speak(text) {
-          if (!('speechSynthesis' in window)) return;
           if (this.config.outputMode === 'studio') return; // Yalnızca stüdyo modundaysa OBS overlay sessiz kalır
           if (!text || !text.trim()) return;
 
@@ -831,28 +831,79 @@
           this.process();
         },
         process() {
-          if (this.isSpeaking || this.queue.length === 0) return;
-          this.isSpeaking = true;
-          const txt = this.queue.shift();
-          const utterance = new SpeechSynthesisUtterance(txt);
-          if (this.selectedVoice) utterance.voice = this.selectedVoice;
-          utterance.volume = typeof this.config.volume === 'number' ? this.config.volume : 1.0;
-          utterance.rate = typeof this.config.rate === 'number' ? this.config.rate : 1.0;
-          utterance.pitch = typeof this.config.pitch === 'number' ? this.config.pitch : 1.0;
-          utterance.onend = () => {
-            this.isSpeaking = false;
-            setTimeout(() => this.process(), 250);
-          };
-          utterance.onerror = () => {
-            this.isSpeaking = false;
-            this.process();
-          };
-          window.speechSynthesis.speak(utterance);
+          if (this.isPlaying || this.queue.length === 0) return;
+          this.isPlaying = true;
+          const rawText = this.queue.shift();
+
+          const hasVoices = ('speechSynthesis' in window) && window.speechSynthesis.getVoices().length > 0;
+          if (this.config.voiceName && this.config.voiceName !== 'mira_natural_tr' && hasVoices) {
+            this.playSpeechSynthesis(rawText);
+          } else {
+            this.playAudioStream(rawText);
+          }
+        },
+        playAudioStream(text) {
+          try {
+            const url = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=tr`;
+            const audio = new Audio(url);
+            this.currentAudio = audio;
+            audio.volume = typeof this.config.volume === 'number' ? Math.max(0, Math.min(1, this.config.volume)) : 1.0;
+            audio.playbackRate = typeof this.config.rate === 'number' ? Math.max(0.5, Math.min(2.0, this.config.rate)) : 1.0;
+
+            const next = () => {
+              this.isPlaying = false;
+              this.currentAudio = null;
+              setTimeout(() => this.process(), 200);
+            };
+
+            audio.onended = next;
+            audio.onerror = () => {
+              this.playSpeechSynthesis(text);
+            };
+            audio.play().catch(() => {
+              this.playSpeechSynthesis(text);
+            });
+          } catch(e) {
+            this.playSpeechSynthesis(text);
+          }
+        },
+        playSpeechSynthesis(text) {
+          if (!('speechSynthesis' in window)) {
+            this.isPlaying = false;
+            setTimeout(() => this.process(), 200);
+            return;
+          }
+          try {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            if (this.selectedVoice) utterance.voice = this.selectedVoice;
+            utterance.volume = typeof this.config.volume === 'number' ? this.config.volume : 1.0;
+            utterance.rate = typeof this.config.rate === 'number' ? this.config.rate : 1.0;
+            utterance.pitch = typeof this.config.pitch === 'number' ? this.config.pitch : 1.0;
+            utterance.onend = () => {
+              this.isPlaying = false;
+              setTimeout(() => this.process(), 200);
+            };
+            utterance.onerror = () => {
+              this.isPlaying = false;
+              setTimeout(() => this.process(), 200);
+            };
+            window.speechSynthesis.speak(utterance);
+          } catch(e) {
+            this.isPlaying = false;
+            setTimeout(() => this.process(), 200);
+          }
         },
         stop() {
           this.queue = [];
-          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-          this.isSpeaking = false;
+          if (this.currentAudio) {
+            try { this.currentAudio.pause(); this.currentAudio.currentTime = 0; } catch(e){}
+            this.currentAudio = null;
+          }
+          if ('speechSynthesis' in window) {
+            try { window.speechSynthesis.cancel(); } catch(e){}
+          }
+          this.isPlaying = false;
         },
         speakAlert(alertType, data = {}) {
           if (this.config.ttsAlertsEnabled === false) return;

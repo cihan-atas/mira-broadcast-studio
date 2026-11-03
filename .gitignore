@@ -33,6 +33,7 @@ temp/
 now-playing.txt.tmp
 user-gallery.json
 uploads/
+shared/tts_cache/
 
 # OS & Desktop Artifacts
 .DS_Store

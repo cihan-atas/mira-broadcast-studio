@@ -1,4 +1,21 @@
 {
   "ttsAlertsEnabled": true,
-  "ttsChatEnabled": true
+  "ttsChatEnabled": true,
+  "outputMode": "studio",
+  "volume": 1,
+  "rate": 1,
+  "pitch": 1,
+  "voiceName": "",
+  "voiceLang": "tr-TR",
+  "chatFormat": "{user}: {message}",
+  "readStreamerSelf": true,
+  "filterBotCommands": true,
+  "filterUrls": true,
+  "maxChatLength": 100,
+  "alertTemplates": {
+    "follower": "{user} aramıza katıldı, hoş geldin!",
+    "sub": "Teşekkürler {user}, {months}. ayında abone oldu!",
+    "donation": "{user}, {amount} destek gönderdi: {message}",
+    "gift": "{user}, {gift} hediyesi gönderdi!"
+  }
 }

@@ -181,7 +181,8 @@ class HeroTTSManager {
     this.volume = options.volume !== undefined ? options.volume : 1.0;
     this.rate = options.rate !== undefined ? options.rate : 1.0;
     this.pitch = options.pitch !== undefined ? options.pitch : 1.0;
-    this.voiceName = options.voiceName || '';
+    this.voiceName = options.voiceName || 'mira_natural_tr';
+    this.voiceLang = options.voiceLang || 'tr';
     this.readStreamerSelf = options.readStreamerSelf || false;
     this.filterBotCommands = options.filterBotCommands !== false;
     this.filterUrls = options.filterUrls !== false;
@@ -196,7 +197,8 @@ class HeroTTSManager {
 
     this.selectedVoice = null;
     this.queue = [];
-    this.isSpeaking = false;
+    this.isPlaying = false;
+    this.currentAudio = null;
     this.initVoices();
   }
 
@@ -206,7 +208,7 @@ class HeroTTSManager {
       const voices = window.speechSynthesis.getVoices();
       if (!voices || voices.length === 0) return;
 
-      if (this.voiceName) {
+      if (this.voiceName && this.voiceName !== 'mira_natural_tr') {
         const found = voices.find(v => v.name === this.voiceName);
         if (found) {
           this.selectedVoice = found;
@@ -229,6 +231,7 @@ class HeroTTSManager {
 
   setVoiceByName(name) {
     this.voiceName = name;
+    if (name === 'mira_natural_tr') return;
     if (!('speechSynthesis' in window)) return;
     const voices = window.speechSynthesis.getVoices();
     const found = voices.find(v => v.name === name);
@@ -267,7 +270,7 @@ class HeroTTSManager {
   }
 
   speak(text) {
-    if (!this.enabled || !('speechSynthesis' in window)) return;
+    if (!this.enabled) return;
     if (this.outputMode === 'overlay') return; // Sadece OBS overlay konuşacak şekilde ayarlanmışsa stüdyoda ses çıkarma
     if (!text || !text.trim()) return;
 
@@ -308,33 +311,96 @@ class HeroTTSManager {
 
   stop() {
     this.queue = [];
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+    if (this.currentAudio) {
+      try {
+        this.currentAudio.pause();
+        this.currentAudio.currentTime = 0;
+      } catch(e){}
+      this.currentAudio = null;
     }
-    this.isSpeaking = false;
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch(e){}
+    }
+    this.isPlaying = false;
   }
 
   processQueue() {
-    if (this.isSpeaking || this.queue.length === 0) return;
-    this.isSpeaking = true;
+    if (this.isPlaying || this.queue.length === 0) return;
+    this.isPlaying = true;
 
     const rawText = this.queue.shift();
-    const utterance = new SpeechSynthesisUtterance(rawText);
-    if (this.selectedVoice) utterance.voice = this.selectedVoice;
-    utterance.volume = typeof this.volume === 'number' ? this.volume : 1.0;
-    utterance.rate = typeof this.rate === 'number' ? this.rate : 1.0;
-    utterance.pitch = typeof this.pitch === 'number' ? this.pitch : 1.0;
 
-    utterance.onend = () => {
-      this.isSpeaking = false;
-      setTimeout(() => this.processQueue(), 250);
-    };
-    utterance.onerror = () => {
-      this.isSpeaking = false;
-      this.processQueue();
-    };
+    // Sistemde ses varsa ve kullanıcı browser_speech seçtiyse SpeechSynthesis kullan
+    const hasBrowserVoices = ('speechSynthesis' in window) && window.speechSynthesis.getVoices().length > 0;
+    if (this.voiceName && this.voiceName !== 'mira_natural_tr' && hasBrowserVoices) {
+      this.playSpeechSynthesis(rawText);
+    } else {
+      // Varsayılan ve en güvenilir yöntem: MİRA Doğal Ses Akışı (OBS ve Linux'ta %100 çalışır)
+      this.playAudioStream(rawText);
+    }
+  }
 
-    window.speechSynthesis.speak(utterance);
+  playAudioStream(text) {
+    try {
+      const audioUrl = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(this.voiceLang || 'tr')}`;
+      const audio = new Audio(audioUrl);
+      this.currentAudio = audio;
+      audio.volume = typeof this.volume === 'number' ? Math.max(0, Math.min(1, this.volume)) : 1.0;
+      audio.playbackRate = typeof this.rate === 'number' ? Math.max(0.5, Math.min(2.0, this.rate)) : 1.0;
+
+      const finish = () => {
+        this.isPlaying = false;
+        this.currentAudio = null;
+        setTimeout(() => this.processQueue(), 250);
+      };
+
+      audio.onended = finish;
+      audio.onerror = (e) => {
+        console.warn('TTS Audio akış hatası, SpeechSynthesis deneniyor:', e);
+        this.playSpeechSynthesis(text);
+      };
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn('Ses oynatma engellendi, SpeechSynthesis deneniyor:', err);
+          this.playSpeechSynthesis(text);
+        });
+      }
+    } catch(err) {
+      this.playSpeechSynthesis(text);
+    }
+  }
+
+  playSpeechSynthesis(text) {
+    if (!('speechSynthesis' in window)) {
+      this.isPlaying = false;
+      setTimeout(() => this.processQueue(), 200);
+      return;
+    }
+
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      if (this.selectedVoice) utterance.voice = this.selectedVoice;
+      utterance.volume = typeof this.volume === 'number' ? this.volume : 1.0;
+      utterance.rate = typeof this.rate === 'number' ? this.rate : 1.0;
+      utterance.pitch = typeof this.pitch === 'number' ? this.pitch : 1.0;
+
+      utterance.onend = () => {
+        this.isPlaying = false;
+        setTimeout(() => this.processQueue(), 250);
+      };
+      utterance.onerror = () => {
+        this.isPlaying = false;
+        setTimeout(() => this.processQueue(), 250);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } catch(e) {
+      this.isPlaying = false;
+      setTimeout(() => this.processQueue(), 200);
+    }
   }
 }
 
