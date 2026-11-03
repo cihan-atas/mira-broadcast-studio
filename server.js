@@ -919,6 +919,72 @@ PIECE_CARD_TYPES.forEach(p => {
   });
 });
 
+APP_GALLERY_CATALOG.push({
+  id: 'tpl_card_image_widget',
+  category: 'card',
+  cardType: 'image',
+  name: 'Özel Resim / GIF / Logo Kartı (StreamElements Görsel Katmanı)',
+  subtitle: 'PC\'den yüklediğiniz veya kütüphaneden seçtiğiniz resim, GIF, logo veya çerçeveyi tuvalde istediğiniz yere koyun',
+  icon: '🖼️',
+  badge: 'RESİM / GIF KARTI • GENEL',
+  previewImg: 'assets/icon.png',
+  basePath: 'custom-overlay.html',
+  config: {
+    cardType: 'image',
+    cardPosition: 'top-left',
+    title: 'ÖZEL GÖRSEL KATMANI',
+    imageUrl: '/kick/vexana/assets/images/portrait.jpg',
+    imageFit: 'cover',
+    primaryColor: '#a855f7',
+    secondaryColor: '#10b981'
+  }
+});
+
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  try { fs.mkdirSync(UPLOADS_DIR, { recursive: true }); } catch (e) {}
+}
+
+const BUILTIN_MEDIA_ASSETS = [
+  { id: 'builtin_vexana_portrait', name: '💀 Vexana HD Portre / Arka Plan', url: '/kick/vexana/assets/images/portrait.jpg', category: 'builtin', hero: 'vexana' },
+  { id: 'builtin_vexana_avatar', name: '💀 Vexana Avatar', url: '/kick/vexana/assets/images/avatar.jpg', category: 'builtin', hero: 'vexana' },
+  { id: 'builtin_zetian_portrait', name: '👑 Zetian HD Portre / Arka Plan', url: '/kick/zetian/assets/images/portrait.jpg', category: 'builtin', hero: 'zetian' },
+  { id: 'builtin_zetian_avatar', name: '👑 Zetian Avatar', url: '/kick/zetian/assets/images/avatar.jpg', category: 'builtin', hero: 'zetian' },
+  { id: 'builtin_nana_portrait', name: '🐾 Nana HD Portre / Arka Plan', url: '/kick/nana/assets/images/portrait.jpg', category: 'builtin', hero: 'nana' },
+  { id: 'builtin_nana_avatar', name: '🐾 Nana Avatar', url: '/kick/nana/assets/images/avatar.jpg', category: 'builtin', hero: 'nana' },
+  { id: 'builtin_carmilla_portrait', name: '🩸 Carmilla HD Portre / Arka Plan', url: '/kick/carmilla/assets/images/portrait.jpg', category: 'builtin', hero: 'carmilla' },
+  { id: 'builtin_carmilla_avatar', name: '🩸 Carmilla Avatar', url: '/kick/carmilla/assets/images/avatar.jpg', category: 'builtin', hero: 'carmilla' },
+  { id: 'builtin_atlas_portrait', name: '⚓ Atlas HD Portre / Arka Plan', url: '/kick/atlas/assets/images/portrait.jpg', category: 'builtin', hero: 'atlas' },
+  { id: 'builtin_atlas_avatar', name: '⚓ Atlas Avatar', url: '/kick/atlas/assets/images/avatar.jpg', category: 'builtin', hero: 'atlas' },
+  { id: 'builtin_mira_logo', name: '🌸 Mira Studio Resmi Logo', url: '/assets/icon.png', category: 'builtin', hero: 'all' }
+];
+
+function listMediaLibrary() {
+  const uploaded = [];
+  if (fs.existsSync(UPLOADS_DIR)) {
+    try {
+      const files = fs.readdirSync(UPLOADS_DIR);
+      files.forEach(file => {
+        const ext = path.extname(file).toLowerCase();
+        if (['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'].includes(ext)) {
+          let mtime = 0;
+          try { mtime = fs.statSync(path.join(UPLOADS_DIR, file)).mtimeMs; } catch (e) {}
+          uploaded.push({
+            id: 'up_' + file,
+            filename: file,
+            name: file.replace(/^\d+_/, ''),
+            url: '/uploads/' + encodeURIComponent(file),
+            category: 'upload',
+            createdAt: mtime
+          });
+        }
+      });
+      uploaded.sort((a, b) => b.createdAt - a.createdAt);
+    } catch (e) {}
+  }
+  return { uploaded, builtin: BUILTIN_MEDIA_ASSETS, items: [...uploaded, ...BUILTIN_MEDIA_ASSETS] };
+}
+
 function loadUserGallery() {
   if (!fs.existsSync(USER_GALLERY_PATH)) {
     return [];
@@ -950,9 +1016,13 @@ const MIME_TYPES = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.png': 'image/png',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
   '.wav': 'audio/wav',
-  '.mp3': 'audio/mpeg'
+  '.mp3': 'audio/mpeg',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm'
 };
 
 const server = http.createServer((req, res) => {
@@ -1406,6 +1476,76 @@ const server = http.createServer((req, res) => {
     saveUserGallery(filtered);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ success: true, items: filtered }));
+  }
+
+  // ==========================================
+  // 2.10 API: MEDYA & RESİM KÜTÜPHANESİ (StreamElements Tarzı Asset Manager)
+  // ==========================================
+  if (pathname === '/api/media/list' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify(listMediaLibrary()));
+  }
+
+  if (pathname === '/api/media/upload' && req.method === 'POST') {
+    const chunks = [];
+    let totalBytes = 0;
+    req.on('data', chunk => {
+      totalBytes += chunk.length;
+      if (totalBytes <= 30 * 1024 * 1024) {
+        chunks.push(chunk);
+      }
+    });
+    req.on('end', () => {
+      try {
+        const body = Buffer.concat(chunks).toString('utf-8');
+        const data = JSON.parse(body);
+        const rawDataUrl = (data.dataUrl || '').trim();
+        const match = rawDataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+        if (!match) {
+          throw new Error('Geçersiz görsel formatı (PNG, JPG, GIF, WEBP, SVG desteklenir)');
+        }
+        const mime = match[1].toLowerCase();
+        const base64Data = match[2];
+        let ext = '.png';
+        if (mime.includes('jpeg') || mime.includes('jpg')) ext = '.jpg';
+        else if (mime.includes('gif')) ext = '.gif';
+        else if (mime.includes('webp')) ext = '.webp';
+        else if (mime.includes('svg')) ext = '.svg';
+
+        const cleanBase = String(data.name || 'resim')
+          .replace(/\.[^/.]+$/, '')
+          .replace(/[^a-zA-Z0-9_-]/g, '_')
+          .substring(0, 40) || 'resim';
+        const filename = `${Date.now()}_${cleanBase}${ext}`;
+        const destPath = path.join(UPLOADS_DIR, filename);
+        fs.writeFileSync(destPath, Buffer.from(base64Data, 'base64'));
+
+        const lib = listMediaLibrary();
+        const uploadedItem = {
+          id: 'up_' + filename,
+          filename,
+          name: cleanBase + ext,
+          url: '/uploads/' + encodeURIComponent(filename),
+          category: 'upload'
+        };
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, item: uploadedItem, ...lib }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  if (pathname.startsWith('/api/media/') && req.method === 'DELETE') {
+    const filename = path.basename(decodeURIComponent(pathname.replace('/api/media/', '')).trim());
+    const targetPath = path.join(UPLOADS_DIR, filename);
+    if (fs.existsSync(targetPath)) {
+      try { fs.unlinkSync(targetPath); } catch (e) {}
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ success: true, ...listMediaLibrary() }));
   }
 
   // 3. Statik Dosyalar

@@ -1852,6 +1852,7 @@
               <span class="card-panel-badge" id="builder-mode-badge">Etkileşimli Tuval Aktif</span>
               <button class="btn-gal" onclick="triggerAddCardOnCanvas('user')" style="background: rgba(16,185,129,0.2); border-color:#10b981; color:#fff;">🗂️ Kendi Galerimden Kart Ekle</button>
               <button class="btn-gal" onclick="triggerAddCardOnCanvas('store')" style="background: rgba(168,85,247,0.22); border-color:#a855f7; color:#fff;">🏪 Mağazadan Keşfet & Kaydet</button>
+              <button class="btn-gal" onclick="triggerAddCardOnCanvas('media')" style="background: rgba(56,189,248,0.22); border-color:#38bdf8; color:#fff;">🖼️ Resim & Arka Plan Ekle (StreamElements)</button>
               <button class="btn-gal" onclick="triggerCanvasReset('position', 'all')" title="Tüm kartların yerlerini varsayılana çeker">📍 Konumları Default'a Çek</button>
               <button class="btn-gal" onclick="triggerCanvasReset('size', 'all')" title="Tüm kartların boyutlarını varsayılana sıfırlar">📐 Boyutları Sıfırla</button>
               <button class="btn-gal" onclick="triggerCanvasReset('design', 'all')" title="Tüm kartların renk/font tasarımlarını sıfırlar">🎨 Tasarımı Sıfırla</button>
@@ -2269,6 +2270,9 @@
               </span>
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
+              <button type="button" onclick="triggerAddCardOnCanvas('media')" style="padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.5); background: rgba(56, 189, 248, 0.18); color: #bae6fd; font-size: 11px; font-weight: 800; cursor: pointer;">
+                🖼️ Resim & Arka Plan Ekle
+              </button>
               <button type="button" onclick="triggerAddCardOnCanvas('user')" style="padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.16); color: #6ee7b7; font-size: 11px; font-weight: 800; cursor: pointer;">
                 ➕ Galerimden Kart Ekle
               </button>

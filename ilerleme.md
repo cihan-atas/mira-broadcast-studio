@@ -82,7 +82,12 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
        * Kullanıcı **mouse'u palet üzerinde gezdirdikçe (`mousemove`)** piksel hassasiyetinde tüm ara tonları canlı olarak görür, anında **HEX (`#a855f7`)** ve **RGB (`rgb(168, 85, 247)`)** kodunu alır ve palete tıklayarak beğendiği rengi **📌 Sabitleyebilir** (`Tıkla=Sabitle / Çöz`) veya tek tıkla (`🟣 Çerçeveye Ver`, `🔤 Başlığa Ver`, `📝 Alt Yazıya Ver`, `🖼️ Arka Plana Ver`, `⚡ Tüm Karta Ver`) uygulayabilir.
        * **12'li Lüks Neon Renk Paleti:** Tek tıkla uygulanabilen hazır yayıncı renk paleti ve ayrı renk seçiciler.
     4. **🖼️ Kart Çerçeve & Arka Plan Tasarımı:** Çerçeve/neon parlama rengi, arka plan rengi, arka plan saydamlığı (`%0 - %100`) ve köşe yuvarlaklığı (`0px - 44px`).
-    5. **📐 Konum, Boyut, Katman Yönetimi & 🗑️ Kartı Tuvalden Silme:**
+    5. **🖼️ StreamElements Tarzı Resim, GIF, Logo & Arka Plan Görseli Ekleme (`/api/media/*` & `#mira-tb-media`):**
+       * **📤 Bilgisayardan (PC'den) Resim / GIF Yükleme (`/api/media/upload`):** Kullanıcı bilgisayarından istediği **PNG, JPG, hareketli GIF, WEBP veya SVG** görselini tek tıkla yükleyebilir; yüklenen görseller `/uploads/` dizinine kalıcı olarak kaydedilir ve **Medya Kütüphanesi (`/api/media/list`)** içinde listelenir.
+       * **🌌 1920×1080 Tuvalin (Sahnenin) Arka Planına Resim Ekleme (`widgetOverrides.__canvasBg`):** Bütün sahnenin arka planına PC'den resim yükleme, kütüphaneden seçme veya URL yapıştırma; **Sığdırma Modu** (`Kapla / Cover`, `Sığdır / Contain`, `100% Tam Uzat`, `Döşe / Repeat`), **Opaklık (`%0-%100`)**, **Karartma (`%0-%90`)**, **Bulanıklık (`0px-20px`)** ve **`🗑️ Arka Planı Kaldır (Şeffaf OBS)`** kontrolleri.
+       * **🃏 Seçili Kartın Arka Planına veya İçine Resim Ekleme (`ov.bgImage` & `ov.cardImgSrc`):** Herhangi bir karta tıklandığında açılan **"✏️ Kartı Düzenleme Kartı"** içinden o kartın **kendi kutusunun arka planına resim ekleme** (`ov.bgImage`, sığdırma modu ve karartma yüzdesi) veya **kartın içindeki portre/logo görselini değiştirme/ekleme** (`ov.cardImgSrc`).
+       * **🖼️ Tuvale Bağımsız Resim / GIF / Logo / Çerçeve Katmanı Ekleme (`cardType: 'image'`):** Tıpkı StreamElements'teki *"Add Static Image / GIF"* gibi, istenilen görseli 1920×1080 tuvale bağımsız bir kart olarak ekleyip fareyle sürükleme ve 8 yönden boyutlandırma.
+    6. **📐 Konum, Boyut, Katman Yönetimi & 🗑️ Kartı Tuvalden Silme:**
        * Hassas `X`, `Y`, `Genişlik`, `Yükseklik` kutuları, **⬆️ Öne Getir**, **⬇️ Arkaya Gönder**, **👁️‍🗨️ Kartı Gizle** ve **🗑️ Kartı Tuvalden Sil** kontrolleri.
        * **4 Farklı Yoldan Kart Silme:**
          1. Seçili kartın yeşil üst etiketindeki **`🗑️ Sil`** butonu (`#mira-selection-del-btn`).
