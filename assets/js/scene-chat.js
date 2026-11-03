@@ -146,7 +146,7 @@
         .then(kData => {
           const chatroomId = kData?.chatroom?.id;
           if (!chatroomId) return;
-          const ws = new WebSocket('wss://ws-us2.pusher.com/app/32cbd69e4b950ba97041?protocol=7&client=js&version=8.4.0-rc2&flash=false');
+          const ws = new WebSocket('wss://ws-us2.pusher.com/app/34bf7a0ff419a2a775b9?protocol=7&client=js&version=7.4.0&flash=false');
           ws.onopen = () => {
             ws.send(JSON.stringify({ event: 'pusher:subscribe', data: { channel: `chatrooms.${chatroomId}.v2` } }));
           };

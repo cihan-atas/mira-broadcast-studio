@@ -323,6 +323,9 @@
       </div>
 
       <div class="chat-header-actions">
+        <a href="https://kick.com/popout/cihanatas/chat" target="_blank" onclick="window.open(this.href, 'kick_chat_popout', 'width=420,height=680,scrollbars=yes,resizable=yes'); return false;" class="btn-tts" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.4); color: #00f5a0; text-decoration: none;" title="Kick resmi sohbetini açar; yayıncı hesabınızla izleyicilere yanıt verebilirsiniz">
+          <span>⚡</span> <span>Kick Chat</span>
+        </a>
         <button type="button" class="btn-tts" id="floating-tts-btn" onclick="toggleFloatingTTS()" title="Sohbet Sesli Okuma (TTS) Aç/Kapat">
           <span>🔊</span> <span id="floating-tts-text">TTS: KAPALI</span>
         </button>
@@ -520,19 +523,25 @@
         });
       } catch (e) {}
 
-      // Polling fallback (sunucudan son mesajları alma)
+      // Polling (sunucudan canlı Kick ve TikTok mesajlarını alma)
       let lastPoll = Date.now() - 5000;
       setInterval(() => {
-        fetch(`/api/chat-messages?since=${lastPoll}`)
+        fetch(`/api/poll?since=${lastPoll}`)
           .then(r => r.json())
           .then(data => {
-            if (Array.isArray(data.messages) && data.messages.length > 0) {
-              data.messages.forEach(m => appendMessage(m));
+            if (data && data.events && data.events.length > 0) {
+              data.events.forEach(ev => {
+                if (ev.time > lastPoll) lastPoll = ev.time;
+                if (ev.type === 'CHAT_MESSAGE' || ev.type === 'TEST_CHAT') {
+                  if (ev.senderSession !== SESSION_ID) {
+                    appendMessage(ev);
+                  }
+                }
+              });
             }
-            lastPoll = Date.now();
           })
           .catch(() => {});
-      }, 3000);
+      }, 1200);
 
     })();
   </script>

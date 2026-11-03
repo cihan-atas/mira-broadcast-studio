@@ -1,11 +1,11 @@
 {
   "ttsAlertsEnabled": true,
   "ttsChatEnabled": true,
-  "outputMode": "studio",
+  "outputMode": "overlay",
   "volume": 1,
   "rate": 1,
   "pitch": 1,
-  "voiceName": "",
+  "voiceName": "mira_natural_tr",
   "voiceLang": "tr-TR",
   "chatFormat": "{user}: {message}",
   "readStreamerSelf": true,

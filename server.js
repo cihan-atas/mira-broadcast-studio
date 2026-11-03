@@ -209,6 +209,223 @@ function handleTiktokConnect(username, callback) {
 }
 
 // ==========================================
+// 0.4 KICK CANLI YAYIN & SOHBET KÖPRÜSÜ (PUSHER REALTIME ENGINE)
+// ==========================================
+let kickPusherWs = null;
+let kickPingInterval = null;
+let kickReconnectTimeout = null;
+let activeKickStatus = {
+  connected: false,
+  slug: 'cihanatas',
+  chatroomId: 58578228,
+  channelId: 58866639,
+  followersCount: 0,
+  lastMessageAt: null,
+  error: null
+};
+
+function fetchKickChannelInfo(slug) {
+  return new Promise((resolve, reject) => {
+    const cleanSlug = (slug || 'cihanatas').replace(/[^a-zA-Z0-9_-]/g, '');
+    const options = {
+      hostname: 'kick.com',
+      path: `/api/v2/channels/${encodeURIComponent(cleanSlug)}`,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json'
+      }
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          resolve(parsed);
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(8000, () => {
+      req.destroy();
+      reject(new Error('Kick API zaman aşımı'));
+    });
+    req.end();
+  });
+}
+
+function startKickPusherBridge(slug = 'cihanatas') {
+  if (kickReconnectTimeout) {
+    clearTimeout(kickReconnectTimeout);
+    kickReconnectTimeout = null;
+  }
+  if (kickPingInterval) {
+    clearInterval(kickPingInterval);
+    kickPingInterval = null;
+  }
+  if (kickPusherWs) {
+    try {
+      kickPusherWs.onclose = null;
+      kickPusherWs.onerror = null;
+      kickPusherWs.close();
+    } catch (e) {}
+    kickPusherWs = null;
+  }
+
+  activeKickStatus.slug = slug;
+
+  fetchKickChannelInfo(slug)
+    .then(channelData => {
+      const chatroomId = channelData?.chatroom?.id || activeKickStatus.chatroomId || 58578228;
+      const channelId = channelData?.id || activeKickStatus.channelId || 58866639;
+      const fCount = channelData?.followers_count ?? channelData?.followersCount ?? 0;
+
+      activeKickStatus.chatroomId = chatroomId;
+      activeKickStatus.channelId = channelId;
+      activeKickStatus.followersCount = fCount;
+
+      console.log(`[KICK BRIDGE] Kanal bulundu: ${slug} (Chatroom ID: ${chatroomId}, Channel ID: ${channelId}, Takipçi: ${fCount})`);
+
+      const pusherKey = '34bf7a0ff419a2a775b9';
+      const wsUrl = `wss://ws-us2.pusher.com/app/${pusherKey}?protocol=7&client=js&version=7.4.0&flash=false`;
+      
+      const ws = new WebSocket(wsUrl);
+      kickPusherWs = ws;
+
+      ws.onopen = () => {
+        activeKickStatus.connected = true;
+        activeKickStatus.error = null;
+        console.log(`[KICK BRIDGE] Kick Pusher WebSocket bağlandı! Kanal: ${slug} (Canlı Dinleniyor)`);
+
+        // Subscriptions
+        ws.send(JSON.stringify({
+          event: 'pusher:subscribe',
+          data: { auth: '', channel: `chatrooms.${chatroomId}.v2` }
+        }));
+        ws.send(JSON.stringify({
+          event: 'pusher:subscribe',
+          data: { auth: '', channel: `channel.${channelId}` }
+        }));
+
+        // Keepalive ping (her 25 saniyede bir)
+        kickPingInterval = setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ event: 'pusher:ping', data: {} }));
+          }
+        }, 25000);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const packet = JSON.parse(event.data);
+          if (packet.event === 'pusher:ping') {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ event: 'pusher:pong', data: {} }));
+            }
+            return;
+          }
+          if (packet.event === 'pusher:pong') return;
+
+          // Canlı Sohbet Mesajı
+          if (packet.event === 'App\\Events\\ChatMessageEvent') {
+            const chatData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
+            const sender = chatData.sender?.username || 'Kickİzleyici';
+            const content = chatData.content || '';
+            const badges = chatData.sender?.badges || [];
+            const isStreamer = badges.some(b => b.type === 'broadcaster' || b.type === 'streamer') || (sender.toLowerCase() === activeKickStatus.slug.toLowerCase());
+            const isMod = badges.some(b => b.type === 'moderator');
+            const isSub = badges.some(b => b.type === 'subscriber');
+            const badge = isStreamer ? 'streamer' : (isMod ? 'mod' : (isSub ? 'sub' : 'kick'));
+            const color = chatData.sender?.identity?.color || '#00f5a0';
+
+            const chatItem = {
+              id: chatData.id || ('kick_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6)),
+              type: 'CHAT_MESSAGE',
+              platform: 'kick',
+              username: sender,
+              content: content,
+              badge: badge,
+              isStreamer: isStreamer,
+              color: color,
+              time: Date.now()
+            };
+
+            eventQueue.push(chatItem);
+            if (eventQueue.length > 80) eventQueue.shift();
+            activeKickStatus.lastMessageAt = Date.now();
+            console.log(`[KICK CHAT] [${badge.toUpperCase()}] ${sender}: ${content}`);
+          }
+          // Canlı Takipçi Güncellemesi
+          else if (packet.event === 'App\\Events\\FollowersUpdated') {
+            const evData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
+            const newFollowerName = evData.follower?.username || 'Yeni Takipçi';
+            const updatedCount = evData.followersCount || evData.followers_count;
+            if (typeof updatedCount === 'number') activeKickStatus.followersCount = updatedCount;
+
+            const alertItem = {
+              type: 'LIVE_ALERT',
+              alertType: 'follower',
+              payload: {
+                username: newFollowerName,
+                followersCount: activeKickStatus.followersCount
+              },
+              time: Date.now()
+            };
+            eventQueue.push(alertItem);
+            if (eventQueue.length > 80) eventQueue.shift();
+            console.log(`[KICK TAKİPÇİ] ${newFollowerName} kanalı takip etti!`);
+          }
+          // Abonelik veya Hediye
+          else if (packet.event === 'App\\Events\\SubscriptionEvent' || packet.event === 'App\\Events\\GiftedSubscriptionsEvent') {
+            const sData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
+            const subUser = sData.username || sData.sender?.username || 'Abonemiz';
+            const months = sData.months || 1;
+            const alertItem = {
+              type: 'LIVE_ALERT',
+              alertType: 'sub',
+              payload: {
+                username: subUser,
+                months: months
+              },
+              time: Date.now()
+            };
+            eventQueue.push(alertItem);
+            if (eventQueue.length > 80) eventQueue.shift();
+          }
+        } catch (err) {}
+      };
+
+      ws.onclose = () => {
+        activeKickStatus.connected = false;
+        if (kickPingInterval) clearInterval(kickPingInterval);
+        console.log(`[KICK BRIDGE] Bağlantı koptu, 3 saniye sonra yeniden bağlanılıyor...`);
+        kickReconnectTimeout = setTimeout(() => {
+          startKickPusherBridge(activeKickStatus.slug);
+        }, 3000);
+      };
+
+      ws.onerror = (err) => {
+        activeKickStatus.connected = false;
+        activeKickStatus.error = err.message || 'Pusher WS error';
+      };
+    })
+    .catch(err => {
+      activeKickStatus.connected = false;
+      activeKickStatus.error = err.message;
+      console.error(`[KICK BRIDGE] Kanal bilgisi alınamadı (${slug}):`, err.message);
+      kickReconnectTimeout = setTimeout(() => {
+        startKickPusherBridge(slug);
+      }, 5000);
+    });
+}
+
+// Sunucu başlatıldığında Kick canlı köprüsünü otomatik başlat
+startKickPusherBridge('cihanatas');
+
+// ==========================================
 // 0.3 ANA GALERİ ŞABLON KATALOĞU & KULLANICI GALERİSİ YÖNETİMİ
 // ==========================================
 const USER_GALLERY_PATH = path.join(__dirname, 'user-gallery.json');
@@ -1390,7 +1607,7 @@ const server = http.createServer((req, res) => {
 
   // 2.4 API: Kick Kanal Bilgisi Proxy (CORS engelsiz chatroom ID çözümü)
   if (pathname === '/api/kick/channel' && req.method === 'GET') {
-    const slug = (parsedUrl.searchParams.get('slug') || 'zeuslive').replace(/[^a-zA-Z0-9_-]/g, '');
+    const slug = (parsedUrl.searchParams.get('slug') || activeKickStatus.slug || 'cihanatas').replace(/[^a-zA-Z0-9_-]/g, '');
     const options = {
       hostname: 'kick.com',
       path: `/api/v2/channels/${encodeURIComponent(slug)}`,
@@ -1418,6 +1635,61 @@ const server = http.createServer((req, res) => {
       }
     });
     proxyReq.end();
+    return;
+  }
+
+  // 2.41 API: Kick Canlı Durumu
+  if (pathname === '/api/kick/status' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify(activeKickStatus));
+  }
+
+  // 2.42 API: Kick Yeniden Bağlan / Kanal Değiştir
+  if (pathname === '/api/kick/reconnect' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const d = JSON.parse(body || '{}');
+        const slug = (d.slug || activeKickStatus.slug || 'cihanatas').trim();
+        startKickPusherBridge(slug);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, status: activeKickStatus }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 2.43 API: Canlı Chat Mesajı Gönder (Yayıncı Mesajı)
+  if (pathname === '/api/chat-message' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const d = JSON.parse(body || '{}');
+        const item = {
+          id: d.id || ('msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6)),
+          type: 'CHAT_MESSAGE',
+          platform: d.platform || 'kick',
+          username: d.username || 'cihanatas',
+          content: d.content || '',
+          badge: d.badge || 'streamer',
+          isStreamer: d.isStreamer !== undefined ? d.isStreamer : true,
+          color: d.color || '#f59e0b',
+          time: Date.now()
+        };
+        eventQueue.push(item);
+        if (eventQueue.length > 80) eventQueue.shift();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, item }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
     return;
   }
 

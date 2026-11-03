@@ -576,8 +576,8 @@
         const chatroomId = data?.chatroom?.id;
         const channelId = data?.id;
 
-        const pusherAppKey = '32cbd69e4b950ba97041';
-        const wsUrl = `wss://ws-us2.pusher.com/app/${pusherAppKey}?protocol=7&client=js&version=8.4.0-rc2&flash=false`;
+        const pusherAppKey = '34bf7a0ff419a2a775b9';
+        const wsUrl = `wss://ws-us2.pusher.com/app/${pusherAppKey}?protocol=7&client=js&version=7.4.0&flash=false`;
         const ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
