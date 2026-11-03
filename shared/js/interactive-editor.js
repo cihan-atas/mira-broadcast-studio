@@ -1093,8 +1093,85 @@
       if (targetImg) targetImg.style.objectFit = ov.cardImgFit;
     }
 
-    if (ov.borderRadius !== undefined) {
+    if (ov.borderRadius !== undefined && (!ov.shapeCut || ov.shapeCut === 'none')) {
       styleTarget.style.setProperty('border-radius', `${ov.borderRadius}px`, 'important');
+    }
+
+    // Özel Kart Şekli & Kesim Geometrisi (Shape Cut: chamfer, bevel, notch, slanted, hexagon, pill, none)
+    if (ov.shapeCut !== undefined) {
+      const cutRad = ov.cutRadius !== undefined ? ov.cutRadius : (ov.borderRadius !== undefined ? ov.borderRadius : 20);
+      const clip = getClipPathByShape(ov.shapeCut, cutRad);
+      if (ov.shapeCut === 'none') {
+        styleTarget.style.removeProperty('clip-path');
+        styleTarget.style.removeProperty('-webkit-clip-path');
+        styleTarget.style.setProperty('border-radius', `${cutRad}px`, 'important');
+      } else if (ov.shapeCut === 'pill') {
+        styleTarget.style.removeProperty('clip-path');
+        styleTarget.style.removeProperty('-webkit-clip-path');
+        styleTarget.style.setProperty('border-radius', '999px', 'important');
+      } else {
+        styleTarget.style.setProperty('clip-path', clip, 'important');
+        styleTarget.style.setProperty('-webkit-clip-path', clip, 'important');
+        styleTarget.style.removeProperty('border-radius');
+      }
+    }
+
+    // Kenarlık Stili & Kalınlığı (Border Style & Width)
+    if (ov.borderStyle !== undefined || ov.borderWidth !== undefined) {
+      const bCol = ov.borderColor || '#a855f7';
+      const bWidth = ov.borderWidth !== undefined ? Number(ov.borderWidth) : 2;
+      const bStyle = ov.borderStyle || 'solid';
+      if (bStyle === 'none' || bWidth === 0) {
+        styleTarget.style.setProperty('border', 'none', 'important');
+      } else if (bStyle === 'accent-left') {
+        styleTarget.style.setProperty('border', 'none', 'important');
+        styleTarget.style.setProperty('border-left', `${Math.max(4, bWidth * 2)}px solid ${bCol}`, 'important');
+      } else {
+        styleTarget.style.setProperty('border', `${bWidth}px ${bStyle} ${bCol}`, 'important');
+      }
+    }
+
+    // Neon Parıltı / Aura Şiddeti (Glow Intensity)
+    if (ov.glowIntensity !== undefined) {
+      const bCol = ov.borderColor || '#a855f7';
+      const glow = Number(ov.glowIntensity);
+      if (glow <= 0) {
+        styleTarget.style.setProperty('box-shadow', '0 10px 30px rgba(0,0,0,0.65)', 'important');
+      } else {
+        styleTarget.style.setProperty('box-shadow', `0 10px 30px rgba(0,0,0,0.65), 0 0 ${glow}px ${bCol}88`, 'important');
+      }
+    }
+
+    // Kart Materyali & Doku (Glassmorphism, Carbon Fiber, Cybergrid, Scanlines, Gradient, Matte)
+    if (ov.cardMaterial !== undefined) {
+      const bCol = ov.bgColor || '#0d0f18';
+      const op = ov.bgOpacity !== undefined ? ov.bgOpacity : 85;
+      const prim = ov.primaryColor || ov.borderColor || '#a855f7';
+      const sec = ov.secondaryColor || '#10b981';
+      const mat = ov.cardMaterial;
+      if (mat === 'glass') {
+        const blur = ov.backdropBlur !== undefined ? ov.backdropBlur : 14;
+        styleTarget.style.setProperty('backdrop-filter', `blur(${blur}px)`, 'important');
+        styleTarget.style.setProperty('-webkit-backdrop-filter', `blur(${blur}px)`, 'important');
+        styleTarget.style.setProperty('background-color', hexToRgba(bCol, op / 100), 'important');
+      } else if (mat === 'carbon') {
+        styleTarget.style.setProperty('background-color', '#111218', 'important');
+        styleTarget.style.setProperty('background-image', 'radial-gradient(rgba(255,255,255,0.12) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.12) 15%, transparent 16%)', 'important');
+        styleTarget.style.setProperty('background-size', '14px 14px', 'important');
+        styleTarget.style.setProperty('background-position', '0 0, 7px 7px', 'important');
+      } else if (mat === 'cybergrid') {
+        styleTarget.style.setProperty('background-color', '#090b14', 'important');
+        styleTarget.style.setProperty('background-image', `linear-gradient(${prim}28 1px, transparent 1px), linear-gradient(90deg, ${sec}28 1px, transparent 1px)`, 'important');
+        styleTarget.style.setProperty('background-size', '22px 22px', 'important');
+      } else if (mat === 'scanlines') {
+        styleTarget.style.setProperty('background-color', '#0b0d16', 'important');
+        styleTarget.style.setProperty('background-image', 'repeating-linear-gradient(0deg, rgba(0,0,0,0.6) 0px, rgba(0,0,0,0.6) 2px, transparent 2px, transparent 4px)', 'important');
+      } else if (mat === 'gradient') {
+        const ang = ov.gradientAngle !== undefined ? ov.gradientAngle : 135;
+        styleTarget.style.setProperty('background', `linear-gradient(${ang}deg, ${prim}55 0%, ${sec}55 100%), #0a0d18`, 'important');
+      } else if (mat === 'matte') {
+        styleTarget.style.setProperty('background', 'linear-gradient(180deg, #181a26 0%, #0c0d14 100%)', 'important');
+      }
     }
 
     if (ov.texts && typeof ov.texts === 'object') {
@@ -1324,8 +1401,250 @@
     notifyParentOfLiveChange();
   }
 
+  function getClipPathByShape(shape, radius = 20) {
+    const r = Math.max(6, Math.min(60, Number(radius) || 20));
+    switch (shape) {
+      case 'chamfer':
+        return `polygon(0 0, calc(100% - ${r}px) 0, 100% ${r}px, 100% 100%, ${r}px 100%, 0 calc(100% - ${r}px))`;
+      case 'bevel':
+        return `polygon(${r}px 0, calc(100% - ${r}px) 0, 100% ${r}px, 100% calc(100% - ${r}px), calc(100% - ${r}px) 100%, ${r}px 100%, 0 calc(100% - ${r}px), 0 ${r}px)`;
+      case 'notch':
+        return `polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 calc(50% + ${r}px), ${Math.round(r * 0.7)}px 50%, 0 calc(50% - ${r}px))`;
+      case 'slanted':
+        return `polygon(0 0, calc(100% - ${Math.round(r * 1.5)}px) 0, 100% ${Math.round(r * 1.2)}px, 100% 100%, 0 100%)`;
+      case 'hexagon':
+        return `polygon(${r}px 0, calc(100% - ${r}px) 0, 100% 50%, calc(100% - ${r}px) 100%, ${r}px 100%, 0 50%)`;
+      default:
+        return 'none';
+    }
+  }
+
+  function getAvatarClipPath(shape) {
+    switch (shape) {
+      case 'hex':
+        return 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)';
+      case 'diamond':
+        return 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
+      default:
+        return 'none';
+    }
+  }
+
+  function getMaterialBackgroundCss(material, bgCol, bgOpacity = 85, prim = '#a855f7', sec = '#10b981', gradientAngle = 135, backdropBlur = 14) {
+    const alpha = (bgOpacity !== undefined ? bgOpacity : 85) / 100;
+    const baseRgba = hexToRgba(bgCol || '#0d0f18', alpha);
+    switch (material) {
+      case 'glass':
+        return `backdrop-filter: blur(${backdropBlur || 14}px); -webkit-backdrop-filter: blur(${backdropBlur || 14}px); background: ${baseRgba};`;
+      case 'carbon':
+        return `background-color: #111218; background-image: radial-gradient(rgba(255,255,255,0.12) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.12) 15%, transparent 16%); background-size: 14px 14px; background-position: 0 0, 7px 7px;`;
+      case 'cybergrid':
+        return `background-color: #090b14; background-image: linear-gradient(${prim}28 1px, transparent 1px), linear-gradient(90deg, ${sec}28 1px, transparent 1px); background-size: 22px 22px;`;
+      case 'scanlines':
+        return `background-color: #0b0d16; background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.6) 0px, rgba(0,0,0,0.6) 2px, transparent 2px, transparent 4px);`;
+      case 'gradient':
+        return `background: linear-gradient(${gradientAngle}deg, ${hexToRgba(prim, 0.45)} 0%, ${hexToRgba(sec, 0.45)} 100%), #0a0d18;`;
+      case 'matte':
+        return `background: linear-gradient(180deg, #181a26 0%, #0c0d14 100%);`;
+      default:
+        return `background: ${baseRgba};`;
+    }
+  }
+
+  function buildForgeCardHtml(cDef) {
+    const cfg = cDef || {};
+    const comps = cfg.components || {};
+    const prim = cfg.primaryColor || cfg.accent || '#a855f7';
+    const sec = cfg.secondaryColor || cfg.secondary || '#10b981';
+    const textCol = cfg.textColor || '#ffffff';
+    const subCol = cfg.subTextColor || '#cbd5e1';
+    const bgCol = cfg.bgColor || '#0d0f18';
+    const borderCol = cfg.borderColor || prim;
+    const fontFam = cfg.fontFamily || "'Orbitron', sans-serif";
+    const shape = cfg.shapeCut || 'chamfer';
+    const cutRad = cfg.cutRadius !== undefined ? cfg.cutRadius : (cfg.borderRadius || 20);
+    const bStyle = cfg.borderStyle || 'solid';
+    const bWidth = cfg.borderWidth !== undefined ? cfg.borderWidth : 2;
+    const glow = cfg.glowIntensity !== undefined ? cfg.glowIntensity : 22;
+    const pulse = !!cfg.neonPulse;
+    const mat = cfg.cardMaterial || 'glass';
+    const blur = cfg.backdropBlur !== undefined ? cfg.backdropBlur : 14;
+    const op = cfg.bgOpacity !== undefined ? cfg.bgOpacity : 85;
+    const gradAng = cfg.gradientAngle !== undefined ? cfg.gradientAngle : 135;
+    const cardW = cfg.cardWidth || 440;
+    const cardH = cfg.cardHeight || 230;
+
+    const clip = getClipPathByShape(shape, cutRad);
+    const isClipped = clip !== 'none';
+    const matCss = getMaterialBackgroundCss(mat, bgCol, op, prim, sec, gradAng, blur);
+
+    // 1. Top Tag
+    let topTagHtml = '';
+    if (comps.showTopTag !== false) {
+      const icon = comps.topTagIcon || '⚡';
+      const text = comps.topTagText || 'CANLI VİTRİN KARTI';
+      topTagHtml = `
+        <div class="forge-comp-toptag" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid ${prim}33; padding-bottom:6px;">
+          <div style="display:flex; align-items:center; gap:6px; font-size:10px; font-weight:900; letter-spacing:1px; color:${sec};">
+            <span>${icon}</span>
+            <span>${text}</span>
+          </div>
+          <span style="font-size:9.5px; font-weight:800; color:#94a3b8;">MİRA FORGE</span>
+        </div>
+      `;
+    }
+
+    // 2. Avatar / Profile
+    let avatarHtml = '';
+    if (comps.showAvatar !== false) {
+      const avUrl = comps.avatarUrl || cfg.avatar || '/kick/vexana/assets/images/portrait.jpg';
+      const avShape = comps.avatarShape || 'hex';
+      const avSize = comps.avatarSize || 'medium';
+      const sizePx = avSize === 'small' ? 48 : (avSize === 'large' ? 82 : 64);
+      const avClip = getAvatarClipPath(avShape);
+      avatarHtml = `
+        <div class="forge-comp-avatar" style="width:${sizePx}px; height:${sizePx}px; flex-shrink:0; clip-path:${avClip}; -webkit-clip-path:${avClip}; border-radius:${avShape === 'round' ? '50%' : (avShape === 'square' ? '10px' : '0')}; border:2px solid ${prim}; box-shadow:0 0 12px ${prim}66; overflow:hidden;">
+          <img src="${avUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/kick/vexana/assets/images/portrait.jpg'">
+        </div>
+      `;
+    }
+
+    // 3. Titles
+    const titleText = comps.title || cfg.title || 'MİRA CYBER SHOWCASE';
+    const subText = comps.subtitle || cfg.subtitle || 'Mythic Glory Streamer • Mid Lane';
+    const tSize = comps.titleSize || 18;
+    const tAlign = comps.textAlign || 'left';
+    const titlesHtml = `
+      <div class="forge-comp-titles" style="flex:1; min-width:0; text-align:${tAlign};">
+        <div style="font-family:${fontFam}; font-size:${tSize}px; font-weight:900; color:${textCol}; text-shadow:0 0 10px ${prim}88; line-height:1.2; word-break:break-word;">
+          ${titleText}
+        </div>
+        <div style="font-size:11.5px; color:${subCol}; margin-top:3px; word-break:break-word;">
+          ${subText}
+        </div>
+      </div>
+    `;
+
+    // 4. Stat Box
+    let statHtml = '';
+    if (comps.showStatBox) {
+      const sLbl = comps.statLabel || 'CANLI TAKİPÇİ';
+      const sVal = comps.statValue || '1,450';
+      statHtml = `
+        <div class="forge-comp-stat" style="background:rgba(0,0,0,0.45); border:1px solid ${prim}44; border-radius:10px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:10px; font-weight:800; color:${sec}; letter-spacing:0.8px;">${sLbl}</span>
+          <span style="font-family:'Orbitron', sans-serif; font-size:15px; font-weight:900; color:#fff; text-shadow:0 0 8px ${prim};">${sVal}</span>
+        </div>
+      `;
+    }
+
+    // 5. Progress Bar
+    let progressHtml = '';
+    if (comps.showProgressBar) {
+      const pVal = comps.progressValue !== undefined ? comps.progressValue : 70;
+      const pLbl = comps.progressLabel || 'HEDEF: 2,000';
+      progressHtml = `
+        <div class="forge-comp-progress" style="display:flex; flex-direction:column; gap:4px;">
+          <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:800; color:#e2e8f0;">
+            <span>${pLbl}</span>
+            <span style="color:${sec};">%${pVal}</span>
+          </div>
+          <div style="height:8px; border-radius:99px; background:rgba(0,0,0,0.6); overflow:hidden; border:1px solid ${prim}44;">
+            <div style="width:${pVal}%; height:100%; background:linear-gradient(90deg, ${prim}, ${sec}); border-radius:99px;"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 6. Badges
+    let badgesHtml = '';
+    if (comps.showBadges !== false) {
+      const b1 = comps.badge1 || cfg.roleBadge || '⚡ PRO STREAMER';
+      const b2 = comps.badge2 || cfg.laneBadge || '● LIVE';
+      const bRad = comps.badgeStyle === 'pill' ? '99px' : '6px';
+      badgesHtml = `
+        <div class="forge-comp-badges" style="display:flex; gap:6px; flex-wrap:wrap;">
+          <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:${bRad}; background:${prim}25; border:1px solid ${prim}; color:#e9d5ff;">${b1}</span>
+          <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:${bRad}; background:${sec}22; border:1px solid ${sec}; color:${sec};">${b2}</span>
+        </div>
+      `;
+    }
+
+    // 7. Socials
+    let socialsHtml = '';
+    if (comps.showSocials) {
+      const kick = comps.kickHandle || 'cihanatas';
+      const tiktok = comps.tiktokHandle || '@mira';
+      socialsHtml = `
+        <div class="forge-comp-socials" style="display:flex; gap:12px; font-size:11px; font-weight:700; color:#cbd5e1; flex-wrap:wrap;">
+          <span>🟢 kick.com/${kick}</span>
+          <span>📱 ${tiktok}</span>
+        </div>
+      `;
+    }
+
+    // 8. Quote
+    let quoteHtml = '';
+    if (comps.showQuote !== false && (comps.quoteText || cfg.quote)) {
+      const qText = comps.quoteText || cfg.quote || '"Şafak Vadisi zaferimizi bekliyor!"';
+      quoteHtml = `
+        <div class="forge-comp-quote" style="font-size:11px; font-style:italic; color:#cbd5e1; border-left:3px solid ${prim}; padding-left:8px; line-height:1.4;">
+          ${qText}
+        </div>
+      `;
+    }
+
+    const pulseClass = pulse ? 'mira-pulse-glow' : '';
+    const glowFilter = glow > 0 ? `filter: drop-shadow(0 0 ${glow}px ${borderCol}88);` : '';
+
+    if (isClipped) {
+      return `
+        <div class="mod-card mod-forge-card ${pulseClass}" style="width:${cardW}px; height:${cardH ? cardH + 'px' : 'auto'}; position:relative; box-sizing:border-box; clip-path:${clip}; -webkit-clip-path:${clip}; background:${borderCol}; padding:${bWidth}px; ${glowFilter} transition: all 0.2s ease;">
+          <div style="clip-path:${clip}; -webkit-clip-path:${clip}; width:100%; height:100%; box-sizing:border-box; ${matCss} padding:16px 20px; display:flex; flex-direction:column; gap:10px; font-family:${fontFam}; color:${textCol}; overflow:hidden;">
+            ${topTagHtml}
+            <div style="display:flex; gap:12px; align-items:center;">
+              ${avatarHtml}
+              ${titlesHtml}
+            </div>
+            ${statHtml}
+            ${progressHtml}
+            ${badgesHtml}
+            ${socialsHtml}
+            ${quoteHtml}
+          </div>
+        </div>
+      `;
+    } else {
+      const radCss = shape === 'pill' ? '999px' : `${cutRad}px`;
+      const borderCss = bStyle === 'accent-left'
+        ? `border-left: ${Math.max(4, bWidth * 2)}px solid ${borderCol}; border-top:none; border-right:none; border-bottom:none;`
+        : (bWidth > 0 ? `border: ${bWidth}px ${bStyle} ${borderCol};` : 'border:none;');
+      const shadowCss = glow > 0
+        ? `box-shadow: 0 10px 30px rgba(0,0,0,0.65), 0 0 ${glow}px ${borderCol}88;`
+        : 'box-shadow: 0 10px 30px rgba(0,0,0,0.65);';
+
+      return `
+        <div class="mod-card mod-forge-card ${pulseClass}" style="width:${cardW}px; height:${cardH ? cardH + 'px' : 'auto'}; position:relative; box-sizing:border-box; border-radius:${radCss}; ${borderCss} ${shadowCss} ${matCss} padding:16px 20px; display:flex; flex-direction:column; gap:10px; font-family:${fontFam}; color:${textCol}; overflow:hidden; transition: all 0.2s ease;">
+          ${topTagHtml}
+          <div style="display:flex; gap:12px; align-items:center;">
+            ${avatarHtml}
+            ${titlesHtml}
+          </div>
+          ${statHtml}
+          ${progressHtml}
+          ${badgesHtml}
+          ${socialsHtml}
+          ${quoteHtml}
+        </div>
+      `;
+    }
+  }
+
   // Galeriden veya Özel Olarak Eklenen Kartların & Kahraman Parçalarının Zengin HTML Üreticisi
   function buildExtraCardInnerHtml(cDef) {
+    if (cDef && (cDef.shapeCut || cDef.cardType === 'forge' || cDef.components || cDef.borderStyle || cDef.cardMaterial)) {
+      return buildForgeCardHtml(cDef);
+    }
     const accent = cDef.accent || '#a855f7';
     const secondary = cDef.secondary || '#10b981';
     const streamer = cDef.streamerName || 'MİRA LIVE';
@@ -2527,6 +2846,19 @@
       borderRadius: cfg.borderRadius !== undefined ? cfg.borderRadius : undefined,
       fontFamily: cfg.fontFamily || undefined,
       fontScale: cfg.fontScale !== undefined ? cfg.fontScale : undefined,
+      // Özel Tasarım Atölyesi (Forge) Parametreleri
+      shapeCut: cfg.shapeCut,
+      cutRadius: cfg.cutRadius,
+      cardWidth: cfg.cardWidth,
+      cardHeight: cfg.cardHeight,
+      borderStyle: cfg.borderStyle,
+      borderWidth: cfg.borderWidth,
+      glowIntensity: cfg.glowIntensity,
+      neonPulse: cfg.neonPulse,
+      cardMaterial: cfg.cardMaterial,
+      backdropBlur: cfg.backdropBlur,
+      gradientAngle: cfg.gradientAngle,
+      components: cfg.components,
       socials: cfg.socials || { kick: cfg.kickHandle, tiktok: cfg.tiktokHandle, instagram: cfg.youtubeHandle },
       goalTitle: cfg.goalTitle,
       goalCurrent: cfg.goalCurrent,
@@ -2564,6 +2896,19 @@
       imageUrl: customOpts.imageUrl || customOpts.avatar || '/kick/vexana/assets/images/portrait.jpg',
       imageFit: customOpts.imageFit || 'cover',
       showCaption: customOpts.showCaption !== undefined ? customOpts.showCaption : true,
+      // Özel Atölye Parametreleri
+      shapeCut: customOpts.shapeCut,
+      cutRadius: customOpts.cutRadius,
+      cardWidth: customOpts.cardWidth,
+      cardHeight: customOpts.cardHeight,
+      borderStyle: customOpts.borderStyle,
+      borderWidth: customOpts.borderWidth,
+      glowIntensity: customOpts.glowIntensity,
+      neonPulse: customOpts.neonPulse,
+      cardMaterial: customOpts.cardMaterial,
+      backdropBlur: customOpts.backdropBlur,
+      gradientAngle: customOpts.gradientAngle,
+      components: customOpts.components,
       socials: customOpts.socials,
       goalTitle: customOpts.goalTitle,
       goalCurrent: customOpts.goalCurrent,
@@ -2584,6 +2929,7 @@
       topbar:    { x: 320, y: 18 },
       gameframe: { x: 380, y: 100 },
       showcase:  { x: 28,  y: 100 },
+      forge:     { x: 120, y: 180 },
       social:    { x: 28,  y: 410 },
       webcam:    { x: 28,  y: 720 },
       chat:      { x: 1555, y: 100 },
@@ -2599,6 +2945,16 @@
       x: basePos.x,
       y: basePos.y
     };
+    if (customOpts.cardWidth) widgetOverrides[newId].w = customOpts.cardWidth;
+    if (customOpts.cardHeight) widgetOverrides[newId].h = customOpts.cardHeight;
+    if (customOpts.shapeCut) widgetOverrides[newId].shapeCut = customOpts.shapeCut;
+    if (customOpts.cutRadius !== undefined) widgetOverrides[newId].cutRadius = customOpts.cutRadius;
+    if (customOpts.borderStyle) widgetOverrides[newId].borderStyle = customOpts.borderStyle;
+    if (customOpts.borderWidth !== undefined) widgetOverrides[newId].borderWidth = customOpts.borderWidth;
+    if (customOpts.glowIntensity !== undefined) widgetOverrides[newId].glowIntensity = customOpts.glowIntensity;
+    if (customOpts.cardMaterial) widgetOverrides[newId].cardMaterial = customOpts.cardMaterial;
+    if (customOpts.backdropBlur !== undefined) widgetOverrides[newId].backdropBlur = customOpts.backdropBlur;
+    if (customOpts.gradientAngle !== undefined) widgetOverrides[newId].gradientAngle = customOpts.gradientAngle;
     if (customOpts.bgImage) widgetOverrides[newId].bgImage = customOpts.bgImage;
     if (customOpts.bgFit) widgetOverrides[newId].bgFit = customOpts.bgFit;
     if (customOpts.bgDim !== undefined) widgetOverrides[newId].bgDim = customOpts.bgDim;
@@ -2854,6 +3210,59 @@
                 <input type="range" id="mira-insp-radius" min="0" max="44" step="2" value="${curRadius}">
                 <span class="mira-range-val" id="mira-insp-radius-val">${curRadius}px</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3.5 ÖZEL KART ŞEKLİ, KESİM GEOMETRİSİ & MATERYAL -->
+        <div class="mira-insp-section" style="background:rgba(20,15,40,0.65); border-color:rgba(168,85,247,0.35);">
+          <div class="mira-insp-sec-title">
+            <span>📐 KART ŞEKLİ, KESİM & MATERYAL</span>
+          </div>
+
+          <div class="mira-field">
+            <label>Kart Şekli & Kesim Türü</label>
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:5px;">
+              <button type="button" class="mira-mini-btn mira-insp-shape-btn ${(ov.shapeCut || 'none') === 'none' ? 'active' : ''}" data-shape="none" style="${(ov.shapeCut || 'none') === 'none' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">⬛ Standart</button>
+              <button type="button" class="mira-mini-btn mira-insp-shape-btn ${ov.shapeCut === 'chamfer' ? 'active' : ''}" data-shape="chamfer" style="${ov.shapeCut === 'chamfer' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">✂️ 45° Kesik</button>
+              <button type="button" class="mira-mini-btn mira-insp-shape-btn ${ov.shapeCut === 'bevel' ? 'active' : ''}" data-shape="bevel" style="${ov.shapeCut === 'bevel' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">📐 4 Köşe</button>
+              <button type="button" class="mira-mini-btn mira-insp-shape-btn ${ov.shapeCut === 'pill' ? 'active' : ''}" data-shape="pill" style="${ov.shapeCut === 'pill' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">💊 Pill Oval</button>
+              <button type="button" class="mira-mini-btn mira-insp-shape-btn ${ov.shapeCut === 'hexagon' ? 'active' : ''}" data-shape="hexagon" style="${ov.shapeCut === 'hexagon' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🔷 Hexagon</button>
+              <button type="button" class="mira-mini-btn mira-insp-shape-btn ${ov.shapeCut === 'notch' ? 'active' : ''}" data-shape="notch" style="${ov.shapeCut === 'notch' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🏷️ Sol Çentik</button>
+            </div>
+          </div>
+
+          <div class="mira-row-2">
+            <div class="mira-field">
+              <label>Kenarlık Stili</label>
+              <select class="mira-select" id="mira-insp-border-style">
+                <option value="solid" ${(ov.borderStyle || 'solid') === 'solid' ? 'selected' : ''}>Düz Neon (Solid)</option>
+                <option value="double" ${ov.borderStyle === 'double' ? 'selected' : ''}>Çift Zırh (Double)</option>
+                <option value="dashed" ${ov.borderStyle === 'dashed' ? 'selected' : ''}>Kesikli Çizgi (Dashed)</option>
+                <option value="accent-left" ${ov.borderStyle === 'accent-left' ? 'selected' : ''}>Sol Vurgu Barı</option>
+                <option value="none" ${ov.borderStyle === 'none' ? 'selected' : ''}>Çerçevesiz (None)</option>
+              </select>
+            </div>
+            <div class="mira-field">
+              <label>Kenarlık Kalınlığı: <strong id="mira-insp-bwidth-val">${ov.borderWidth !== undefined ? ov.borderWidth : 2}px</strong></label>
+              <input type="range" id="mira-insp-bwidth" min="0" max="8" step="1" value="${ov.borderWidth !== undefined ? ov.borderWidth : 2}">
+            </div>
+          </div>
+
+          <div class="mira-row-2">
+            <div class="mira-field">
+              <label>Neon Parlama (Glow): <strong id="mira-insp-glow-val">${ov.glowIntensity !== undefined ? ov.glowIntensity : 22}px</strong></label>
+              <input type="range" id="mira-insp-glow" min="0" max="45" step="3" value="${ov.glowIntensity !== undefined ? ov.glowIntensity : 22}">
+            </div>
+            <div class="mira-field">
+              <label>Kart Materyali</label>
+              <select class="mira-select" id="mira-insp-material">
+                <option value="glass" ${(ov.cardMaterial || 'glass') === 'glass' ? 'selected' : ''}>🪟 Buzlu Cam (Glass)</option>
+                <option value="carbon" ${ov.cardMaterial === 'carbon' ? 'selected' : ''}>🏁 Karbon Fiber</option>
+                <option value="cybergrid" ${ov.cardMaterial === 'cybergrid' ? 'selected' : ''}>⚡ Siber Izgara</option>
+                <option value="scanlines" ${ov.cardMaterial === 'scanlines' ? 'selected' : ''}>📺 CRT Scanlines</option>
+                <option value="matte" ${ov.cardMaterial === 'matte' ? 'selected' : ''}>🌑 Mat Koyu Çelik</option>
+              </select>
             </div>
           </div>
         </div>
@@ -3192,6 +3601,66 @@
       applyWidgetOverride(widgetEl, wid, ov);
       notifyParentOfLiveChange();
     });
+
+    // 3.2 Şekil, Kenarlık & Materyal Değişiklikleri
+    inspectorEl.querySelectorAll('.mira-insp-shape-btn').forEach(sBtn => {
+      sBtn.addEventListener('click', () => {
+        inspectorEl.querySelectorAll('.mira-insp-shape-btn').forEach(b => {
+          b.classList.remove('active');
+          b.style.background = '';
+          b.style.borderColor = '';
+          b.style.color = '';
+        });
+        sBtn.classList.add('active');
+        sBtn.style.background = '#7c3aed';
+        sBtn.style.borderColor = '#c084fc';
+        sBtn.style.color = '#fff';
+        const shp = sBtn.getAttribute('data-shape') || 'none';
+        ov.shapeCut = shp;
+        applyWidgetOverride(widgetEl, wid, ov);
+        notifyParentOfLiveChange();
+      });
+    });
+
+    const bStyleSel = inspectorEl.querySelector('#mira-insp-border-style');
+    if (bStyleSel) {
+      bStyleSel.addEventListener('change', () => {
+        ov.borderStyle = bStyleSel.value;
+        applyWidgetOverride(widgetEl, wid, ov);
+        notifyParentOfLiveChange();
+      });
+    }
+
+    const bWidthInp = inspectorEl.querySelector('#mira-insp-bwidth');
+    const bWidthVal = inspectorEl.querySelector('#mira-insp-bwidth-val');
+    if (bWidthInp) {
+      bWidthInp.addEventListener('input', () => {
+        ov.borderWidth = parseInt(bWidthInp.value, 10);
+        if (bWidthVal) bWidthVal.textContent = `${ov.borderWidth}px`;
+        applyWidgetOverride(widgetEl, wid, ov);
+        notifyParentOfLiveChange();
+      });
+    }
+
+    const glowInp = inspectorEl.querySelector('#mira-insp-glow');
+    const glowVal = inspectorEl.querySelector('#mira-insp-glow-val');
+    if (glowInp) {
+      glowInp.addEventListener('input', () => {
+        ov.glowIntensity = parseInt(glowInp.value, 10);
+        if (glowVal) glowVal.textContent = `${ov.glowIntensity}px`;
+        applyWidgetOverride(widgetEl, wid, ov);
+        notifyParentOfLiveChange();
+      });
+    }
+
+    const matSel = inspectorEl.querySelector('#mira-insp-material');
+    if (matSel) {
+      matSel.addEventListener('change', () => {
+        ov.cardMaterial = matSel.value;
+        applyWidgetOverride(widgetEl, wid, ov);
+        notifyParentOfLiveChange();
+      });
+    }
 
     // 3.5 Karta & Tuvale Resim / Arka Plan Görseli Ekleme Kontrolleri
     const cardBgUrlInp = inspectorEl.querySelector('#mira-insp-card-bg-url');
@@ -3740,6 +4209,9 @@
     } else if (msg.type === 'ADD_NEW_CARD_ON_CANVAS') {
       setEditMode(true);
       openAddCardModal(msg.tab || 'user');
+    } else if (msg.type === 'MIRA_ADD_FORGE_CARD_DIRECT' && msg.item) {
+      setEditMode(true);
+      addGalleryItemCardToCanvas(msg.item);
     } else if (msg.type === 'MIRA_RESET_CANVAS') {
       setEditMode(true);
       executeResetScope(msg.mode || 'all', msg.scope || 'all');

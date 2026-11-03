@@ -1774,6 +1774,153 @@
       justify-content: center;
       box-shadow: inset 0 0 40px rgba(0,0,0,0.85);
     }
+
+    /* FORGE KART ATÖLYESİ ÖZEL STILLERI */
+    .forge-presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .forge-preset-card {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+    .forge-preset-card:hover {
+      background: rgba(168, 85, 247, 0.15);
+      border-color: rgba(168, 85, 247, 0.45);
+      transform: translateY(-2px);
+    }
+    .forge-preset-card.active {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.32), rgba(6, 182, 212, 0.22));
+      border-color: #a855f7;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
+    }
+    .forge-preset-icon {
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+    .forge-preset-title {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .forge-preset-desc {
+      font-size: 9.5px;
+      color: #94a3b8;
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+    .forge-shape-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 6px;
+    }
+    .forge-shape-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 6px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .forge-shape-btn:hover {
+      background: rgba(168, 85, 247, 0.16);
+      border-color: #a855f7;
+      color: #fff;
+    }
+    .forge-shape-btn.active {
+      background: rgba(168, 85, 247, 0.3);
+      border-color: #c084fc;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+    }
+    .forge-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      margin-bottom: 6px;
+    }
+    .forge-toggle-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .forge-switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .forge-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .forge-slider-switch {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255,255,255,0.18);
+      border-radius: 20px;
+      transition: .2s;
+    }
+    .forge-slider-switch:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: .2s;
+    }
+    .forge-switch input:checked + .forge-slider-switch {
+      background-color: #10b981;
+    }
+    .forge-switch input:checked + .forge-slider-switch:before {
+      transform: translateX(16px);
+    }
+    .forge-sub-options {
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    @keyframes miraPulseGlow {
+      0% { filter: drop-shadow(0 0 10px var(--pulse-color, #a855f7)); }
+      50% { filter: drop-shadow(0 0 32px var(--pulse-color, #a855f7)); }
+      100% { filter: drop-shadow(0 0 10px var(--pulse-color, #a855f7)); }
+    }
+    .mira-pulse-glow {
+      animation: miraPulseGlow 2.4s infinite ease-in-out;
+    }
   </style>
 </head>
 <body>
@@ -2191,109 +2338,352 @@
             <!-- SOL KOLON: KONTROLLER & ÖZELLEŞTİRME FORMU -->
             <div class="creator-studio-controls">
               
-              <!-- 1. KART TASARIM FORMU (MODE: CARD) -->
+              <!-- 1. KART TASARIM FORMU (MODE: CARD - FORGE ATÖLYESİ) -->
               <div id="creator-form-card" class="creator-subform">
-                <!-- A. Kart Tipi / Preset Seçimi -->
-                <div class="creator-section">
-                  <div class="creator-sec-title">🎭 KART TİPİ VE ŞABLON DÜZENİ</div>
-                  <div class="creator-presets-grid" id="creator-card-type-pills">
-                    <button type="button" class="creator-preset-btn active" data-type="showcase" onclick="selectCreatorCardType('showcase', this)">🃏 Vitrin Kartı</button>
-                    <button type="button" class="creator-preset-btn" data-type="webcam" onclick="selectCreatorCardType('webcam', this)">📷 Kamera Çerçevesi</button>
-                    <button type="button" class="creator-preset-btn" data-type="chat" onclick="selectCreatorCardType('chat', this)">💬 Sohbet Kutusu</button>
-                    <button type="button" class="creator-preset-btn" data-type="social" onclick="selectCreatorCardType('social', this)">🌐 Sosyal Medya</button>
-                    <button type="button" class="creator-preset-btn" data-type="music" onclick="selectCreatorCardType('music', this)">🎵 Müzik & Player</button>
-                    <button type="button" class="creator-preset-btn" data-type="skills" onclick="selectCreatorCardType('skills', this)">⚡ Skill Yetenekleri</button>
-                    <button type="button" class="creator-preset-btn" data-type="topbar" onclick="selectCreatorCardType('topbar', this)">📊 Üst Bilgi Barı</button>
-                    <button type="button" class="creator-preset-btn" data-type="gameframe" onclick="selectCreatorCardType('gameframe', this)">🎮 Oyun Çerçevesi</button>
-                    <button type="button" class="creator-preset-btn" data-type="goal" onclick="selectCreatorCardType('goal', this)">🎯 Hedef Barı</button>
-                    <button type="button" class="creator-preset-btn" data-type="image" onclick="selectCreatorCardType('image', this)">🖼️ Resim & GIF Kartı</button>
-                    <button type="button" class="creator-preset-btn" data-type="custom" onclick="selectCreatorCardType('custom', this)">📌 Özel Duyuru Kartı</button>
+
+                <!-- 0. İLHAM VEREN ŞEKİL & STİL ŞABLONLARI (1 TIKLA HAZIR DÜNYALAR) -->
+                <div class="creator-section" style="background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(6,182,212,0.08)); border-color: rgba(168,85,247,0.35);">
+                  <div class="creator-sec-title" style="color: #e9d5ff;">
+                    <span>⚡</span> <span>İLHAM VEREN ŞEKİL & STİL ŞABLONLARI (1 TIKLA TÜM DÜNYAYI DEĞİŞTİR)</span>
+                  </div>
+                  <div class="forge-presets-grid" id="forge-presets-container">
+                    <!-- Preset kartları JS ile dinamik doldurulacak -->
                   </div>
                 </div>
 
-                <!-- B. Metin & İçerik Bilgileri -->
+                <!-- 1. KART GEOMETRİSİ, ŞEKLİ & KESİM DÜZENİ -->
                 <div class="creator-section">
-                  <div class="creator-sec-title">📝 METİNLER & YAYINCI BİLGİLERİ</div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Galeri Kayıt Adı (Galerinizde görünecek isim)</label>
-                      <input type="text" id="cr-card-name" class="form-control" value="Özel Mistik Vitrinim" oninput="updateCreatorLivePreview()">
-                    </div>
-                    <div class="form-group">
-                      <label>Kart Başlığı</label>
-                      <input type="text" id="cr-card-title" class="form-control" value="MİRA PRO SHOWCASE" oninput="updateCreatorLivePreview()">
-                    </div>
+                  <div class="creator-sec-title">
+                    <span>📐</span> <span>1. KART GEOMETRİSİ, KESİM ŞEKLİ & ORANLARI</span>
                   </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Alt Başlık / Açıklama</label>
-                      <input type="text" id="cr-card-sub" class="form-control" value="Mythic Glory Streamer • Mid Lane" oninput="updateCreatorLivePreview()">
-                    </div>
-                    <div class="form-group">
-                      <label>Yayıncı Adı</label>
-                      <input type="text" id="cr-card-streamer" class="form-control" value="MİRA" oninput="updateCreatorLivePreview()">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Rol Rozeti</label>
-                      <input type="text" id="cr-card-role" class="form-control" value="PRO STREAMER" oninput="updateCreatorLivePreview()">
-                    </div>
-                    <div class="form-group">
-                      <label>Platform / Koridor Rozeti</label>
-                      <input type="text" id="cr-card-lane" class="form-control" value="KICK & TIKTOK" oninput="updateCreatorLivePreview()">
-                    </div>
-                  </div>
+                  
                   <div class="form-group">
-                    <label>Alıntı / Slogan Metni</label>
-                    <input type="text" id="cr-card-quote" class="form-control" value='"Şafak Vadisi zaferimizi bekliyor!"' oninput="updateCreatorLivePreview()">
+                    <label>Kart Şekli & Fütüristik Kesim Türü</label>
+                    <div class="forge-shape-grid" id="forge-shape-cuts-grid">
+                      <button type="button" class="forge-shape-btn active" data-shape="chamfer" onclick="setForgeShapeCut('chamfer', this)">
+                        <div class="forge-shape-icon" style="clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));"></div>
+                        <span>✂️ 45° Çift Kesik</span>
+                      </button>
+                      <button type="button" class="forge-shape-btn" data-shape="bevel" onclick="setForgeShapeCut('bevel', this)">
+                        <div class="forge-shape-icon" style="clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);"></div>
+                        <span>📐 4 Köşe Kesik</span>
+                      </button>
+                      <button type="button" class="forge-shape-btn" data-shape="notch" onclick="setForgeShapeCut('notch', this)">
+                        <div class="forge-shape-icon" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 calc(50% + 5px), 6px 50%, 0 calc(50% - 5px));"></div>
+                        <span>🏷️ Sol Çentikli</span>
+                      </button>
+                      <button type="button" class="forge-shape-btn" data-shape="slanted" onclick="setForgeShapeCut('slanted', this)">
+                        <div class="forge-shape-icon" style="clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 8px, 100% 100%, 0 100%);"></div>
+                        <span>🚩 Asimetrik Eğim</span>
+                      </button>
+                      <button type="button" class="forge-shape-btn" data-shape="hexagon" onclick="setForgeShapeCut('hexagon', this)">
+                        <div class="forge-shape-icon" style="clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);"></div>
+                        <span>🔷 Altıgen (Hex)</span>
+                      </button>
+                      <button type="button" class="forge-shape-btn" data-shape="pill" onclick="setForgeShapeCut('pill', this)">
+                        <div class="forge-shape-icon" style="border-radius: 999px;"></div>
+                        <span>💊 Kapsül / Pill</span>
+                      </button>
+                      <button type="button" class="forge-shape-btn" data-shape="none" onclick="setForgeShapeCut('none', this)">
+                        <div class="forge-shape-icon" style="border-radius: 8px;"></div>
+                        <span>⬛ Dikdörtgen</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Köşe Kesim / Yuvarlaklık Derinliği: <strong id="fg-cut-rad-lbl">22px</strong></label>
+                      <input type="range" id="fg-cut-rad" min="0" max="48" step="2" value="22" oninput="document.getElementById('fg-cut-rad-lbl').textContent = this.value + 'px'; forgeState.cutRadius = parseInt(this.value, 10); updateCreatorLivePreview();">
+                    </div>
+                    <div class="form-group">
+                      <label>Kart Boyut & Oran Ön Ayarı</label>
+                      <select id="fg-size-preset" class="form-control" onchange="onForgeSizePresetChange(this.value)">
+                        <option value="standard" selected>Standart Kart (440 × 230)</option>
+                        <option value="banner">Geniş Banner (480 × 150)</option>
+                        <option value="vertical">Dikey Panel (320 × 420)</option>
+                        <option value="compact">Kompakt Bar (460 × 75)</option>
+                        <option value="square">Kare Vitrin (320 × 320)</option>
+                        <option value="custom">Özel Boyutlandırma</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-row" id="fg-custom-size-row" style="display:none;">
+                    <div class="form-group">
+                      <label>Genişlik: <strong id="fg-card-w-lbl">440px</strong></label>
+                      <input type="range" id="fg-card-w" min="260" max="720" step="10" value="440" oninput="document.getElementById('fg-card-w-lbl').textContent = this.value + 'px'; forgeState.cardWidth = parseInt(this.value, 10); updateCreatorLivePreview();">
+                    </div>
+                    <div class="form-group">
+                      <label>Yükseklik: <strong id="fg-card-h-lbl">230px</strong></label>
+                      <input type="range" id="fg-card-h" min="60" max="520" step="10" value="230" oninput="document.getElementById('fg-card-h-lbl').textContent = this.value + 'px'; forgeState.cardHeight = parseInt(this.value, 10); updateCreatorLivePreview();">
+                    </div>
                   </div>
                 </div>
 
-                <!-- C. Profil Görseli & Kart İçi Arka Plan Resmi -->
+                <!-- 2. ÇERÇEVE, KENARLIK & IŞIK EFEKTLERİ -->
                 <div class="creator-section">
-                  <div class="creator-sec-title">🖼️ PROFİL GÖRSELİ & KART ARKA PLANI (STREAM ELEMENTS)</div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label>Profil / Avatar / Logo Görseli</label>
-                      <div style="display:flex; gap:6px;">
-                        <button type="button" class="btn-gal" onclick="uploadCreatorAvatar()" style="flex:0 0 auto; padding:8px 12px; background:rgba(56,189,248,0.2); border-color:#38bdf8; color:#bae6fd;">
-                          📤 PC'den Seç
-                        </button>
-                        <input type="text" id="cr-card-avatar" class="form-control" value="/kick/vexana/assets/images/portrait.jpg" oninput="updateCreatorLivePreview()">
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label>Kart Arka Plan Görseli (Opsiyonel)</label>
-                      <div style="display:flex; gap:6px;">
-                        <button type="button" class="btn-gal" onclick="uploadCreatorCardBg()" style="flex:0 0 auto; padding:8px 12px; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#e9d5ff;">
-                          📤 PC'den Seç
-                        </button>
-                        <input type="text" id="cr-card-bg-img" class="form-control" placeholder="Boş bırakılabilir veya resim URL" oninput="updateCreatorLivePreview()">
-                      </div>
-                    </div>
+                  <div class="creator-sec-title">
+                    <span>🪟</span> <span>2. ÇERÇEVE, KENARLIK & NEON IŞIK FX</span>
                   </div>
                   <div class="form-row">
                     <div class="form-group">
-                      <label>Kart Arka Plan Sığdırma (Fit)</label>
-                      <select id="cr-card-bg-fit" class="form-control" onchange="updateCreatorLivePreview()">
-                        <option value="cover" selected>Kapla (Cover)</option>
-                        <option value="contain">Sığdır (Contain)</option>
-                        <option value="stretch">Tam Uzat (100%)</option>
+                      <label>Kenarlık Stili</label>
+                      <select id="fg-border-style" class="form-control" onchange="forgeState.borderStyle = this.value; updateCreatorLivePreview();">
+                        <option value="solid" selected>Düz Neon Çizgi (Solid)</option>
+                        <option value="double">Çift Zırhlı Çerçeve (Double)</option>
+                        <option value="dashed">Fütüristik Kesikli Çizgi (Dashed)</option>
+                        <option value="accent-left">Sol Vurgu Barı (Accent Line)</option>
+                        <option value="none">Çerçevesiz Saf Cam (None)</option>
                       </select>
                     </div>
                     <div class="form-group">
-                      <label>Arka Plan Karartması: <strong id="cr-card-bg-dim-lbl">20%</strong></label>
-                      <input type="range" id="cr-card-bg-dim" min="0" max="90" step="5" value="20" oninput="document.getElementById('cr-card-bg-dim-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
+                      <label>Kenarlık Kalınlığı: <strong id="fg-border-w-lbl">2px</strong></label>
+                      <input type="range" id="fg-border-w" min="0" max="8" step="1" value="2" oninput="document.getElementById('fg-border-w-lbl').textContent = this.value + 'px'; forgeState.borderWidth = parseInt(this.value, 10); updateCreatorLivePreview();">
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Neon Parlama (Glow): <strong id="fg-glow-lbl">26px</strong></label>
+                      <input type="range" id="fg-glow" min="0" max="45" step="3" value="26" oninput="document.getElementById('fg-glow-lbl').textContent = this.value + 'px'; forgeState.glowIntensity = parseInt(this.value, 10); updateCreatorLivePreview();">
+                    </div>
+                    <div class="form-group" style="display:flex; align-items:center; justify-content:space-between; padding-top:20px;">
+                      <label style="margin:0; cursor:pointer;" for="fg-pulse-chk">⚡ Canlı Nefes Alan Neon Nabız (Pulse FX)</label>
+                      <label class="forge-switch">
+                        <input type="checkbox" id="fg-pulse-chk" onchange="forgeState.neonPulse = this.checked; updateCreatorLivePreview();">
+                        <span class="forge-slider-switch"></span>
+                      </label>
                     </div>
                   </div>
                 </div>
 
-                <!-- D. Renk Laboratuvarı & Hassas 2D Spektrum Seçici -->
+                <!-- 3. ARKA PLAN, MATERYAL & DOKU LABORATUVARI -->
                 <div class="creator-section">
-                  <div class="creator-sec-title">🎨 RENK LABORATUVARI & 2D SPEKTRUM SEÇİCİ</div>
+                  <div class="creator-sec-title">
+                    <span>🎨</span> <span>3. ARKA PLAN, MATERYAL & DOKU LABORATUVARI</span>
+                  </div>
+                  <div class="form-group">
+                    <label>Kart Materyali / Dokusu</label>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:6px;" id="fg-materials-grid">
+                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="glass" onclick="setForgeMaterial('glass', this)">🪟 Buzlu Cam</button>
+                      <button type="button" class="mira-mini-btn fg-mat-btn active" data-mat="carbon" onclick="setForgeMaterial('carbon', this)" style="background:#7c3aed; border-color:#c084fc; color:#fff;">🏁 Karbon Fiber</button>
+                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="cybergrid" onclick="setForgeMaterial('cybergrid', this)">⚡ Siber Izgara</button>
+                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="scanlines" onclick="setForgeMaterial('scanlines', this)">📺 CRT Scanlines</button>
+                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="gradient" onclick="setForgeMaterial('gradient', this)">🎨 Açısal Gradyan</button>
+                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="matte" onclick="setForgeMaterial('matte', this)">🌑 Koyu Mat Çelik</button>
+                      <button type="button" class="mira-mini-btn fg-mat-btn" data-mat="custom_img" onclick="setForgeMaterial('custom_img', this)">🖼️ Özel Resim/GIF</button>
+                    </div>
+                  </div>
+
+                  <div class="form-row" id="fg-mat-glass-opts">
+                    <div class="form-group">
+                      <label>Cam Bulanıklığı (Blur): <strong id="fg-blur-lbl">14px</strong></label>
+                      <input type="range" id="fg-blur" min="0" max="30" step="2" value="14" oninput="document.getElementById('fg-blur-lbl').textContent = this.value + 'px'; forgeState.backdropBlur = parseInt(this.value, 10); updateCreatorLivePreview();">
+                    </div>
+                    <div class="form-group">
+                      <label>Şeffaflık / Opaklık: <strong id="fg-op-lbl">85%</strong></label>
+                      <input type="range" id="fg-op" min="10" max="100" step="5" value="85" oninput="document.getElementById('fg-op-lbl').textContent = this.value + '%'; forgeState.bgOpacity = parseInt(this.value, 10); updateCreatorLivePreview();">
+                    </div>
+                  </div>
+
+                  <div class="form-group" id="fg-mat-grad-opts" style="display:none;">
+                    <label>Gradyan Açısı: <strong id="fg-grad-ang-lbl">135°</strong></label>
+                    <input type="range" id="fg-grad-ang" min="0" max="360" step="15" value="135" oninput="document.getElementById('fg-grad-ang-lbl').textContent = this.value + '°'; forgeState.gradientAngle = parseInt(this.value, 10); updateCreatorLivePreview();">
+                  </div>
+
+                  <div id="fg-mat-img-opts" style="display:none; flex-direction:column; gap:8px;">
+                    <div class="form-group">
+                      <label>PC'den Kart Arka Plan Resmi Yükle veya URL Gir</label>
+                      <div style="display:flex; gap:6px;">
+                        <button type="button" class="btn-gal" onclick="uploadForgeCardBg()" style="flex:0 0 auto; padding:8px 12px; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#e9d5ff;">
+                          📤 PC'den Resim Seç
+                        </button>
+                        <input type="text" id="fg-custom-img-url" class="form-control" placeholder="Resim URL..." oninput="forgeState.customImgUrl = this.value; updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4. MODÜLER KART BİLEŞENLERİ (İÇERİKLERİ AÇ / KAPAT & DÜZENLE) -->
+                <div class="creator-section">
+                  <div class="creator-sec-title">
+                    <span>🧩</span> <span>4. MODÜLER KART BİLEŞENLERİ (AÇ / KAPAT & KİŞİSELLEŞTİR)</span>
+                  </div>
+
+                  <!-- 1. Üst Başlık Şeridi -->
+                  <div class="forge-toggle-row">
+                    <span class="forge-toggle-label"><span>🏷️</span> Üst Başlık Şeridi (Top Banner Tag)</span>
+                    <label class="forge-switch">
+                      <input type="checkbox" id="fg-chk-toptag" checked onchange="forgeState.showTopTag = this.checked; toggleForgeSubOpt('fg-opt-toptag', this.checked); updateCreatorLivePreview();">
+                      <span class="forge-slider-switch"></span>
+                    </label>
+                  </div>
+                  <div class="forge-sub-options" id="fg-opt-toptag">
+                    <div class="form-row">
+                      <div class="form-group" style="flex:0 0 70px;">
+                        <label>İkon</label>
+                        <input type="text" id="fg-toptag-icon" class="form-control" value="⚡" style="text-align:center;" oninput="forgeState.topTagIcon = this.value; updateCreatorLivePreview();">
+                      </div>
+                      <div class="form-group">
+                        <label>Şerit Metni</label>
+                        <input type="text" id="fg-toptag-txt" class="form-control" value="CANLI VİTRİN KARTI" oninput="forgeState.topTagText = this.value; updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 2. Profil / Portre Görseli -->
+                  <div class="forge-toggle-row">
+                    <span class="forge-toggle-label"><span>🖼️</span> Profil / Portre / Logo Görseli</span>
+                    <label class="forge-switch">
+                      <input type="checkbox" id="fg-chk-avatar" checked onchange="forgeState.showAvatar = this.checked; toggleForgeSubOpt('fg-opt-avatar', this.checked); updateCreatorLivePreview();">
+                      <span class="forge-slider-switch"></span>
+                    </label>
+                  </div>
+                  <div class="forge-sub-options" id="fg-opt-avatar">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Profil Görseli (PC'den veya URL)</label>
+                        <div style="display:flex; gap:6px;">
+                          <button type="button" class="btn-gal" onclick="uploadForgeAvatar()" style="flex:0 0 auto; padding:6px 10px; font-size:11px; background:rgba(56,189,248,0.2); border-color:#38bdf8; color:#bae6fd;">
+                            📤 PC'den Seç
+                          </button>
+                          <input type="text" id="fg-avatar-url" class="form-control" value="/kick/vexana/assets/images/portrait.jpg" oninput="forgeState.avatarUrl = this.value; updateCreatorLivePreview();">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label>Avatar Kesim Şekli</label>
+                        <select id="fg-avatar-shape" class="form-control" onchange="forgeState.avatarShape = this.value; updateCreatorLivePreview();">
+                          <option value="hex" selected>Siber Altıgen (Hexagon)</option>
+                          <option value="diamond">Elmas (Diamond)</option>
+                          <option value="round">Tam Daire (Circle)</option>
+                          <option value="square">Modern Kare</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 3. Kart Başlığı & Alt Başlık -->
+                  <div class="forge-toggle-row">
+                    <span class="forge-toggle-label"><span>📝</span> Başlık & Alt Başlık Metinleri</span>
+                    <label class="forge-switch">
+                      <input type="checkbox" id="fg-chk-titles" checked disabled>
+                      <span class="forge-slider-switch" style="background:#10b981;"></span>
+                    </label>
+                  </div>
+                  <div class="forge-sub-options">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Kart Başlığı</label>
+                        <input type="text" id="fg-title" class="form-control" value="MİRA CYBER SHOWCASE" oninput="forgeState.title = this.value; updateCreatorLivePreview();">
+                      </div>
+                      <div class="form-group">
+                        <label>Başlık Boyutu: <strong id="fg-title-size-lbl">18px</strong></label>
+                        <input type="range" id="fg-title-size" min="12" max="28" step="1" value="18" oninput="document.getElementById('fg-title-size-lbl').textContent = this.value + 'px'; forgeState.titleSize = parseInt(this.value, 10); updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Alt Başlık / Açıklama</label>
+                        <input type="text" id="fg-subtitle" class="form-control" value="Mythic Glory Streamer • Mid Lane" oninput="forgeState.subtitle = this.value; updateCreatorLivePreview();">
+                      </div>
+                      <div class="form-group">
+                        <label>Metin Hizalama</label>
+                        <select id="fg-text-align" class="form-control" onchange="forgeState.textAlign = this.value; updateCreatorLivePreview();">
+                          <option value="left" selected>Sola Hizala</option>
+                          <option value="center">Ortala</option>
+                          <option value="right">Sağa Hizala</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 4. Büyük Sayaç / İstatistik Alanı -->
+                  <div class="forge-toggle-row">
+                    <span class="forge-toggle-label"><span>📊</span> Büyük İstatistik / Sayaç Kutusu</span>
+                    <label class="forge-switch">
+                      <input type="checkbox" id="fg-chk-stat" checked onchange="forgeState.showStatBox = this.checked; toggleForgeSubOpt('fg-opt-stat', this.checked); updateCreatorLivePreview();">
+                      <span class="forge-slider-switch"></span>
+                    </label>
+                  </div>
+                  <div class="forge-sub-options" id="fg-opt-stat">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Sayaç Başlığı</label>
+                        <input type="text" id="fg-stat-label" class="form-control" value="CANLI TAKİPÇİ" oninput="forgeState.statLabel = this.value; updateCreatorLivePreview();">
+                      </div>
+                      <div class="form-group">
+                        <label>Sayaç Değeri</label>
+                        <input type="text" id="fg-stat-val" class="form-control" value="1,450" oninput="forgeState.statValue = this.value; updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 5. İlerleme Çubuğu (Mini Goal) -->
+                  <div class="forge-toggle-row">
+                    <span class="forge-toggle-label"><span>🎯</span> İlerleme Çubuğu (Progress Bar)</span>
+                    <label class="forge-switch">
+                      <input type="checkbox" id="fg-chk-prog" checked onchange="forgeState.showProgressBar = this.checked; toggleForgeSubOpt('fg-opt-prog', this.checked); updateCreatorLivePreview();">
+                      <span class="forge-slider-switch"></span>
+                    </label>
+                  </div>
+                  <div class="forge-sub-options" id="fg-opt-prog">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Hedef Etiketi</label>
+                        <input type="text" id="fg-prog-label" class="form-control" value="HEDEF: 2,000" oninput="forgeState.progressLabel = this.value; updateCreatorLivePreview();">
+                      </div>
+                      <div class="form-group">
+                        <label>Doluluk: <strong id="fg-prog-val-lbl">%70</strong></label>
+                        <input type="range" id="fg-prog-val" min="0" max="100" step="5" value="70" oninput="document.getElementById('fg-prog-val-lbl').textContent = '%' + this.value; forgeState.progressValue = parseInt(this.value, 10); updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 6. Rozetler -->
+                  <div class="forge-toggle-row">
+                    <span class="forge-toggle-label"><span>🏷️</span> Rozetler (Badges)</span>
+                    <label class="forge-switch">
+                      <input type="checkbox" id="fg-chk-badges" checked onchange="forgeState.showBadges = this.checked; toggleForgeSubOpt('fg-opt-badges', this.checked); updateCreatorLivePreview();">
+                      <span class="forge-slider-switch"></span>
+                    </label>
+                  </div>
+                  <div class="forge-sub-options" id="fg-opt-badges">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>1. Rozet</label>
+                        <input type="text" id="fg-badge-1" class="form-control" value="⚡ PRO STREAMER" oninput="forgeState.badge1 = this.value; updateCreatorLivePreview();">
+                      </div>
+                      <div class="form-group">
+                        <label>2. Rozet</label>
+                        <input type="text" id="fg-badge-2" class="form-control" value="● LIVE" oninput="forgeState.badge2 = this.value; updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 7. Alıntı / Slogan -->
+                  <div class="forge-toggle-row">
+                    <span class="forge-toggle-label"><span>💬</span> Alıntı / Slogan Kutusu</span>
+                    <label class="forge-switch">
+                      <input type="checkbox" id="fg-chk-quote" checked onchange="forgeState.showQuote = this.checked; toggleForgeSubOpt('fg-opt-quote', this.checked); updateCreatorLivePreview();">
+                      <span class="forge-slider-switch"></span>
+                    </label>
+                  </div>
+                  <div class="forge-sub-options" id="fg-opt-quote">
+                    <div class="form-group">
+                      <label>Alıntı / Slogan Metni</label>
+                      <input type="text" id="fg-quote-text" class="form-control" value='"Şafak Vadisi zaferimizi bekliyor!"' oninput="forgeState.quoteText = this.value; updateCreatorLivePreview();">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 5. RENK LABORATUVARI & 2D SPEKTRUM SEÇİCİ -->
+                <div class="creator-section">
+                  <div class="creator-sec-title">
+                    <span>🎨</span> <span>5. RENK LABORATUVARI & 2D SPEKTRUM SEÇİCİ</span>
+                  </div>
                   <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
-                    🎯 Düzenlemek istediğiniz rengi seçin, 2D renk tablasında mouse gezdirerek hassas ayar yapın:
+                    🎯 Düzenlemek istediğiniz rengi seçin, 2D renk tablasında mouse gezdirerek anında rengi bulun:
                   </div>
                   <div class="creator-color-target-pills" id="cr-color-target-pills">
                     <button type="button" class="creator-target-pill active" data-target="primary" onclick="setCreatorColorTarget('primary', this)">Ana Vurgu Rengi</button>
@@ -2340,13 +2730,15 @@
                   </div>
                 </div>
 
-                <!-- E. Font, Yuvarlaklık & Opaklık -->
+                <!-- 6. FONT & GALERİ KAYIT ADI -->
                 <div class="creator-section">
-                  <div class="creator-sec-title">🔤 FONT, KÖŞE YUVARLAKLIĞI & ŞEFFAFLIK</div>
+                  <div class="creator-sec-title">
+                    <span>🔤</span> <span>6. YAZI FONTU & GALERİ BİLGİSİ</span>
+                  </div>
                   <div class="form-row">
                     <div class="form-group">
                       <label>Yazı Fontu (Font Family)</label>
-                      <select id="cr-card-font" class="form-control" onchange="updateCreatorLivePreview()">
+                      <select id="fg-card-font" class="form-control" onchange="forgeState.fontFamily = this.value; updateCreatorLivePreview();">
                         <option value="'Orbitron', sans-serif" selected>Orbitron (Siber / E-Spor)</option>
                         <option value="'Cinzel Decorative', cursive">Cinzel Decorative (Mistik / Epik)</option>
                         <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Modern Net)</option>
@@ -2355,15 +2747,12 @@
                       </select>
                     </div>
                     <div class="form-group">
-                      <label>Köşe Yuvarlaklığı: <strong id="cr-card-radius-lbl">18px</strong></label>
-                      <input type="range" id="cr-card-radius" min="0" max="44" step="2" value="18" oninput="document.getElementById('cr-card-radius-lbl').textContent = this.value + 'px'; updateCreatorLivePreview();">
+                      <label>Galeri Kayıt Adı (Kendi Galerinizde Görünecek İsim)</label>
+                      <input type="text" id="cr-card-name" class="form-control" value="Özel Cyberpunk Vitrinim" oninput="forgeState.name = this.value; updateCreatorLivePreview();">
                     </div>
                   </div>
-                  <div class="form-group">
-                    <label>Kart Arka Plan Opaklığı: <strong id="cr-card-opacity-lbl">90%</strong></label>
-                    <input type="range" id="cr-card-opacity" min="10" max="100" step="5" value="90" oninput="document.getElementById('cr-card-opacity-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
-                  </div>
                 </div>
+
               </div>
 
               <!-- 2. ARKA PLAN TASARIM FORMU (MODE: BACKGROUND) -->
@@ -2558,9 +2947,12 @@
                 </div>
               </div>
 
-              <!-- Kaydet Butonu -->
+              <!-- Kaydet & Tuvale Ekle Butonları -->
               <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
-                <button type="button" class="btn-primary" id="creator-save-to-gallery-btn" onclick="saveCreatorDesignToGallery()" style="width:100%; padding:14px 20px; font-size:13.5px; font-weight:800; letter-spacing:0.5px; background:linear-gradient(135deg, #10b981, #059669); border:none; box-shadow:0 6px 20px rgba(16,185,129,0.35); cursor:pointer;">
+                <button type="button" class="btn-primary" id="creator-direct-add-to-canvas-btn" onclick="directAddCreatedDesignToCanvas()" style="width:100%; padding:13px 20px; font-size:13px; font-weight:800; background:linear-gradient(135deg, #7c3aed, #06b6d4); border:none; box-shadow:0 6px 20px rgba(124,58,237,0.35); cursor:pointer;">
+                  🚀 BU KARTI DİREKT TUVALE EKLE & KULLAN
+                </button>
+                <button type="button" class="btn-primary" id="creator-save-to-gallery-btn" onclick="saveCreatorDesignToGallery()" style="width:100%; padding:13px 20px; font-size:13px; font-weight:800; letter-spacing:0.5px; background:linear-gradient(135deg, #10b981, #059669); border:none; box-shadow:0 6px 20px rgba(16,185,129,0.35); cursor:pointer;">
                   💾 BU TASARIMI KENDİ GALERİME KAYDET
                 </button>
                 
@@ -3148,21 +3540,451 @@
     }
 
     /* ========================================================
-       CREATOR STUDIO (ÖZEL TASARIM ATÖLYESİ) MOTORU
+       CREATOR STUDIO (ÖZEL TASARIM ATÖLYESİ - FORGE) MOTORU
        ======================================================== */
     let creatorActiveMode = 'card'; // 'card' | 'background' | 'alert'
-    let creatorActiveCardType = 'showcase';
     let creatorActiveColorTarget = 'primary'; // 'primary' | 'secondary' | 'textColor' | 'bgColor' | 'borderColor'
     let creatorColors = {
-      primary: '#a855f7',
-      secondary: '#10b981',
+      primary: '#eab308',
+      secondary: '#06b6d4',
       textColor: '#ffffff',
-      bgColor: '#0d0f18',
-      borderColor: '#a855f7'
+      bgColor: '#0c0e17',
+      borderColor: '#eab308'
     };
-    let creatorSpectrumHsv = { h: 271, s: 67, v: 97 };
+    let creatorSpectrumHsv = { h: 48, s: 92, v: 92 };
     let creatorSpectrumLocked = false;
     let lastSavedCreatorItem = null;
+
+    let forgeState = {
+      preset: 'cyberpunk',
+      name: 'Özel Cyberpunk Vitrinim',
+      shapeCut: 'chamfer',
+      cutRadius: 22,
+      sizePreset: 'standard',
+      cardWidth: 440,
+      cardHeight: 230,
+      borderStyle: 'solid',
+      borderWidth: 2,
+      glowIntensity: 28,
+      neonPulse: false,
+      material: 'carbon',
+      backdropBlur: 14,
+      bgOpacity: 85,
+      gradientAngle: 135,
+      customImgUrl: '',
+      showTopTag: true,
+      topTagIcon: '⚡',
+      topTagText: 'CANLI VİTRİN KARTI',
+      showAvatar: true,
+      avatarUrl: '/kick/vexana/assets/images/portrait.jpg',
+      avatarShape: 'hex',
+      title: 'MİRA CYBER SHOWCASE',
+      titleSize: 18,
+      subtitle: 'Mythic Glory Streamer • Mid Lane',
+      textAlign: 'left',
+      showStatBox: true,
+      statLabel: 'CANLI TAKİPÇİ',
+      statValue: '1,450',
+      showProgressBar: true,
+      progressValue: 70,
+      progressLabel: 'HEDEF: 2,000',
+      showBadges: true,
+      badge1: '⚡ PRO STREAMER',
+      badge2: '● LIVE',
+      badgeStyle: 'pill',
+      showSocials: false,
+      kickHandle: 'cihanatas',
+      tiktokHandle: '@mira',
+      showQuote: true,
+      quoteText: '"Şafak Vadisi zaferimizi bekliyor!"',
+      fontFamily: "'Orbitron', sans-serif"
+    };
+
+    const FORGE_PRESETS = {
+      cyberpunk: {
+        icon: '🦾',
+        title: 'Cyberpunk 2077',
+        desc: '45° Kesik Köşe + Karbon Doku + Neon Sarı & Camgöbeği',
+        shapeCut: 'chamfer',
+        cutRadius: 22,
+        borderStyle: 'solid',
+        borderWidth: 2,
+        glowIntensity: 28,
+        material: 'carbon',
+        primary: '#eab308',
+        secondary: '#06b6d4',
+        textColor: '#ffffff',
+        bgColor: '#0c0e17',
+        borderColor: '#eab308',
+        avatarShape: 'hex',
+        topTagIcon: '🦾',
+        topTagText: 'CYBERPUNK 2077 // NIGHT CITY',
+        title: 'V // SİBER YAYINCI',
+        subtitle: 'Sandevistan • Solo Rank #1',
+        statLabel: 'SİBER GÜÇ',
+        statValue: '99,420 XP',
+        badge1: '🦾 SANDEVISTAN',
+        badge2: '● LIVE',
+        quoteText: '"Gecenin şehri asla uyumaz."'
+      },
+      glassmorphism: {
+        icon: '🪟',
+        title: 'Buzlu Cam (Glass)',
+        desc: '20px Oval Köşe + 24px Blur + Beyaz İnce Glow + Saydam',
+        shapeCut: 'none',
+        cutRadius: 24,
+        borderStyle: 'solid',
+        borderWidth: 1,
+        glowIntensity: 18,
+        material: 'glass',
+        backdropBlur: 20,
+        bgOpacity: 55,
+        primary: '#ffffff',
+        secondary: '#38bdf8',
+        textColor: '#f8fafc',
+        bgColor: '#0f172a',
+        borderColor: '#94a3b8',
+        avatarShape: 'round',
+        topTagIcon: '✨',
+        topTagText: 'FROSTED GLASS AESTHETIC',
+        title: 'MİRA AESTHETIC',
+        subtitle: 'Chill Vibes & Lo-Fi Lounge',
+        statLabel: 'TAKİPÇİ',
+        statValue: '3,250',
+        badge1: '✨ VERIFIED',
+        badge2: '❄️ CHILL',
+        quoteText: '"Kahveni al ve rahatına bak."'
+      },
+      esports: {
+        icon: '🛡️',
+        title: 'E-Spor Zırhlı',
+        desc: '4 Köşe Zırhlı Kesik + Çift Katman Çerçeve + Altın & Ateş',
+        shapeCut: 'bevel',
+        cutRadius: 18,
+        borderStyle: 'double',
+        borderWidth: 4,
+        glowIntensity: 30,
+        material: 'matte',
+        primary: '#ffd700',
+        secondary: '#ef4444',
+        textColor: '#ffffff',
+        bgColor: '#0d0f18',
+        borderColor: '#ffd700',
+        avatarShape: 'diamond',
+        topTagIcon: '🏆',
+        topTagText: 'TOURNAMENT CHAMPION',
+        title: 'PRO ESPORTS ARENA',
+        subtitle: 'Grand Finalist • MVP 2026',
+        statLabel: 'WIN RATE',
+        statValue: '%84.2',
+        badge1: '🏆 RANK #1',
+        badge2: '🔥 ON STREAK',
+        quoteText: '"Zafer inananlarındır!"'
+      },
+      synthwave: {
+        icon: '🌌',
+        title: 'Synthwave 80s',
+        desc: 'Asimetrik Eğim + CRT Tarama Çizgileri + Neon Pembe & Mavi',
+        shapeCut: 'slanted',
+        cutRadius: 20,
+        borderStyle: 'solid',
+        borderWidth: 2,
+        glowIntensity: 35,
+        material: 'scanlines',
+        primary: '#f43f5e',
+        secondary: '#06b6d4',
+        textColor: '#ffffff',
+        bgColor: '#0e0d1f',
+        borderColor: '#f43f5e',
+        avatarShape: 'square',
+        topTagIcon: '📼',
+        topTagText: 'SYNTHWAVE 1984 RADICAL',
+        title: 'RETRO NEON WAVE',
+        subtitle: 'Outrun • Synth Vibes',
+        statLabel: 'HIGH SCORE',
+        statValue: '999,999',
+        badge1: '📼 VHS VIBES',
+        badge2: '🕹️ RETRO',
+        quoteText: '"Drive into the neon sunset."'
+      },
+      minimalist: {
+        icon: '💎',
+        title: 'Minimalist Lüks',
+        desc: 'Sol Vurgu Çubuğu + Jilet Keskin Köşe + Derin Mat Siyah',
+        shapeCut: 'none',
+        cutRadius: 8,
+        borderStyle: 'accent-left',
+        borderWidth: 3,
+        glowIntensity: 14,
+        material: 'matte',
+        primary: '#c084fc',
+        secondary: '#10b981',
+        textColor: '#f1f5f9',
+        bgColor: '#090a0f',
+        borderColor: '#c084fc',
+        avatarShape: 'round',
+        topTagIcon: '💎',
+        topTagText: 'MINIMAL STREAM HUB',
+        title: 'MINIMAL ELEGANCE',
+        subtitle: 'Clean, Modern, Distraction-Free',
+        statLabel: 'TOP BAĞIŞ',
+        statValue: '500 ₺',
+        badge1: '💎 VIP',
+        badge2: '● ONLINE',
+        quoteText: '"Sadelik en yüksek gelişmişlik düzeyidir."'
+      },
+      liquid_pill: {
+        icon: '💊',
+        title: 'Sıvı Kapsül (Pill)',
+        desc: '999px Tam Oval Kapsül + Zümrüt & Camgöbeği Aura + Pürüzsüz',
+        shapeCut: 'pill',
+        cutRadius: 50,
+        borderStyle: 'solid',
+        borderWidth: 2,
+        glowIntensity: 26,
+        material: 'gradient',
+        gradientAngle: 90,
+        primary: '#10b981',
+        secondary: '#6366f1',
+        textColor: '#ffffff',
+        bgColor: '#0a1120',
+        borderColor: '#10b981',
+        avatarShape: 'round',
+        topTagIcon: '🟢',
+        topTagText: 'LIQUID CAPSULE DOCK',
+        title: 'NEO CAPSULE',
+        subtitle: 'Stream Deck • Fast Info',
+        statLabel: 'HEDEF',
+        statValue: '%92 DOLU',
+        badge1: '🟢 CANLI',
+        badge2: '⚡ BOOST',
+        quoteText: '"Hız ve akıcılık bir arada."'
+      }
+    };
+
+    function renderForgePresets() {
+      const container = document.getElementById('forge-presets-container');
+      if (!container) return;
+      container.innerHTML = Object.entries(FORGE_PRESETS).map(([key, p]) => `
+        <div class="forge-preset-card ${forgeState.preset === key ? 'active' : ''}" onclick="applyForgePreset('${key}')">
+          <div class="forge-preset-icon">${p.icon}</div>
+          <div class="forge-preset-title">${p.title}</div>
+          <div class="forge-preset-desc">${p.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    function applyForgePreset(presetKey) {
+      const p = FORGE_PRESETS[presetKey];
+      if (!p) return;
+      forgeState.preset = presetKey;
+      forgeState.name = `Özel ${p.title} Kartım`;
+      forgeState.shapeCut = p.shapeCut;
+      forgeState.cutRadius = p.cutRadius;
+      forgeState.borderStyle = p.borderStyle;
+      forgeState.borderWidth = p.borderWidth;
+      forgeState.glowIntensity = p.glowIntensity;
+      forgeState.material = p.material;
+      if (p.backdropBlur !== undefined) forgeState.backdropBlur = p.backdropBlur;
+      if (p.bgOpacity !== undefined) forgeState.bgOpacity = p.bgOpacity;
+      if (p.gradientAngle !== undefined) forgeState.gradientAngle = p.gradientAngle;
+      if (p.avatarShape) forgeState.avatarShape = p.avatarShape;
+      if (p.topTagIcon) forgeState.topTagIcon = p.topTagIcon;
+      if (p.topTagText) forgeState.topTagText = p.topTagText;
+      if (p.title) forgeState.title = p.title;
+      if (p.subtitle) forgeState.subtitle = p.subtitle;
+      if (p.statLabel) forgeState.statLabel = p.statLabel;
+      if (p.statValue) forgeState.statValue = p.statValue;
+      if (p.badge1) forgeState.badge1 = p.badge1;
+      if (p.badge2) forgeState.badge2 = p.badge2;
+      if (p.quoteText) forgeState.quoteText = p.quoteText;
+
+      creatorColors.primary = p.primary;
+      creatorColors.secondary = p.secondary;
+      creatorColors.textColor = p.textColor;
+      creatorColors.bgColor = p.bgColor;
+      creatorColors.borderColor = p.borderColor;
+      creatorSpectrumHsv = studioHexToHsv(p.primary);
+
+      syncForgeUIFromState();
+      renderForgePresets();
+      updateCreatorLivePreview();
+      showToast(`⚡ "${p.title}" şablonu uygulandı!`, 'success');
+    }
+
+    function syncForgeUIFromState() {
+      // Shape cut buttons
+      document.querySelectorAll('#forge-shape-cuts-grid .forge-shape-btn').forEach(btn => {
+        const shp = btn.getAttribute('data-shape');
+        if (shp === forgeState.shapeCut) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+
+      // Material buttons
+      document.querySelectorAll('#fg-materials-grid .fg-mat-btn').forEach(btn => {
+        const mat = btn.getAttribute('data-mat');
+        if (mat === forgeState.material) {
+          btn.classList.add('active');
+          btn.style.background = '#7c3aed';
+          btn.style.borderColor = '#c084fc';
+          btn.style.color = '#fff';
+        } else {
+          btn.classList.remove('active');
+          btn.style.background = '';
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }
+      });
+
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+      const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+      const setChk = (id, chk) => { const el = document.getElementById(id); if (el) el.checked = !!chk; };
+
+      setVal('fg-cut-rad', forgeState.cutRadius);
+      setTxt('fg-cut-rad-lbl', forgeState.cutRadius + 'px');
+      setVal('fg-size-preset', forgeState.sizePreset);
+      setVal('fg-card-w', forgeState.cardWidth);
+      setTxt('fg-card-w-lbl', forgeState.cardWidth + 'px');
+      setVal('fg-card-h', forgeState.cardHeight);
+      setTxt('fg-card-h-lbl', forgeState.cardHeight + 'px');
+      setVal('fg-border-style', forgeState.borderStyle);
+      setVal('fg-border-w', forgeState.borderWidth);
+      setTxt('fg-border-w-lbl', forgeState.borderWidth + 'px');
+      setVal('fg-glow', forgeState.glowIntensity);
+      setTxt('fg-glow-lbl', forgeState.glowIntensity + 'px');
+      setChk('fg-pulse-chk', forgeState.neonPulse);
+      setVal('fg-blur', forgeState.backdropBlur);
+      setTxt('fg-blur-lbl', forgeState.backdropBlur + 'px');
+      setVal('fg-op', forgeState.bgOpacity);
+      setTxt('fg-op-lbl', forgeState.bgOpacity + '%');
+      setVal('fg-grad-ang', forgeState.gradientAngle);
+      setTxt('fg-grad-ang-lbl', forgeState.gradientAngle + '°');
+
+      setChk('fg-chk-toptag', forgeState.showTopTag);
+      toggleForgeSubOpt('fg-opt-toptag', forgeState.showTopTag);
+      setVal('fg-toptag-icon', forgeState.topTagIcon);
+      setVal('fg-toptag-txt', forgeState.topTagText);
+
+      setChk('fg-chk-avatar', forgeState.showAvatar);
+      toggleForgeSubOpt('fg-opt-avatar', forgeState.showAvatar);
+      setVal('fg-avatar-url', forgeState.avatarUrl);
+      setVal('fg-avatar-shape', forgeState.avatarShape);
+
+      setVal('fg-title', forgeState.title);
+      setVal('fg-title-size', forgeState.titleSize);
+      setTxt('fg-title-size-lbl', forgeState.titleSize + 'px');
+      setVal('fg-subtitle', forgeState.subtitle);
+      setVal('fg-text-align', forgeState.textAlign);
+
+      setChk('fg-chk-stat', forgeState.showStatBox);
+      toggleForgeSubOpt('fg-opt-stat', forgeState.showStatBox);
+      setVal('fg-stat-label', forgeState.statLabel);
+      setVal('fg-stat-val', forgeState.statValue);
+
+      setChk('fg-chk-prog', forgeState.showProgressBar);
+      toggleForgeSubOpt('fg-opt-prog', forgeState.showProgressBar);
+      setVal('fg-prog-label', forgeState.progressLabel);
+      setVal('fg-prog-val', forgeState.progressValue);
+      setTxt('fg-prog-val-lbl', '%' + forgeState.progressValue);
+
+      setChk('fg-chk-badges', forgeState.showBadges);
+      toggleForgeSubOpt('fg-opt-badges', forgeState.showBadges);
+      setVal('fg-badge-1', forgeState.badge1);
+      setVal('fg-badge-2', forgeState.badge2);
+
+      setChk('fg-chk-quote', forgeState.showQuote);
+      toggleForgeSubOpt('fg-opt-quote', forgeState.showQuote);
+      setVal('fg-quote-text', forgeState.quoteText);
+
+      setVal('fg-card-font', forgeState.fontFamily);
+      setVal('cr-card-name', forgeState.name);
+
+      updateCreatorSpectrumVisuals();
+    }
+
+    function setForgeShapeCut(shape, btnEl) {
+      forgeState.shapeCut = shape;
+      document.querySelectorAll('#forge-shape-cuts-grid .forge-shape-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      updateCreatorLivePreview();
+    }
+
+    function setForgeMaterial(mat, btnEl) {
+      forgeState.material = mat;
+      document.querySelectorAll('#fg-materials-grid .fg-mat-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = '';
+        b.style.borderColor = '';
+        b.style.color = '';
+      });
+      if (btnEl) {
+        btnEl.classList.add('active');
+        btnEl.style.background = '#7c3aed';
+        btnEl.style.borderColor = '#c084fc';
+        btnEl.style.color = '#fff';
+      }
+
+      const glassOpts = document.getElementById('fg-mat-glass-opts');
+      const gradOpts = document.getElementById('fg-mat-grad-opts');
+      const imgOpts = document.getElementById('fg-mat-img-opts');
+      if (glassOpts) glassOpts.style.display = (mat === 'glass') ? 'flex' : 'none';
+      if (gradOpts) gradOpts.style.display = (mat === 'gradient') ? 'block' : 'none';
+      if (imgOpts) imgOpts.style.display = (mat === 'custom_img') ? 'flex' : 'none';
+
+      updateCreatorLivePreview();
+    }
+
+    function onForgeSizePresetChange(preset) {
+      forgeState.sizePreset = preset;
+      const customRow = document.getElementById('fg-custom-size-row');
+      const presetSizes = {
+        standard: [440, 230],
+        banner: [480, 150],
+        vertical: [320, 420],
+        compact: [460, 75],
+        square: [320, 320]
+      };
+      if (preset === 'custom') {
+        if (customRow) customRow.style.display = 'flex';
+      } else {
+        if (customRow) customRow.style.display = 'none';
+        const [w, h] = presetSizes[preset] || [440, 230];
+        forgeState.cardWidth = w;
+        forgeState.cardHeight = h;
+        const wInp = document.getElementById('fg-card-w');
+        const hInp = document.getElementById('fg-card-h');
+        if (wInp) wInp.value = w;
+        if (hInp) hInp.value = h;
+        const wLbl = document.getElementById('fg-card-w-lbl');
+        const hLbl = document.getElementById('fg-card-h-lbl');
+        if (wLbl) wLbl.textContent = w + 'px';
+        if (hLbl) hLbl.textContent = h + 'px';
+      }
+      updateCreatorLivePreview();
+    }
+
+    function toggleForgeSubOpt(id, show) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = show ? 'flex' : 'none';
+    }
+
+    function uploadForgeAvatar() {
+      uploadStudioMediaFile((url) => {
+        forgeState.avatarUrl = url;
+        const inp = document.getElementById('fg-avatar-url');
+        if (inp) inp.value = url;
+        updateCreatorLivePreview();
+      });
+    }
+
+    function uploadForgeCardBg() {
+      uploadStudioMediaFile((url) => {
+        forgeState.customImgUrl = url;
+        const inp = document.getElementById('fg-custom-img-url');
+        if (inp) inp.value = url;
+        updateCreatorLivePreview();
+      });
+    }
 
     function uploadStudioMediaFile(onUploaded) {
       let inp = document.getElementById('studio-global-file-input');
@@ -3202,22 +4024,6 @@
       inp.click();
     }
 
-    function uploadCreatorAvatar() {
-      uploadStudioMediaFile((url) => {
-        const el = document.getElementById('cr-card-avatar');
-        if (el) el.value = url;
-        updateCreatorLivePreview();
-      });
-    }
-
-    function uploadCreatorCardBg() {
-      uploadStudioMediaFile((url) => {
-        const el = document.getElementById('cr-card-bg-img');
-        if (el) el.value = url;
-        updateCreatorLivePreview();
-      });
-    }
-
     function uploadCreatorSceneBg() {
       uploadStudioMediaFile((url) => {
         const el = document.getElementById('cr-bg-img-url');
@@ -3243,7 +4049,7 @@
 
       const typeBadge = document.getElementById('cr-preview-type-badge');
       if (typeBadge) {
-        if (mode === 'card') typeBadge.textContent = '🃏 Özel Kart';
+        if (mode === 'card') typeBadge.textContent = '🃏 Özel Kart (Forge)';
         else if (mode === 'background') typeBadge.textContent = '🌌 Sahne Arka Planı';
         else if (mode === 'alert') typeBadge.textContent = '⚡ Canlı Alert';
       }
@@ -3251,62 +4057,9 @@
       const saveBox = document.getElementById('creator-saved-success-box');
       if (saveBox) saveBox.style.display = 'none';
 
-      updateCreatorLivePreview();
-    }
-
-    function selectCreatorCardType(cardType, btnEl) {
-      creatorActiveCardType = cardType;
-      document.querySelectorAll('#creator-card-type-pills .creator-preset-btn').forEach(b => b.classList.remove('active'));
-      if (btnEl) btnEl.classList.add('active');
-
-      const typeLabels = {
-        showcase: '🃏 Vitrin Kartı',
-        webcam: '📷 Kamera Çerçevesi',
-        chat: '💬 Sohbet Kutusu',
-        social: '🌐 Sosyal Medya',
-        music: '🎵 Müzik & Player',
-        skills: '⚡ Skill Yetenekleri',
-        topbar: '📊 Üst Bilgi Barı',
-        gameframe: '🎮 Oyun Çerçevesi',
-        goal: '🎯 Hedef Barı',
-        image: '🖼️ Resim & GIF',
-        custom: '📌 Özel Duyuru'
-      };
-      const badge = document.getElementById('cr-preview-type-badge');
-      if (badge) badge.textContent = typeLabels[cardType] || '🃏 Özel Kart';
-
-      // Akıllı varsayılan metinler
-      const titleInp = document.getElementById('cr-card-title');
-      const nameInp = document.getElementById('cr-card-name');
-      if (titleInp && nameInp) {
-        if (cardType === 'webcam') {
-          titleInp.value = 'MİRA WEBCAM';
-          nameInp.value = 'Özel Kamera Çerçevem';
-        } else if (cardType === 'chat') {
-          titleInp.value = 'CANLI SOHBET';
-          nameInp.value = 'Özel Sohbet Kartım';
-        } else if (cardType === 'music') {
-          titleInp.value = 'NOW PLAYING';
-          nameInp.value = 'Özel Müzik Widgetim';
-        } else if (cardType === 'social') {
-          titleInp.value = 'SOSYAL MEDYA';
-          nameInp.value = 'Özel Sosyal Medya Kartım';
-        } else if (cardType === 'skills') {
-          titleInp.value = 'KAHRAMAN SKİLLERİ';
-          nameInp.value = 'Özel Yetenek Kartım';
-        } else if (cardType === 'goal') {
-          titleInp.value = 'TAKİPÇİ HEDEFİ';
-          nameInp.value = 'Özel Hedef Barım';
-        } else if (cardType === 'topbar') {
-          titleInp.value = 'MİRA E-SPORTS ARENA';
-          nameInp.value = 'Özel Üst Barım';
-        } else if (cardType === 'image') {
-          titleInp.value = 'ÖZEL GÖRSEL / LOGO';
-          nameInp.value = 'Özel Logo Kartım';
-        } else if (cardType === 'showcase') {
-          titleInp.value = 'MİRA PRO SHOWCASE';
-          nameInp.value = 'Özel Mistik Vitrinim';
-        }
+      if (mode === 'card') {
+        renderForgePresets();
+        syncForgeUIFromState();
       }
 
       updateCreatorLivePreview();
@@ -3455,6 +4208,234 @@
       }
     }
 
+    function hexToRgba(hex, alpha = 0.9) {
+      const clean = (hex || '#0d0f18').replace('#', '');
+      const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16) || 0;
+      const r = (num >> 16) & 255;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function getForgeClipPath(shape, cutRadius = 22) {
+      const r = Math.max(6, Math.min(60, Number(cutRadius) || 22));
+      switch (shape) {
+        case 'chamfer':
+          return `polygon(0 0, calc(100% - ${r}px) 0, 100% ${r}px, 100% 100%, ${r}px 100%, 0 calc(100% - ${r}px))`;
+        case 'bevel':
+          return `polygon(${r}px 0, calc(100% - ${r}px) 0, 100% ${r}px, 100% calc(100% - ${r}px), calc(100% - ${r}px) 100%, ${r}px 100%, 0 calc(100% - ${r}px), 0 ${r}px)`;
+        case 'notch':
+          return `polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 calc(50% + ${r}px), ${Math.round(r * 0.7)}px 50%, 0 calc(50% - ${r}px))`;
+        case 'slanted':
+          return `polygon(0 0, calc(100% - ${Math.round(r * 1.5)}px) 0, 100% ${Math.round(r * 1.2)}px, 100% 100%, 0 100%)`;
+        case 'hexagon':
+          return `polygon(${r}px 0, calc(100% - ${r}px) 0, 100% 50%, calc(100% - ${r}px) 100%, ${r}px 100%, 0 50%)`;
+        default:
+          return 'none';
+      }
+    }
+
+    function getForgeAvatarClip(shape) {
+      switch (shape) {
+        case 'hex':
+          return 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)';
+        case 'diamond':
+          return 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
+        default:
+          return 'none';
+      }
+    }
+
+    function getForgeMaterialCss(mat, bgCol, op, prim, sec, angle, blur) {
+      const alpha = (op !== undefined ? op : 85) / 100;
+      const baseRgba = hexToRgba(bgCol || '#0d0f18', alpha);
+      switch (mat) {
+        case 'glass':
+          return `backdrop-filter: blur(${blur || 14}px); -webkit-backdrop-filter: blur(${blur || 14}px); background: ${baseRgba};`;
+        case 'carbon':
+          return `background-color: #111218; background-image: radial-gradient(rgba(255,255,255,0.12) 15%, transparent 16%), radial-gradient(rgba(255,255,255,0.12) 15%, transparent 16%); background-size: 14px 14px; background-position: 0 0, 7px 7px;`;
+        case 'cybergrid':
+          return `background-color: #090b14; background-image: linear-gradient(${prim}28 1px, transparent 1px), linear-gradient(90deg, ${sec}28 1px, transparent 1px); background-size: 22px 22px;`;
+        case 'scanlines':
+          return `background-color: #0b0d16; background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.6) 0px, rgba(0,0,0,0.6) 2px, transparent 2px, transparent 4px);`;
+        case 'gradient':
+          return `background: linear-gradient(${angle}deg, ${hexToRgba(prim, 0.45)} 0%, ${hexToRgba(sec, 0.45)} 100%), #0a0d18;`;
+        case 'matte':
+          return `background: linear-gradient(180deg, #181a26 0%, #0c0d14 100%);`;
+        case 'custom_img':
+          return forgeState.customImgUrl ? `background-image: url("${forgeState.customImgUrl}"); background-size: cover; background-position: center;` : `background: ${baseRgba};`;
+        default:
+          return `background: ${baseRgba};`;
+      }
+    }
+
+    function buildCreatorForgeMockupHtml() {
+      const prim = creatorColors.primary || '#eab308';
+      const sec = creatorColors.secondary || '#06b6d4';
+      const textCol = creatorColors.textColor || '#ffffff';
+      const subCol = '#cbd5e1';
+      const bgCol = creatorColors.bgColor || '#0c0e17';
+      const borderCol = creatorColors.borderColor || prim;
+      const fontFam = forgeState.fontFamily || "'Orbitron', sans-serif";
+      const shape = forgeState.shapeCut || 'chamfer';
+      const cutRad = forgeState.cutRadius !== undefined ? forgeState.cutRadius : 22;
+      const bStyle = forgeState.borderStyle || 'solid';
+      const bWidth = forgeState.borderWidth !== undefined ? forgeState.borderWidth : 2;
+      const glow = forgeState.glowIntensity !== undefined ? forgeState.glowIntensity : 28;
+      const pulse = !!forgeState.neonPulse;
+      const mat = forgeState.material || 'carbon';
+      const blur = forgeState.backdropBlur !== undefined ? forgeState.backdropBlur : 14;
+      const op = forgeState.bgOpacity !== undefined ? forgeState.bgOpacity : 85;
+      const gradAng = forgeState.gradientAngle !== undefined ? forgeState.gradientAngle : 135;
+      const cardW = Math.min(520, forgeState.cardWidth || 440);
+      const cardH = forgeState.cardHeight || 230;
+
+      const clip = getForgeClipPath(shape, cutRad);
+      const isClipped = clip !== 'none';
+      const matCss = getForgeMaterialCss(mat, bgCol, op, prim, sec, gradAng, blur);
+
+      let topTagHtml = '';
+      if (forgeState.showTopTag) {
+        topTagHtml = `
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid ${prim}33; padding-bottom:5px;">
+            <div style="display:flex; align-items:center; gap:6px; font-size:10px; font-weight:900; letter-spacing:1px; color:${sec};">
+              <span>${escHtml(forgeState.topTagIcon || '⚡')}</span>
+              <span>${escHtml(forgeState.topTagText || 'CANLI VİTRİN KARTI')}</span>
+            </div>
+            <span style="font-size:9px; font-weight:800; color:#94a3b8; letter-spacing:0.8px;">MİRA FORGE</span>
+          </div>
+        `;
+      }
+
+      let avatarHtml = '';
+      if (forgeState.showAvatar) {
+        const avUrl = forgeState.avatarUrl || '/kick/vexana/assets/images/portrait.jpg';
+        const avShape = forgeState.avatarShape || 'hex';
+        const avClip = getForgeAvatarClip(avShape);
+        avatarHtml = `
+          <div style="width:58px; height:58px; flex-shrink:0; clip-path:${avClip}; -webkit-clip-path:${avClip}; border-radius:${avShape === 'round' ? '50%' : (avShape === 'square' ? '10px' : '0')}; border:2px solid ${prim}; box-shadow:0 0 12px ${prim}66; overflow:hidden;">
+            <img src="${escHtml(avUrl)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/kick/vexana/assets/images/portrait.jpg'">
+          </div>
+        `;
+      }
+
+      const titleText = forgeState.title || 'MİRA CYBER SHOWCASE';
+      const subText = forgeState.subtitle || 'Mythic Glory Streamer • Mid Lane';
+      const tSize = forgeState.titleSize || 18;
+      const tAlign = forgeState.textAlign || 'left';
+      const titlesHtml = `
+        <div style="flex:1; min-width:0; text-align:${tAlign};">
+          <div style="font-family:${fontFam}; font-size:${tSize}px; font-weight:900; color:${textCol}; text-shadow:0 0 10px ${prim}88; line-height:1.2; word-break:break-word;">
+            ${escHtml(titleText)}
+          </div>
+          <div style="font-size:11.5px; color:${subCol}; margin-top:3px; word-break:break-word;">
+            ${escHtml(subText)}
+          </div>
+        </div>
+      `;
+
+      let statHtml = '';
+      if (forgeState.showStatBox) {
+        statHtml = `
+          <div style="background:rgba(0,0,0,0.45); border:1px solid ${prim}44; border-radius:10px; padding:6px 12px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:10px; font-weight:800; color:${sec}; letter-spacing:0.8px;">${escHtml(forgeState.statLabel || 'CANLI TAKİPÇİ')}</span>
+            <span style="font-family:'Orbitron', sans-serif; font-size:15px; font-weight:900; color:#fff; text-shadow:0 0 8px ${prim};">${escHtml(forgeState.statValue || '1,450')}</span>
+          </div>
+        `;
+      }
+
+      let progressHtml = '';
+      if (forgeState.showProgressBar) {
+        const pVal = forgeState.progressValue !== undefined ? forgeState.progressValue : 70;
+        progressHtml = `
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:800; color:#e2e8f0;">
+              <span>${escHtml(forgeState.progressLabel || 'HEDEF: 2,000')}</span>
+              <span style="color:${sec};">%${pVal}</span>
+            </div>
+            <div style="height:8px; border-radius:99px; background:rgba(0,0,0,0.6); overflow:hidden; border:1px solid ${prim}44;">
+              <div style="width:${pVal}%; height:100%; background:linear-gradient(90deg, ${prim}, ${sec}); border-radius:99px;"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      let badgesHtml = '';
+      if (forgeState.showBadges) {
+        const bRad = forgeState.badgeStyle === 'pill' ? '99px' : '6px';
+        badgesHtml = `
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:${bRad}; background:${prim}25; border:1px solid ${prim}; color:#e9d5ff;">${escHtml(forgeState.badge1 || '⚡ PRO STREAMER')}</span>
+            <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:${bRad}; background:${sec}22; border:1px solid ${sec}; color:${sec};">${escHtml(forgeState.badge2 || '● LIVE')}</span>
+          </div>
+        `;
+      }
+
+      let socialsHtml = '';
+      if (forgeState.showSocials) {
+        socialsHtml = `
+          <div style="display:flex; gap:12px; font-size:11px; font-weight:700; color:#cbd5e1; flex-wrap:wrap;">
+            <span>🟢 kick.com/${escHtml(forgeState.kickHandle || 'cihanatas')}</span>
+            <span>📱 ${escHtml(forgeState.tiktokHandle || '@mira')}</span>
+          </div>
+        `;
+      }
+
+      let quoteHtml = '';
+      if (forgeState.showQuote && forgeState.quoteText) {
+        quoteHtml = `
+          <div style="font-size:11px; font-style:italic; color:#cbd5e1; border-left:3px solid ${prim}; padding-left:8px; line-height:1.4;">
+            ${escHtml(forgeState.quoteText)}
+          </div>
+        `;
+      }
+
+      const pulseClass = pulse ? 'mira-pulse-glow' : '';
+      const glowFilter = glow > 0 ? `filter: drop-shadow(0 0 ${glow}px ${borderCol}88);` : '';
+
+      if (isClipped) {
+        return `
+          <div class="mod-card mod-forge-card ${pulseClass}" style="max-width:100%; width:${cardW}px; min-height:${cardH ? cardH + 'px' : 'auto'}; position:relative; box-sizing:border-box; clip-path:${clip}; -webkit-clip-path:${clip}; background:${borderCol}; padding:${bWidth}px; ${glowFilter} transition: all 0.2s ease;">
+            <div style="clip-path:${clip}; -webkit-clip-path:${clip}; width:100%; height:100%; box-sizing:border-box; ${matCss} padding:16px 20px; display:flex; flex-direction:column; gap:10px; font-family:${fontFam}; color:${textCol}; overflow:hidden;">
+              ${topTagHtml}
+              <div style="display:flex; gap:12px; align-items:center;">
+                ${avatarHtml}
+                ${titlesHtml}
+              </div>
+              ${statHtml}
+              ${progressHtml}
+              ${badgesHtml}
+              ${socialsHtml}
+              ${quoteHtml}
+            </div>
+          </div>
+        `;
+      } else {
+        const radCss = shape === 'pill' ? '999px' : `${cutRad}px`;
+        const borderCss = bStyle === 'accent-left'
+          ? `border-left: ${Math.max(4, bWidth * 2)}px solid ${borderCol}; border-top:none; border-right:none; border-bottom:none;`
+          : (bWidth > 0 ? `border: ${bWidth}px ${bStyle} ${borderCol};` : 'border:none;');
+        const shadowCss = glow > 0
+          ? `box-shadow: 0 10px 30px rgba(0,0,0,0.65), 0 0 ${glow}px ${borderCol}88;`
+          : 'box-shadow: 0 10px 30px rgba(0,0,0,0.65);';
+
+        return `
+          <div class="mod-card mod-forge-card ${pulseClass}" style="max-width:100%; width:${cardW}px; min-height:${cardH ? cardH + 'px' : 'auto'}; position:relative; box-sizing:border-box; border-radius:${radCss}; ${borderCss} ${shadowCss} ${matCss} padding:16px 20px; display:flex; flex-direction:column; gap:10px; font-family:${fontFam}; color:${textCol}; overflow:hidden; transition: all 0.2s ease;">
+            ${topTagHtml}
+            <div style="display:flex; gap:12px; align-items:center;">
+              ${avatarHtml}
+              ${titlesHtml}
+            </div>
+            ${statHtml}
+            ${progressHtml}
+            ${badgesHtml}
+            ${socialsHtml}
+            ${quoteHtml}
+          </div>
+        `;
+      }
+    }
+
     function updateCreatorLivePreview() {
       const bgLayer = document.getElementById('creator-sim-bg-layer');
       const dimLayer = document.getElementById('creator-sim-dim-layer');
@@ -3537,164 +4518,31 @@
         return;
       }
 
-      // MODE: CARD
+      // MODE: CARD (FORGE)
       dimLayer.style.opacity = '0.35';
       bgLayer.style.backgroundImage = 'radial-gradient(circle at center, rgba(16,20,38,0.9) 0%, #060810 100%)';
       bgLayer.style.filter = 'none';
 
-      const cType = creatorActiveCardType;
-      const title = document.getElementById('cr-card-title')?.value || 'BAŞLIK';
-      const sub = document.getElementById('cr-card-sub')?.value || 'Açıklama';
-      const streamer = document.getElementById('cr-card-streamer')?.value || 'MİRA';
-      const role = document.getElementById('cr-card-role')?.value || 'PRO STREAMER';
-      const lane = document.getElementById('cr-card-lane')?.value || 'KICK & TIKTOK';
-      const quote = document.getElementById('cr-card-quote')?.value || '';
-      const avatar = (document.getElementById('cr-card-avatar')?.value || '').trim() || '/kick/vexana/assets/images/portrait.jpg';
-      const cardBgImg = (document.getElementById('cr-card-bg-img')?.value || '').trim();
-      const cardBgFit = document.getElementById('cr-card-bg-fit')?.value || 'cover';
-      const cardBgDim = parseInt(document.getElementById('cr-card-bg-dim')?.value || '20', 10);
-      const fontFam = document.getElementById('cr-card-font')?.value || "'Orbitron', sans-serif";
-      const rad = parseInt(document.getElementById('cr-card-radius')?.value || '18', 10);
-      const op = parseInt(document.getElementById('cr-card-opacity')?.value || '90', 10);
-
-      const primCol = creatorColors.primary || '#a855f7';
-      const secCol = creatorColors.secondary || '#10b981';
-      const textCol = creatorColors.textColor || '#ffffff';
-      const bgCol = creatorColors.bgColor || '#0d0f18';
-      const borderCol = creatorColors.borderColor || primCol;
-
-      const cardStyle = `
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-        max-width: 480px;
-        background: ${bgCol};
-        opacity: ${op / 100};
-        border: 2px solid ${borderCol};
-        border-radius: ${rad}px;
-        padding: 16px 20px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.65), 0 0 20px ${primCol}44;
-        font-family: ${fontFam};
-        color: ${textCol};
-        transition: all 0.2s ease;
-      `;
-
-      let cardInnerBgHtml = '';
-      if (cardBgImg) {
-        cardInnerBgHtml = `
-          <div style="position:absolute; inset:0; z-index:0; background-image:url('${escHtml(cardBgImg)}'); background-size:${cardBgFit === 'stretch' ? '100% 100%' : cardBgFit}; background-position:center; pointer-events:none;"></div>
-          <div style="position:absolute; inset:0; z-index:0; background:#000; opacity:${cardBgDim / 100}; pointer-events:none;"></div>
-        `;
-      }
-
-      let innerContentHtml = '';
-
-      if (cType === 'showcase') {
-        innerContentHtml = `
-          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:12px;">
-            <div style="display:flex; gap:14px; align-items:center;">
-              <div style="position:relative; width:56px; height:56px; border-radius:14px; overflow:hidden; border:2px solid ${primCol}; box-shadow:0 0 12px ${primCol}66; flex-shrink:0;">
-                <img src="${escHtml(avatar)}" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
-              </div>
-              <div style="flex:1; min-width:0;">
-                <span style="font-size:10px; font-weight:800; color:${secCol}; letter-spacing:0.8px;">${escHtml(streamer)} VİTRİNİ</span>
-                <div style="font-size:15px; font-weight:900; color:${textCol}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escHtml(title)}</div>
-                <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">${escHtml(sub)}</div>
-              </div>
-            </div>
-            <div style="display:flex; gap:6px;">
-              <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:6px; background:${primCol}22; border:1px solid ${primCol}; color:#e9d5ff;">${escHtml(role)}</span>
-              <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:6px; background:${secCol}22; border:1px solid ${secCol}; color:#6ee7b7;">${escHtml(lane)}</span>
-            </div>
-            ${quote ? `<div style="font-size:11px; font-style:italic; color:#cbd5e1; border-left:2px solid ${primCol}; padding-left:8px;">${escHtml(quote)}</div>` : ''}
-          </div>
-        `;
-      } else if (cType === 'webcam') {
-        innerContentHtml = `
-          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11.5px; font-weight:800; color:${textCol};">📷 ${escHtml(title)}</span>
-              <span style="font-size:10px; font-weight:800; color:${secCol};">● LIVE</span>
-            </div>
-            <div style="height:120px; border-radius:10px; border:1px dashed ${primCol}88; background:rgba(0,0,0,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center;">
-              <span style="font-size:12px; font-weight:800; color:#fff;">KAMERA YAYIN ALANI</span>
-              <span style="font-size:9.5px; color:#94a3b8; margin-top:2px;">OBS Video Yakalama Aygıtı</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:10.5px; color:#cbd5e1;">
-              <span>${escHtml(streamer)}</span>
-              <span style="color:${secCol}; font-weight:700;">${escHtml(sub)}</span>
-            </div>
-          </div>
-        `;
-      } else if (cType === 'chat') {
-        innerContentHtml = `
-          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid ${primCol}44; padding-bottom:6px;">
-              <span style="font-size:12px; font-weight:800; color:${textCol};">💬 ${escHtml(title)}</span>
-              <span style="font-size:9.5px; color:${secCol};">BotRix Bağlı</span>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:5px; font-size:11px;">
-              <div><strong style="color:${primCol};">AhmetPro:</strong> Yayın efsane gidiyor! 🔥</div>
-              <div><strong style="color:${secCol};">SelinGamer:</strong> Rank kaç oldu hocam? 🎮</div>
-              <div><strong style="color:#ffd700;">VexanaFan:</strong> GG WP! 💜</div>
-            </div>
-          </div>
-        `;
-      } else if (cType === 'music') {
-        innerContentHtml = `
-          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:12px; font-weight:800; color:${textCol};">🎵 ${escHtml(title)}</span>
-              <span style="font-size:10px; color:${secCol}; font-weight:800;">BGM PLAYING</span>
-            </div>
-            <div style="display:flex; gap:3px; height:18px; align-items:flex-end;">
-              ${Array.from({ length: 14 }).map((_, i) => `<div style="flex:1; background:${primCol}; height:${25 + ((i * 17) % 75)}%; border-radius:2px;"></div>`).join('')}
-            </div>
-            <div style="font-size:11.5px; font-weight:700; color:#fff;">♪ MLBB Arena - Chill Lo-Fi Beats</div>
-          </div>
-        `;
-      } else if (cType === 'goal') {
-        innerContentHtml = `
-          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800;">
-              <span>🎯 ${escHtml(title)}</span>
-              <span style="color:${secCol};">35 / 50 (%70)</span>
-            </div>
-            <div style="height:14px; border-radius:99px; background:rgba(0,0,0,0.6); overflow:hidden; border:1px solid ${primCol}66;">
-              <div style="width:70%; height:100%; background:linear-gradient(90deg, ${primCol}, ${secCol}); border-radius:99px;"></div>
-            </div>
-            <div style="font-size:10.5px; color:#cbd5e1; text-align:right;">Hedefe son 15 takipçi!</div>
-          </div>
-        `;
-      } else if (cType === 'image') {
-        innerContentHtml = `
-          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px; align-items:center;">
-            <div style="font-size:12px; font-weight:800; color:${textCol}; align-self:flex-start;">🖼️ ${escHtml(title)}</div>
-            <div style="width:100%; max-height:160px; border-radius:10px; overflow:hidden; border:1px solid ${primCol};">
-              <img src="${escHtml(avatar)}" alt="Görsel" style="width:100%; height:100%; object-fit:cover; display:block;">
-            </div>
-            <div style="font-size:10.5px; color:#cbd5e1;">${escHtml(sub)}</div>
-          </div>
-        `;
-      } else {
-        innerContentHtml = `
-          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
-            <div style="font-size:13px; font-weight:900; color:${textCol};">📌 ${escHtml(title)}</div>
-            <div style="font-size:11.5px; color:#cbd5e1; line-height:1.5;">${escHtml(sub || 'Bu karta tıklayarak metinleri, renkleri ve boyutları özelleştirebilirsiniz.')}</div>
-            ${quote ? `<div style="font-size:10.5px; font-style:italic; color:${secCol};">${escHtml(quote)}</div>` : ''}
-          </div>
-        `;
-      }
-
-      contentLayer.innerHTML = `
-        <div style="${cardStyle}">
-          ${cardInnerBgHtml}
-          ${innerContentHtml}
-        </div>
-      `;
+      contentLayer.innerHTML = buildCreatorForgeMockupHtml();
     }
 
-    function saveCreatorDesignToGallery() {
+    function directAddCreatedDesignToCanvas() {
+      saveCreatorDesignToGallery((savedItem) => {
+        openBlankCanvasBuilder();
+        const iframe = document.getElementById('preview-iframe');
+        if (iframe && iframe.contentWindow) {
+          setTimeout(() => {
+            iframe.contentWindow.postMessage({
+              type: 'MIRA_ADD_FORGE_CARD_DIRECT',
+              item: savedItem
+            }, '*');
+          }, 450);
+        }
+        showToast(`🚀 "${savedItem.name}" tuvalinize eklendi!`, 'success');
+      });
+    }
+
+    function saveCreatorDesignToGallery(onSavedCallback) {
       const btn = document.getElementById('creator-save-to-gallery-btn');
       if (btn) {
         btn.textContent = '⏳ Galerime Kaydediliyor...';
@@ -3704,48 +4552,73 @@
       let payload = null;
 
       if (creatorActiveMode === 'card') {
-        const title = (document.getElementById('cr-card-title')?.value || '').trim() || 'Özel Kartım';
-        const name = (document.getElementById('cr-card-name')?.value || '').trim() || `${title} (Kişisel Tasarımım)`;
-        const sub = (document.getElementById('cr-card-sub')?.value || '').trim();
-        const streamer = (document.getElementById('cr-card-streamer')?.value || '').trim();
-        const role = (document.getElementById('cr-card-role')?.value || '').trim();
-        const lane = (document.getElementById('cr-card-lane')?.value || '').trim();
-        const quote = (document.getElementById('cr-card-quote')?.value || '').trim();
-        const avatar = (document.getElementById('cr-card-avatar')?.value || '').trim() || '/kick/vexana/assets/images/portrait.jpg';
-        const cardBgImg = (document.getElementById('cr-card-bg-img')?.value || '').trim();
-        const cardBgFit = document.getElementById('cr-card-bg-fit')?.value || 'cover';
-        const cardBgDim = parseInt(document.getElementById('cr-card-bg-dim')?.value || '20', 10);
-        const fontFam = document.getElementById('cr-card-font')?.value || "'Orbitron', sans-serif";
-        const rad = parseInt(document.getElementById('cr-card-radius')?.value || '18', 10);
-        const op = parseInt(document.getElementById('cr-card-opacity')?.value || '90', 10);
+        const name = (document.getElementById('cr-card-name')?.value || '').trim() || forgeState.name || 'Özel Tasarım Kartım';
+        forgeState.name = name;
 
         payload = {
           name: name,
           category: 'card',
           icon: '🃏',
-          previewImg: avatar || cardBgImg || '/kick/vexana/assets/images/portrait.jpg',
-          badge: '🎨 Özel Tasarımım',
+          cardType: 'forge',
+          isCustomDesigned: true,
+          previewImg: forgeState.avatarUrl || '/kick/vexana/assets/images/portrait.jpg',
+          badge: '🎨 ' + (FORGE_PRESETS[forgeState.preset]?.title || 'Özel Şekilli Kart'),
           config: {
-            cardType: creatorActiveCardType,
-            title: title,
-            subtitleText: sub,
-            streamerName: streamer,
-            roleBadge: role,
-            laneBadge: lane,
-            quote: quote,
-            avatarUrl: avatar,
-            imageUrl: avatar,
-            bgImage: cardBgImg,
-            bgFit: cardBgFit,
-            bgDim: cardBgDim,
+            cardType: 'forge',
+            title: forgeState.title,
+            subtitleText: forgeState.subtitle,
+            streamerName: 'MİRA',
+            roleBadge: forgeState.badge1,
+            laneBadge: forgeState.badge2,
+            quote: forgeState.quoteText,
+            avatarUrl: forgeState.avatarUrl,
+            imageUrl: forgeState.avatarUrl,
+            shapeCut: forgeState.shapeCut,
+            cutRadius: forgeState.cutRadius,
+            cardWidth: forgeState.cardWidth,
+            cardHeight: forgeState.cardHeight,
+            borderStyle: forgeState.borderStyle,
+            borderWidth: forgeState.borderWidth,
+            glowIntensity: forgeState.glowIntensity,
+            neonPulse: forgeState.neonPulse,
+            cardMaterial: forgeState.material,
+            backdropBlur: forgeState.backdropBlur,
+            bgOpacity: forgeState.bgOpacity,
+            gradientAngle: forgeState.gradientAngle,
+            customImgUrl: forgeState.customImgUrl,
             primaryColor: creatorColors.primary,
             secondaryColor: creatorColors.secondary,
             textColor: creatorColors.textColor,
             bgColor: creatorColors.bgColor,
             borderColor: creatorColors.borderColor,
-            borderRadius: rad,
-            bgOpacity: op,
-            fontFamily: fontFam
+            fontFamily: forgeState.fontFamily,
+            components: {
+              showTopTag: forgeState.showTopTag,
+              topTagIcon: forgeState.topTagIcon,
+              topTagText: forgeState.topTagText,
+              showAvatar: forgeState.showAvatar,
+              avatarUrl: forgeState.avatarUrl,
+              avatarShape: forgeState.avatarShape,
+              title: forgeState.title,
+              titleSize: forgeState.titleSize,
+              subtitle: forgeState.subtitle,
+              textAlign: forgeState.textAlign,
+              showStatBox: forgeState.showStatBox,
+              statLabel: forgeState.statLabel,
+              statValue: forgeState.statValue,
+              showProgressBar: forgeState.showProgressBar,
+              progressValue: forgeState.progressValue,
+              progressLabel: forgeState.progressLabel,
+              showBadges: forgeState.showBadges,
+              badge1: forgeState.badge1,
+              badge2: forgeState.badge2,
+              badgeStyle: forgeState.badgeStyle,
+              showSocials: forgeState.showSocials,
+              kickHandle: forgeState.kickHandle,
+              tiktokHandle: forgeState.tiktokHandle,
+              showQuote: forgeState.showQuote,
+              quoteText: forgeState.quoteText
+            }
           }
         };
       } else if (creatorActiveMode === 'background') {
@@ -3829,6 +4702,10 @@
           const successBox = document.getElementById('creator-saved-success-box');
           if (successBox) successBox.style.display = 'block';
 
+          if (typeof onSavedCallback === 'function') {
+            onSavedCallback(lastSavedCreatorItem);
+          }
+
           setTimeout(() => {
             if (btn) btn.textContent = '💾 BU TASARIMI KENDİ GALERİME KAYDET';
           }, 3000);
@@ -3868,7 +4745,10 @@
           showToast(`🌌 Arka plan tuvalinize uygulandı!`, 'success');
         } else {
           setTimeout(() => {
-            iframe.contentWindow.postMessage({ type: 'MIRA_OPEN_ADD_CARD_MODAL', tab: 'user' }, '*');
+            iframe.contentWindow.postMessage({
+              type: 'MIRA_ADD_FORGE_CARD_DIRECT',
+              item: lastSavedCreatorItem
+            }, '*');
           }, 400);
         }
       }
@@ -5032,6 +5912,8 @@
       resizePreview();
       initStudioSpectrumPalette();
       initCreatorSpectrumPalette();
+      renderForgePresets();
+      syncForgeUIFromState();
       updateCreatorLivePreview();
       loadGalleries();
       const urlParams = new URLSearchParams(window.location.search);
