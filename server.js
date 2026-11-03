@@ -120,6 +120,73 @@ function setObsTextSource(sourceName, text, callback) {
   });
 }
 
+let obsSavedMusicVolume = 1.0;
+let obsIsDucked = false;
+
+function getObsAudioInputs(callback) {
+  if (!obsWsConnected || !obsWsClient) {
+    return callback(new Error('OBS WebSocket bağlı değil'));
+  }
+  obsWsClient.call('GetInputList')
+    .then(async (data) => {
+      const inputs = data.inputs || [];
+      const audioInputs = [];
+      for (const inp of inputs) {
+        try {
+          const vol = await obsWsClient.call('GetInputVolume', { inputName: inp.inputName });
+          audioInputs.push({
+            name: inp.inputName,
+            kind: inp.inputKind,
+            volumeMul: vol.inputVolumeMul,
+            volumeDb: vol.inputVolumeDb
+          });
+        } catch(e) {}
+      }
+      callback(null, audioInputs);
+    })
+    .catch(err => callback(err));
+}
+
+function setObsAudioVolume(inputName, volumeMul, callback) {
+  if (!obsWsConnected || !obsWsClient) {
+    if (callback) callback(new Error('OBS WebSocket bağlı değil'));
+    return;
+  }
+  const mul = Math.max(0, Math.min(2.0, parseFloat(volumeMul) || 1.0));
+  if (!obsIsDucked) {
+    obsSavedMusicVolume = mul;
+  }
+  obsWsClient.call('SetInputVolume', {
+    inputName: inputName || 'Desktop Audio',
+    inputVolumeMul: mul
+  })
+  .then(() => {
+    if (callback) callback(null, { inputName: inputName || 'Desktop Audio', volumeMul: mul });
+  })
+  .catch(err => {
+    if (callback) callback(err);
+  });
+}
+
+function setObsDucking(duck, inputName = 'Desktop Audio', callback) {
+  if (!obsWsConnected || !obsWsClient) {
+    if (callback) callback(new Error('OBS WebSocket bağlı değil'));
+    return;
+  }
+  if (duck) {
+    obsIsDucked = true;
+    const duckedVolume = Math.max(0.05, obsSavedMusicVolume * 0.25); // %75 kıs
+    obsWsClient.call('SetInputVolume', { inputName: inputName, inputVolumeMul: duckedVolume })
+      .then(() => callback && callback(null, { ducked: true, volume: duckedVolume }))
+      .catch(err => callback && callback(err));
+  } else {
+    obsIsDucked = false;
+    obsWsClient.call('SetInputVolume', { inputName: inputName, inputVolumeMul: obsSavedMusicVolume })
+      .then(() => callback && callback(null, { ducked: false, volume: obsSavedMusicVolume }))
+      .catch(err => callback && callback(err));
+  }
+}
+
 let TikTokLiveConnection = null;
 try {
   const tklib = require('tiktok-live-connector');
@@ -1692,6 +1759,7 @@ const server = http.createServer((req, res) => {
         const d = JSON.parse(body || '{}');
         const item = {
           id: d.id || ('msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6)),
+          senderSession: d.senderSession,
           type: 'CHAT_MESSAGE',
           platform: d.platform || 'kick',
           username: d.username || 'cihanatas',
@@ -1699,12 +1767,77 @@ const server = http.createServer((req, res) => {
           badge: d.badge || 'streamer',
           isStreamer: d.isStreamer !== undefined ? d.isStreamer : true,
           color: d.color || '#f59e0b',
-          time: Date.now()
+          time: d.time || Date.now()
         };
         eventQueue.push(item);
         if (eventQueue.length > 80) eventQueue.shift();
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, item }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 2.44 API: OBS Ses Kaynakları Listesi
+  if (pathname === '/api/obs/audio-sources' && req.method === 'GET') {
+    getObsAudioInputs((err, sources) => {
+      if (err) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, sources: [
+          { name: 'Desktop Audio', kind: 'pulse_output_capture', volumeMul: obsSavedMusicVolume }
+        ], error: err.message, savedVolume: obsSavedMusicVolume }));
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, sources, savedVolume: obsSavedMusicVolume }));
+    });
+    return;
+  }
+
+  // 2.45 API: OBS Müzik / Arka Plan Ses Seviyesi Ayarla
+  if (pathname === '/api/obs/volume' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const d = JSON.parse(body || '{}');
+        const inputName = d.inputName || 'Desktop Audio';
+        const volumeMul = d.volumeMul !== undefined ? d.volumeMul : (d.volume !== undefined ? d.volume : 1.0);
+        setObsAudioVolume(inputName, volumeMul, (err, result) => {
+          if (err) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: err.message }));
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, ...result }));
+        });
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 2.46 API: OBS Ses Kısma (Audio Ducking - TTS Konuşurken Müziği Otomatik Kıs)
+  if (pathname === '/api/obs/ducking' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const d = JSON.parse(body || '{}');
+        const duck = d.duck !== undefined ? !!d.duck : (d.enabled !== undefined ? !!d.enabled : false);
+        const inputName = d.inputName || 'Desktop Audio';
+        setObsDucking(duck, inputName, (err, result) => {
+          if (err) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ success: false, error: err.message }));
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, ...result }));
+        });
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));

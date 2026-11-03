@@ -4712,10 +4712,16 @@
             <div class="voice-engine-grid" style="margin-top:0;">
               <div>
                 <div class="range-label-row">
-                  <span>🔊 Ses Seviyesi</span>
+                  <span>🔊 TTS Ses Gücü (Booster)</span>
                   <span class="range-val-badge" id="val-tts-vol">100%</span>
                 </div>
-                <input type="range" id="tts-volume-range" class="form-control" style="padding:0; height:auto; accent-color:#00f5a0;" min="0" max="1" step="0.05" value="1.0" oninput="onTtsVolumeChange(this.value)">
+                <input type="range" id="tts-volume-range" class="form-control" style="padding:0; height:auto; accent-color:#00f5a0;" min="0" max="2.5" step="0.05" value="1.0" oninput="onTtsVolumeChange(this.value)">
+                <div style="display:flex; gap:4px; margin-top:6px;">
+                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px;" onclick="setTtsVolumePreset(1.0)">%100 Normal</button>
+                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px;" onclick="setTtsVolumePreset(1.5)">%150 ⚡ Yüksek</button>
+                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px; border-color:#00f5a0; color:#00f5a0;" onclick="setTtsVolumePreset(2.0)">%200 🚀 Ultra</button>
+                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px; border-color:#f59e0b; color:#f59e0b;" onclick="setTtsVolumePreset(2.5)">%250 🔥 Boost</button>
+                </div>
               </div>
 
               <div>
@@ -4854,9 +4860,6 @@
             <button type="button" class="btn-music-sync-obs" onclick="syncMusicToObsAndStream()" title="Şarkıyı OBS Metin Kaynağına, Dosyaya ve Canlı Yayına Aktar">
               <span>🚀</span> OBS'E & YAYINA AKTAR
             </button>
-            <button type="button" class="btn-music-mute" onclick="muteStreamMusic()" title="Yayında Müziği Gizle / Sessiz">
-              <span>⏹️</span> Müziği Gizle
-            </button>
           </div>
         </div>
 
@@ -4969,6 +4972,67 @@
 
           </div>
 
+        </div>
+
+        <!-- 3. MÜZİK & ARKA PLAN SES SEVİYESİ (OBS WEBSOCKET ENTEGRASYONU) -->
+        <div class="card-panel" style="margin-top:20px; border: 1px solid rgba(168, 85, 247, 0.35); background: rgba(168, 85, 247, 0.04);">
+          <div class="card-panel-header">
+            <span class="card-panel-title">
+              <span>🎚️</span> OBS MÜZİK & ARKA PLAN SES AYARI
+            </span>
+            <span class="card-panel-badge" id="music-vol-obs-badge" style="background:rgba(168,85,247,0.2); color:#c084fc; border-color:rgba(168,85,247,0.4);">
+              OBS Canlı Bağlı
+            </span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label>Hedef OBS Ses Kaynağı</label>
+              <div style="display:flex; gap:8px;">
+                <select id="obs-audio-source-select" class="form-control" onchange="onObsAudioSourceChange()">
+                  <option value="Desktop Audio" selected>Desktop Audio (Masaüstü Müziği / Spotify)</option>
+                  <option value="Mic/Aux">Mic/Aux (Mikrofon)</option>
+                </select>
+                <button type="button" class="btn-secondary" style="padding:6px 12px; white-space:nowrap;" onclick="refreshObsAudioSources()" title="OBS Ses Kaynaklarını Yenile">
+                  🔄
+                </button>
+              </div>
+              <small style="font-size:10.5px; color:#94a3b8; display:block; margin-top:4px;">
+                Müzik yayınınızın bağlı olduğu OBS ses kaynağını seçin (Genelde <em>Desktop Audio</em> veya <em>Spotify/Tuna</em>).
+              </small>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label style="margin:0;">Müzik Ses Şiddeti</label>
+                <span id="music-vol-badge" style="font-size:12px; font-weight:800; color:#c084fc; background:rgba(168,85,247,0.2); padding:2px 8px; border-radius:6px;">
+                  🔊 %40
+                </span>
+              </div>
+              <input type="range" id="music-volume-range" class="form-control" style="padding:0; height:auto; accent-color:#a855f7;" min="0" max="1" step="0.05" value="0.4" oninput="onMusicVolumeChange(this.value)">
+
+              <!-- Hızlı Ses Butonları -->
+              <div style="display:flex; gap:6px; margin-top:8px;">
+                <button type="button" class="btn-secondary" style="flex:1; padding:4px 6px; font-size:10.5px;" onclick="setMusicVolumePreset(0)">Sessiz</button>
+                <button type="button" class="btn-secondary" style="flex:1; padding:4px 6px; font-size:10.5px;" onclick="setMusicVolumePreset(0.20)">%20 Fısıltı</button>
+                <button type="button" class="btn-secondary" style="flex:1; padding:4px 6px; font-size:10.5px; border-color:#a855f7; color:#c084fc;" onclick="setMusicVolumePreset(0.40)">%40 İdeal</button>
+                <button type="button" class="btn-secondary" style="flex:1; padding:4px 6px; font-size:10.5px;" onclick="setMusicVolumePreset(0.70)">%70</button>
+                <button type="button" class="btn-secondary" style="flex:1; padding:4px 6px; font-size:10.5px;" onclick="setMusicVolumePreset(1.0)">%100 Tam</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audio Ducking (Otomatik Kısma) Anahtarı -->
+          <div style="margin-top:14px; padding-top:12px; border-top:1px dashed rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">🎙️ TTS Konuşurken Müziği Otomatik Kıs (Audio Ducking)</div>
+              <div style="font-size:10.5px; color:#94a3b8;">Canlı bildirim veya chat okunduğunda arka plan müziğini anında %25'e kısar, seslendirme bitince eski seviyesine çıkarır.</div>
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <span id="ducking-status-label" style="font-size:11px; font-weight:700; color:#00f5a0;">AÇIK</span>
+              <input type="checkbox" id="music-ducking-toggle" checked onchange="onDuckingToggle(this.checked)" style="width:18px; height:18px; accent-color:#00f5a0; cursor:pointer;">
+            </label>
+          </div>
         </div>
 
       </div>
@@ -7906,9 +7970,25 @@
     }
 
     function onTtsVolumeChange(val) {
-      miraTtsConfig.volume = parseFloat(val);
-      document.getElementById('val-tts-vol').textContent = `${Math.round(val * 100)}%`;
-      localTTS.volume = parseFloat(val);
+      const v = parseFloat(val);
+      miraTtsConfig.volume = v;
+      localTTS.volume = v;
+      const badge = document.getElementById('val-tts-vol');
+      if (badge) {
+        let tag = '';
+        if (v >= 2.1) tag = ' (🔥 Boost)';
+        else if (v >= 1.5) tag = ' (🚀 Ultra)';
+        else if (v > 1.0) tag = ' (⚡ Yüksek)';
+        badge.textContent = `${Math.round(v * 100)}%${tag}`;
+      }
+      saveTtsConfigAndSync(false);
+    }
+
+    function setTtsVolumePreset(val) {
+      const slider = document.getElementById('tts-volume-range');
+      if (slider) slider.value = val;
+      onTtsVolumeChange(val);
+      showToast(`TTS Ses Gücü: %${Math.round(val * 100)}`);
     }
 
     function onTtsRateChange(val) {
@@ -8076,6 +8156,29 @@
       sendCustomSimulatedAlert();
     }
 
+    // Tekil ve Güvenli Chat Yayıncısı (Mükerrer ve 4x okumayı kesin olarak engeller)
+    function broadcastChatMessage(payload) {
+      if (!payload) return;
+      // 1. Canlı önizleme iframe'ine aktar (iframe içi sessizdir)
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage(payload, '*');
+      }
+      // 2. Yalnızca tek bir BroadcastChannel üzerinden yayınla (kick_stream_bus)
+      try {
+        const bus = new BroadcastChannel('kick_stream_bus');
+        bus.postMessage(payload);
+      } catch (e) {}
+      // 3. Sunucuya ilet (OBS ve overlayler /api/poll ile tek sefer yakalar)
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/chat-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => {});
+      }
+    }
+
     function testCustomChatTTS() {
       const author = document.getElementById('test-chat-author').value || 'NecroFan';
       const text = document.getElementById('test-chat-msg').value || 'Selamlar, yayının kalitesi harika olmuş başarılar!';
@@ -8093,7 +8196,7 @@
       };
 
       appendStudioChatMessage(payload);
-      dispatchEventToOverlay(payload);
+      broadcastChatMessage(payload);
       showToast(`Chat TTS test edildi: ${author}`);
     }
 
@@ -8418,7 +8521,7 @@
             time: Date.now()
           };
           appendStudioChatMessage(payload);
-          dispatchEventToOverlay(payload);
+          broadcastChatMessage(payload);
           pipInput.value = '';
           pipInput.focus();
         };
@@ -8691,15 +8794,7 @@
       };
 
       appendStudioChatMessage(payload);
-      dispatchEventToOverlay(payload);
-
-      if (window.location.protocol.startsWith('http')) {
-        fetch('/api/chat-message', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }).catch(() => {});
-      }
+      broadcastChatMessage(payload);
 
       inp.value = '';
       inp.focus();
@@ -8726,15 +8821,7 @@
       };
 
       appendStudioChatMessage(payload);
-      dispatchEventToOverlay(payload);
-
-      if (window.location.protocol.startsWith('http')) {
-        fetch('/api/chat-message', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }).catch(() => {});
-      }
+      broadcastChatMessage(payload);
 
       inp.value = '';
       inp.focus();
@@ -8742,17 +8829,111 @@
     }
 
     function triggerTestChat() {
-      const author = document.getElementById('chat-author-input').value || 'İzleyici';
-      const text = document.getElementById('chat-test-msg').value || 'Harika yayın!';
+      const author = document.getElementById('chat-author-input')?.value || 'İzleyici';
+      const text = document.getElementById('chat-test-msg')?.value || 'Harika yayın!';
 
-      localTTS.speak(`${author} diyor ki: ${text}`);
-
-      dispatchEventToOverlay({
-        type: 'TEST_CHAT',
+      const payload = {
+        id: 'msg_test_' + Date.now(),
+        senderSession: MIRA_TAB_SESSION_ID,
+        type: 'CHAT_MESSAGE',
         username: author,
-        content: text
-      });
+        content: text,
+        badge: 'kick',
+        isStreamer: false,
+        platform: 'kick',
+        time: Date.now()
+      };
+
+      appendStudioChatMessage(payload);
+      broadcastChatMessage(payload);
       showToast(`Chat mesajı iletildi: ${author}`);
+    }
+
+    /* ========================================================
+       OBS MÜZİK & ARKA PLAN SES KONTROL MOTORU (OBS WEBSOCKET)
+       ======================================================== */
+    let currentObsMusicVolume = 0.40;
+    let isMusicDuckingEnabled = true;
+
+    function refreshObsAudioSources() {
+      fetch('/api/obs/audio-sources')
+        .then(r => r.json())
+        .then(data => {
+          const select = document.getElementById('obs-audio-source-select');
+          if (!select) return;
+          if (data && data.sources && data.sources.length > 0) {
+            const currentVal = select.value;
+            select.innerHTML = '';
+            data.sources.forEach(src => {
+              const opt = document.createElement('option');
+              opt.value = src.name;
+              opt.textContent = `${src.name} (${Math.round((src.volumeMul || 1.0) * 100)}%)`;
+              select.appendChild(opt);
+            });
+            if (currentVal && [...select.options].some(o => o.value === currentVal)) {
+              select.value = currentVal;
+            } else {
+              select.value = 'Desktop Audio';
+            }
+          }
+          if (data.savedVolume !== undefined) {
+            currentObsMusicVolume = data.savedVolume;
+            updateMusicVolumeUI(currentObsMusicVolume);
+          }
+          const badge = document.getElementById('music-vol-obs-badge');
+          if (badge) {
+            badge.textContent = data.success ? '🟢 OBS Canlı Bağlı' : '🟡 OBS Bekleniyor';
+            badge.style.color = data.success ? '#00f5a0' : '#f59e0b';
+          }
+        })
+        .catch(() => {});
+    }
+
+    function onObsAudioSourceChange() {
+      const src = document.getElementById('obs-audio-source-select')?.value || 'Desktop Audio';
+      localStorage.setItem('mira_obs_music_source', src);
+      showToast(`Müzik ses kaynağı: ${src}`, 'info');
+    }
+
+    function updateMusicVolumeUI(val) {
+      const v = Math.max(0, Math.min(1.0, parseFloat(val) || 0.4));
+      const range = document.getElementById('music-volume-range');
+      const badge = document.getElementById('music-vol-badge');
+      if (range) range.value = v;
+      if (badge) {
+        badge.textContent = v === 0 ? '🔇 Sessiz' : `🔊 %${Math.round(v * 100)}`;
+      }
+    }
+
+    function onMusicVolumeChange(val) {
+      const v = Math.max(0, Math.min(1.0, parseFloat(val) || 0));
+      currentObsMusicVolume = v;
+      updateMusicVolumeUI(v);
+      localStorage.setItem('mira_obs_music_volume', v);
+
+      const src = document.getElementById('obs-audio-source-select')?.value || 'Desktop Audio';
+      fetch('/api/obs/volume', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputName: src, volumeMul: v })
+      }).catch(() => {});
+    }
+
+    function setMusicVolumePreset(val) {
+      onMusicVolumeChange(val);
+      showToast(`Müzik sesi: %${Math.round(val * 100)}`);
+    }
+
+    function onDuckingToggle(enabled) {
+      isMusicDuckingEnabled = !!enabled;
+      if (localTTS) localTTS.autoDucking = isMusicDuckingEnabled;
+      const lbl = document.getElementById('ducking-status-label');
+      if (lbl) {
+        lbl.textContent = isMusicDuckingEnabled ? 'AÇIK' : 'KAPALI';
+        lbl.style.color = isMusicDuckingEnabled ? '#00f5a0' : '#94a3b8';
+      }
+      localStorage.setItem('mira_music_ducking', isMusicDuckingEnabled ? 'true' : 'false');
+      showToast(isMusicDuckingEnabled ? 'Otomatik müzik kısma (Ducking) açık' : 'Otomatik müzik kısma kapalı');
     }
 
     /* ========================================================
@@ -9300,6 +9481,23 @@
   
     // Chat Deck Enter Listener & Bus Receiver
     document.addEventListener('DOMContentLoaded', () => {
+      refreshObsAudioSources();
+      const savedMusicVol = localStorage.getItem('mira_obs_music_volume');
+      if (savedMusicVol !== null) {
+        updateMusicVolumeUI(parseFloat(savedMusicVol));
+      }
+      const savedDuck = localStorage.getItem('mira_music_ducking');
+      if (savedDuck !== null) {
+        isMusicDuckingEnabled = savedDuck === 'true';
+        const chk = document.getElementById('music-ducking-toggle');
+        if (chk) chk.checked = isMusicDuckingEnabled;
+        const lbl = document.getElementById('ducking-status-label');
+        if (lbl) {
+          lbl.textContent = isMusicDuckingEnabled ? 'AÇIK' : 'KAPALI';
+          lbl.style.color = isMusicDuckingEnabled ? '#00f5a0' : '#94a3b8';
+        }
+      }
+
       const studioInp = document.getElementById('studio-chat-input');
       if (studioInp) {
         studioInp.addEventListener('keydown', (e) => {

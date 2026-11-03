@@ -781,6 +781,36 @@
         queue: [],
         isPlaying: false,
         currentAudio: null,
+        audioCtx: null,
+        gainNode: null,
+        audioEl: null,
+        mediaConnected: false,
+
+        getAudioPlayer() {
+          if (this.audioEl) return this.audioEl;
+          let el = document.getElementById('overlay-tts-audio-node');
+          if (!el) {
+            el = document.createElement('audio');
+            el.id = 'overlay-tts-audio-node';
+            el.style.display = 'none';
+            if (document.body) document.body.appendChild(el);
+          }
+          this.audioEl = el;
+
+          try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx && !this.mediaConnected) {
+              this.audioCtx = new AudioCtx();
+              const source = this.audioCtx.createMediaElementSource(el);
+              this.gainNode = this.audioCtx.createGain();
+              source.connect(this.gainNode);
+              this.gainNode.connect(this.audioCtx.destination);
+              this.mediaConnected = true;
+            }
+          } catch(e) {}
+          return this.audioEl;
+        },
+
         init() {
           this.loadConfig();
           this.initVoices();
@@ -832,21 +862,28 @@
           if (!text || !text.trim()) return;
 
           const clean = text.trim();
-          const norm = clean.toLowerCase().substring(0, 80);
+          let core = clean.toLowerCase();
+          const colonIdx = core.indexOf(':');
+          if (colonIdx > 0 && colonIdx < 35) {
+            core = core.substring(colonIdx + 1).trim();
+          }
+          const norm = core.replace(/[^a-z0-9ğüşıöç]/gi, '').substring(0, 70);
+          if (!norm) return;
+
           const lockKey = 'mira_tts_audio_lock';
           const now = Date.now();
           try {
             const raw = localStorage.getItem(lockKey);
             if (raw) {
               const data = JSON.parse(raw);
-              if (data.text === norm && (now - data.time) < 4000) {
+              if (data.norm === norm && (now - data.time) < 4000) {
                 return; // Başka bir pencere veya MİRA Stüdyo bu sesi zaten tek sefer okuyor!
               }
-              if ((now - data.time) < 1400 && data.text === norm) {
+              if ((now - data.time) < 1200 && data.norm && (data.norm.startsWith(norm.substring(0, 15)) || norm.startsWith(data.norm.substring(0, 15)))) {
                 return;
               }
             }
-            localStorage.setItem(lockKey, JSON.stringify({ text: norm, time: now, win: 'obs' }));
+            localStorage.setItem(lockKey, JSON.stringify({ norm: norm, time: now, win: 'obs' }));
           } catch(e) {}
 
           this.queue.push(clean);
@@ -867,10 +904,23 @@
         playAudioStream(text) {
           try {
             const url = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=tr`;
-            const audio = new Audio(url);
+            const audio = this.getAudioPlayer();
             this.currentAudio = audio;
-            audio.volume = typeof this.config.volume === 'number' ? Math.max(0, Math.min(1, this.config.volume)) : 1.0;
+
+            // Standart %100 sınırını aşarak %250'ye kadar ses yükseltme (Booster)
+            const targetVol = typeof this.config.volume === 'number' ? Math.max(0, this.config.volume) : 1.0;
+            if (this.gainNode) {
+              if (this.audioCtx && this.audioCtx.state === 'suspended') {
+                this.audioCtx.resume().catch(() => {});
+              }
+              this.gainNode.gain.value = targetVol;
+              audio.volume = 1.0;
+            } else {
+              audio.volume = Math.max(0, Math.min(1.0, targetVol));
+            }
+
             audio.playbackRate = typeof this.config.rate === 'number' ? Math.max(0.5, Math.min(2.0, this.config.rate)) : 1.0;
+            audio.src = url;
 
             const next = () => {
               this.isPlaying = false;
@@ -1396,9 +1446,28 @@
         }
       });
 
+      // Tekilleştirme seti — Aynı olayın farklı kanallardan (Broadcast / Poll / PostMessage) çift çalışmasını %100 engeller
+      const seenOverlayEventIds = new Set();
+      function isDuplicateOverlayEvent(ev) {
+        if (!ev || typeof ev !== 'object') return true;
+        const coreMsg = ev.content || ev.text || (ev.payload ? (ev.payload.username + '_' + (ev.payload.amount || ev.payload.giftName || '')) : '');
+        const id = ev.id || `${ev.type}_${ev.username || ev.user || ''}_${coreMsg}_${Math.floor((ev.time || Date.now()) / 2500)}`;
+        if (seenOverlayEventIds.has(id)) return true;
+        seenOverlayEventIds.add(id);
+        if (seenOverlayEventIds.size > 300) {
+          const oldest = seenOverlayEventIds.values().next().value;
+          seenOverlayEventIds.delete(oldest);
+        }
+        return false;
+      }
+
       // Canlı Olay & Güncelleme Dinleyicisi
       function handleEvent(ev) {
         if (!ev || typeof ev !== 'object') return;
+        if (ev.type === 'TEST_ALERT' || ev.type === 'LIVE_ALERT' || ev.type === 'TEST_CHAT' || ev.type === 'CHAT_MESSAGE') {
+          if (isDuplicateOverlayEvent(ev)) return;
+        }
+
         if (ev.type === 'USER_ITEM_UPDATED' && ev.item) {
           if (!itemId || itemId === ev.item.id) {
             renderItem(ev.item);

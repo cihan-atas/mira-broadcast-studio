@@ -179,6 +179,7 @@ class HeroTTSManager {
     this.outputMode = options.outputMode || 'all';
     this.heroName = (options.heroName || 'vexana').toLowerCase();
     this.volume = options.volume !== undefined ? options.volume : 1.0;
+    this.autoDucking = options.autoDucking !== undefined ? options.autoDucking : true;
     this.rate = options.rate !== undefined ? options.rate : 1.0;
     this.pitch = options.pitch !== undefined ? options.pitch : 1.0;
     this.voiceName = options.voiceName || 'mira_natural_tr';
@@ -187,7 +188,7 @@ class HeroTTSManager {
     this.filterBotCommands = options.filterBotCommands !== false;
     this.filterUrls = options.filterUrls !== false;
     this.maxChatLength = options.maxChatLength || 100;
-    this.chatFormat = options.chatFormat || '{user} diyor ki: {message}';
+    this.chatFormat = options.chatFormat || '{user}: {message}';
     this.alertTemplates = options.alertTemplates || {
       follower: '{user} aramıza katıldı, hoş geldin!',
       sub: 'Teşekkürler {user}, {months}. ayında abone oldu!',
@@ -243,6 +244,7 @@ class HeroTTSManager {
     if (cfg.ttsChatEnabled !== undefined) this.ttsChatEnabled = !!cfg.ttsChatEnabled;
     if (cfg.outputMode !== undefined) this.outputMode = cfg.outputMode;
     if (cfg.volume !== undefined) this.volume = parseFloat(cfg.volume);
+    if (cfg.autoDucking !== undefined) this.autoDucking = !!cfg.autoDucking;
     if (cfg.rate !== undefined) this.rate = parseFloat(cfg.rate);
     if (cfg.pitch !== undefined) this.pitch = parseFloat(cfg.pitch);
     if (cfg.voiceName !== undefined) this.setVoiceByName(cfg.voiceName);
@@ -276,7 +278,15 @@ class HeroTTSManager {
     if (typeof window === 'undefined') return true;
     if (window.self !== window.top) return false; // İframe içinde (ör: önizleme iframe'i) KESİNLİKLE ses çalma!
 
-    const norm = String(text || '').trim().toLowerCase().substring(0, 80);
+    // Mesaj içeriğini temizle (varsa kullanıcı adı veya ön eki atlayarak gövdeyi eşleştir)
+    let core = String(text || '').trim().toLowerCase();
+    const colonIdx = core.indexOf(':');
+    if (colonIdx > 0 && colonIdx < 35) {
+      core = core.substring(colonIdx + 1).trim();
+    }
+    const norm = core.replace(/[^a-z0-9ğüşıöç]/gi, '').substring(0, 70);
+    if (!norm) return true;
+
     const lockKey = 'mira_tts_audio_lock';
     const now = Date.now();
     try {
@@ -284,19 +294,57 @@ class HeroTTSManager {
       if (raw) {
         const data = JSON.parse(raw);
         // Aynı metin son 4 saniye içinde çalındıysa ikinci kez çalma
-        if (data.text === norm && (now - data.time) < (durationSec * 1000)) {
+        if (data.norm === norm && (now - data.time) < (durationSec * 1000)) {
           return false;
         }
-        // Son 1.4 saniye içinde herhangi bir ses zaten başladıysa pas geç
-        if ((now - data.time) < 1400 && data.text === norm) {
+        // Son 1.2 saniye içinde benzer başlayan bir ses zaten başladıysa pas geç
+        if ((now - data.time) < 1200 && data.norm && norm && (data.norm.startsWith(norm.substring(0, 15)) || norm.startsWith(data.norm.substring(0, 15)))) {
           return false;
         }
       }
-      localStorage.setItem(lockKey, JSON.stringify({ text: norm, time: now, win: Math.random().toString(36).substr(2, 6) }));
+      localStorage.setItem(lockKey, JSON.stringify({ norm: norm, time: now, win: Math.random().toString(36).substr(2, 6) }));
       return true;
     } catch (e) {
       return true;
     }
+  }
+
+  triggerDucking(enable) {
+    if (!this.autoDucking) return;
+    try {
+      if (typeof fetch === 'function' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
+        fetch('/api/obs/ducking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ duck: enable })
+        }).catch(() => {});
+      }
+    } catch(e) {}
+  }
+
+  getAudioPlayer() {
+    if (this.audioEl) return this.audioEl;
+    let el = document.getElementById('mira-tts-audio-node');
+    if (!el) {
+      el = document.createElement('audio');
+      el.id = 'mira-tts-audio-node';
+      el.style.display = 'none';
+      if (document.body) document.body.appendChild(el);
+    }
+    this.audioEl = el;
+
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx && !this.mediaSourceConnected) {
+        this.audioCtx = new AudioCtx();
+        const source = this.audioCtx.createMediaElementSource(el);
+        this.gainNode = this.audioCtx.createGain();
+        source.connect(this.gainNode);
+        this.gainNode.connect(this.audioCtx.destination);
+        this.mediaSourceConnected = true;
+      }
+    } catch(e) {}
+    return this.audioEl;
   }
 
   speak(text) {
@@ -358,7 +406,7 @@ class HeroTTSManager {
     const clean = this.sanitizeText(message);
     if (!clean) return;
 
-    const tpl = this.chatFormat || '{user} diyor ki: {message}';
+    const tpl = this.chatFormat || '{user}: {message}';
     const text = tpl.replace(/\{user\}/g, username || 'İzleyici').replace(/\{message\}/g, clean);
     this.speak(text);
   }
@@ -375,6 +423,7 @@ class HeroTTSManager {
     if ('speechSynthesis' in window) {
       try { window.speechSynthesis.cancel(); } catch(e){}
     }
+    this.triggerDucking(false);
     this.isPlaying = false;
   }
 
@@ -397,14 +446,33 @@ class HeroTTSManager {
   playAudioStream(text) {
     try {
       const audioUrl = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(this.voiceLang || 'tr')}`;
-      const audio = new Audio(audioUrl);
+      const audio = this.getAudioPlayer();
       this.currentAudio = audio;
-      audio.volume = typeof this.volume === 'number' ? Math.max(0, Math.min(1, this.volume)) : 1.0;
+
+      // Web Audio GainNode ile standart %100 sınırını aşıp %250 ses yükseltme (Booster) desteği:
+      const targetVol = typeof this.volume === 'number' ? Math.max(0, this.volume) : 1.0;
+      if (this.gainNode) {
+        if (this.audioCtx && this.audioCtx.state === 'suspended') {
+          this.audioCtx.resume().catch(() => {});
+        }
+        this.gainNode.gain.value = targetVol;
+        audio.volume = 1.0;
+      } else {
+        audio.volume = Math.max(0, Math.min(1.0, targetVol));
+      }
+
       audio.playbackRate = typeof this.rate === 'number' ? Math.max(0.5, Math.min(2.0, this.rate)) : 1.0;
+      audio.src = audioUrl;
+
+      // TTS başladığında müziği otomatik kıs (Ducking)
+      this.triggerDucking(true);
 
       const finish = () => {
         this.isPlaying = false;
         this.currentAudio = null;
+        if (this.queue.length === 0) {
+          this.triggerDucking(false);
+        }
         setTimeout(() => this.processQueue(), 250);
       };
 
