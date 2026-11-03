@@ -293,17 +293,10 @@
       <div class="chat-title-box">
         <span class="live-dot"></span>
         <span>CANLI SOHBET</span>
-        <span class="chat-status-pill">🟢 Canlı</span>
+        <span class="chat-status-pill">🟢 Kick: cihanatas</span>
       </div>
 
       <div class="chat-header-actions">
-        <!-- Opaklık Slider'ı -->
-        <div class="chat-opacity-control" title="Pencere saydamlığını ayarla">
-          <span>🪟</span>
-          <input type="range" id="floating-chat-opacity-slider" min="15" max="100" value="95" oninput="setFloatingChatOpacity(this.value)">
-          <span id="floating-chat-opacity-label">%95</span>
-        </div>
-
         <button type="button" class="btn-clear" onclick="clearFeed()" title="Sohbeti Temizle">
           🗑️ Temizle
         </button>
@@ -315,13 +308,13 @@
       <div class="clean-chat-msg is-system">
         <span class="clean-msg-time" id="init-time">17:00</span>
         <span class="clean-msg-badge">MİRA</span>
-        <span class="clean-msg-text">Canlı sohbet konsolu aktif. Kick ve TikTok mesajları buraya anlık akar.</span>
+        <span class="clean-msg-text">Canlı sohbet konsolu aktif. Mesajlarınızı buradan cihanatas olarak yanıtlayabilirsiniz.</span>
       </div>
     </main>
 
     <!-- Mesaj Gönderme Çubuğu -->
     <footer class="chat-input-bar">
-      <input type="text" id="streamer-input" class="chat-input" placeholder="Mesajınızı yazın ve Enter'a basın..." autocomplete="off">
+      <input type="text" id="streamer-input" class="chat-input" placeholder="cihanatas olarak mesaj yazın... (Enter)" autocomplete="off">
       <button type="button" class="chat-send-btn" onclick="sendReply()">
         Gönder
       </button>
@@ -337,6 +330,9 @@
       const chatFeed = document.getElementById('chat-feed');
       const inputEl = document.getElementById('streamer-input');
 
+      const streamerName = localStorage.getItem('mira_streamer_username') || 'cihanatas';
+      if (inputEl) inputEl.placeholder = `${streamerName} olarak mesaj yazın... (Enter)`;
+
       function getNowTimeStr() {
         const d = new Date();
         return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
@@ -348,21 +344,7 @@
         return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
 
-      // Opaklık Ayarı
-      window.setFloatingChatOpacity = function (val) {
-        const op = Math.max(0.15, Math.min(1.0, val / 100));
-        document.documentElement.style.setProperty('--chat-opacity', op);
-        const lbl = document.getElementById('floating-chat-opacity-label');
-        if (lbl) lbl.textContent = `%${val}`;
-        localStorage.setItem('mira_floating_opacity', val);
-      };
-
-      const savedOpacity = localStorage.getItem('mira_floating_opacity');
-      if (savedOpacity) {
-        setFloatingChatOpacity(savedOpacity);
-        const slider = document.getElementById('floating-chat-opacity-slider');
-        if (slider) slider.value = savedOpacity;
-      }
+      window.setFloatingChatOpacity = function (val) {};
 
       window.clearFeed = function () {
         if (chatFeed) chatFeed.innerHTML = '';
@@ -389,16 +371,17 @@
           seenIds.delete(oldest);
         }
 
-        const isStreamer = !!item.isStreamer || user === 'MİRA (Yayıncı)' || user === 'MİRA';
+        const isStreamer = !!item.isStreamer || user.toLowerCase() === streamerName.toLowerCase() || user === 'MİRA (Yayıncı)' || user === 'MİRA';
+        const displayUser = isStreamer ? streamerName : user;
         const timeStr = item.timeStr || getNowTimeStr();
-        const badge = isStreamer ? 'YAYINCI' : (item.badge === 'tiktok' ? 'TIKTOK' : 'KICK');
+        const badge = isStreamer ? '👑 YAYINCI' : (item.badge === 'tiktok' ? 'TIKTOK' : 'KICK');
 
         const card = document.createElement('div');
         card.className = `clean-chat-msg ${isStreamer ? 'is-streamer' : ''}`;
         card.innerHTML = `
           <span class="clean-msg-time">${timeStr}</span>
           <span class="clean-msg-badge">${badge}</span>
-          <span class="clean-msg-user" onclick="replyTo('${escapeHtml(user)}')">${escapeHtml(user)}:</span>
+          <span class="clean-msg-user" onclick="replyTo('${escapeHtml(displayUser)}')">${escapeHtml(displayUser)}:</span>
           <span class="clean-msg-text">${escapeHtml(content)}</span>
         `;
 
@@ -418,11 +401,11 @@
           id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
           senderSession: SESSION_ID,
           type: 'TEST_CHAT',
-          username: 'MİRA (Yayıncı)',
+          username: streamerName,
           content: text,
           badge: 'streamer',
           isStreamer: true,
-          platform: 'mira',
+          platform: 'kick',
           timeStr: getNowTimeStr(),
           time: Date.now()
         };

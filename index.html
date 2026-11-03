@@ -3955,13 +3955,6 @@
                 🔗 BotRix Linki
               </button>
 
-              <!-- Opaklık Slider'ı -->
-              <div class="chat-opacity-control" title="Sohbet zemininin saydamlığını ayarlar">
-                <span>🪟 Opaklık:</span>
-                <input type="range" id="studio-chat-opacity-slider" min="15" max="100" value="95" oninput="setStudioChatOpacity(this.value)">
-                <span id="studio-chat-opacity-label">%95</span>
-              </div>
-
               <!-- Yüzen Karta Çıkar Butonu (Browser açmaz, ekranda üstte tutar) -->
               <button type="button" class="btn-float-chat" onclick="openFloatingChatWidget()" title="Sohbeti ekranda serbestçe gezdirilebilir şeffaf yüzen karta dönüştürür">
                 📌 Ekranda Üstte Tut (Yüzen Kart)
@@ -4000,7 +3993,7 @@
 
           <!-- Mesaj Gönderme Çubuğu -->
           <div class="mira-clean-input-bar">
-            <input type="text" id="studio-chat-input" class="mira-clean-input" placeholder="Mesajınızı yazın ve Enter'a basın..." autocomplete="off">
+            <input type="text" id="studio-chat-input" class="mira-clean-input" placeholder="cihanatas olarak mesaj yazın... (Enter)" autocomplete="off">
             <button type="button" class="mira-clean-send-btn" onclick="sendStudioChatReply()">
               Gönder
             </button>
@@ -6720,25 +6713,19 @@
        ======================================================== */
     const MIRA_TAB_SESSION_ID = 'session_' + Math.random().toString(36).substr(2, 9);
     const seenChatMessageIds = new Set();
-    let studioChatOpacity = 95;
-    let floatingWidgetOpacity = 95;
 
-    // 1. Opaklık Ayarları
-    function setStudioChatOpacity(val) {
-      studioChatOpacity = val;
-      const op = Math.max(0.15, Math.min(1.0, val / 100));
-      document.documentElement.style.setProperty('--chat-panel-opacity', op);
-      const lbl = document.getElementById('studio-chat-opacity-label');
-      if (lbl) lbl.textContent = `%${val}`;
+    // Yayıncı Kullanıcı Adı Belirleyici (Varsayılan: cihanatas)
+    function getStreamerUsername() {
+      const kickUserEl = document.getElementById('kick-user-name');
+      const saved = localStorage.getItem('mira_streamer_username');
+      if (saved && saved.trim()) return saved.trim();
+      if (kickUserEl && kickUserEl.textContent.trim()) return kickUserEl.textContent.trim();
+      return 'cihanatas';
     }
 
-    function setFloatingWidgetOpacity(val) {
-      floatingWidgetOpacity = val;
-      const op = Math.max(0.15, Math.min(1.0, val / 100));
-      document.documentElement.style.setProperty('--float-chat-opacity', op);
-      const lbl = document.getElementById('float-widget-opacity-label');
-      if (lbl) lbl.textContent = `%${val}`;
-    }
+    // Geriye dönük uyumluluk (Opaklık ayarları kaldırıldı, temiz koyu tema devrede)
+    function setStudioChatOpacity(val) {}
+    function setFloatingWidgetOpacity(val) {}
 
     // 2. BotRix Çekmecesi Aç/Kapat
     function toggleBotrixConfigDrawer(force) {
@@ -6837,12 +6824,11 @@
           }
         });
 
-        // Font ve PiP özel stil tanımları
+        const sName = getStreamerUsername();
+
+        // Font ve PiP özel stil tanımları (Net ve koyu tema, opaklık ayarsız)
         const customStyle = pipWin.document.createElement('style');
         customStyle.textContent = `
-          :root {
-            --pip-opacity: ${studioChatOpacity / 100};
-          }
           * {
             box-sizing: border-box;
             margin: 0;
@@ -6853,11 +6839,10 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: rgba(9, 11, 20, var(--pip-opacity));
+            background: #090b14;
             color: #f1f5f9;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             user-select: none;
-            transition: background 0.15s ease;
           }
           .pip-shell {
             display: flex;
@@ -6866,8 +6851,6 @@
             width: 100vw;
             overflow: hidden;
             box-sizing: border-box;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
           }
           .pip-header {
             display: flex;
@@ -6895,23 +6878,6 @@
             align-items: center;
             gap: 8px;
           }
-          .pip-opacity-wrap {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 10.5px;
-            color: #94a3b8;
-            background: rgba(0, 0, 0, 0.45);
-            padding: 3px 8px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-          }
-          .pip-opacity-wrap input[type="range"] {
-            width: 55px;
-            height: 3px;
-            accent-color: #a855f7;
-            cursor: pointer;
-          }
           .pip-feed {
             flex: 1;
             overflow-y: auto;
@@ -6921,7 +6887,7 @@
             flex-direction: column;
             gap: 8px;
             scroll-behavior: smooth;
-            background: transparent !important;
+            background: #07090e !important;
           }
           .pip-feed::-webkit-scrollbar {
             width: 5px;
@@ -6990,27 +6956,22 @@
         `;
         pipWin.document.head.appendChild(customStyle);
 
-        // Body içeriği
+        // Body içeriği (Opaklık ayarı kaldırıldı, temiz başlık + temizleme butonu)
         pipWin.document.body.innerHTML = `
           <div class="pip-shell">
             <header class="pip-header">
               <div class="pip-title-box">
                 <span class="live-dot" style="width:8px; height:8px; background:#00f5a0; box-shadow:0 0 8px #00f5a0; border-radius:50%;"></span>
                 <span>CANLI SOHBET</span>
-                <span class="clean-msg-badge" style="background:rgba(0,245,160,0.15); color:#00f5a0; border:1px solid rgba(0,245,160,0.35);">ÜSTTE SABİT</span>
+                <span class="clean-msg-badge" style="background:#f59e0b; color:#000; font-weight:800;">👑 ${escHtml(sName)}</span>
               </div>
               <div class="pip-top-actions">
-                <div class="pip-opacity-wrap" title="Sohbet saydamlığını ayarlar">
-                  <span>🪟</span>
-                  <input type="range" id="pip-opacity-slider" min="15" max="100" value="${studioChatOpacity}">
-                  <span id="pip-opacity-label" style="font-family:monospace; color:#00f5a0; font-size:10px;">%${studioChatOpacity}</span>
-                </div>
-                <button type="button" class="pip-clear-btn" id="pip-clear-btn" title="Sohbeti Temizle">🗑️</button>
+                <button type="button" class="pip-clear-btn" id="pip-clear-btn" title="Sohbeti Temizle">🗑️ Temizle</button>
               </div>
             </header>
             <main class="pip-feed" id="pip-chat-feed"></main>
             <footer class="pip-input-bar">
-              <input type="text" id="pip-input" class="pip-input" placeholder="Mesajınızı yazın... (Enter)" autocomplete="off">
+              <input type="text" id="pip-input" class="pip-input" placeholder="${escHtml(sName)} olarak yanıt yazın... (Enter)" autocomplete="off">
               <button type="button" id="pip-send-btn" class="pip-send-btn">Gönder</button>
             </footer>
           </div>
@@ -7022,21 +6983,6 @@
         if (studioFeed && pipFeed) {
           pipFeed.innerHTML = studioFeed.innerHTML;
           pipFeed.scrollTop = pipFeed.scrollHeight;
-        }
-
-        // Opaklık slider dinleyicisi
-        const pipSlider = pipWin.document.getElementById('pip-opacity-slider');
-        const pipLabel = pipWin.document.getElementById('pip-opacity-label');
-        if (pipSlider) {
-          pipSlider.addEventListener('input', (e) => {
-            const v = e.target.value;
-            if (pipLabel) pipLabel.textContent = `%${v}`;
-            pipWin.document.documentElement.style.setProperty('--pip-opacity', v / 100);
-            pipWin.document.body.style.backgroundColor = `rgba(9, 11, 20, ${v / 100})`;
-            setStudioChatOpacity(v);
-            const mainSlider = document.getElementById('studio-chat-opacity-slider');
-            if (mainSlider) mainSlider.value = v;
-          });
         }
 
         // Temizle butonu dinleyicisi
@@ -7062,15 +7008,16 @@
           if (!pipInput) return;
           const text = pipInput.value.trim();
           if (!text) return;
+          const currentStreamer = getStreamerUsername();
           const payload = {
             id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
             senderSession: MIRA_TAB_SESSION_ID,
             type: 'TEST_CHAT',
-            username: 'MİRA (Yayıncı)',
+            username: currentStreamer,
             content: text,
             badge: 'streamer',
             isStreamer: true,
-            platform: 'mira',
+            platform: 'kick',
             time: Date.now()
           };
           appendStudioChatMessage(payload);
@@ -7098,7 +7045,7 @@
         });
 
         updatePipButtonState(true);
-        showToast('📌 Sohbet ekranın üzerinde bağımsız karta alındı! Ana MİRA penceresini simge durumuna küçültseniz bile ekranda kalır.', 'success');
+        showToast(`📌 Sohbet ${sName} olarak ekranda üstte tutulan karta aktarıldı! Ana pencereyi alta alsanız bile ekranda kalır.`, 'success');
         return true;
       } catch(err) {
         console.warn('Document Picture-in-Picture hatası:', err);
@@ -7266,15 +7213,17 @@
       const feed1 = document.getElementById('studio-chat-feed');
       const feed2 = document.getElementById('floating-chat-feed');
 
-      const isStreamer = !!item.isStreamer || user === 'MİRA (Yayıncı)' || user === 'MİRA';
+      const streamerName = getStreamerUsername();
+      const isStreamer = !!item.isStreamer || user.toLowerCase() === streamerName.toLowerCase() || user === 'MİRA (Yayıncı)' || user === 'MİRA';
+      const displayUser = isStreamer ? streamerName : user;
       const d = new Date();
       const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-      const badge = isStreamer ? 'YAYINCI' : (item.badge === 'tiktok' ? 'TIKTOK' : 'KICK');
+      const badge = isStreamer ? '👑 YAYINCI' : (item.badge === 'tiktok' ? 'TIKTOK' : 'KICK');
 
       const html = `
         <span class="clean-msg-time">${timeStr}</span>
         <span class="clean-msg-badge">${badge}</span>
-        <span class="clean-msg-user" onclick="replyToUser('${escHtml(user)}')">${escHtml(user)}:</span>
+        <span class="clean-msg-user" onclick="replyToUser('${escHtml(displayUser)}')">${escHtml(displayUser)}:</span>
         <span class="clean-msg-text">${escHtml(content)}</span>
       `;
 
@@ -7319,22 +7268,23 @@
       });
     }
 
-    // 7. Mesaj Gönderme
+    // 7. Mesaj Gönderme (Yayıncı: cihanatas olarak canlı yayına ve sohbet akışına basar)
     function sendStudioChatReply() {
       const inp = document.getElementById('studio-chat-input');
       if (!inp) return;
       const text = inp.value.trim();
       if (!text) return;
 
+      const currentStreamer = getStreamerUsername();
       const payload = {
         id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
         senderSession: MIRA_TAB_SESSION_ID,
         type: 'TEST_CHAT',
-        username: 'MİRA (Yayıncı)',
+        username: currentStreamer,
         content: text,
         badge: 'streamer',
         isStreamer: true,
-        platform: 'mira',
+        platform: 'kick',
         time: Date.now()
       };
 
@@ -7350,15 +7300,16 @@
       const text = inp.value.trim();
       if (!text) return;
 
+      const currentStreamer = getStreamerUsername();
       const payload = {
         id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
         senderSession: MIRA_TAB_SESSION_ID,
         type: 'TEST_CHAT',
-        username: 'MİRA (Yayıncı)',
+        username: currentStreamer,
         content: text,
         badge: 'streamer',
         isStreamer: true,
-        platform: 'mira',
+        platform: 'kick',
         time: Date.now()
       };
 
@@ -7689,13 +7640,7 @@
       <div class="mira-float-title">
         <span class="live-dot" style="width:8px; height:8px; background:#00f5a0; box-shadow:0 0 8px #00f5a0; border-radius:50%;"></span>
         <span>CANLI SOHBET</span>
-      </div>
-
-      <!-- Opaklık Slider'ı -->
-      <div class="mira-float-opacity-wrap" title="Yüzen kartın saydamlığını ayarlar">
-        <span>🪟</span>
-        <input type="range" id="float-widget-opacity-slider" min="15" max="100" value="95" oninput="setFloatingWidgetOpacity(this.value)">
-        <span id="float-widget-opacity-label">%95</span>
+        <span class="clean-msg-badge" style="background:#f59e0b; color:#000; font-size:9px; font-weight:800;">👑 cihanatas</span>
       </div>
 
       <div class="mira-float-actions">
@@ -7709,13 +7654,13 @@
       <div class="clean-chat-msg is-system">
         <span class="clean-msg-time">17:00</span>
         <span class="clean-msg-badge">MİRA</span>
-        <span class="clean-msg-text">Yüzen sohbet aktif. Opaklığı yukarıdan kısıp arkadaki ekranı görebilirsiniz.</span>
+        <span class="clean-msg-text">Yüzen sohbet konsolu aktif. Mesajlarınızı doğrudan buradan cihanatas olarak yanıtlayabilirsiniz.</span>
       </div>
     </div>
 
     <!-- Mesaj Gönderme -->
     <div class="mira-clean-input-bar mira-float-input-bar">
-      <input type="text" id="floating-widget-input" class="mira-clean-input" placeholder="Mesajınızı yazın... (Enter)" autocomplete="off">
+      <input type="text" id="floating-widget-input" class="mira-clean-input" placeholder="cihanatas olarak mesaj yazın... (Enter)" autocomplete="off">
       <button type="button" class="mira-clean-send-btn" onclick="sendFloatingWidgetReply()">Gönder</button>
     </div>
   </div>
