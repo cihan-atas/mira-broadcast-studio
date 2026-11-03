@@ -960,6 +960,64 @@
         `;
       }
 
+      function buildTopBarHtml(cfg) {
+        return `
+          <div class="custom-top-bar" data-widget-id="topbar" data-widget-label="📊 Üst HUD Barı">
+            <div class="brand-cluster">
+              <div class="brand-dot"></div>
+              <span class="brand-name">${esc(cfg.streamerName || 'MİRA')}</span>
+              <span class="brand-sub">${esc(cfg.title || 'CUSTOM STUDIO')}</span>
+            </div>
+            <div class="top-stats-row">
+              <div class="top-stat-pill">
+                <span class="top-stat-label">SON TAKİP:</span>
+                <span class="top-stat-val" id="custom-recent-follower">SelinGamer</span>
+              </div>
+              <div class="top-stat-pill">
+                <span class="top-stat-label">SON ABONE:</span>
+                <span class="top-stat-val" id="custom-recent-sub">NecroLord</span>
+              </div>
+              <div class="top-stat-pill">
+                <span class="top-stat-label">SON DESTEK:</span>
+                <span class="top-stat-val" id="custom-recent-donation">MiraFan (100₺)</span>
+              </div>
+            </div>
+            <div class="top-clock-box" id="custom-clock">20:00:00</div>
+          </div>
+        `;
+      }
+
+      function buildGameFrameHtml(cfg) {
+        return `
+          <div class="custom-game-frame" data-widget-id="gameframe" data-widget-label="🎮 16:9 Oyun Çerçevesi">
+            <div class="custom-game-header">
+              <span>🎮 ${esc(cfg.gameHeaderTitle || (cfg.title ? cfg.title + ' • 16:9 CANLI OYUN EKRANI' : '16:9 CANLI OYUN EKRANI'))}</span>
+              <span>1080P 60FPS PRO</span>
+            </div>
+            <div class="custom-game-cutout">
+              <div class="custom-guide-box" id="custom-guide-box">
+                <strong>16:9 OYUN YAKALAMA ALANI</strong><br>
+                <span>OBS Oyun Yakalama kaynağını bu çerçevenin altına yerleştirin (Gizlemek için 'H' tuşu)</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // 1. Modüler Tekil Kart & Kahraman Parçası Modu
+      function renderCardByType(cType, cfg, posClass) {
+        if (cType === 'showcase') return buildShowcaseHtml(cfg, posClass);
+        if (cType === 'webcam') return buildWebcamHtml(cfg, posClass);
+        if (cType === 'social') return buildSocialHtml(cfg, posClass);
+        if (cType === 'music') return buildMusicHtml(cfg, posClass);
+        if (cType === 'goal') return buildGoalHtml(cfg, posClass);
+        if (cType === 'skills') return buildSkillsHtml(cfg, posClass);
+        if (cType === 'topbar') return buildTopBarHtml(cfg);
+        if (cType === 'gameframe') return buildGameFrameHtml(cfg);
+        if (cType === 'chat') return buildChatHtml(cfg, posClass);
+        return buildCustomCardHtml(cfg, posClass);
+      }
+
       function showAlertPopup(cfg, overridePayload) {
         const p = overridePayload || {};
         const headerTag = p.headerTag || cfg.headerTag || 'CANLI BİLDİRİM!';
@@ -1012,16 +1070,11 @@
         bgLayerEl.className = `canvas-bg-layer bg-${bgStyle}`;
         particleMode = cfg.showParticles === false ? 'none' : (cfg.particleType || 'soul');
 
-        // 1. Modüler Tekil Kart Modu
+        // 1. Modüler Tekil Kart & Kahraman Parçası Modu
         if (item.category === 'card') {
           const posClass = `pos-${cfg.cardPosition || 'center'}`;
           const cType = cfg.cardType || 'showcase';
-          if (cType === 'showcase') stageEl.innerHTML = buildShowcaseHtml(cfg, posClass);
-          else if (cType === 'webcam') stageEl.innerHTML = buildWebcamHtml(cfg, posClass);
-          else if (cType === 'social') stageEl.innerHTML = buildSocialHtml(cfg, posClass);
-          else if (cType === 'music') stageEl.innerHTML = buildMusicHtml(cfg, posClass);
-          else if (cType === 'goal') stageEl.innerHTML = buildGoalHtml(cfg, posClass);
-          else if (cType === 'skills') stageEl.innerHTML = buildSkillsHtml(cfg, posClass);
+          stageEl.innerHTML = renderCardByType(cType, cfg, posClass);
           return;
         }
 
@@ -1038,51 +1091,15 @@
           return;
         }
 
-        // 3. Boş Tuval (Blank Canvas) Tam Sahne Modu — Varsayılan olarak gerçekten BOŞ başlar, kullanıcı seçtikçe dolar
+        // 3. Boş Tuval (Blank Canvas) Tam Sahne Modu — BOMBOŞ 1920x1080 başlar, kullanıcı tek tek ekledikçe dolar
         let html = '';
 
         if (cfg.showTopBar === true) {
-          html += `
-            <div class="custom-top-bar">
-              <div class="brand-cluster">
-                <div class="brand-dot"></div>
-                <span class="brand-name">${esc(cfg.streamerName || 'MİRA')}</span>
-                <span class="brand-sub">${esc(cfg.title || 'CUSTOM STUDIO')}</span>
-              </div>
-              <div class="top-stats-row">
-                <div class="top-stat-pill">
-                  <span class="top-stat-label">SON TAKİP:</span>
-                  <span class="top-stat-val" id="custom-recent-follower">SelinGamer</span>
-                </div>
-                <div class="top-stat-pill">
-                  <span class="top-stat-label">SON ABONE:</span>
-                  <span class="top-stat-val" id="custom-recent-sub">NecroLord</span>
-                </div>
-                <div class="top-stat-pill">
-                  <span class="top-stat-label">SON DESTEK:</span>
-                  <span class="top-stat-val" id="custom-recent-donation">MiraFan (100₺)</span>
-                </div>
-              </div>
-              <div class="top-clock-box" id="custom-clock">20:00:00</div>
-            </div>
-          `;
+          html += buildTopBarHtml(cfg);
         }
 
         if (cfg.showGameFrame === true) {
-          html += `
-            <div class="custom-game-frame">
-              <div class="custom-game-header">
-                <span>🎮 ${esc(cfg.gameHeaderTitle || '16:9 CANLI OYUN EKRANI')}</span>
-                <span>1080P 60FPS PRO</span>
-              </div>
-              <div class="custom-game-cutout">
-                <div class="custom-guide-box" id="custom-guide-box">
-                  <strong>16:9 OYUN YAKALAMA ALANI</strong><br>
-                  <span>OBS Oyun Yakalama kaynağını bu çerçevenin altına yerleştirin (Gizlemek için 'H' tuşu)</span>
-                </div>
-              </div>
-            </div>
-          `;
+          html += buildGameFrameHtml(cfg);
         }
 
         if (cfg.showShowcase === true) {
@@ -1108,34 +1125,6 @@
         }
         if (cfg.showCustomCard === true) {
           html += buildCustomCardHtml(cfg, `pos-${cfg.customCardPos || 'bottom-right'}`);
-        }
-
-        const hasExtraCards = cfg.widgets && Array.isArray(cfg.widgets.__extraCards) && cfg.widgets.__extraCards.length > 0;
-        const isEditPreview = params.get('edit') === '1' || itemId === 'preview_canvas';
-
-        if (!html && !hasExtraCards && isEditPreview) {
-          html = `
-            <div id="mira-empty-canvas-guide" style="position:absolute; inset:40px; border:2px dashed rgba(168,85,247,0.38); border-radius:28px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:radial-gradient(circle at center, rgba(124,58,237,0.08), rgba(8,10,18,0.45)); pointer-events:auto; z-index:5;">
-              <div style="font-size:48px; margin-bottom:12px;">🎨✨</div>
-              <div style="font-family:'Orbitron',sans-serif; font-size:24px; font-weight:900; color:#fff; letter-spacing:1px;">
-                1920 × 1080 BOŞ TUVALİNİZ HAZIR
-              </div>
-              <p style="max-width:640px; font-size:14.5px; color:#cbd5e1; line-height:1.6; margin:10px 0 22px 0;">
-                Tuvaliniz şu an tamamen boş. Aşağıdaki butonlardan <strong>Kendi Galerinizdeki</strong> kayıtlı kartları seçerek, <strong>Ana Mağazadan</strong> yeni kartlar keşfedip kaydederek veya üst bardaki <strong>Kart Kutucuklarını</strong> tek tek işaretleyerek tuvalinizi yavaş yavaş kendinize göre doldurabilirsiniz.
-              </p>
-              <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
-                <button type="button" onclick="window.postMessage({type:'ADD_NEW_CARD_ON_CANVAS', tab:'user'}, '*')" style="padding:12px 22px; border-radius:12px; border:1.5px solid #10b981; background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:13.5px; font-weight:800; cursor:pointer; box-shadow:0 10px 25px rgba(16,185,129,0.35);">
-                  🗂️ Kendi Galerimden Kart Seç & Ekle
-                </button>
-                <button type="button" onclick="window.postMessage({type:'ADD_NEW_CARD_ON_CANVAS', tab:'store'}, '*')" style="padding:12px 22px; border-radius:12px; border:1.5px solid #a855f7; background:linear-gradient(135deg,#7c3aed,#9333ea); color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:13.5px; font-weight:800; cursor:pointer; box-shadow:0 10px 25px rgba(124,58,237,0.35);">
-                  🏪 Ana Mağazadan Kart Keşfet & Kaydet
-                </button>
-                <button type="button" onclick="window.postMessage({type:'ADD_NEW_CARD_ON_CANVAS', tab:'custom'}, '*')" style="padding:12px 22px; border-radius:12px; border:1.5px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:13.5px; font-weight:800; cursor:pointer;">
-                  ✏️ Sıfırdan Özel Yazı Kartı Oluştur
-                </button>
-              </div>
-            </div>
-          `;
         }
 
         stageEl.innerHTML = html;
@@ -1231,7 +1220,7 @@
             primaryColor: '#a855f7',
             secondaryColor: '#10b981',
             bgStyle: 'transparent',
-            showParticles: true,
+            showParticles: false,
             showTopBar: false,
             showGameFrame: false,
             showShowcase: false,

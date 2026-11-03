@@ -1074,7 +1074,7 @@
     notifyParentOfLiveChange();
   }
 
-  // Galeriden veya Özel Olarak Eklenen Kartların Zengin HTML Üreticisi
+  // Galeriden veya Özel Olarak Eklenen Kartların & Kahraman Parçalarının Zengin HTML Üreticisi
   function buildExtraCardInnerHtml(cDef) {
     const accent = cDef.accent || '#a855f7';
     const secondary = cDef.secondary || '#10b981';
@@ -1084,18 +1084,25 @@
     const cType = cDef.cardType || 'custom';
 
     if (cType === 'showcase') {
+      const roleBadge = cDef.roleBadge || 'PRO STREAMER';
+      const laneBadge = cDef.laneBadge || 'KICK & TIKTOK';
+      const quote = cDef.quote || `"${title}"`;
       return `
-        <div class="mod-card mod-showcase-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 18px; width: 320px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+        <div class="mod-card mod-showcase-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 18px; width: 325px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
           <div style="display:flex; align-items:center; gap:14px;">
-            <img src="${cDef.avatar || '/kick/vexana/img-hero.png'}" style="width:64px; height:64px; border-radius:14px; object-fit:cover; border:2px solid ${accent};" onerror="this.style.display='none'">
+            <img src="${cDef.avatar || '/kick/vexana/img-hero.png'}" style="width:68px; height:68px; border-radius:14px; object-fit:cover; border:2px solid ${accent}; box-shadow:0 0 14px ${accent}66;" onerror="this.style.display='none'">
             <div>
-              <div class="mod-showcase-tag" style="font-size:10px; font-weight:800; color:${secondary}; letter-spacing:1.2px;">MİRA VİTRİNİ</div>
-              <div class="mod-showcase-title" style="font-family:'Orbitron',sans-serif; font-size:18px; font-weight:900; color:#fff;">${streamer}</div>
+              <div class="mod-showcase-tag" style="font-size:10px; font-weight:800; color:${secondary}; letter-spacing:1.2px;">★ KAHRAMAN & YAYINCI VİTRİNİ</div>
+              <div class="mod-showcase-title" style="font-family:'Orbitron',sans-serif; font-size:19px; font-weight:900; color:#fff;">${title}</div>
               <div class="mod-showcase-sub" style="font-size:12px; color:#cbd5e1;">${sub}</div>
+              <div style="display:flex; gap:6px; margin-top:6px;">
+                <span class="mod-badge-pill" style="padding:2px 8px; border-radius:99px; font-size:9.5px; font-weight:800; background:${accent}28; border:1px solid ${accent}; color:#fff;">${roleBadge}</span>
+                <span class="mod-badge-pill" style="padding:2px 8px; border-radius:99px; font-size:9.5px; font-weight:800; background:${secondary}22; border:1px solid ${secondary}; color:${secondary};">${laneBadge}</span>
+              </div>
             </div>
           </div>
-          <div class="mod-showcase-quote" style="margin-top:10px; font-size:12px; font-style:italic; color:#e2e8f0; border-left:3px solid ${accent}; padding-left:10px;">
-            "${title}"
+          <div class="mod-showcase-quote" style="margin-top:11px; font-size:11.5px; font-style:italic; color:#e2e8f0; border-left:3px solid ${accent}; padding-left:10px;">
+            ${quote}
           </div>
         </div>
       `;
@@ -1103,18 +1110,18 @@
 
     if (cType === 'webcam') {
       return `
-        <div class="mod-card mod-webcam-card" style="background: rgba(13,15,24,0.88); border: 2px solid ${accent}; border-radius: 18px; padding: 14px; width: 310px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+        <div class="mod-card mod-webcam-card" style="background: rgba(13,15,24,0.88); border: 2px solid ${accent}; border-radius: 18px; padding: 14px; width: 315px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
           <div class="mod-webcam-header" style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:${accent}; margin-bottom:8px;">
-            <span>📷 ${streamer}</span>
-            <span style="color:${secondary};">● LIVE</span>
+            <span>📷 ${title || streamer}</span>
+            <span style="color:${secondary};">● LIVE CAM</span>
           </div>
-          <div style="height:165px; border:1px dashed rgba(255,255,255,0.2); border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">
-            <strong style="color:#fff;">KAMERA ALANI</strong>
-            <span>OBS Video Yakalama Aygıtı</span>
+          <div style="height:168px; border:1px dashed rgba(255,255,255,0.22); border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">
+            <strong style="color:#fff;">OBS KAMERA ALANI</strong>
+            <span>Video Yakalama Aygıtı (16:9)</span>
           </div>
-          <div class="mod-webcam-footer" style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-top:8px; color:#e2e8f0;">
-            <span>MİRA</span>
-            <span style="color:${secondary};">${sub}</span>
+          <div class="mod-webcam-footer" style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; margin-top:8px; color:#e2e8f0;">
+            <span>${streamer}</span>
+            <span style="color:${secondary};">${cDef.roleBadge || sub}</span>
           </div>
         </div>
       `;
@@ -1123,9 +1130,9 @@
     if (cType === 'social') {
       const s = cDef.socials || { kick: 'kick.com/mira', tiktok: '@mira_mlbb', instagram: '@mira.gaming' };
       return `
-        <div class="mod-card mod-social-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 16px; width: 310px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+        <div class="mod-card mod-social-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 16px; width: 315px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
           <div class="mod-card-header" style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:${accent}; margin-bottom:10px;">
-            <span>🌐 ${streamer} SOSYAL</span>
+            <span>🌐 ${title || streamer} SOSYAL</span>
             <span style="color:${secondary};">● AKTİF</span>
           </div>
           <div style="display:flex; flex-direction:column; gap:7px;">
@@ -1141,8 +1148,8 @@
       return `
         <div class="mod-card mod-music-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 15px 18px; width: 350px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
           <div class="mod-card-header" style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:${accent}; margin-bottom:8px;">
-            <span>🎵 ${streamer} MÜZİK</span>
-            <span style="color:${secondary};">BGM</span>
+            <span>🎵 ${streamer} SOUNDTRACK</span>
+            <span style="color:${secondary};">CANLI SES</span>
           </div>
           <div class="mod-song-title" style="font-size:13.5px; font-weight:800; color:#fff;">♪ ${title || 'MLBB Arena - Lo-Fi Chill Beats'}</div>
         </div>
@@ -1164,21 +1171,84 @@
     }
 
     if (cType === 'skills') {
+      const sPTitle = cDef.skillPassiveTitle || 'Pasif Yetenek';
+      const sPDesc  = cDef.skillPassiveDesc  || 'Temel kahraman pasifi ve güçlendirme';
+      const s1Title = cDef.skill1Title || '1. Yetenek (Q)';
+      const s1Desc  = cDef.skill1Desc  || 'Alan hasarı ve kitle kontrolü';
+      const s2Title = cDef.skill2Title || '2. Yetenek (W)';
+      const s2Desc  = cDef.skill2Desc  || 'Yavaşlatma ve alan patlaması';
+      const sUTitle = cDef.skillUltiTitle || 'Ulti (R)';
+      const sUDesc  = cDef.skillUltiDesc  || 'Takım savaşını başlatan nihai güç';
       return `
-        <div class="mod-card mod-skills-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 14px 16px; width: 440px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+        <div class="mod-card mod-skills-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 14px 16px; width: 480px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
           <div class="mod-card-header" style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:${accent}; margin-bottom:8px;">
             <span>⚡ ${title}</span>
-            <span style="color:${secondary};">MLBB REHBER</span>
+            <span style="color:${secondary};">${cDef.roleBadge || 'MLBB REHBER'}</span>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <div style="background:rgba(255,255,255,0.04); padding:7px 9px; border-radius:8px;">
-              <div class="mod-skill-name" style="font-size:11.5px; font-weight:800; color:#fff;">1. Yetenek (Q)</div>
-              <div class="mod-skill-desc" style="font-size:10.5px; color:#94a3b8;">Alan hasarı ve kitle kontrolü</div>
+            <div style="background:rgba(255,255,255,0.04); padding:7px 9px; border-radius:8px; border-left:2px solid ${accent};">
+              <div class="mod-skill-name" style="font-size:11.5px; font-weight:800; color:#fff;">${sPTitle}</div>
+              <div class="mod-skill-desc" style="font-size:10.5px; color:#94a3b8;">${sPDesc}</div>
             </div>
-            <div style="background:rgba(255,255,255,0.04); padding:7px 9px; border-radius:8px;">
-              <div class="mod-skill-name" style="font-size:11.5px; font-weight:800; color:#fff;">Ulti (R)</div>
-              <div class="mod-skill-desc" style="font-size:10.5px; color:#94a3b8;">Takım savaşını başlatan güç</div>
+            <div style="background:rgba(255,255,255,0.04); padding:7px 9px; border-radius:8px; border-left:2px solid ${accent};">
+              <div class="mod-skill-name" style="font-size:11.5px; font-weight:800; color:#fff;">${s1Title}</div>
+              <div class="mod-skill-desc" style="font-size:10.5px; color:#94a3b8;">${s1Desc}</div>
             </div>
+            <div style="background:rgba(255,255,255,0.04); padding:7px 9px; border-radius:8px; border-left:2px solid ${accent};">
+              <div class="mod-skill-name" style="font-size:11.5px; font-weight:800; color:#fff;">${s2Title}</div>
+              <div class="mod-skill-desc" style="font-size:10.5px; color:#94a3b8;">${s2Desc}</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.04); padding:7px 9px; border-radius:8px; border-left:2px solid ${secondary};">
+              <div class="mod-skill-name" style="font-size:11.5px; font-weight:800; color:#fff;">${sUTitle}</div>
+              <div class="mod-skill-desc" style="font-size:10.5px; color:#94a3b8;">${sUDesc}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (cType === 'topbar') {
+      return `
+        <div class="mod-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 16px; padding: 12px 24px; width: 1280px; display:flex; align-items:center; justify-content:space-between; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="width:10px; height:10px; border-radius:50%; background:${secondary}; box-shadow:0 0 10px ${secondary};"></span>
+            <span class="brand-name" style="font-family:'Orbitron',sans-serif; font-size:17px; font-weight:900; color:#fff;">${streamer}</span>
+            <span class="brand-sub" style="font-size:11px; font-weight:800; color:${accent}; padding:3px 9px; border-radius:99px; background:${accent}22;">${title}</span>
+          </div>
+          <div style="display:flex; gap:14px; font-size:11.5px; font-weight:800; color:#e2e8f0;">
+            <span>💜 SON TAKİP: <strong style="color:#fff;">SelinGamer</strong></span>
+            <span>🌟 SON ABONE: <strong style="color:#fff;">NecroLord</strong></span>
+            <span>💎 SON DESTEK: <strong style="color:${secondary};">MiraFan (100₺)</strong></span>
+          </div>
+          <div style="font-family:'Orbitron',sans-serif; font-size:13px; font-weight:900; color:${accent};">CANLI YAYIN</div>
+        </div>
+      `;
+    }
+
+    if (cType === 'gameframe') {
+      return `
+        <div class="mod-card" style="background: rgba(8,10,16,0.45); border: 2.5px solid ${accent}; border-radius: 22px; width: 1120px; height: 640px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 18px 50px rgba(0,0,0,0.75), 0 0 28px ${accent}55;">
+          <div style="padding:10px 18px; background:rgba(13,15,24,0.92); border-bottom:1px solid ${accent}66; display:flex; justify-content:space-between; font-family:'Orbitron',sans-serif; font-size:11.5px; font-weight:900; color:#fff;">
+            <span>🎮 ${title} • 16:9 OYUN EKRANI</span>
+            <span style="color:${secondary};">1080P 60FPS</span>
+          </div>
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.45); font-size:13px; font-weight:700;">
+            16:9 OBS OYUN YAKALAMA ÇERÇEVESİ (${title})
+          </div>
+        </div>
+      `;
+    }
+
+    if (cType === 'chat') {
+      return `
+        <div class="mod-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 16px; width: 325px; height: 420px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+          <div class="mod-card-header" style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:800; color:${accent}; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+            <span>💬 ${title || 'CANLI SOHBET'}</span>
+            <span style="color:${secondary};">● KICK & TIKTOK</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px; margin:12px 0; flex:1; justify-content:flex-end;">
+            <div style="background:rgba(255,255,255,0.04); padding:8px 11px; border-radius:10px; font-size:12px; color:#e2e8f0;"><strong style="color:${accent};">SelinGamer:</strong> Harika sahne olmuş! 🔥</div>
+            <div style="background:rgba(255,255,255,0.04); padding:8px 11px; border-radius:10px; font-size:12px; color:#e2e8f0;"><strong style="color:${secondary};">MLBB_King:</strong> Mythic Glory serisi başlasın!</div>
           </div>
         </div>
       `;
@@ -1405,6 +1475,8 @@
     });
   }
 
+  let currentStoreSubFilter = 'all';
+
   function renderAddCardModalContent(activeTab, userItems, catalogItems) {
     if (!addCardModalBackdropEl) return;
 
@@ -1420,10 +1492,10 @@
             <div style="font-size:40px; margin-bottom:10px;">🗂️</div>
             <h4 style="margin:0 0 8px 0; font-size:17px; color:#fff;">Kendi Galerinizde Henüz Kayıtlı Kart Yok</h4>
             <p style="margin:0 auto 18px auto; max-width:520px; font-size:13px; color:#cbd5e1; line-height:1.5;">
-              Önce <strong>🏪 Ana Mağazadan Keşfet</strong> sekmesine geçerek beğendiğiniz kartları kendi galerinize kaydedin, ardından buradan tuvalinize ekleyin!
+              Önce <strong>🏪 Ana Mağazadan Keşfet</strong> sekmesine geçerek beğendiğiniz Kahraman Parçalarını veya Kartları kendi galerinize kaydedin, ardından buradan tuvalinize tek tek ekleyin!
             </p>
-            <button type="button" class="mira-btn primary" id="mira-go-store-tab-btn" style="max-width:320px; padding:12px 20px; font-size:13px;">
-              🏪 Ana Mağazadan Kart Keşfet & Galerime Kaydet
+            <button type="button" class="mira-btn primary" id="mira-go-store-tab-btn" style="max-width:340px; padding:12px 20px; font-size:13px;">
+              🏪 Ana Mağazadan Kahraman Parçası & Kart Keşfet
             </button>
           </div>
         `;
@@ -1453,17 +1525,37 @@
         bodyHtml = `
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.28); padding:10px 16px; border-radius:12px;">
             <span style="font-size:12.5px; color:#d1fae5;">
-              💡 <strong>Kendi Galerim:</strong> Aşağıdaki kayıtlı kartlarınızdan istediğinizi seçip tuvale ekleyebilir veya Ana Mağaza'dan yeni kart keşfedebilirsiniz.
+              💡 <strong>Kendi Galerim:</strong> Aşağıdaki kayıtlı kart veya kahraman parçalarınızdan istediğinizi seçip bomboş tuvale tek tek ekleyebilirsiniz.
             </span>
             <button type="button" class="mira-btn primary" id="mira-go-store-tab-btn" style="flex:0 0 auto; padding:7px 14px;">
-              🏪 Mağazadan Yeni Kart Keşfet
+              🏪 Mağazadan Parça Keşfet
             </button>
           </div>
           <div class="mira-add-grid">${cardsGrid}</div>
         `;
       }
     } else if (activeTab === 'store') {
-      const storeGrid = catalogItems.map(tpl => {
+      const filteredCatalog = catalogItems.filter(tpl => {
+        if (currentStoreSubFilter === 'all') return true;
+        if (currentStoreSubFilter === 'pieces') return !!tpl.heroPiece;
+        if (currentStoreSubFilter === 'general') return !tpl.heroPiece;
+        return tpl.heroPiece === currentStoreSubFilter;
+      });
+
+      const filterBarHtml = `
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'all' ? 'active' : ''}" data-sf="all" style="${currentStoreSubFilter === 'all' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🌟 Tümü (${catalogItems.length})</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'pieces' ? 'active' : ''}" data-sf="pieces" style="${currentStoreSubFilter === 'pieces' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🧩 Tüm Kahraman Parçaları (40)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'vexana' ? 'active' : ''}" data-sf="vexana" style="${currentStoreSubFilter === 'vexana' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">💀 Vexana (8)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'zetian' ? 'active' : ''}" data-sf="zetian" style="${currentStoreSubFilter === 'zetian' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">👑 Zetian (8)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'nana' ? 'active' : ''}" data-sf="nana" style="${currentStoreSubFilter === 'nana' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🐾 Nana (8)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'carmilla' ? 'active' : ''}" data-sf="carmilla" style="${currentStoreSubFilter === 'carmilla' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🩸 Carmilla (8)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'atlas' ? 'active' : ''}" data-sf="atlas" style="${currentStoreSubFilter === 'atlas' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">⚓ Atlas (8)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'general' ? 'active' : ''}" data-sf="general" style="${currentStoreSubFilter === 'general' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🃏 Genel Kart & Alert (10)</button>
+        </div>
+      `;
+
+      const storeGrid = filteredCatalog.map(tpl => {
         const cfg = tpl.config || {};
         const acc = cfg.primaryColor || cfg.accent || '#a855f7';
         const isSaved = savedTplIds.has(tpl.id);
@@ -1476,19 +1568,17 @@
                 <p>${tpl.subtitle || tpl.description || ''}</p>
               </div>
             </div>
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-              <span style="font-size:11px; font-weight:800; color:${isSaved ? '#10b981' : '#c084fc'};">
-                ${isSaved ? '✓ Galerinizde Mevcut' : '🏪 Ana Mağaza Şablonu'}
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+              <span style="font-size:10.5px; font-weight:800; color:${isSaved ? '#10b981' : '#c084fc'};">
+                ${isSaved ? '✓ Galerinizde Kayıtlı' : (tpl.badge || '🏪 Mağaza Parçası')}
               </span>
               <div style="display:flex; gap:6px;">
-                <button type="button" class="mira-btn primary mira-save-tpl-to-gallery-btn" data-tpl="${tpl.id}" style="flex:0 0 auto; padding:8px 13px;">
+                <button type="button" class="mira-btn primary mira-save-tpl-to-gallery-btn" data-tpl="${tpl.id}" style="flex:0 0 auto; padding:7px 11px; font-size:11px;">
                   📥 Galerime Kaydet
                 </button>
-                ${isSaved ? `
-                  <button type="button" class="mira-btn success mira-switch-to-user-btn" style="flex:0 0 auto; padding:8px 12px;">
-                    🗂️ Galerimden Seç
-                  </button>
-                ` : ''}
+                <button type="button" class="mira-btn success mira-direct-add-tpl-btn" data-tpl="${tpl.id}" style="flex:0 0 auto; padding:7px 11px; font-size:11px;">
+                  ➕ Direkt Tuvale Ekle
+                </button>
               </div>
             </div>
           </div>
@@ -1496,9 +1586,10 @@
       }).join('');
 
       bodyHtml = `
-        <div style="margin-bottom:14px; background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.3); padding:10px 16px; border-radius:12px; font-size:12.5px; color:#e9d5ff;">
-          🏪 <strong>Ana Mağaza Keşfi:</strong> Beğendiğiniz kartı <strong>"📥 Galerime Kaydet"</strong> ile kendi galerinize ekleyin, ardından <strong>"🗂️ Kendi Galerimden Seç"</strong> sekmesinden tuvalinize yerleştirin!
+        <div style="margin-bottom:12px; background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.3); padding:10px 16px; border-radius:12px; font-size:12.5px; color:#e9d5ff;">
+          🧩 <strong>Kahraman Parçaları & Kart Mağazası:</strong> Kahramanların vitrin, kamera, skill, üst bar, oyun çerçevesi, müzik ve sohbet parçalarını tek tek <strong>"📥 Galerime Kaydet"</strong> veya <strong>"➕ Direkt Tuvale Ekle"</strong> ile boş tuvalinize dizebilirsiniz!
         </div>
+        ${filterBarHtml}
         <div class="mira-add-grid">${storeGrid}</div>
       `;
     } else if (activeTab === 'custom') {
@@ -1523,7 +1614,7 @@
     addCardModalBackdropEl.innerHTML = `
       <div class="mira-add-modal">
         <div class="mira-add-modal-head">
-          <h3><span>➕</span> <span>Tuvale Kart Ekle (Kendi Galerim & Ana Mağaza)</span></h3>
+          <h3><span>➕</span> <span>Tuvale Tek Tek Kart & Kahraman Parçası Ekle</span></h3>
           <button type="button" class="mira-insp-close" id="mira-add-modal-close">✕</button>
         </div>
         <div class="mira-add-tabs">
@@ -1531,7 +1622,7 @@
             🗂️ 1. Kendi Galerimden Seç (${userCardItems.length})
           </button>
           <button type="button" class="mira-add-tab ${activeTab === 'store' ? 'active' : ''}" data-tab="store">
-            🏪 2. Ana Mağazadan Keşfet & Galerime Kaydet (${catalogItems.length})
+            🏪 2. Mağaza & Kahraman Parçaları (${catalogItems.length})
           </button>
           <button type="button" class="mira-add-tab ${activeTab === 'custom' ? 'active' : ''}" data-tab="custom">
             ✏️ 3. Sıfırdan Özel Yazı Kartı
@@ -1550,6 +1641,13 @@
     addCardModalBackdropEl.querySelectorAll('.mira-add-tab').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
         renderAddCardModalContent(tabBtn.getAttribute('data-tab'), userItems, catalogItems);
+      });
+    });
+
+    addCardModalBackdropEl.querySelectorAll('.store-sub-filter').forEach(fBtn => {
+      fBtn.addEventListener('click', () => {
+        currentStoreSubFilter = fBtn.getAttribute('data-sf') || 'all';
+        renderAddCardModalContent('store', userItems, catalogItems);
       });
     });
 
@@ -1593,9 +1691,29 @@
             if (window.parent && window.parent !== window) {
               window.parent.postMessage({ type: 'MIRA_GALLERY_SAVED_OK' }, '*');
             }
-            // Güncel kullanıcı galerisini çek ve Kendi Galerim sekmesine geçir
             openAddCardModal('user');
           });
+      });
+    });
+
+    // 2B. Ana Mağazadan Hem Galerime Kaydet Hem Direkt Tuvale Ekle
+    addCardModalBackdropEl.querySelectorAll('.mira-direct-add-tpl-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tplId = btn.getAttribute('data-tpl');
+        const tplObj = catalogItems.find(t => t.id === tplId);
+        if (tplObj) {
+          fetch('/api/gallery/user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ templateId: tplId })
+          }).then(() => {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({ type: 'MIRA_GALLERY_SAVED_OK' }, '*');
+            }
+          }).catch(() => {});
+          addGalleryItemCardToCanvas(tplObj);
+          addCardModalBackdropEl.classList.remove('open');
+        }
       });
     });
 
@@ -1623,14 +1741,25 @@
       cardType: cType,
       title: cfg.title || cfg.headerTag || galleryItem.name,
       subtitle: cfg.subtitleText || cfg.subTitle || galleryItem.subtitle || galleryItem.description || 'Mythic Glory Streamer',
-      streamerName: cfg.streamerName || 'MİRA LIVE',
+      streamerName: cfg.streamerName || 'MİRA',
+      roleBadge: cfg.roleBadge,
+      laneBadge: cfg.laneBadge,
+      quote: cfg.quote,
       accent: cfg.primaryColor || cfg.accent || '#a855f7',
       secondary: cfg.secondaryColor || cfg.secondary || '#10b981',
-      avatar: galleryItem.previewImg || '/kick/vexana/img-hero.png',
+      avatar: cfg.avatarUrl || galleryItem.previewImg || '/kick/vexana/img-hero.png',
       socials: cfg.socials || { kick: cfg.kickHandle, tiktok: cfg.tiktokHandle, instagram: cfg.youtubeHandle },
       goalTitle: cfg.goalTitle,
       goalCurrent: cfg.goalCurrent,
-      goalTarget: cfg.goalTarget
+      goalTarget: cfg.goalTarget,
+      skillPassiveTitle: cfg.skillPassiveTitle,
+      skillPassiveDesc: cfg.skillPassiveDesc,
+      skill1Title: cfg.skill1Title,
+      skill1Desc: cfg.skill1Desc,
+      skill2Title: cfg.skill2Title,
+      skill2Desc: cfg.skill2Desc,
+      skillUltiTitle: cfg.skillUltiTitle,
+      skillUltiDesc: cfg.skillUltiDesc
     });
   }
 
@@ -1638,26 +1767,54 @@
     if (!widgetOverrides.__extraCards) widgetOverrides.__extraCards = [];
     const count = widgetOverrides.__extraCards.length + 1;
     const newId = 'custom_card_' + Date.now().toString(36);
+    const cType = customOpts.cardType || 'custom';
     const cardDef = {
       id: newId,
       label: customOpts.label || ('📌 Özel Kart #' + count),
-      cardType: customOpts.cardType || 'custom',
+      cardType: cType,
       title: customOpts.title || 'ÖZEL KART BAŞLIĞI',
       subtitle: customOpts.subtitle || 'Mythic Glory Streamer',
       body: customOpts.body || customOpts.subtitle || 'Bu karta tıklayarak yazısını, fontunu, rengini ve boyutunu değiştirebilirsiniz.',
-      streamerName: customOpts.streamerName || 'MİRA LIVE',
+      streamerName: customOpts.streamerName || 'MİRA',
+      roleBadge: customOpts.roleBadge,
+      laneBadge: customOpts.laneBadge,
+      quote: customOpts.quote,
       accent: customOpts.accent || '#a855f7',
       secondary: customOpts.secondary || '#10b981',
       avatar: customOpts.avatar || '/kick/vexana/img-hero.png',
       socials: customOpts.socials,
       goalTitle: customOpts.goalTitle,
       goalCurrent: customOpts.goalCurrent,
-      goalTarget: customOpts.goalTarget
+      goalTarget: customOpts.goalTarget,
+      skillPassiveTitle: customOpts.skillPassiveTitle,
+      skillPassiveDesc: customOpts.skillPassiveDesc,
+      skill1Title: customOpts.skill1Title,
+      skill1Desc: customOpts.skill1Desc,
+      skill2Title: customOpts.skill2Title,
+      skill2Desc: customOpts.skill2Desc,
+      skillUltiTitle: customOpts.skillUltiTitle,
+      skillUltiDesc: customOpts.skillUltiDesc
     };
     widgetOverrides.__extraCards.push(cardDef);
+
+    // Kart tipine göre 1920x1080 tuval üzerinde akıllı varsayılan yerleşim koordinatı
+    const defaultPosByType = {
+      topbar:    { x: 320, y: 18 },
+      gameframe: { x: 380, y: 100 },
+      showcase:  { x: 28,  y: 100 },
+      social:    { x: 28,  y: 410 },
+      webcam:    { x: 28,  y: 720 },
+      chat:      { x: 1555, y: 100 },
+      music:     { x: 420, y: 830 },
+      skills:    { x: 840, y: 800 },
+      goal:      { x: 1540, y: 830 },
+      alert:     { x: 760, y: 380 }
+    };
+    const basePos = defaultPosByType[cType] || { x: 740 + ((count % 4) * 28), y: 380 + ((count % 4) * 28) };
+
     widgetOverrides[newId] = {
-      x: 740 + ((count % 4) * 28),
-      y: 380 + ((count % 4) * 28)
+      x: basePos.x,
+      y: basePos.y
     };
     applyAllWidgetOverrides(widgetOverrides);
     const newEl = document.querySelector(`[data-mira-widget="${newId}"]`);

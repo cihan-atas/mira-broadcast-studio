@@ -48,15 +48,16 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
 * **Sorun:** Önizleme iframe'inin CSS Grid içinde 1920px genişlik dayatması sebebiyle pencere daraltıldığında Carmilla ve Atlas ekran dışına taşıyordu.
 * **Çözüm:** Iframe mutlak konuma (`position: absolute`) alındı, `.hero-grid` esnek `repeat(auto-fit, minmax(170px, 1fr))` yapısına kavuşturuldu. Artık tüm pencere boyutlarında 5 şampiyon da eksiksiz ve dengeli görüntülenir.
 
-### ✅ Aşama 6: Profesyonel Galeri Sistemi (Kendi Galerim, Ana Galeri & Boş Tuval Stüdyosu)
+### ✅ Aşama 6: Profesyonel Galeri Sistemi (60 Şablonluk Ana Mağaza: Bütün Setler + Parça Parça Kahraman Modülleri & Bomboş Tuval)
 * **Açılışta Temiz Başlangıç (Standby Modu):** Uygulama ilk açıldığında sahneler doğrudan hazır ve aktif gelmez; kullanıcı **"🗂️ Kendi Galerim"** sekmesinde temiz bir yayın masasıyla ve sağ monitörde **"Yayın Masanız Hazır (Standby)"** ekranıyla karşılanır.
-* **🏪 Ana Galeri (Uygulama Mağazası - 20 Şablon):**
-  * **5 Şampiyon Sahne Paketi:** Vexana, Zetian, Nana, Carmilla, Atlas.
-  * **5 Yayın Akış Sahnesi:** Yayın Başlıyor, Just Chatting, Kısa Mola (BRB), Yayın Bitti, PC Oyun Sahnesi.
-  * **6 Modüler Kart & Widget:** Hero Vitrin Kartı, Neon Kamera Çerçevesi, Sosyal Medya Kartı, 4'lü Skill Rehberi Kartı, Now Playing Müzik Kartı, Canlı Takipçi Hedef Barı.
-  * **4 Canlı Alert Şablonu:** Yeni Takipçi, VIP Abone, Bağış/Destek, TikTok Hediye.
-* **🗂️ Kendi Galerim & Özelleştirme (Edit):** Kullanıcı Ana Galeri'den beğendiği şablonları kendi galerisine kaydedebilir (`user-gallery.json`), **"✏️ Düzenle"** ile başlıklarını, yayıncı adını, renk paletini, sosyal medya hesaplarını ve görünür modüllerini kendine göre değiştirebilir ve **"▶️ Yayına Ver"** ile tek tıkla yayına alabilir.
-* **🎨 Gerçek Boş Tuval (1920×1080 Blank Canvas Builder):** Kullanıcı sıfırdan **tamamen boş (0 hazır kart)** bir `1920×1080 (16:9 HD)` tuval açar; kendi galerisinden kart seçerek, ana mağazadan keşfederek veya üst bardaki modül kutucuklarını (`Üst Bar`, `Oyun`, `Vitrin`, `Sosyal`, `Kamera`, `Sohbet`, `Müzik`, `Hedef`, `Skill`, `Duyuru`) tek tek işaretleyerek tuvalini yavaş yavaş kendi zevkine göre doldurur ([`custom-overlay.html`](file:///home/zeus/Desktop/yayın/custom-overlay.html)).
+* **🏪 Ana Galeri (Uygulama Mağazası - 60 Resmi Şablon & Parça):**
+  * **⚔️ 5 Bütün Kahraman Sahne Paketi (`category: 'hero'`):** Vexana, Zetian, Nana, Carmilla ve Atlas'ın tüm kartları bir arada tam sahne setleri.
+  * **🧩 40 Parça Parça Kahraman Modülü (`5 Kahraman × 8 Tekil Parça`):** Vexana, Zetian, Nana, Carmilla ve Atlas'ın her biri için ayrı ayrı mağazada yer alan 8'er modüler parça (`Vitrin Kartı`, `Kamera Çerçevesi`, `4'lü Skill Rehberi Kartı`, `Üst Yayın HUD Barı`, `16:9 Oyun Çerçevesi`, `Müzik & Ekolayzer Kartı`, `Sosyal Medya Kartı`, `Canlı Sohbet Paneli`).
+  * **📺 5 Yayın Akış Sahnesi:** Yayın Başlıyor, Just Chatting, Kısa Mola (BRB), Yayın Bitti, PC Oyun Sahnesi.
+  * **🃏 6 Genel Modüler Kart & Widget:** Hero Vitrin Kartı, Neon Kamera Çerçevesi, Sosyal Medya Kartı, 4'lü Skill Rehberi Kartı, Now Playing Müzik Kartı, Canlı Takipçi Hedef Barı.
+  * **⚡ 4 Canlı Alert Şablonu:** Yeni Takipçi, VIP Abone, Bağış/Destek, TikTok Hediye.
+* **🗂️ Kendi Galerim & Özelleştirme (Edit):** Kullanıcı Ana Galeri'den beğendiği bütün sahneleri veya tekil kahraman parçalarını kendi galerisine kaydedebilir (`user-gallery.json`), **"✏️ Düzenle"** ile başlıklarını, yayıncı adını, renk paletini, sosyal medya hesaplarını ve görünür modüllerini kendine göre değiştirebilir ve **"▶️ Yayına Ver"** ile tek tıkla yayına alabilir.
+* **🎨 %100 Bomboş Tuval (1920×1080 Blank Canvas Builder):** Kullanıcı **"🎨 Boş Tuval & Editör"** sekmesine tıkladığında içinde hiçbir hazır kart, orta rehber kutusu veya efekt bulunmayan **%100 bomboş (`1920×1080`)** bir tuval açılır; kendi galerisinden, mağazadaki 40 kahraman parçasından veya üst bardaki modül kutucuklarından istediği kartları **tek tek** tuvaline ekleyip özgürce dizebilir ([`custom-overlay.html`](file:///home/zeus/Desktop/yayın/custom-overlay.html)).
 
 ### ✅ Aşama 7: Etkileşimli Sürükle-Bırak, 8 Yönlü Boyutlandırma & Karta Tıklayınca Açılan "Kartı Düzenleme Kartı"
 * **Tam Genişlikli İnteraktif Tuval Modu (`studio-visual-editor-mode`):** Kullanıcı **"🎨 Boş Tuval & Editör"** sekmesine geçtiğinde veya galerisindeki herhangi bir sahne/kart üzerinde **"✏️ Düzenle"** butonuna tıkladığında, stüdyo tam genişlikli tek sütun görsel editör moduna geçer ve 1920×1080 canlı tuval fare etkileşimine (`pointer-events: auto`) açılır.

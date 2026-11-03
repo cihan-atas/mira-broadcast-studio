@@ -191,10 +191,10 @@ const APP_GALLERY_CATALOG = [
   {
     id: 'tpl_hero_vexana',
     category: 'hero',
-    name: 'Vexana — Necrokeep Sovereign',
-    subtitle: 'Gotik Mor & Zümrüt Ruh Temalı 16:9 Tam Sahne Paketi',
+    name: 'Vexana — Tam Sahne Paketi (Bütün Set)',
+    subtitle: 'Gotik Mor & Zümrüt Ruh Temalı 16:9 Bütünleşik Tam Sahne Paketi',
     icon: '💀',
-    badge: 'BÜYÜCÜ • MID LANE',
+    badge: 'BÜTÜN PAKET • VEXANA',
     previewImg: 'kick/vexana/assets/images/avatar.jpg',
     basePath: '{platform}/vexana/in-game.html',
     obsKey: 'vexana',
@@ -226,10 +226,10 @@ const APP_GALLERY_CATALOG = [
   {
     id: 'tpl_hero_zetian',
     category: 'hero',
-    name: 'Zetian — Celestial Empress',
-    subtitle: 'İmparatoriçe Altın & Kızıl Anka Temalı 16:9 Tam Sahne Paketi',
+    name: 'Zetian — Tam Sahne Paketi (Bütün Set)',
+    subtitle: 'İmparatoriçe Altın & Kızıl Anka Temalı 16:9 Bütünleşik Tam Sahne Paketi',
     icon: '👑',
-    badge: 'BÜYÜCÜ • IMPERIAL MID',
+    badge: 'BÜTÜN PAKET • ZETIAN',
     previewImg: 'kick/zetian/assets/images/avatar.jpg',
     basePath: '{platform}/zetian/in-game.html',
     obsKey: 'zetian',
@@ -261,10 +261,10 @@ const APP_GALLERY_CATALOG = [
   {
     id: 'tpl_hero_nana',
     category: 'hero',
-    name: 'Nana — Sweet Leonin Mage',
-    subtitle: 'Pastel Pembe & Gökyüzü Mavisi Molina Temalı 16:9 Tam Sahne Paketi',
+    name: 'Nana — Tam Sahne Paketi (Bütün Set)',
+    subtitle: 'Pastel Pembe & Gökyüzü Mavisi Molina Temalı 16:9 Bütünleşik Tam Sahne Paketi',
     icon: '🐾',
-    badge: 'BÜYÜCÜ / DESTEK',
+    badge: 'BÜTÜN PAKET • NANA',
     previewImg: 'kick/nana/assets/images/avatar.jpg',
     basePath: '{platform}/nana/in-game.html',
     obsKey: 'nana',
@@ -275,7 +275,7 @@ const APP_GALLERY_CATALOG = [
       roleBadge: 'MAGE / SUPPORT',
       laneBadge: 'ROAM / MID',
       subtitleText: 'Sweet Leonin Spirit',
-      quote: '"Molina seni yakalarsa sevimli bir پامuk şekere dönüşürsün!"',
+      quote: '"Molina seni yakalarsa sevimli bir pamuk şekere dönüşürsün!"',
       primaryColor: '#ff85a2',
       secondaryColor: '#60a5fa',
       kickHandle: 'kick.com/mira',
@@ -296,10 +296,10 @@ const APP_GALLERY_CATALOG = [
   {
     id: 'tpl_hero_carmilla',
     category: 'hero',
-    name: 'Carmilla — Shadow of Twilight',
-    subtitle: 'Kan Kırmızısı & Gümüş Gotik Gül Temalı 16:9 Tam Sahne Paketi',
+    name: 'Carmilla — Tam Sahne Paketi (Bütün Set)',
+    subtitle: 'Kan Kırmızısı & Gümüş Gotik Gül Temalı 16:9 Bütünleşik Tam Sahne Paketi',
     icon: '🩸',
-    badge: 'TANK / DESTEK • ROAM',
+    badge: 'BÜTÜN PAKET • CARMILLA',
     previewImg: 'kick/carmilla/assets/images/avatar.jpg',
     basePath: '{platform}/carmilla/in-game.html',
     obsKey: 'carmilla',
@@ -331,10 +331,10 @@ const APP_GALLERY_CATALOG = [
   {
     id: 'tpl_hero_atlas',
     category: 'hero',
-    name: 'Atlas — Ocean Gladiator',
-    subtitle: 'Okyanus Turkuazı & Derin Deniz Neon Temalı 16:9 Tam Sahne Paketi',
+    name: 'Atlas — Tam Sahne Paketi (Bütün Set)',
+    subtitle: 'Okyanus Turkuazı & Derin Deniz Neon Temalı 16:9 Bütünleşik Tam Sahne Paketi',
     icon: '⚓',
-    badge: 'TANK • INITIATÖR',
+    badge: 'BÜTÜN PAKET • ATLAS',
     previewImg: 'kick/atlas/assets/images/avatar.jpg',
     basePath: '{platform}/atlas/in-game.html',
     obsKey: 'atlas',
@@ -683,6 +683,241 @@ const APP_GALLERY_CATALOG = [
     }
   }
 ];
+
+// --- 5. KAHRAMAN ŞABLONLARININ PARÇA PARÇA (MODÜLER KART) HALLERİ ---
+const HERO_PIECE_DEFINITIONS = [
+  {
+    key: 'vexana',
+    heroName: 'Vexana',
+    heroSub: 'Necrokeep Sovereign',
+    icon: '💀',
+    roleBadge: 'BÜYÜCÜ (MAGE)',
+    laneBadge: 'MID LANE',
+    quote: '"Şafak Vadisi\'nde dirilen ruhlar kaderinizi mühürleyecek!"',
+    avatarUrl: 'kick/vexana/assets/images/portrait.jpg',
+    thumbUrl: 'kick/vexana/assets/images/avatar.jpg',
+    primaryColor: '#a855f7',
+    secondaryColor: '#10b981',
+    skills: {
+      passiveTitle: 'Çürüyen Büyü (Pasif)',
+      passiveDesc: 'Hedeflere gölge mührü bırakır; katledilen rakipler patlar.',
+      s1Title: 'Ölümcül Pençe (1. Yetenek)',
+      s1Desc: 'Hayalet pençe fırlatarak ilk hedefi korkutur ve durdurur.',
+      s2Title: 'Lanetli Patlama (2. Yetenek)',
+      s2Desc: 'Seçilen alanı yavaşlatır ve yüksek büyü hasarı patlatır.',
+      ultiTitle: 'Ölümsüz Muhafız (Ulti)',
+      ultiDesc: 'Savaş alanına dev Ölümsüz Şövalye çağırarak düşmanları savurur.'
+    }
+  },
+  {
+    key: 'zetian',
+    heroName: 'Zetian',
+    heroSub: 'Celestial Empress',
+    icon: '👑',
+    roleBadge: 'BURST MAGE',
+    laneBadge: 'IMPERIAL MID',
+    quote: '"Göklerin iradesi ve Anka\'nın ateşi önünde diz çökün!"',
+    avatarUrl: 'kick/zetian/assets/images/portrait.jpg',
+    thumbUrl: 'kick/zetian/assets/images/avatar.jpg',
+    primaryColor: '#ffd700',
+    secondaryColor: '#ef4444',
+    skills: {
+      passiveTitle: 'İmparatoriçe Mührü (Pasif)',
+      passiveDesc: 'Yetenek isabetleri Anka kalkanı ve büyü nüfuzu kazandırır.',
+      s1Title: 'Anka Dalgaları (1. Yetenek)',
+      s1Desc: 'Üçlü altın ateş dalgası göndererek rakipleri geri iter.',
+      s2Title: 'Kraliyet Ruh Çağrısı (2. Yetenek)',
+      s2Desc: 'Hedef bölgeye Anka Ruhu indirerek büyü direncini kırar.',
+      ultiTitle: 'Göklerin Gazabı (Ulti)',
+      ultiDesc: 'Tüm haritadaki düşmanları ortaya çıkarıp göksel yıldırım indirir.'
+    }
+  },
+  {
+    key: 'nana',
+    heroName: 'Nana',
+    heroSub: 'Sweet Leonin Mage',
+    icon: '🐾',
+    roleBadge: 'MAGE / SUPPORT',
+    laneBadge: 'ROAM / MID',
+    quote: '"Molina seni yakalarsa sevimli bir pamuk şekere dönüşürsün!"',
+    avatarUrl: 'kick/nana/assets/images/portrait.jpg',
+    thumbUrl: 'kick/nana/assets/images/avatar.jpg',
+    primaryColor: '#ff85a2',
+    secondaryColor: '#60a5fa',
+    skills: {
+      passiveTitle: 'Molina\'nın Armağanı (Pasif)',
+      passiveDesc: 'Ölümcül hasardan kaçıp 2 saniye dokunulmaz hız kazanır.',
+      s1Title: 'Büyülü Bumerang (1. Yetenek)',
+      s1Desc: 'Gidip dönen yıldız bumerangı ile rakipleri yavaşlatır.',
+      s2Title: 'Molina Öpücüğü (2. Yetenek)',
+      s2Desc: 'Rakipleri kovalayıp sevimli руha dönüştüren Molina fırlatır.',
+      ultiTitle: 'Molina Saldırısı (Ulti)',
+      ultiDesc: 'Geniş alana 3 dev Molina pençesi indirerek sersemletir.'
+    }
+  },
+  {
+    key: 'carmilla',
+    heroName: 'Carmilla',
+    heroSub: 'Shadow of Twilight',
+    icon: '🩸',
+    roleBadge: 'TANK / SUPPORT',
+    laneBadge: 'ROAMER',
+    quote: '"Kan Bağı kurulduğunda kaderimiz ve acımız bir olur!"',
+    avatarUrl: 'kick/carmilla/assets/images/portrait.jpg',
+    thumbUrl: 'kick/carmilla/assets/images/avatar.jpg',
+    primaryColor: '#e11d48',
+    secondaryColor: '#94a3b8',
+    skills: {
+      passiveTitle: 'Vampir Anlaşması (Pasif)',
+      passiveDesc: 'Hasar verdiği rakiplerin fiziksel ve büyü savunmasını çalar.',
+      s1Title: 'Kızıl Çiçek (1. Yetenek)',
+      s1Desc: 'Etrafında dönen 2 kan çiçeği ile can yeniler ve yavaşlatır.',
+      s2Title: 'Kan Banyosu (2. Yetenek)',
+      s2Desc: 'Hız kazanıp hedef düşmanı kızıl enerjiyle sersemletir.',
+      ultiTitle: 'Kan Лaneti (Ulti)',
+      ultiDesc: 'Rakipleri birbirine bağlar; birine vuran hasar ve CC hepsine geçer.'
+    }
+  },
+  {
+    key: 'atlas',
+    heroName: 'Atlas',
+    heroSub: 'Ocean Gladiator',
+    icon: '⚓',
+    roleBadge: 'TANK / INITIATOR',
+    laneBadge: 'ABYSSAL ROAM',
+    quote: '"Derin okyanusun zincirlerinden kimse kaçamaz!"',
+    avatarUrl: 'kick/atlas/assets/images/portrait.jpg',
+    thumbUrl: 'kick/atlas/assets/images/avatar.jpg',
+    primaryColor: '#00f5d4',
+    secondaryColor: '#38bdf8',
+    skills: {
+      passiveTitle: 'Dondurucu Nefes (Pasif)',
+      passiveDesc: 'Yetenek kullanınca etrafında buz alanı oluşturup rakipleri dondurur.',
+      s1Title: 'Yıkım (1. Yetenek)',
+      s1Desc: 'Zeminini yumruklayarak 3 ardışık okyanus şok dalgası yayar.',
+      s2Title: 'Mükemmel Eşleşme (2. Yetenek)',
+      s2Desc: 'Zırhından ayrılıp hızla ileri atılır; birleşirken sersemletir.',
+      ultiTitle: 'Ölümcül Zincirler (Ulti)',
+      ultiDesc: 'Etraftaki tüm rakipleri zincirleyip seçtiği noktaya fırlatır.'
+    }
+  }
+];
+
+HERO_PIECE_DEFINITIONS.forEach(h => {
+  const pieces = [
+    {
+      suffix: 'showcase',
+      cardType: 'showcase',
+      cardPos: 'top-left',
+      pieceIcon: '🃏',
+      pieceTitle: `${h.heroName} — Vitrin Kartı (Parça)`,
+      pieceSub: `${h.heroName} portresi, rol/koridor rozeti ve repliğini içeren tekil vitrin kartı.`,
+      badge: `${h.heroName.toUpperCase()} PARÇASI`
+    },
+    {
+      suffix: 'webcam',
+      cardType: 'webcam',
+      cardPos: 'bottom-left',
+      pieceIcon: '📷',
+      pieceTitle: `${h.heroName} — Kamera Çerçevesi (Parça)`,
+      pieceSub: `${h.heroName} neon temalı, canlı durum ve rütbe etiketli tekil kamera çerçevesi.`,
+      badge: `${h.heroName.toUpperCase()} PARÇASI`
+    },
+    {
+      suffix: 'skills',
+      cardType: 'skills',
+      cardPos: 'bottom-center',
+      pieceIcon: '⚡',
+      pieceTitle: `${h.heroName} — 4'lü Skill Rehberi (Parça)`,
+      pieceSub: `${h.heroName} Pasif, 1. Yetenek, 2. Yetenek ve Ulti açıklamalarını içeren tekil kart.`,
+      badge: `${h.heroName.toUpperCase()} PARÇASI`
+    },
+    {
+      suffix: 'topbar',
+      cardType: 'topbar',
+      cardPos: 'top-center',
+      pieceIcon: '📊',
+      pieceTitle: `${h.heroName} — Üst Yayın HUD Barı (Parça)`,
+      pieceSub: `${h.heroName} temalı yayıncı logosu, son takipçi/abone/destek ve canlı saat barı.`,
+      badge: `${h.heroName.toUpperCase()} PARÇASI`
+    },
+    {
+      suffix: 'gameframe',
+      cardType: 'gameframe',
+      cardPos: 'center',
+      pieceIcon: '🎮',
+      pieceTitle: `${h.heroName} — 16:9 Oyun Çerçevesi (Parça)`,
+      pieceSub: `${h.heroName} neon parlama efektli 16:9 ana oyun yakalama çerçevesi.`,
+      badge: `${h.heroName.toUpperCase()} PARÇASI`
+    },
+    {
+      suffix: 'music',
+      cardType: 'music',
+      cardPos: 'bottom-center',
+      pieceIcon: '🎵',
+      pieceTitle: `${h.heroName} — Müzik & Ekolayzer Kartı (Parça)`,
+      pieceSub: `${h.heroName} renk paletli 16 çubuklu ses dalgası ve çalan şarkı kartı.`,
+      badge: `${h.heroName.toUpperCase()} PARÇASI`
+    },
+    {
+      suffix: 'social',
+      cardType: 'social',
+      cardPos: 'middle-left',
+      pieceIcon: '🌐',
+      pieceTitle: `${h.heroName} — Sosyal Medya Kartı (Parça)`,
+      pieceSub: `${h.heroName} temalı Kick, TikTok ve YouTube sosyal medya adres kartı.`,
+      badge: `${h.heroName.toUpperCase()} PARÇASI`
+    },
+    {
+      suffix: 'chat',
+      cardType: 'chat',
+      cardPos: 'top-right',
+      pieceIcon: '💬',
+      pieceTitle: `${h.heroName} — Canlı Sohbet Paneli (Parça)`,
+      pieceSub: `${h.heroName} neon cam tasarımlı dikey canlı sohbet (Chat) kutusu.`,
+      badge: `${h.heroName.toUpperCase()} PARÇASI`
+    }
+  ];
+
+  pieces.forEach(p => {
+    APP_GALLERY_CATALOG.push({
+      id: `tpl_piece_${h.key}_${p.suffix}`,
+      category: 'card',
+      heroPiece: h.key,
+      name: p.pieceTitle,
+      subtitle: p.pieceSub,
+      icon: p.pieceIcon,
+      badge: `${h.icon} ${p.badge}`,
+      previewImg: h.thumbUrl,
+      basePath: 'custom-overlay.html',
+      config: {
+        heroKey: h.key,
+        cardType: p.cardType,
+        cardPosition: p.cardPos,
+        title: h.heroName.toUpperCase(),
+        streamerName: 'MİRA',
+        subtitleText: h.heroSub,
+        roleBadge: h.roleBadge,
+        laneBadge: h.laneBadge,
+        quote: h.quote,
+        avatarUrl: h.avatarUrl,
+        primaryColor: h.primaryColor,
+        secondaryColor: h.secondaryColor,
+        kickHandle: 'kick.com/mira',
+        tiktokHandle: '@mira_mlbb',
+        youtubeHandle: '@mira.gaming',
+        skillPassiveTitle: h.skills.passiveTitle,
+        skillPassiveDesc: h.skills.passiveDesc,
+        skill1Title: h.skills.s1Title,
+        skill1Desc: h.skills.s1Desc,
+        skill2Title: h.skills.s2Title,
+        skill2Desc: h.skills.s2Desc,
+        skillUltiTitle: h.skills.ultiTitle,
+        skillUltiDesc: h.skills.ultiDesc
+      }
+    });
+  });
+});
 
 function loadUserGallery() {
   if (!fs.existsSync(USER_GALLERY_PATH)) {

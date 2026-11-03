@@ -1716,7 +1716,7 @@
         <button class="studio-tab-btn" id="tab-btn-app-gallery" onclick="switchTab('tab-app-gallery', this)">
           🏪 Ana Galeri (Mağaza)
         </button>
-        <button class="studio-tab-btn" id="tab-btn-canvas-builder" onclick="switchTab('tab-canvas-builder', this)">
+        <button class="studio-tab-btn" id="tab-btn-canvas-builder" onclick="openBlankCanvasBuilder()">
           🎨 Boş Tuval & Editör
         </button>
         <button class="studio-tab-btn" onclick="switchTab('tab-goal', this)">
@@ -1809,24 +1809,30 @@
         <div class="card-panel">
           <div class="card-panel-header">
             <span class="card-panel-title">
-              <span>🏪</span> ANA GALERİ (HAZIR SAHNE, HERO, KART VE ALERT KÜTÜPHANESİ)
+              <span>🏪</span> ANA GALERİ (BÜTÜN KAHRAMAN SAHNELERİ + PARÇA PARÇA KAHRAMAN MODÜLLERİ & KARTLAR)
             </span>
-            <span class="card-panel-badge">20 Resmi Şablon</span>
+            <span class="card-panel-badge">60 Resmi Şablon & Parça</span>
           </div>
 
           <div class="info-tip-box" style="margin-bottom: 14px;">
-            ✨ <strong>Nasıl Kullanılır?</strong> Aşağıdaki resmi şablonları <strong>"👁️ Önizle"</strong> ile sağdaki monitörde inceleyin. Beğendiklerinizi <strong>"➕ Galerime Kaydet"</strong> diyerek kendi galerinize ekleyin; ardından kendi galerinizden istediğiniz gibi renklerini, yazılarını ve modüllerini düzenleyin!
+            ✨ <strong>Bütün Sahne veya Parça Parça Modüller:</strong> Kahraman şablonlarını ister <strong>"⚔️ Bütün Kahraman Sahneleri (5)"</strong> olarak tek parça halinde kullanın, ister <strong>"🧩 Kahraman Parçaları (40)"</strong> sekmesinden Vexana, Zetian, Nana, Carmilla ve Atlas'ın vitrin, kamera, 4'lü skill, üst bar, oyun çerçevesi, müzik ve sohbet kartlarını <strong>parça parça</strong> kendi galerinize kaydedip <strong>bomboş tuvalinize</strong> tek tek ekleyin!
           </div>
 
-          <div class="gallery-toolbar">
-            <div class="gallery-filter-pills">
-              <button class="gallery-filter-btn active" onclick="filterAppCatalog('all', this)">Tümü (20)</button>
-              <button class="gallery-filter-btn" onclick="filterAppCatalog('hero', this)">⚔️ Şampiyon Sahneleri (5)</button>
+          <div class="gallery-toolbar" style="flex-wrap: wrap; gap: 10px;">
+            <div class="gallery-filter-pills" style="flex-wrap: wrap;">
+              <button class="gallery-filter-btn active" onclick="filterAppCatalog('all', this)">🌟 Tümü (60)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('hero', this)">⚔️ Bütün Kahraman Sahneleri (5)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('hero_pieces', this)">🧩 Tüm Kahraman Parçaları (40)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('piece_vexana', this)">💀 Vexana Parçaları (8)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('piece_zetian', this)">👑 Zetian Parçaları (8)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('piece_nana', this)">🐾 Nana Parçaları (8)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('piece_carmilla', this)">🩸 Carmilla Parçaları (8)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('piece_atlas', this)">⚓ Atlas Parçaları (8)</button>
               <button class="gallery-filter-btn" onclick="filterAppCatalog('scene', this)">📺 Yayın Sahneleri (5)</button>
-              <button class="gallery-filter-btn" onclick="filterAppCatalog('card', this)">🃏 Kartlar & Widget (6)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('general_card', this)">🃏 Genel Kartlar (6)</button>
               <button class="gallery-filter-btn" onclick="filterAppCatalog('alert', this)">⚡ Alert Şablonları (4)</button>
             </div>
-            <input type="text" id="catalog-search-input" class="form-control" style="max-width: 220px; padding: 7px 12px; font-size: 12px;" placeholder="🔍 Şablon ara..." oninput="renderAppCatalogGrid()">
+            <input type="text" id="catalog-search-input" class="form-control" style="max-width: 220px; padding: 7px 12px; font-size: 12px;" placeholder="🔍 Şablon veya parça ara..." oninput="renderAppCatalogGrid()">
           </div>
 
           <div class="gallery-cards-grid" id="app-catalog-grid"></div>
@@ -2572,9 +2578,18 @@
       const q = (document.getElementById('catalog-search-input')?.value || '').trim().toLowerCase();
 
       const filtered = appCatalog.filter(tpl => {
-        if (appCatalogFilter !== 'all' && tpl.category !== appCatalogFilter) return false;
+        if (appCatalogFilter === 'hero_pieces') {
+          if (!tpl.heroPiece) return false;
+        } else if (appCatalogFilter && appCatalogFilter.startsWith('piece_')) {
+          const targetHero = appCatalogFilter.replace('piece_', '');
+          if (tpl.heroPiece !== targetHero) return false;
+        } else if (appCatalogFilter === 'general_card') {
+          if (tpl.category !== 'card' || tpl.heroPiece) return false;
+        } else if (appCatalogFilter !== 'all' && tpl.category !== appCatalogFilter) {
+          return false;
+        }
         if (q) {
-          const hay = `${tpl.name} ${tpl.subtitle} ${tpl.badge || ''}`.toLowerCase();
+          const hay = `${tpl.name} ${tpl.subtitle} ${tpl.badge || ''} ${tpl.heroPiece || ''}`.toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
@@ -2588,6 +2603,9 @@
         const thumbHtml = tpl.previewImg
           ? `<img src="${escHtml(tpl.previewImg)}" alt="${escHtml(tpl.name)}">`
           : `<span>${escHtml(tpl.icon || '✨')}</span>`;
+        const catBadgeLabel = tpl.heroPiece
+          ? `🧩 ${tpl.heroPiece.toUpperCase()} PARÇASI`
+          : (tpl.category === 'hero' ? '⚔️ BÜTÜN SAHNE SETİ' : getCategoryLabel(tpl.category));
 
         return `
           <div class="gallery-card">
@@ -2596,7 +2614,7 @@
                 <div class="gallery-card-thumb" style="border-color:${escHtml(pCol)};">${thumbHtml}</div>
                 <div class="gallery-card-info">
                   <div class="gallery-card-badges">
-                    <span class="gallery-cat-pill">${getCategoryLabel(tpl.category)}</span>
+                    <span class="gallery-cat-pill">${escHtml(catBadgeLabel)}</span>
                     ${alreadySaved ? `<span class="gallery-saved-pill">✓ Galerinizde</span>` : ''}
                   </div>
                   <div class="gallery-card-title" title="${escHtml(tpl.name)}">${escHtml(tpl.name)}</div>
@@ -2784,7 +2802,7 @@
 
       applyBuilderColorPreset('#a855f7', '#10b981');
       document.getElementById('b-bg-style').value = 'transparent';
-      document.getElementById('b-particles').value = 'true';
+      document.getElementById('b-particles').value = 'false';
 
       document.getElementById('b-show-topbar').checked = false;
       document.getElementById('b-show-gameframe').checked = false;
@@ -3426,7 +3444,10 @@
       }
       resizePreview();
       loadGalleries();
-      const initTab = new URLSearchParams(window.location.search).get('tab');
+      const urlParams = new URLSearchParams(window.location.search);
+      const initTab = urlParams.get('tab');
+      const initFilter = urlParams.get('filter');
+      if (initFilter) appCatalogFilter = initFilter;
       if (initTab === 'app-gallery') goToAppGallery();
       else if (initTab === 'canvas-builder') openBlankCanvasBuilder();
       updateGoalProgressPreview();
