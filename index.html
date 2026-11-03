@@ -2055,12 +2055,14 @@
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
-              <label>Genel Sahne Neon Renkleri (Ana & İkincil)</label>
+              <label title="Yayın sahnesinde uyumlu iki renk kullanılır: 1. Ana Vurgu Rengi ve 2. İkincil Neon Parıltı Rengi">
+                Genel Sahne Renkleri: <strong>1. Ana Renk</strong> & <strong>2. İkincil Neon</strong>
+              </label>
               <div style="display: flex; gap: 6px; align-items: center;">
-                <input type="color" id="b-primary-color" value="#a855f7" style="width: 36px; height: 34px; border: none; background: transparent; cursor: pointer;" oninput="document.getElementById('b-primary-color-txt').value=this.value; livePreviewBuilder()">
-                <input type="text" id="b-primary-color-txt" class="form-control" style="padding: 7px 8px; font-family: monospace;" value="#a855f7" oninput="document.getElementById('b-primary-color').value=this.value; livePreviewBuilder()">
-                <input type="color" id="b-secondary-color" value="#10b981" style="width: 36px; height: 34px; border: none; background: transparent; cursor: pointer;" oninput="document.getElementById('b-secondary-color-txt').value=this.value; livePreviewBuilder()">
-                <input type="text" id="b-secondary-color-txt" class="form-control" style="padding: 7px 8px; font-family: monospace;" value="#10b981" oninput="document.getElementById('b-secondary-color').value=this.value; livePreviewBuilder()">
+                <input type="color" id="b-primary-color" value="#a855f7" style="width: 36px; height: 34px; border: none; background: transparent; cursor: pointer;" title="1. Ana Renk (Kart Çerçevesi & Başlık Işıkları)" oninput="document.getElementById('b-primary-color-txt').value=this.value; livePreviewBuilder()">
+                <input type="text" id="b-primary-color-txt" class="form-control" style="padding: 7px 8px; font-family: monospace;" value="#a855f7" title="1. Ana Renk Hex Kodu" oninput="document.getElementById('b-primary-color').value=this.value; livePreviewBuilder()">
+                <input type="color" id="b-secondary-color" value="#10b981" style="width: 36px; height: 34px; border: none; background: transparent; cursor: pointer;" title="2. İkincil Neon Rengi (LIVE Rozeti, Hedef Çubuğu & Parıltılar)" oninput="document.getElementById('b-secondary-color-txt').value=this.value; livePreviewBuilder()">
+                <input type="text" id="b-secondary-color-txt" class="form-control" style="padding: 7px 8px; font-family: monospace;" value="#10b981" title="2. İkincil Renk Hex Kodu" oninput="document.getElementById('b-secondary-color').value=this.value; livePreviewBuilder()">
               </div>
             </div>
 
@@ -2070,8 +2072,9 @@
               <div style="display: flex; gap: 6px; align-items: center;">
                 <input type="color" id="studio-color-lab-picker" value="#a855f7" style="width: 34px; height: 30px; border: none; background: transparent; cursor: pointer;" oninput="onStudioColorLabChange(this.value)">
                 <input type="text" id="studio-color-lab-hex" class="form-control" style="padding: 5px 8px; font-family: monospace; font-weight: 800; max-width: 92px;" value="#a855f7" oninput="onStudioColorLabChange(this.value)">
-                <button type="button" class="btn-gal" id="studio-color-lab-copy" onclick="copyStudioColorLabCode()" style="padding: 5px 9px; font-size: 11px;">📋 Kodu Al</button>
-                <button type="button" class="btn-gal" onclick="applyBuilderColorPreset(document.getElementById('studio-color-lab-hex').value, document.getElementById('b-secondary-color').value)" style="padding: 5px 9px; font-size: 11px;">🎨 Sahneye Ver</button>
+                <button type="button" class="btn-gal" id="studio-color-lab-copy" onclick="copyStudioColorLabCode()" style="padding: 5px 9px; font-size: 11px;">📋 Kodu Kopyala</button>
+                <button type="button" class="btn-gal" onclick="applyBuilderColorPreset(document.getElementById('studio-color-lab-hex').value, document.getElementById('b-secondary-color').value)" style="padding: 5px 9px; font-size: 11px;" title="Bu rengi kartların ana çerçeve ve başlık rengi (1. Ana Renk) yapar">🎨 1. Ana Renk Yap</button>
+                <button type="button" class="btn-gal" onclick="applyBuilderColorPreset(document.getElementById('b-primary-color').value, document.getElementById('studio-color-lab-hex').value)" style="padding: 5px 9px; font-size: 11px; background:rgba(16,185,129,0.18); border-color:#10b981; color:#6ee7b7;" title="Bu rengi LIVE rozeti ve ikincil neon parıltı (2. İkincil Renk) yapar">✨ 2. İkincil Renk Yap</button>
               </div>
             </div>
           </div>
@@ -2114,13 +2117,18 @@
                 </div>
 
                 <!-- Sağ Canlı Önizleme Kutusu -->
-                <div style="display: flex; flex-direction: column; justify-content: space-between; width: 135px; gap: 5px;">
-                  <div id="studio-spectrum-preview-box" style="flex: 1; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.3); background: #a855f7; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.85);">
+                <div style="display: flex; flex-direction: column; justify-content: space-between; width: 145px; gap: 4px;">
+                  <div id="studio-spectrum-preview-box" style="flex: 1; min-height: 28px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.3); background: #a855f7; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 11px; font-weight: 900; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.85);">
                     #a855f7
                   </div>
-                  <button type="button" class="btn-gal" onclick="applyBuilderColorPreset(document.getElementById('b-primary-color').value, document.getElementById('studio-color-lab-hex').value)" style="padding: 4px 8px; font-size: 10.5px; width: 100%; justify-content: center;">
-                    ✨ 2. Renk Yap
-                  </button>
+                  <div style="display: flex; gap: 4px;">
+                    <button type="button" class="btn-gal" onclick="applyBuilderColorPreset(document.getElementById('studio-color-lab-hex').value, document.getElementById('b-secondary-color').value)" style="padding: 5px 6px; font-size: 10px; flex: 1; justify-content: center; font-weight: 800;" title="Seçilen rengi kartların 1. Ana Çerçeve Rengi yapar">
+                      🎨 1. Ana
+                    </button>
+                    <button type="button" class="btn-gal" onclick="applyBuilderColorPreset(document.getElementById('b-primary-color').value, document.getElementById('studio-color-lab-hex').value)" style="padding: 5px 6px; font-size: 10px; flex: 1; justify-content: center; font-weight: 800; background:rgba(16,185,129,0.18); border-color:#10b981; color:#6ee7b7;" title="Seçilen rengi 2. İkincil Neon Parıltı (LIVE/Hedef) rengi yapar">
+                      ✨ 2. İkincil
+                    </button>
+                  </div>
                 </div>
               </div>
 

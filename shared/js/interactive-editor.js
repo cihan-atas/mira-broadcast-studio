@@ -147,77 +147,9 @@
         animation: miraFocusFlash 0.85s ease-out;
       }
 
-      /* Tuval Altı Aktif Kartlar Listesi Dock Barı */
+      /* Tuval Altı Aktif Kartlar Listesi Dock Barı (Tuval içinde boş yer kaplamasın diye kaldırıldı) */
       .mira-bottom-cards-dock {
-        position: absolute;
-        bottom: 8px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10002;
-        max-width: 1860px;
-        background: rgba(9, 12, 20, 0.96);
-        border: 2px solid rgba(168, 85, 247, 0.72);
-        border-radius: 14px;
-        padding: 6px 12px;
-        display: none;
-        align-items: center;
-        gap: 7px;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        white-space: nowrap;
-        box-shadow: 0 16px 40px rgba(0,0,0,0.9), 0 0 24px rgba(168, 85, 247, 0.38);
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        backdrop-filter: blur(16px);
-      }
-      body.mira-edit-mode .mira-bottom-cards-dock {
-        display: flex;
-      }
-      .mira-dock-title {
-        font-size: 11px;
-        font-weight: 800;
-        color: #c084fc;
-        white-space: nowrap;
-        margin-right: 4px;
-      }
-      .mira-dock-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 10px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,0.15);
-        background: rgba(255,255,255,0.06);
-        color: #e2e8f0;
-        font-size: 11.5px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: all 0.15s;
-      }
-      .mira-dock-chip:hover {
-        background: rgba(168, 85, 247, 0.25);
-        border-color: #a855f7;
-        color: #fff;
-      }
-      .mira-dock-chip.active {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.32), rgba(5, 150, 105, 0.25));
-        border-color: #53fc18;
-        color: #fff;
-        box-shadow: 0 0 14px rgba(83, 252, 24, 0.35);
-      }
-      .mira-dock-chip-del {
-        background: rgba(239, 68, 68, 0.22);
-        border: 1px solid rgba(239, 68, 68, 0.5);
-        color: #fca5a5;
-        border-radius: 6px;
-        padding: 1px 6px;
-        font-size: 10.5px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: all 0.14s;
-      }
-      .mira-dock-chip-del:hover {
-        background: #ef4444;
-        color: #fff;
+        display: none !important;
       }
 
       /* 8 Yönlü Boyutlandırma Tutamaçları (Resize Handles) */
@@ -1748,14 +1680,10 @@
       });
     }
 
-    if (!bottomCardsDockEl) {
-      bottomCardsDockEl = document.createElement('div');
-      bottomCardsDockEl.className = 'mira-bottom-cards-dock';
-      bottomCardsDockEl.id = 'mira-bottom-cards-dock';
-      bottomCardsDockEl.addEventListener('mousedown', (e) => e.stopPropagation());
-      bottomCardsDockEl.addEventListener('click', (e) => e.stopPropagation());
-      root.appendChild(bottomCardsDockEl);
-    }
+    // Tuval içindeki alt bar ("TUVALDEKİ KARTLAR") tuvalde boş yer kaplamaması için kaldırıldı.
+    // Kartlar artık stüdyo monitörünün altındaki "🗂️ TUVALDEKİ TÜM KARTLAR" listesinde yer alır.
+    const existingOldDock = document.getElementById('mira-bottom-cards-dock');
+    if (existingOldDock) existingOldDock.remove();
 
     if (!snapXEl) {
       snapXEl = document.createElement('div');
@@ -1938,45 +1866,15 @@
     return list;
   }
 
-  // Tuvalin Altındaki Aktif Kartlar Barını Günceller
+  // Tuvalin Altındaki Aktif Kartlar Barı (Tuval içinde boş yer kaplamaması için kaldırıldı)
+  // Kartlar artık stüdyoda tuval monitörünün hemen altındaki "TUVALDEKİ TÜM KARTLAR" listesinde yer alır.
   function renderBottomCardsDock() {
-    if (!bottomCardsDockEl) return;
-    const cards = getActiveCanvasCardsList();
-    if (cards.length === 0) {
-      bottomCardsDockEl.innerHTML = `
-        <span class="mira-dock-title">🗂️ TUVALDEKİ KARTLAR (0):</span>
-        <span style="font-size:11.5px; color:#94a3b8;">Tuval şu an bomboş. Üstteki <strong>"➕ Yeni Kart Ekle"</strong> butonundan kart ekleyebilirsiniz.</span>
-      `;
-      return;
+    if (bottomCardsDockEl) {
+      bottomCardsDockEl.remove();
+      bottomCardsDockEl = null;
     }
-
-    const chipsHtml = cards.map(c => `
-      <div class="mira-dock-chip ${c.selected ? 'active' : ''}" data-focus-wid="${c.id}" title="Tıklayınca direkt bu karta odaklanır ve düzenleme kartını açar">
-        <span>${c.label}</span>
-        <button type="button" class="mira-dock-chip-del" data-del-wid="${c.id}" title="Bu kartı tuvalden sil">🗑️ Sil</button>
-      </div>
-    `).join('');
-
-    bottomCardsDockEl.innerHTML = `
-      <span class="mira-dock-title">🗂️ TUVALDEKİ KARTLAR (${cards.length}) — Tıkla Odaklan:</span>
-      ${chipsHtml}
-    `;
-
-    bottomCardsDockEl.querySelectorAll('.mira-dock-chip').forEach(chip => {
-      chip.addEventListener('click', (e) => {
-        if (e.target.closest('.mira-dock-chip-del')) return;
-        const wid = chip.getAttribute('data-focus-wid');
-        focusWidgetById(wid);
-      });
-    });
-
-    bottomCardsDockEl.querySelectorAll('.mira-dock-chip-del').forEach(delBtn => {
-      delBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const wid = delBtn.getAttribute('data-del-wid');
-        deleteWidgetFromCanvas(null, wid);
-      });
-    });
+    const old = document.getElementById('mira-bottom-cards-dock');
+    if (old) old.remove();
   }
 
   function updateSelectionBox() {
