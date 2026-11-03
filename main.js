@@ -5,6 +5,7 @@ const { fork } = require('child_process');
 
 let mainWindow = null;
 let previewWindow = null;
+let floatingChatWindow = null;
 let tray = null;
 let serverProcess = null;
 let isQuitting = false;
@@ -80,6 +81,53 @@ function ensureServer(callback) {
   });
 }
 
+function openFloatingChatWindow(url) {
+  if (floatingChatWindow && !floatingChatWindow.isDestroyed()) {
+    if (floatingChatWindow.isMinimized()) floatingChatWindow.restore();
+    floatingChatWindow.show();
+    floatingChatWindow.focus();
+    return;
+  }
+
+  const iconPath = path.join(__dirname, 'assets', 'icon.png');
+  const appIcon = nativeImage.createFromPath(iconPath);
+
+  floatingChatWindow = new BrowserWindow({
+    width: 440,
+    height: 720,
+    minWidth: 320,
+    minHeight: 380,
+    title: 'MİRA STUDIO — Her Zaman Üstte Canlı Sohbet Konsolu',
+    backgroundColor: '#0a0d16',
+    alwaysOnTop: true,
+    transparent: false,
+    frame: true,
+    autoHideMenuBar: true,
+    icon: appIcon,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  try {
+    floatingChatWindow.setAlwaysOnTop(true, 'screen-saver');
+  } catch (e) {
+    floatingChatWindow.setAlwaysOnTop(true);
+  }
+
+  floatingChatWindow.loadURL(url || 'http://localhost:8080/floating-chat.html');
+
+  floatingChatWindow.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+    shell.openExternal(targetUrl);
+    return { action: 'deny' };
+  });
+
+  floatingChatWindow.on('closed', () => {
+    floatingChatWindow = null;
+  });
+}
+
 function openPreviewWindow(url) {
   if (previewWindow && !previewWindow.isDestroyed()) {
     previewWindow.loadURL(url);
@@ -149,6 +197,10 @@ function createWindow() {
 
   // Stüdyo içi sahneler & Yeni Sekme tıklandığında tarayıcıya atmak yerine stüdyo içi özel önizleme penceresinde aç
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.includes('floating-chat')) {
+      openFloatingChatWindow(url);
+      return { action: 'deny' };
+    }
     if (url.includes('localhost:8080') || url.includes('127.0.0.1:8080')) {
       openPreviewWindow(url);
       return { action: 'deny' };
@@ -204,6 +256,10 @@ function createTray() {
       click: () => openPreviewWindow('http://localhost:8080/kick/vexana/in-game.html')
     },
     {
+      label: '💬 Canlı Sohbet Konsolu (Her Zaman Üstte)',
+      click: () => openFloatingChatWindow('http://localhost:8080/floating-chat.html')
+    },
+    {
       label: '📱 Mobil Kumanda Linkini Kopyala',
       click: () => {
         http.get('http://127.0.0.1:8080/api/lan-ip', (res) => {
@@ -246,6 +302,10 @@ function createTray() {
 }
 
 function killServerProcess() {
+  if (floatingChatWindow && !floatingChatWindow.isDestroyed()) {
+    try { floatingChatWindow.destroy(); } catch (e) {}
+    floatingChatWindow = null;
+  }
   if (previewWindow && !previewWindow.isDestroyed()) {
     try { previewWindow.destroy(); } catch (e) {}
     previewWindow = null;
