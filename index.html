@@ -6799,8 +6799,353 @@
       toggleBotrixConfigDrawer(false);
     }
 
-    // 3. Yüzen Kart Açma / Kapatma / Küçültme (BROWSER AÇMAZ!)
-    function openFloatingChatWidget() {
+    // 3. Yüzen Kart & OS-Level Always-on-Top Picture-in-Picture (MİRA ALTA ALINSA BİLE EKRANDA KALIR!)
+    let activePipWindow = null;
+
+    async function openDocumentPipChat() {
+      if (!('documentPictureInPicture' in window) || typeof window.documentPictureInPicture.requestWindow !== 'function') {
+        return false;
+      }
+
+      try {
+        if (activePipWindow && !activePipWindow.closed) {
+          activePipWindow.focus();
+          return true;
+        }
+
+        const pipWin = await window.documentPictureInPicture.requestWindow({
+          width: 400,
+          height: 620
+        });
+
+        activePipWindow = pipWin;
+
+        // Parent sayfadaki stilleri PiP penceresine aktar
+        [...document.styleSheets].forEach((sheet) => {
+          try {
+            const css = [...sheet.cssRules].map(r => r.cssText).join('');
+            const style = pipWin.document.createElement('style');
+            style.textContent = css;
+            pipWin.document.head.appendChild(style);
+          } catch(e) {
+            try {
+              const link = pipWin.document.createElement('link');
+              link.rel = 'stylesheet';
+              link.href = sheet.href;
+              pipWin.document.head.appendChild(link);
+            } catch(err) {}
+          }
+        });
+
+        // Font ve PiP özel stil tanımları
+        const customStyle = pipWin.document.createElement('style');
+        customStyle.textContent = `
+          :root {
+            --pip-opacity: ${studioChatOpacity / 100};
+          }
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+          }
+          html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(9, 11, 20, var(--pip-opacity));
+            color: #f1f5f9;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
+            transition: background 0.15s ease;
+          }
+          .pip-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            box-sizing: border-box;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+          }
+          .pip-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: linear-gradient(180deg, rgba(20, 24, 42, 0.98), rgba(12, 15, 28, 0.98));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+            gap: 8px;
+          }
+          .pip-title-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            color: #c084fc;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
+          }
+          .pip-top-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .pip-opacity-wrap {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10.5px;
+            color: #94a3b8;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+          }
+          .pip-opacity-wrap input[type="range"] {
+            width: 55px;
+            height: 3px;
+            accent-color: #a855f7;
+            cursor: pointer;
+          }
+          .pip-feed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scroll-behavior: smooth;
+            background: transparent !important;
+          }
+          .pip-feed::-webkit-scrollbar {
+            width: 5px;
+          }
+          .pip-feed::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.35);
+            border-radius: 4px;
+          }
+          .pip-input-bar {
+            display: flex;
+            gap: 8px;
+            padding: 10px 14px;
+            background: linear-gradient(180deg, rgba(16, 20, 36, 0.98), rgba(9, 12, 22, 0.98));
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            align-items: center;
+            flex-shrink: 0;
+          }
+          .pip-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.15s ease;
+          }
+          .pip-input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.35);
+          }
+          .pip-send-btn {
+            background: linear-gradient(135deg, #a855f7, #06b6d4);
+            border: none;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            transition: transform 0.15s, box-shadow 0.15s;
+          }
+          .pip-send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(168, 85, 247, 0.5);
+          }
+          .pip-clear-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+          }
+          .pip-clear-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #fca5a5;
+          }
+        `;
+        pipWin.document.head.appendChild(customStyle);
+
+        // Body içeriği
+        pipWin.document.body.innerHTML = `
+          <div class="pip-shell">
+            <header class="pip-header">
+              <div class="pip-title-box">
+                <span class="live-dot" style="width:8px; height:8px; background:#00f5a0; box-shadow:0 0 8px #00f5a0; border-radius:50%;"></span>
+                <span>CANLI SOHBET</span>
+                <span class="clean-msg-badge" style="background:rgba(0,245,160,0.15); color:#00f5a0; border:1px solid rgba(0,245,160,0.35);">ÜSTTE SABİT</span>
+              </div>
+              <div class="pip-top-actions">
+                <div class="pip-opacity-wrap" title="Sohbet saydamlığını ayarlar">
+                  <span>🪟</span>
+                  <input type="range" id="pip-opacity-slider" min="15" max="100" value="${studioChatOpacity}">
+                  <span id="pip-opacity-label" style="font-family:monospace; color:#00f5a0; font-size:10px;">%${studioChatOpacity}</span>
+                </div>
+                <button type="button" class="pip-clear-btn" id="pip-clear-btn" title="Sohbeti Temizle">🗑️</button>
+              </div>
+            </header>
+            <main class="pip-feed" id="pip-chat-feed"></main>
+            <footer class="pip-input-bar">
+              <input type="text" id="pip-input" class="pip-input" placeholder="Mesajınızı yazın... (Enter)" autocomplete="off">
+              <button type="button" id="pip-send-btn" class="pip-send-btn">Gönder</button>
+            </footer>
+          </div>
+        `;
+
+        // Mevcut mesajları aktar
+        const studioFeed = document.getElementById('studio-chat-feed');
+        const pipFeed = pipWin.document.getElementById('pip-chat-feed');
+        if (studioFeed && pipFeed) {
+          pipFeed.innerHTML = studioFeed.innerHTML;
+          pipFeed.scrollTop = pipFeed.scrollHeight;
+        }
+
+        // Opaklık slider dinleyicisi
+        const pipSlider = pipWin.document.getElementById('pip-opacity-slider');
+        const pipLabel = pipWin.document.getElementById('pip-opacity-label');
+        if (pipSlider) {
+          pipSlider.addEventListener('input', (e) => {
+            const v = e.target.value;
+            if (pipLabel) pipLabel.textContent = `%${v}`;
+            pipWin.document.documentElement.style.setProperty('--pip-opacity', v / 100);
+            pipWin.document.body.style.backgroundColor = `rgba(9, 11, 20, ${v / 100})`;
+            setStudioChatOpacity(v);
+            const mainSlider = document.getElementById('studio-chat-opacity-slider');
+            if (mainSlider) mainSlider.value = v;
+          });
+        }
+
+        // Temizle butonu dinleyicisi
+        const pipClear = pipWin.document.getElementById('pip-clear-btn');
+        if (pipClear) {
+          pipClear.addEventListener('click', () => {
+            clearStudioChatFeed();
+            if (pipFeed) pipFeed.innerHTML = '';
+          });
+        }
+
+        // Mesaj gönderme ve kullanıcıya yanıt verme
+        const pipInput = pipWin.document.getElementById('pip-input');
+        const pipSend = pipWin.document.getElementById('pip-send-btn');
+        
+        pipWin.replyToUser = function(uname) {
+          if (!pipInput) return;
+          pipInput.value = `@${uname} ` + pipInput.value;
+          pipInput.focus();
+        };
+
+        const doSend = () => {
+          if (!pipInput) return;
+          const text = pipInput.value.trim();
+          if (!text) return;
+          const payload = {
+            id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+            senderSession: MIRA_TAB_SESSION_ID,
+            type: 'TEST_CHAT',
+            username: 'MİRA (Yayıncı)',
+            content: text,
+            badge: 'streamer',
+            isStreamer: true,
+            platform: 'mira',
+            time: Date.now()
+          };
+          appendStudioChatMessage(payload);
+          dispatchEventToOverlay(payload);
+          pipInput.value = '';
+          pipInput.focus();
+        };
+
+        if (pipSend) pipSend.addEventListener('click', doSend);
+        if (pipInput) {
+          pipInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              doSend();
+            }
+          });
+          setTimeout(() => pipInput.focus(), 150);
+        }
+
+        // Kapatıldığında ana ekrana dönme
+        pipWin.addEventListener('pagehide', () => {
+          activePipWindow = null;
+          updatePipButtonState(false);
+          showToast('Yüzen sohbet konsolu ana pencereye geri alındı.');
+        });
+
+        updatePipButtonState(true);
+        showToast('📌 Sohbet ekranın üzerinde bağımsız karta alındı! Ana MİRA penceresini simge durumuna küçültseniz bile ekranda kalır.', 'success');
+        return true;
+      } catch(err) {
+        console.warn('Document Picture-in-Picture hatası:', err);
+        return false;
+      }
+    }
+
+    function updatePipButtonState(isOpen) {
+      const btn = document.querySelector('.btn-float-chat');
+      if (btn) {
+        if (isOpen) {
+          btn.innerHTML = '🟢 Ekranda Açık (PiP)';
+          btn.style.borderColor = '#00f5a0';
+          btn.style.color = '#00f5a0';
+        } else {
+          btn.innerHTML = '📌 Ekranda Üstte Tut (Yüzen Kart)';
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }
+      }
+    }
+
+    async function openFloatingChatWidget() {
+      // 1. Eğer PiP zaten açıksa odaklan
+      if (activePipWindow && !activePipWindow.closed) {
+        activePipWindow.focus();
+        return;
+      }
+
+      // 2. Electron ortamında çalışıyorsak (Bağımsız masaüstü BrowserWindow)
+      if (window.navigator && window.navigator.userAgent.includes('Electron')) {
+        window.open('/floating-chat.html', 'MiraFloatingChat', 'width=420,height=640');
+        showToast('📌 Masaüstü bağımsız sohbet penceresi açıldı!', 'success');
+        return;
+      }
+
+      // 3. Tarayıcıda gerçek OS-Level Document Picture-in-Picture desteği
+      if ('documentPictureInPicture' in window && typeof window.documentPictureInPicture.requestWindow === 'function') {
+        const ok = await openDocumentPipChat();
+        if (ok) return;
+      }
+
+      // 4. Fallback: Sayfa içi yüzen kart
+      openInAppFloatingWidget();
+    }
+
+    function openInAppFloatingWidget() {
       const widget = document.getElementById('mira-floating-chat-widget');
       const bubble = document.getElementById('mira-chat-bubble');
       if (bubble) bubble.style.display = 'none';
@@ -6810,7 +7155,7 @@
         if (inp) setTimeout(() => inp.focus(), 100);
       }
       initFloatingChatDrag();
-      showToast('📌 Sohbet ekranda yüzen karta alındı! İstediğiniz yere sürükleyebilirsiniz.', 'info');
+      showToast('📌 Sohbet sayfa içi yüzen karta alındı! İstediğiniz yere sürükleyebilirsiniz.', 'info');
     }
 
     function openAlwaysOnTopChat() {
@@ -6891,6 +7236,12 @@
       const feed2 = document.getElementById('floating-chat-feed');
       if (feed1) feed1.innerHTML = '';
       if (feed2) feed2.innerHTML = '';
+      if (activePipWindow && !activePipWindow.closed) {
+        try {
+          const pipFeed = activePipWindow.document.getElementById('pip-chat-feed');
+          if (pipFeed) pipFeed.innerHTML = '';
+        } catch (e) {}
+      }
       showToast('Sohbet akışı temizlendi.');
     }
 
@@ -6938,6 +7289,23 @@
         }
         feed.scrollTop = feed.scrollHeight;
       });
+
+      // PiP Açık ise oradaki akışa da canlı ekle
+      if (activePipWindow && !activePipWindow.closed) {
+        try {
+          const pipFeed = activePipWindow.document.getElementById('pip-chat-feed');
+          if (pipFeed) {
+            const pipMsg = activePipWindow.document.createElement('div');
+            pipMsg.className = `clean-chat-msg ${isStreamer ? 'is-streamer' : ''}`;
+            pipMsg.innerHTML = html;
+            pipFeed.appendChild(pipMsg);
+            while (pipFeed.children.length > 70) {
+              pipFeed.removeChild(pipFeed.firstChild);
+            }
+            pipFeed.scrollTop = pipFeed.scrollHeight;
+          }
+        } catch (e) {}
+      }
     }
 
     function replyToUser(uname) {
