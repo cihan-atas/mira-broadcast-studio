@@ -974,8 +974,8 @@ html, body {
   display: flex;
   align-items: flex-end;
   gap: 4px;
-  height: 68px; /* Progress bar için dengeli yükseklik */
-  padding: 4px 0;
+  height: 48px; /* Kapak ve progress bar ile dengeli kompakt yükseklik */
+  padding: 2px 0;
 }
 
 .viz-bar {
@@ -985,10 +985,55 @@ html, body {
   transition: height 0.08s ease;
 }
 
+/* Şarkı Satırı: Albüm Kapağı + Şarkı & Sanatçı */
+.audio-track-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.audio-cover-box {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  border: 1.5px solid var(--secondary-color, #10b981);
+  box-shadow: 0 0 10px var(--secondary-glow, rgba(16, 185, 129, 0.4));
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.audio-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 6px;
+  transition: opacity 0.3s ease;
+}
+
+.audio-cover-placeholder {
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-color, #10b981);
+}
+
 .audio-track-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
+  flex: 1;
 }
 
 .audio-track-title {
@@ -1005,6 +1050,9 @@ html, body {
   font-size: 10px;
   color: #a0aec0;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Şarkı İlerleme Çubuğu & Canlı Saniye Göstergesi */

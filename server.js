@@ -13,6 +13,7 @@ let currentSongArtist = "MİRA Broadcast Studio";
 let currentSongProgress = 45; // Saniye cinsinden
 let currentSongDuration = 210; // Saniye cinsinden (3:30)
 let currentSongStatus = "playing";
+let currentSongCover = "";
 let currentSongLastUpdate = Date.now();
 
 // ==========================================
@@ -119,6 +120,7 @@ function pollTunaBackground() {
 
           currentSongTitle = formattedTitle;
           currentSongArtist = rawArtist || 'Spotify Canlı';
+          currentSongCover = (parsed.cover_path || parsed.cover_url || '').trim();
           currentSongDuration = durSec;
           currentSongProgress = progSec;
           currentSongStatus = status;
@@ -145,6 +147,7 @@ function pollTunaBackground() {
             type: 'UPDATE_SONG',
             title: currentSongTitle,
             artist: currentSongArtist,
+            coverUrl: currentSongCover || '/api/tuna/cover',
             progress: currentSongProgress,
             duration: currentSongDuration,
             status: currentSongStatus,
@@ -1993,6 +1996,7 @@ const server = http.createServer((req, res) => {
       return res.end(JSON.stringify({
         title: currentSongTitle,
         artist: currentSongArtist,
+        coverUrl: currentSongCover || '/api/tuna/cover',
         progress: elapsed,
         duration: currentSongDuration,
         status: currentSongStatus,
@@ -2008,6 +2012,7 @@ const server = http.createServer((req, res) => {
           const data = JSON.parse(body);
           if (data.title !== undefined) currentSongTitle = data.title;
           if (data.artist !== undefined) currentSongArtist = data.artist;
+          if (data.coverUrl !== undefined) currentSongCover = data.coverUrl;
           if (data.progress !== undefined) currentSongProgress = Number(data.progress);
           if (data.duration !== undefined) currentSongDuration = Number(data.duration);
           if (data.status !== undefined) currentSongStatus = data.status;
@@ -2018,6 +2023,7 @@ const server = http.createServer((req, res) => {
             type: 'UPDATE_SONG',
             title: currentSongTitle,
             artist: currentSongArtist,
+            coverUrl: currentSongCover || '/api/tuna/cover',
             progress: currentSongProgress,
             duration: currentSongDuration,
             status: currentSongStatus,
@@ -2035,6 +2041,7 @@ const server = http.createServer((req, res) => {
             success: true,
             title: currentSongTitle,
             artist: currentSongArtist,
+            coverUrl: currentSongCover || '/api/tuna/cover',
             progress: currentSongProgress,
             duration: currentSongDuration,
             obsConnected: obsWsConnected
@@ -2046,6 +2053,41 @@ const server = http.createServer((req, res) => {
       });
       return;
     }
+  }
+
+  // 2.1b API: Tuna / Spotify Albüm Kapağı Proxy
+  if (pathname === '/api/tuna/cover' && (req.method === 'GET' || req.method === 'HEAD')) {
+    const reqCover = http.get(`http://127.0.0.1:${tunaPort}/cover.png`, (cRes) => {
+      if (cRes.statusCode === 200) {
+        res.writeHead(200, {
+          'Content-Type': cRes.headers['content-type'] || 'image/png',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-cache'
+        });
+        return cRes.pipe(res);
+      }
+      fallbackCover();
+    });
+    reqCover.on('error', () => fallbackCover());
+    reqCover.setTimeout(1200, () => {
+      reqCover.destroy();
+      fallbackCover();
+    });
+
+    function fallbackCover() {
+      if (currentSongCover && currentSongCover.startsWith('http')) {
+        res.writeHead(302, { 'Location': currentSongCover });
+        return res.end();
+      }
+      const iconPath = path.join(__dirname, 'assets', 'icon.png');
+      if (fs.existsSync(iconPath)) {
+        res.writeHead(200, { 'Content-Type': 'image/png', 'Access-Control-Allow-Origin': '*' });
+        return fs.createReadStream(iconPath).pipe(res);
+      }
+      res.writeHead(404);
+      res.end();
+    }
+    return;
   }
 
   // 2.15 API: Tuna Web Sunucusu Kontrolü & Canlı Şarkı Çekme

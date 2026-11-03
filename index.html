@@ -2774,8 +2774,8 @@
     }
 
     .music-disc-icon {
-      width: 52px;
-      height: 52px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
       background: radial-gradient(circle, #2e1065 0%, #090d1a 70%);
       border: 2px solid #a855f7;
@@ -2786,11 +2786,26 @@
       box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
       animation: spinDisc 8s linear infinite;
       flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
     }
     .music-disc-icon.paused {
       animation-play-state: paused;
       border-color: #64748b;
       box-shadow: none;
+    }
+    .music-disc-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+    .music-disc-fallback {
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     @keyframes spinDisc {
@@ -4915,7 +4930,8 @@
         <div class="music-now-card">
           <div class="music-now-left">
             <div class="music-disc-icon" id="music-disc-spin">
-              🎵
+              <img src="/api/tuna/cover" id="deck-cover-img" class="music-disc-img" alt="Kapak" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+              <span class="music-disc-fallback" style="display:none;">🎵</span>
             </div>
             <div class="music-now-meta">
               <div class="music-now-tag-row">
@@ -9123,6 +9139,18 @@
       }
     }
 
+    function updateDeckCover(url) {
+      const img = document.getElementById('deck-cover-img');
+      if (!img) return;
+      const targetUrl = url || '/api/tuna/cover';
+      if (img.getAttribute('data-src') !== targetUrl) {
+        img.setAttribute('data-src', targetUrl);
+        img.src = targetUrl;
+        img.style.display = 'block';
+        if (img.nextElementSibling) img.nextElementSibling.style.display = 'none';
+      }
+    }
+
     // Her saniye akıcı saniye ilerletme
     setInterval(() => {
       if (deckMusicStatus !== 'paused') {
@@ -9261,6 +9289,7 @@
               const tDur = data.data.duration ? Math.floor(data.data.duration / 1000) : (data.data.duration_ms ? Math.floor(data.data.duration_ms / 1000) : 210);
               const tProg = data.data.progress ? Math.floor(data.data.progress / 1000) : (data.data.progress_ms ? Math.floor(data.data.progress_ms / 1000) : 0);
               updateDeckMusicProgress(tProg, tDur, data.data.status || 'playing');
+              updateDeckCover(data.data.cover_path || data.data.cover_url || '/api/tuna/cover');
 
               if (tTitle) {
                 const sInp = document.getElementById('music-song-input');
@@ -9314,6 +9343,7 @@
               const tDur = data.data.duration ? Math.floor(data.data.duration / 1000) : (data.data.duration_ms ? Math.floor(data.data.duration_ms / 1000) : 210);
               const tProg = data.data.progress ? Math.floor(data.data.progress / 1000) : (data.data.progress_ms ? Math.floor(data.data.progress_ms / 1000) : 0);
               updateDeckMusicProgress(tProg, tDur, data.data.status || 'playing');
+              updateDeckCover(data.data.cover_path || data.data.cover_url || '/api/tuna/cover');
 
               const cur = document.getElementById('music-song-input')?.value;
               if (tTitle && tTitle !== cur) {
@@ -9349,6 +9379,11 @@
           }
           if (data && (typeof data.progress === 'number' || typeof data.duration === 'number')) {
             updateDeckMusicProgress(data.progress, data.duration, data.status);
+          }
+          if (data && data.coverUrl) {
+            updateDeckCover(data.coverUrl);
+          } else {
+            updateDeckCover('/api/tuna/cover');
           }
           if (data && data.filePath) {
             const fInp = document.getElementById('now-playing-filepath');
@@ -9704,6 +9739,17 @@
             updateTtsUI();
           } else if (e.data && e.data.type === 'STOP_TTS') {
             localTTS.stop();
+          } else if (e.data && e.data.type === 'UPDATE_SONG') {
+            if (e.data.coverUrl) updateDeckCover(e.data.coverUrl);
+            if (e.data.title) {
+              const cardTitle = document.getElementById('music-card-title');
+              if (cardTitle) cardTitle.textContent = e.data.title;
+              const marquee = document.getElementById('music-marquee-display');
+              if (marquee) marquee.textContent = `🎵 ŞU AN ÇALAN: ${e.data.title} • CANLI YAYIN MÜZİĞİ`;
+            }
+            if (typeof e.data.progress === 'number' || typeof e.data.duration === 'number') {
+              updateDeckMusicProgress(e.data.progress, e.data.duration, e.data.status);
+            }
           }
         });
       } catch (e) {}
@@ -9727,6 +9773,17 @@
                 } else if (ev.type === 'TEST_CHAT' || ev.type === 'CHAT_MESSAGE') {
                   if (ev.senderSession !== MIRA_TAB_SESSION_ID) {
                     appendStudioChatMessage(ev);
+                  }
+                } else if (ev.type === 'UPDATE_SONG') {
+                  if (ev.coverUrl) updateDeckCover(ev.coverUrl);
+                  if (ev.title) {
+                    const cardTitle = document.getElementById('music-card-title');
+                    if (cardTitle) cardTitle.textContent = ev.title;
+                    const marquee = document.getElementById('music-marquee-display');
+                    if (marquee) marquee.textContent = `🎵 ŞU AN ÇALAN: ${ev.title} • CANLI YAYIN MÜZİĞİ`;
+                  }
+                  if (typeof ev.progress === 'number' || typeof ev.duration === 'number') {
+                    updateDeckMusicProgress(ev.progress, ev.duration, ev.status);
                   }
                 }
               });

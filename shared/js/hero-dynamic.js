@@ -700,11 +700,24 @@
     const fillEl = document.getElementById('music-progress-fill') || document.querySelector('.audio-progress-fill');
     const curTimeEl = document.getElementById('music-time-current') || document.querySelector('.audio-time-current');
     const durTimeEl = document.getElementById('music-time-duration') || document.querySelector('.audio-time-duration');
+    const coverImg = document.getElementById('music-cover-img') || document.querySelector('.audio-cover-img');
+    const placeholderEl = document.querySelector('.audio-cover-placeholder');
 
     let currentSeconds = 0;
     let durationSeconds = 180;
     let lastSongTitle = '';
+    let lastCoverUrl = '';
     let isPlaying = true;
+
+    function updateCover(url) {
+      if (!coverImg) return;
+      if (url && url !== lastCoverUrl) {
+        lastCoverUrl = url;
+        coverImg.src = url;
+        coverImg.style.display = 'block';
+        if (placeholderEl) placeholderEl.style.display = 'none';
+      }
+    }
 
     function formatTime(sec) {
       if (!sec || isNaN(sec) || sec < 0) sec = 0;
@@ -743,6 +756,11 @@
     function syncMusicData(data) {
       if (!data) return;
       if (data.title) updateTitle(data.title);
+      if (data.coverUrl) {
+        updateCover(data.coverUrl);
+      } else {
+        updateCover('/api/tuna/cover');
+      }
 
       // Milisaniye veya saniye birimini düzelt
       let prog = typeof data.progress === 'number' ? data.progress : 0;
