@@ -880,7 +880,7 @@
       }
     });
 
-    // Sunucu Polling Entegrasyonu (OBS içinde tek başına çalışırken bile gerçek olayları yakalar)
+    // Sunucu Polling Entegrasyonu (OBS içinde tek başına çalışırken bile anlık 250ms ile olayları yakalar)
     let lastPollTime = Date.now() - 5000;
     setInterval(() => {
       fetch(`/api/poll?since=${lastPollTime}`)
@@ -894,7 +894,7 @@
           }
         })
         .catch(() => {});
-    }, 1000);
+    }, 250);
   }
 
   // =============================================================

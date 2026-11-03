@@ -8517,6 +8517,10 @@
     function initTtsDashboard() {
       loadTtsConfig();
       populateVoiceList();
+      if (localTTS) {
+        localTTS.obsMusicSource = localStorage.getItem('mira_obs_music_source') || 'Desktop Audio';
+        localTTS.autoDucking = localStorage.getItem('mira_music_ducking') !== 'false';
+      }
       if ('speechSynthesis' in window) {
         window.speechSynthesis.onvoiceschanged = () => populateVoiceList();
       }
@@ -8819,14 +8823,16 @@
 
     function onTtsRateChange(val) {
       miraTtsConfig.rate = parseFloat(val);
-      document.getElementById('val-tts-rate').textContent = `${parseFloat(val).toFixed(1)}x`;
-      localTTS.rate = parseFloat(val);
+      document.getElementById('val-tts-rate').textContent = `${parseFloat(val).toFixed(2)}x`;
+      if (localTTS) localTTS.rate = parseFloat(val);
+      saveTtsConfigAndSync(false);
     }
 
     function onTtsPitchChange(val) {
       miraTtsConfig.pitch = parseFloat(val);
-      document.getElementById('val-tts-pitch').textContent = parseFloat(val).toFixed(1);
-      localTTS.pitch = parseFloat(val);
+      document.getElementById('val-tts-pitch').textContent = parseFloat(val).toFixed(2);
+      if (localTTS) localTTS.pitch = parseFloat(val);
+      saveTtsConfigAndSync(false);
     }
 
     function onTtsTemplateChange() {
@@ -9718,6 +9724,7 @@
     function onObsAudioSourceChange() {
       const src = document.getElementById('obs-audio-source-select')?.value || 'Desktop Audio';
       localStorage.setItem('mira_obs_music_source', src);
+      if (localTTS) localTTS.obsMusicSource = src;
       showToast(`Müzik ses kaynağı: ${src}`, 'info');
     }
 
@@ -10619,7 +10626,7 @@
             }
           })
           .catch(() => {});
-      }, 1200);
+      }, 250);
     });
 
 </script>

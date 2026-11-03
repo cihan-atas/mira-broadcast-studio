@@ -312,6 +312,24 @@ async function callObsSetInputVolume(inputName, volumeMul) {
   throw lastErr || new Error('OBS ses kaynağı bulunamadı');
 }
 
+async function callObsGetInputVolume(inputName) {
+  if (!obsWsClient) throw new Error('OBS WebSocket bağlı değil');
+  const candidates = [inputName];
+  if (!inputName || inputName === 'Desktop Audio') {
+    candidates.push('Desktop Audio', 'Masaüstü Sesi', 'Masaüstü Ses', 'DesktopAudio', 'Müzik', 'Spotify');
+  }
+  const uniqueCandidates = [...new Set(candidates.filter(Boolean))];
+  for (const name of uniqueCandidates) {
+    try {
+      const vol = await obsWsClient.call('GetInputVolume', { inputName: name });
+      if (vol && typeof vol.inputVolumeMul === 'number') {
+        return { name, volumeMul: vol.inputVolumeMul };
+      }
+    } catch(err) {}
+  }
+  return { name: inputName || 'Desktop Audio', volumeMul: obsSavedMusicVolume || 1.0 };
+}
+
 function getObsAudioInputs(callback) {
   if (!obsWsConnected || !obsWsClient) {
     return callback(new Error('OBS WebSocket bağlı değil'));
@@ -354,22 +372,34 @@ function setObsAudioVolume(inputName, volumeMul, callback) {
     });
 }
 
-function setObsDucking(duck, inputName = 'Desktop Audio', callback) {
+async function setObsDucking(duck, inputName = 'Desktop Audio', callback) {
   if (!obsWsConnected || !obsWsClient) {
     if (callback) callback(new Error('OBS WebSocket bağlı değil'));
     return;
   }
-  if (duck) {
-    obsIsDucked = true;
-    const duckedVolume = Math.max(0.05, obsSavedMusicVolume * 0.25); // %75 kıs
-    callObsSetInputVolume(inputName || 'Desktop Audio', duckedVolume)
-      .then((matchedName) => callback && callback(null, { ducked: true, volume: duckedVolume, inputName: matchedName }))
-      .catch(err => callback && callback(err));
-  } else {
-    obsIsDucked = false;
-    callObsSetInputVolume(inputName || 'Desktop Audio', obsSavedMusicVolume)
-      .then((matchedName) => callback && callback(null, { ducked: false, volume: obsSavedMusicVolume, inputName: matchedName }))
-      .catch(err => callback && callback(err));
+  try {
+    if (duck) {
+      if (!obsIsDucked) {
+        // Canlı OBS ses seviyesini oku ve sakla
+        try {
+          const current = await callObsGetInputVolume(inputName);
+          if (current && typeof current.volumeMul === 'number' && current.volumeMul > 0.05) {
+            obsSavedMusicVolume = current.volumeMul;
+          }
+        } catch(e) {}
+        obsIsDucked = true;
+      }
+      const duckedVolume = Math.max(0.05, obsSavedMusicVolume * 0.25); // %75 kıs
+      const matchedName = await callObsSetInputVolume(inputName || 'Desktop Audio', duckedVolume);
+      if (callback) callback(null, { ducked: true, volume: duckedVolume, inputName: matchedName });
+    } else {
+      obsIsDucked = false;
+      const restoreVolume = Math.max(0.1, obsSavedMusicVolume || 1.0);
+      const matchedName = await callObsSetInputVolume(inputName || 'Desktop Audio', restoreVolume);
+      if (callback) callback(null, { ducked: false, volume: restoreVolume, inputName: matchedName });
+    }
+  } catch(err) {
+    if (callback) callback(err);
   }
 }
 
@@ -2364,10 +2394,13 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  // 2.17 API: TTS Ses Akışı (OBS, Linux ve Tüm Tarayıcılarda %100 Çalışan Doğal Türkçe Ses)
+  // 2.17 API: TTS Ses Akışı (OBS, Linux ve Tüm Tarayıcılarda %100 Çalışan Doğal Türkçe Ses + FFmpeg Perde & Hız)
   if (pathname === '/api/tts/audio' && req.method === 'GET') {
     let text = (parsedUrl.searchParams.get('text') || '').trim();
     const lang = (parsedUrl.searchParams.get('lang') || 'tr').toLowerCase();
+    const pitch = Math.max(0.5, Math.min(2.0, parseFloat(parsedUrl.searchParams.get('pitch') || '1.0') || 1.0));
+    const rate = Math.max(0.5, Math.min(2.0, parseFloat(parsedUrl.searchParams.get('rate') || '1.0') || 1.0));
+
     if (!text) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ error: 'Text parametresi gerekli' }));
@@ -2385,22 +2418,67 @@ const server = http.createServer((req, res) => {
     } catch(e) {}
 
     const textHash = crypto.createHash('md5').update(`${lang}_${text}`).digest('hex');
-    const cachedFilePath = path.join(ttsCacheDir, `${textHash}.mp3`);
+    const baseFilePath = path.join(ttsCacheDir, `base_${textHash}.mp3`);
 
-    // 1. Önbellekte varsa doğrudan diskten sun
-    if (fs.existsSync(cachedFilePath)) {
+    const pitchStr = pitch.toFixed(2);
+    const rateStr = rate.toFixed(2);
+    const isTransformed = Math.abs(pitch - 1.0) >= 0.03 || Math.abs(rate - 1.0) >= 0.03;
+    const finalHash = isTransformed ? crypto.createHash('md5').update(`${lang}_p${pitchStr}_r${rateStr}_${text}`).digest('hex') : textHash;
+    const finalFilePath = path.join(ttsCacheDir, isTransformed ? `mod_${finalHash}.mp3` : `base_${textHash}.mp3`);
+
+    const serveFinalAudio = (filePath) => {
       try {
-        const stat = fs.statSync(cachedFilePath);
+        const stat = fs.statSync(filePath);
         res.writeHead(200, {
           'Content-Type': 'audio/mpeg',
           'Content-Length': stat.size,
           'Cache-Control': 'public, max-age=86400'
         });
-        return fs.createReadStream(cachedFilePath).pipe(res);
-      } catch (e) {}
+        fs.createReadStream(filePath).pipe(res);
+      } catch (e) {
+        if (!res.headersSent) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Ses dosyası okunamadı' }));
+        }
+      }
+    };
+
+    // 1. Nihai işlenmiş ses önbellekte var mı?
+    if (fs.existsSync(finalFilePath)) {
+      return serveFinalAudio(finalFilePath);
     }
 
-    // 2. Önbellekte yoksa Doğal Bulut TTS Servisinden çek ve önbelleğe al
+    // 2. Base sesi elde et (varsa kullan, yoksa Google'dan indir)
+    const applyTransformAndServe = (inputMp3) => {
+      if (!isTransformed) {
+        return serveFinalAudio(inputMp3);
+      }
+      // FFmpeg rubberband ile perde (pitch) ve tempo (hız) dönüştür
+      const ffmpeg = spawn('ffmpeg', [
+        '-y',
+        '-i', inputMp3,
+        '-af', `rubberband=pitch=${pitchStr}:tempo=${rateStr}`,
+        finalFilePath
+      ]);
+
+      ffmpeg.on('close', (code) => {
+        if (code === 0 && fs.existsSync(finalFilePath)) {
+          serveFinalAudio(finalFilePath);
+        } else {
+          serveFinalAudio(inputMp3);
+        }
+      });
+
+      ffmpeg.on('error', () => {
+        serveFinalAudio(inputMp3);
+      });
+    };
+
+    if (fs.existsSync(baseFilePath)) {
+      return applyTransformAndServe(baseFilePath);
+    }
+
+    // Google Translate TTS'ten ham sesi indir
     const googleTtsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
     const ttsReq = https.get(googleTtsUrl, {
       headers: {
@@ -2409,48 +2487,37 @@ const server = http.createServer((req, res) => {
       }
     }, (googleRes) => {
       if (googleRes.statusCode === 200) {
-        const fileStream = fs.createWriteStream(cachedFilePath);
-        res.writeHead(200, {
-          'Content-Type': 'audio/mpeg',
-          'Cache-Control': 'public, max-age=86400'
-        });
+        const fileStream = fs.createWriteStream(baseFilePath);
         googleRes.pipe(fileStream);
-        googleRes.pipe(res);
+        fileStream.on('finish', () => {
+          applyTransformAndServe(baseFilePath);
+        });
+        fileStream.on('error', () => {
+          serveEspeakFallback();
+        });
       } else {
-        // Çevrimdışı/Yedek Sentezleyici (espeak fallback)
-        try {
-          const espeak = spawn('espeak', ['-v', lang === 'tr' ? 'tr' : 'en', text, '--stdout']);
-          res.writeHead(200, { 'Content-Type': 'audio/wav' });
-          espeak.stdout.pipe(res);
-          espeak.on('error', () => { try { res.end(); } catch(e){} });
-        } catch(e) {
-          res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'TTS ses sentezi başarısız' }));
-        }
+        serveEspeakFallback();
       }
     });
 
-    ttsReq.on('error', () => {
+    const serveEspeakFallback = () => {
       try {
         const espeak = spawn('espeak', ['-v', lang === 'tr' ? 'tr' : 'en', text, '--stdout']);
         res.writeHead(200, { 'Content-Type': 'audio/wav' });
         espeak.stdout.pipe(res);
         espeak.on('error', () => { try { res.end(); } catch(e){} });
       } catch(e) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'TTS ses sentezi hatası' }));
+        if (!res.headersSent) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'TTS ses sentezi başarısız' }));
+        }
       }
-    });
+    };
 
+    ttsReq.on('error', () => serveEspeakFallback());
     ttsReq.setTimeout(4000, () => {
       ttsReq.destroy();
-      try {
-        const espeak = spawn('espeak', ['-v', lang === 'tr' ? 'tr' : 'en', text, '--stdout']);
-        res.writeHead(200, { 'Content-Type': 'audio/wav' });
-        espeak.stdout.pipe(res);
-      } catch(e) {
-        try { res.end(); } catch(err){}
-      }
+      serveEspeakFallback();
     });
     return;
   }

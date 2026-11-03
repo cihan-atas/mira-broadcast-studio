@@ -180,6 +180,7 @@ class HeroTTSManager {
     this.heroName = (options.heroName || 'vexana').toLowerCase();
     this.volume = options.volume !== undefined ? options.volume : 1.0;
     this.autoDucking = options.autoDucking !== undefined ? options.autoDucking : true;
+    this.obsMusicSource = options.obsMusicSource || (typeof localStorage !== 'undefined' ? localStorage.getItem('mira_obs_music_source') : null) || 'Desktop Audio';
     this.rate = options.rate !== undefined ? options.rate : 1.0;
     this.pitch = options.pitch !== undefined ? options.pitch : 1.0;
     this.voiceName = options.voiceName || 'mira_natural_tr';
@@ -245,6 +246,7 @@ class HeroTTSManager {
     if (cfg.outputMode !== undefined) this.outputMode = cfg.outputMode;
     if (cfg.volume !== undefined) this.volume = parseFloat(cfg.volume);
     if (cfg.autoDucking !== undefined) this.autoDucking = !!cfg.autoDucking;
+    if (cfg.obsMusicSource !== undefined) this.obsMusicSource = cfg.obsMusicSource;
     if (cfg.rate !== undefined) this.rate = parseFloat(cfg.rate);
     if (cfg.pitch !== undefined) this.pitch = parseFloat(cfg.pitch);
     if (cfg.voiceName !== undefined) this.setVoiceByName(cfg.voiceName);
@@ -313,10 +315,11 @@ class HeroTTSManager {
     if (!this.autoDucking) return;
     try {
       if (typeof fetch === 'function' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
+        const source = this.obsMusicSource || (typeof localStorage !== 'undefined' ? localStorage.getItem('mira_obs_music_source') : null) || 'Desktop Audio';
         fetch('/api/obs/ducking', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ duck: enable })
+          body: JSON.stringify({ duck: enable, inputName: source })
         }).catch(() => {});
       }
     } catch(e) {}
@@ -445,7 +448,9 @@ class HeroTTSManager {
 
   playAudioStream(text) {
     try {
-      const audioUrl = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(this.voiceLang || 'tr')}`;
+      const p = typeof this.pitch === 'number' ? this.pitch : 1.0;
+      const r = typeof this.rate === 'number' ? this.rate : 1.0;
+      const audioUrl = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(this.voiceLang || 'tr')}&pitch=${encodeURIComponent(p)}&rate=${encodeURIComponent(r)}`;
       const audio = this.getAudioPlayer();
       this.currentAudio = audio;
 
@@ -461,7 +466,6 @@ class HeroTTSManager {
         audio.volume = Math.max(0, Math.min(1.0, targetVol));
       }
 
-      audio.playbackRate = typeof this.rate === 'number' ? Math.max(0.5, Math.min(2.0, this.rate)) : 1.0;
       audio.src = audioUrl;
 
       // TTS başladığında müziği otomatik kıs (Ducking)
@@ -497,6 +501,7 @@ class HeroTTSManager {
   playSpeechSynthesis(text) {
     if (!('speechSynthesis' in window)) {
       this.isPlaying = false;
+      this.triggerDucking(false);
       setTimeout(() => this.processQueue(), 200);
       return;
     }
@@ -505,22 +510,27 @@ class HeroTTSManager {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       if (this.selectedVoice) utterance.voice = this.selectedVoice;
-      utterance.volume = typeof this.volume === 'number' ? this.volume : 1.0;
+      utterance.volume = typeof this.volume === 'number' ? Math.min(1.0, this.volume) : 1.0;
       utterance.rate = typeof this.rate === 'number' ? this.rate : 1.0;
       utterance.pitch = typeof this.pitch === 'number' ? this.pitch : 1.0;
 
-      utterance.onend = () => {
+      this.triggerDucking(true);
+
+      const finishSynthesis = () => {
         this.isPlaying = false;
+        if (this.queue.length === 0) {
+          this.triggerDucking(false);
+        }
         setTimeout(() => this.processQueue(), 250);
       };
-      utterance.onerror = () => {
-        this.isPlaying = false;
-        setTimeout(() => this.processQueue(), 250);
-      };
+
+      utterance.onend = finishSynthesis;
+      utterance.onerror = finishSynthesis;
 
       window.speechSynthesis.speak(utterance);
     } catch(e) {
       this.isPlaying = false;
+      this.triggerDucking(false);
       setTimeout(() => this.processQueue(), 200);
     }
   }
