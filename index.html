@@ -1932,30 +1932,79 @@
             </div>
           </div>
 
-          <!-- Hızlı Renk Paletleri & Adım Adım Tuvale Kart Ekleme Çipleri -->
-          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.07);">
-            <div class="preset-colors-bar" style="margin-top: 0; align-items: center;">
-              <span style="font-size: 11px; font-weight: 800; color: #94a3b8; align-self: center;">RENK PALETİ:</span>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#a855f7', '#10b981')">💀 Ametist (#a855f7)</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ffd700', '#ef4444')">👑 Altın (#ffd700)</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ff85a2', '#60a5fa')">🐾 Pembe (#ff85a2)</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#e11d48', '#94a3b8')">🩸 Kızıl (#e11d48)</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#00f5d4', '#38bdf8')">⚓ Turkuaz (#00f5d4)</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#53fc18', '#a855f7')">🟢 Kick (#53fc18)</button>
+          <!-- Hassas Mouse Gezdirmeli 2D Renk Paleti & Hazır Renk Çipleri (Modül Checkbox'ları Kaldırıldı — Kartlar Galeriden Eklenir) -->
+          <div style="display: none;">
+            <input type="checkbox" id="b-show-topbar">
+            <input type="checkbox" id="b-show-gameframe">
+            <input type="checkbox" id="b-show-showcase">
+            <input type="checkbox" id="b-show-social">
+            <input type="checkbox" id="b-show-webcam">
+            <input type="checkbox" id="b-show-chat">
+            <input type="checkbox" id="b-show-music">
+            <input type="checkbox" id="b-show-goal">
+            <input type="checkbox" id="b-show-skills">
+            <input type="checkbox" id="b-show-customcard">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; align-items: center; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08);">
+            <!-- Sol: Mouse Gezdirerek Hassas 2D Renk Spektrumu & 360° Gökkuşağı Ton Şeridi -->
+            <div style="background: rgba(124,58,237,0.08); border: 1px solid rgba(168,85,247,0.32); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 11px; font-weight: 800; color: #e9d5ff;">
+                  🖱️ HASSAS RENK PALETİ (Üzerinde Mouse Gezdirerek Ayarla → Tıkla Sabitle):
+                </span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span id="studio-spectrum-rgb" style="font-family: monospace; font-size: 11px; color: #cbd5e1; background: rgba(0,0,0,0.45); padding: 2px 8px; border-radius: 6px;">rgb(168, 85, 247)</span>
+                  <span id="studio-spectrum-lock-badge" onclick="toggleStudioSpectrumLock()" style="font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 99px; background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #6ee7b7; cursor: pointer;">
+                    🖱️ Mouse Takibi Aktif (Tıkla=Sabitle)
+                  </span>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px; align-items: stretch;">
+                <!-- 2D Doygunluk & Parlaklık Alanı -->
+                <div id="studio-spectrum-pad" style="position: relative; flex: 1; height: 74px; border-radius: 9px; border: 1.5px solid rgba(255,255,255,0.25); background: hsl(271, 100%, 50%); cursor: crosshair; overflow: hidden; user-select: none;">
+                  <div style="position: absolute; inset: 0; background: linear-gradient(to right, #ffffff, rgba(255,255,255,0)); pointer-events: none;"></div>
+                  <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0), #000000); pointer-events: none;"></div>
+                  <div id="studio-spectrum-cursor" style="position: absolute; left: 66%; top: 15%; width: 15px; height: 15px; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 0 0 1.5px rgba(0,0,0,0.85), 0 0 10px rgba(255,255,255,0.8); transform: translate(-50%, -50%); pointer-events: none; background: #a855f7;"></div>
+                </div>
+
+                <!-- Sağ Canlı Önizleme Kutusu -->
+                <div style="display: flex; flex-direction: column; justify-content: space-between; width: 135px; gap: 5px;">
+                  <div id="studio-spectrum-preview-box" style="flex: 1; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.3); background: #a855f7; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 12px; font-weight: 900; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.85);">
+                    #a855f7
+                  </div>
+                  <button type="button" class="btn-gal" onclick="applyBuilderColorPreset(document.getElementById('b-primary-color').value, document.getElementById('studio-color-lab-hex').value)" style="padding: 4px 8px; font-size: 10.5px; width: 100%; justify-content: center;">
+                    ✨ 2. Renk Yap
+                  </button>
+                </div>
+              </div>
+
+              <!-- 360° Gökkuşağı Ton (Hue) Şeridi -->
+              <div id="studio-hue-bar" style="position: relative; width: 100%; height: 14px; border-radius: 99px; border: 1.5px solid rgba(255,255,255,0.24); background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); cursor: ew-resize; user-select: none;">
+                <div id="studio-hue-cursor" style="position: absolute; top: 50%; left: 75%; width: 13px; height: 18px; border-radius: 4px; background: #fff; border: 2px solid #090b12; transform: translate(-50%, -50%); pointer-events: none;"></div>
+              </div>
             </div>
 
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-              <span style="font-size: 11px; font-weight: 800; color: #94a3b8;">TUVALE MODÜL EKLE / ÇIKAR:</span>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-topbar" onchange="livePreviewBuilder()"> 📊 Üst Bar</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-gameframe" onchange="livePreviewBuilder()"> 🎮 Oyun</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-showcase" onchange="livePreviewBuilder()"> 🃏 Vitrin</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-social" onchange="livePreviewBuilder()"> 🌐 Sosyal</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-webcam" onchange="livePreviewBuilder()"> 📷 Kamera</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-chat" onchange="livePreviewBuilder()"> 💬 Sohbet</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-music" onchange="livePreviewBuilder()"> 🎵 Müzik</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-goal" onchange="livePreviewBuilder()"> 🎯 Hedef</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-skills" onchange="livePreviewBuilder()"> ⚡ Skill</label>
-              <label class="module-toggle-label" style="font-size:11.5px; background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:8px;"><input type="checkbox" id="b-show-customcard" onchange="livePreviewBuilder()"> 📌 Duyuru</label>
+            <!-- Sağ: Hazır Kahraman Renk Paletleri & Galeriden Kart Ekleme Kısa Yolu -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div class="preset-colors-bar" style="margin-top: 0; align-items: center; flex-wrap: wrap;">
+                <span style="font-size: 11px; font-weight: 800; color: #94a3b8; align-self: center;">HAZIR TEMALAR:</span>
+                <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#a855f7', '#10b981')">💀 Ametist (#a855f7)</button>
+                <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ffd700', '#ef4444')">👑 Altın (#ffd700)</button>
+                <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ff85a2', '#60a5fa')">🐾 Pembe (#ff85a2)</button>
+                <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#e11d48', '#94a3b8')">🩸 Kızıl (#e11d48)</button>
+                <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#00f5d4', '#38bdf8')">⚓ Turkuaz (#00f5d4)</button>
+                <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#53fc18', '#a855f7')">🟢 Kick (#53fc18)</button>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn-gal" onclick="triggerAddCardOnCanvas('user')" style="flex: 1; justify-content: center; background: rgba(16,185,129,0.18); border-color: #10b981; color: #fff; padding: 9px 12px;">
+                  🗂️ Kendi Galerimden Tuvale Kart Ekle
+                </button>
+                <button type="button" class="btn-gal" onclick="triggerAddCardOnCanvas('store')" style="flex: 1; justify-content: center; background: rgba(168,85,247,0.2); border-color: #a855f7; color: #fff; padding: 9px 12px;">
+                  🧩 Mağazadan Kahraman Parçası & Kart Ekle
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2334,12 +2383,141 @@
       }
     }
 
+    let studioHsv = { h: 271, s: 67, v: 97 };
+    let studioSpectrumLocked = false;
+
+    function studioHsvToHex(h, s, v) {
+      const hh = ((h % 360) + 360) % 360;
+      const ss = Math.max(0, Math.min(100, s)) / 100;
+      const vv = Math.max(0, Math.min(100, v)) / 100;
+      const c = vv * ss;
+      const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
+      const m = vv - c;
+      let r1 = 0, g1 = 0, b1 = 0;
+      if (hh < 60) { r1 = c; g1 = x; b1 = 0; }
+      else if (hh < 120) { r1 = x; g1 = c; b1 = 0; }
+      else if (hh < 180) { r1 = 0; g1 = c; b1 = x; }
+      else if (hh < 240) { r1 = 0; g1 = x; b1 = c; }
+      else if (hh < 300) { r1 = x; g1 = 0; b1 = x; }
+      else { r1 = c; g1 = 0; b1 = x; }
+      const r = Math.round((r1 + m) * 255);
+      const g = Math.round((g1 + m) * 255);
+      const b = Math.round((b1 + m) * 255);
+      return {
+        hex: `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`,
+        rgb: `rgb(${r}, ${g}, ${b})`
+      };
+    }
+
+    function studioHexToHsv(hex) {
+      const clean = (hex || '#a855f7').replace('#', '');
+      const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16) || 0;
+      const r = ((num >> 16) & 255) / 255;
+      const g = ((num >> 8) & 255) / 255;
+      const b = (num & 255) / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      const d = max - min;
+      let h = 0;
+      if (d !== 0) {
+        if (max === r) h = 60 * (((g - b) / d) % 6);
+        else if (max === g) h = 60 * ((b - r) / d + 2);
+        else h = 60 * ((r - g) / d + 4);
+      }
+      if (h < 0) h += 360;
+      return { h, s: max === 0 ? 0 : (d / max) * 100, v: max * 100 };
+    }
+
+    function updateStudioSpectrumVisuals() {
+      const pad = document.getElementById('studio-spectrum-pad');
+      const cur = document.getElementById('studio-spectrum-cursor');
+      const hCur = document.getElementById('studio-hue-cursor');
+      const prev = document.getElementById('studio-spectrum-preview-box');
+      const rgbEl = document.getElementById('studio-spectrum-rgb');
+      const picker = document.getElementById('studio-color-lab-picker');
+      const hexInp = document.getElementById('studio-color-lab-hex');
+
+      const out = studioHsvToHex(studioHsv.h, studioHsv.s, studioHsv.v);
+      if (pad) pad.style.background = `hsl(${Math.round(studioHsv.h)}, 100%, 50%)`;
+      if (cur) {
+        cur.style.left = `${studioHsv.s}%`;
+        cur.style.top = `${100 - studioHsv.v}%`;
+        cur.style.background = out.hex;
+      }
+      if (hCur) hCur.style.left = `${(studioHsv.h / 360) * 100}%`;
+      if (prev) {
+        prev.style.background = out.hex;
+        prev.textContent = out.hex;
+      }
+      if (rgbEl) rgbEl.textContent = out.rgb;
+      if (picker) picker.value = out.hex;
+      if (hexInp) hexInp.value = out.hex;
+    }
+
+    function toggleStudioSpectrumLock(forceVal) {
+      studioSpectrumLocked = typeof forceVal === 'boolean' ? forceVal : !studioSpectrumLocked;
+      const badge = document.getElementById('studio-spectrum-lock-badge');
+      if (!badge) return;
+      if (studioSpectrumLocked) {
+        badge.textContent = '📌 Renk Sabitlendi (Tıkla=Çöz)';
+        badge.style.background = 'rgba(245,158,11,0.22)';
+        badge.style.borderColor = '#f59e0b';
+        badge.style.color = '#fde68a';
+      } else {
+        badge.textContent = '🖱️ Mouse Takibi Aktif (Tıkla=Sabitle)';
+        badge.style.background = 'rgba(16,185,129,0.2)';
+        badge.style.borderColor = '#10b981';
+        badge.style.color = '#6ee7b7';
+      }
+    }
+
+    function initStudioSpectrumPalette() {
+      const pad = document.getElementById('studio-spectrum-pad');
+      const hue = document.getElementById('studio-hue-bar');
+      if (pad && !pad.__bound) {
+        pad.__bound = true;
+        const pickPad = (e) => {
+          const r = pad.getBoundingClientRect();
+          const x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+          const y = Math.max(0, Math.min(r.height, e.clientY - r.top));
+          studioHsv.s = (x / (r.width || 1)) * 100;
+          studioHsv.v = 100 - (y / (r.height || 1)) * 100;
+          updateStudioSpectrumVisuals();
+        };
+        pad.addEventListener('mousemove', (e) => {
+          if (!studioSpectrumLocked || e.buttons === 1) pickPad(e);
+        });
+        pad.addEventListener('mousedown', (e) => {
+          pickPad(e);
+          toggleStudioSpectrumLock(!studioSpectrumLocked);
+        });
+      }
+      if (hue && !hue.__bound) {
+        hue.__bound = true;
+        const pickHue = (e) => {
+          const r = hue.getBoundingClientRect();
+          const x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+          studioHsv.h = (x / (r.width || 1)) * 360;
+          updateStudioSpectrumVisuals();
+        };
+        hue.addEventListener('mousemove', (e) => {
+          if (!studioSpectrumLocked || e.buttons === 1) pickHue(e);
+        });
+        hue.addEventListener('mousedown', (e) => {
+          pickHue(e);
+        });
+      }
+    }
+
     function onStudioColorLabChange(val) {
       const clean = (val || '').trim();
       const picker = document.getElementById('studio-color-lab-picker');
       const hexInp = document.getElementById('studio-color-lab-hex');
-      if (picker && /^#[0-9a-fA-F]{6}$/.test(clean)) picker.value = clean;
-      if (hexInp && hexInp.value !== clean) hexInp.value = clean;
+      if (/^#[0-9a-fA-F]{6}$/.test(clean)) {
+        if (picker) picker.value = clean;
+        if (hexInp && hexInp.value !== clean) hexInp.value = clean;
+        studioHsv = studioHexToHsv(clean);
+        updateStudioSpectrumVisuals();
+      }
     }
 
     function copyStudioColorLabCode() {
@@ -3443,6 +3621,7 @@
         if (btn) btn.textContent = '▲';
       }
       resizePreview();
+      initStudioSpectrumPalette();
       loadGalleries();
       const urlParams = new URLSearchParams(window.location.search);
       const initTab = urlParams.get('tab');

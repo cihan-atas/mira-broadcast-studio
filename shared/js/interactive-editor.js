@@ -440,6 +440,62 @@
         padding: 3px 7px;
         border-radius: 6px;
       }
+      .mira-spectrum-pad {
+        position: relative;
+        width: 100%;
+        height: 118px;
+        border-radius: 10px;
+        border: 1.5px solid rgba(255,255,255,0.22);
+        cursor: crosshair;
+        overflow: hidden;
+        user-select: none;
+        box-shadow: inset 0 0 12px rgba(0,0,0,0.45);
+      }
+      .mira-spectrum-white {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, #ffffff, rgba(255,255,255,0));
+        pointer-events: none;
+      }
+      .mira-spectrum-black {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0), #000000);
+        pointer-events: none;
+      }
+      .mira-spectrum-cursor {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2.5px solid #ffffff;
+        box-shadow: 0 0 0 1.5px rgba(0,0,0,0.85), 0 0 10px rgba(255,255,255,0.8);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 3;
+      }
+      .mira-hue-bar {
+        position: relative;
+        width: 100%;
+        height: 16px;
+        border-radius: 99px;
+        border: 1.5px solid rgba(255,255,255,0.22);
+        background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+        cursor: ew-resize;
+        user-select: none;
+      }
+      .mira-hue-cursor {
+        position: absolute;
+        top: 50%;
+        width: 14px;
+        height: 20px;
+        border-radius: 5px;
+        background: #ffffff;
+        border: 2px solid #090b12;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.7);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
       .mira-Target-pills {
         display: flex;
         flex-wrap: wrap;
@@ -822,6 +878,46 @@
     const g = (num >> 8) & 255;
     const b = num & 255;
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  function hsvToHex(h, s, v) {
+    const hh = ((h % 360) + 360) % 360;
+    const ss = Math.max(0, Math.min(100, s)) / 100;
+    const vv = Math.max(0, Math.min(100, v)) / 100;
+    const c = vv * ss;
+    const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
+    const m = vv - c;
+    let r1 = 0, g1 = 0, b1 = 0;
+    if (hh < 60) { r1 = c; g1 = x; b1 = 0; }
+    else if (hh < 120) { r1 = x; g1 = c; b1 = 0; }
+    else if (hh < 180) { r1 = 0; g1 = c; b1 = x; }
+    else if (hh < 240) { r1 = 0; g1 = x; b1 = c; }
+    else if (hh < 300) { r1 = x; g1 = 0; b1 = c; }
+    else { r1 = c; g1 = 0; b1 = x; }
+    const r = Math.round((r1 + m) * 255).toString(16).padStart(2, '0');
+    const g = Math.round((g1 + m) * 255).toString(16).padStart(2, '0');
+    const b = Math.round((b1 + m) * 255).toString(16).padStart(2, '0');
+    return `#${r}${g}${b}`;
+  }
+
+  function hexToHsv(hex) {
+    const clean = (hex || '#a855f7').replace('#', '');
+    const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16) || 0;
+    const r = ((num >> 16) & 255) / 255;
+    const g = ((num >> 8) & 255) / 255;
+    const b = (num & 255) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const d = max - min;
+    let h = 0;
+    if (d !== 0) {
+      if (max === r) h = 60 * (((g - b) / d) % 6);
+      else if (max === g) h = 60 * ((b - r) / d + 2);
+      else h = 60 * ((r - g) / d + 4);
+    }
+    if (h < 0) h += 360;
+    const s = max === 0 ? 0 : (d / max) * 100;
+    const v = max * 100;
+    return { h, s, v };
   }
 
   function getLayoutTarget(widgetEl) {
@@ -1892,11 +1988,29 @@
             <span>🎨 RENK PALETİ & RENK KODU ÜRETİCİ</span>
           </div>
 
-          <!-- Tekil Renk Ayarla & Kodu Al Kutusu -->
+          <!-- Hassas Mouse Takipli 2D Renk Spektrumu & Kodu Al Kutusu -->
           <div class="mira-color-lab-box">
-            <div style="font-size:10.5px; font-weight:800; color:#e9d5ff;">
-              🧪 Rengi Ayarla → Sana Renk Kodunu Versin (Veya Direkt Uygula):
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+              <span style="font-size:10.5px; font-weight:800; color:#e9d5ff;">
+                🖱️ Palet Üzerinde Mouse Gezdirerek Hassas Renk Ayarla:
+              </span>
+              <span id="mira-spectrum-lock-badge" style="font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:99px; background:rgba(16,185,129,0.2); border:1px solid #10b981; color:#6ee7b7; cursor:pointer;" title="Tıklayarak mouse takibini sabitleyin veya serbest bırakın">
+                🖱️ Mouse Takibi Aktif (Tıkla=Sabitle)
+              </span>
             </div>
+
+            <!-- 2D Doygunluk & Parlaklık Spektrumu (Mouse Gezdirmeli) -->
+            <div class="mira-spectrum-pad" id="mira-spectrum-pad" style="background: hsl(271, 100%, 50%);">
+              <div class="mira-spectrum-white"></div>
+              <div class="mira-spectrum-black"></div>
+              <div class="mira-spectrum-cursor" id="mira-spectrum-cursor" style="left:65%; top:15%;"></div>
+            </div>
+
+            <!-- 360° Gökkuşağı Ton (Hue) Şeridi (Mouse Gezdirmeli) -->
+            <div class="mira-hue-bar" id="mira-hue-bar">
+              <div class="mira-hue-cursor" id="mira-hue-cursor" style="left:75%;"></div>
+            </div>
+
             <div class="mira-lab-top">
               <input type="color" class="mira-lab-big-picker" id="mira-lab-picker" value="${lastLabColor}">
               <div class="mira-lab-codes">
@@ -2077,17 +2191,61 @@
       });
     });
 
-    // 2. Renk Laboratuvarı (Rengi Ayarla -> Sana Kodunu Versin & Hedefe Uygula)
+    // 2. Renk Laboratuvarı (2D Hassas Spektrumda Mouse Gezdirerek Ayarla -> Sana Kodunu Versin & Hedefe Uygula)
     const labPicker = inspectorEl.querySelector('#mira-lab-picker');
     const labHexOut = inspectorEl.querySelector('#mira-lab-hex-out');
     const labRgbOut = inspectorEl.querySelector('#mira-lab-rgb-out');
     const labCopyBtn = inspectorEl.querySelector('#mira-lab-copy-btn');
+    const spectrumPad = inspectorEl.querySelector('#mira-spectrum-pad');
+    const spectrumCursor = inspectorEl.querySelector('#mira-spectrum-cursor');
+    const hueBar = inspectorEl.querySelector('#mira-hue-bar');
+    const hueCursor = inspectorEl.querySelector('#mira-hue-cursor');
+    const lockBadge = inspectorEl.querySelector('#mira-spectrum-lock-badge');
 
-    const applyColorToTarget = (hexColor, targetKey) => {
+    let curHsv = hexToHsv(lastLabColor);
+    let spectrumLocked = false;
+
+    const updateSpectrumUI = () => {
+      if (spectrumPad) spectrumPad.style.background = `hsl(${Math.round(curHsv.h)}, 100%, 50%)`;
+      if (spectrumCursor) {
+        spectrumCursor.style.left = `${curHsv.s}%`;
+        spectrumCursor.style.top = `${100 - curHsv.v}%`;
+        spectrumCursor.style.background = hsvToHex(curHsv.h, curHsv.s, curHsv.v);
+      }
+      if (hueCursor) {
+        hueCursor.style.left = `${(curHsv.h / 360) * 100}%`;
+      }
+    };
+
+    const setLockState = (locked) => {
+      spectrumLocked = locked;
+      if (!lockBadge) return;
+      if (spectrumLocked) {
+        lockBadge.textContent = '📌 Renk Sabitlendi (Tıkla=Çöz)';
+        lockBadge.style.background = 'rgba(245,158,11,0.22)';
+        lockBadge.style.borderColor = '#f59e0b';
+        lockBadge.style.color = '#fde68a';
+      } else {
+        lockBadge.textContent = '🖱️ Mouse Takibi Aktif (Tıkla=Sabitle)';
+        lockBadge.style.background = 'rgba(16,185,129,0.2)';
+        lockBadge.style.borderColor = '#10b981';
+        lockBadge.style.color = '#6ee7b7';
+      }
+    };
+
+    if (lockBadge) {
+      lockBadge.addEventListener('click', () => setLockState(!spectrumLocked));
+    }
+
+    const applyColorToTarget = (hexColor, targetKey, syncHsv = true) => {
       lastLabColor = hexColor;
       labPicker.value = hexColor;
       labHexOut.value = hexColor;
       labRgbOut.textContent = hexToRgbString(hexColor);
+      if (syncHsv) {
+        curHsv = hexToHsv(hexColor);
+        updateSpectrumUI();
+      }
 
       if (targetKey === 'allTheme') {
         ov.borderColor = hexColor;
@@ -2101,6 +2259,55 @@
       applyWidgetOverride(widgetEl, wid, ov);
       notifyParentOfLiveChange();
     };
+
+    updateSpectrumUI();
+
+    const pickFromSpectrumEvent = (e) => {
+      if (!spectrumPad) return;
+      const r = spectrumPad.getBoundingClientRect();
+      const x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+      const y = Math.max(0, Math.min(r.height, e.clientY - r.top));
+      curHsv.s = (x / (r.width || 1)) * 100;
+      curHsv.v = 100 - (y / (r.height || 1)) * 100;
+      updateSpectrumUI();
+      const hex = hsvToHex(curHsv.h, curHsv.s, curHsv.v);
+      applyColorToTarget(hex, activePaletteTarget, false);
+    };
+
+    const pickFromHueEvent = (e) => {
+      if (!hueBar) return;
+      const r = hueBar.getBoundingClientRect();
+      const x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+      curHsv.h = (x / (r.width || 1)) * 360;
+      updateSpectrumUI();
+      const hex = hsvToHex(curHsv.h, curHsv.s, curHsv.v);
+      applyColorToTarget(hex, activePaletteTarget, false);
+    };
+
+    if (spectrumPad) {
+      spectrumPad.addEventListener('mousemove', (e) => {
+        if (!spectrumLocked || e.buttons === 1) {
+          pickFromSpectrumEvent(e);
+        }
+      });
+      spectrumPad.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+        pickFromSpectrumEvent(e);
+        setLockState(!spectrumLocked);
+      });
+    }
+
+    if (hueBar) {
+      hueBar.addEventListener('mousemove', (e) => {
+        if (!spectrumLocked || e.buttons === 1) {
+          pickFromHueEvent(e);
+        }
+      });
+      hueBar.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+        pickFromHueEvent(e);
+      });
+    }
 
     const syncColorInputsInInspector = () => {
       if (ov.textColor) {
