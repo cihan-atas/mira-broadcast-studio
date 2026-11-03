@@ -48,13 +48,21 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
 * **Sorun:** Önizleme iframe'inin CSS Grid içinde 1920px genişlik dayatması sebebiyle pencere daraltıldığında Carmilla ve Atlas ekran dışına taşıyordu.
 * **Çözüm:** Iframe mutlak konuma (`position: absolute`) alındı, `.hero-grid` esnek `repeat(auto-fit, minmax(170px, 1fr))` yapısına kavuşturuldu. Artık tüm pencere boyutlarında 5 şampiyon da eksiksiz ve dengeli görüntülenir.
 
-### ✅ Aşama 6: Profesyonel Galeri Sistemi (60 Şablonluk Ana Mağaza: Bütün Setler + Parça Parça Kahraman Modülleri & Bomboş Tuval)
+### ✅ Aşama 6: Profesyonel Galeri Sistemi (60 Şablonluk Ana Mağaza: Bütün Setler + Kart Türlerine Göre Kategorize Edilmiş Modüller & Bomboş Tuval)
 * **Açılışta Temiz Başlangıç (Standby Modu):** Uygulama ilk açıldığında sahneler doğrudan hazır ve aktif gelmez; kullanıcı **"🗂️ Kendi Galerim"** sekmesinde temiz bir yayın masasıyla ve sağ monitörde **"Yayın Masanız Hazır (Standby)"** ekranıyla karşılanır.
-* **🏪 Ana Galeri (Uygulama Mağazası - 60 Resmi Şablon & Parça):**
+* **🏪 Ana Galeri (Uygulama Mağazası - 60 Resmi Şablon & Kart Türü Kategorisi):**
   * **⚔️ 5 Bütün Kahraman Sahne Paketi (`category: 'hero'`):** Vexana, Zetian, Nana, Carmilla ve Atlas'ın tüm kartları bir arada tam sahne setleri.
-  * **🧩 40 Parça Parça Kahraman Modülü (`5 Kahraman × 8 Tekil Parça`):** Vexana, Zetian, Nana, Carmilla ve Atlas'ın her biri için ayrı ayrı mağazada yer alan 8'er modüler parça (`Vitrin Kartı`, `Kamera Çerçevesi`, `4'lü Skill Rehberi Kartı`, `Üst Yayın HUD Barı`, `16:9 Oyun Çerçevesi`, `Müzik & Ekolayzer Kartı`, `Sosyal Medya Kartı`, `Canlı Sohbet Paneli`).
   * **📺 5 Yayın Akış Sahnesi:** Yayın Başlıyor, Just Chatting, Kısa Mola (BRB), Yayın Bitti, PC Oyun Sahnesi.
-  * **🃏 6 Genel Modüler Kart & Widget:** Hero Vitrin Kartı, Neon Kamera Çerçevesi, Sosyal Medya Kartı, 4'lü Skill Rehberi Kartı, Now Playing Müzik Kartı, Canlı Takipçi Hedef Barı.
+  * **🃏 Kart Türlerine Göre Kategorize Edilmiş 46 Tekil Kart (`Vitrin Kartı`, `Kamera Kartı`, `Skill Kartı` vb.):**
+    * **🃏 Vitrin Kartları (6 Adet):** Genel + Vexana, Zetian, Nana, Carmilla, Atlas Vitrin Kartları.
+    * **📷 Kamera Kartları (6 Adet):** Genel + Vexana, Zetian, Nana, Carmilla, Atlas Kamera Kartları.
+    * **⚡ Skill Kartları (6 Adet):** Genel + Vexana, Zetian, Nana, Carmilla, Atlas 4'lü Skill Kartları.
+    * **📊 Üst Bar Kartları (5 Adet):** Vexana, Zetian, Nana, Carmilla, Atlas Üst Yayın Barı Kartları.
+    * **🎮 Oyun Çerçevesi Kartları (5 Adet):** Vexana, Zetian, Nana, Carmilla, Atlas 16:9 Oyun Çerçeveleri.
+    * **🎵 Müzik Kartları (6 Adet):** Genel + Vexana, Zetian, Nana, Carmilla, Atlas Müzik & Ekolayzer Kartları.
+    * **🌐 Sosyal Medya Kartları (6 Adet):** Genel + Vexana, Zetian, Nana, Carmilla, Atlas Sosyal Medya Kartları.
+    * **💬 Sohbet Kartları (5 Adet):** Vexana, Zetian, Nana, Carmilla, Atlas Canlı Sohbet Kartları.
+    * **🎯 Hedef Kartı (1 Adet):** Canlı Takipçi Hedef Barı Kartı.
   * **⚡ 4 Canlı Alert Şablonu:** Yeni Takipçi, VIP Abone, Bağış/Destek, TikTok Hediye.
 * **🗂️ Kendi Galerim & Özelleştirme (Edit):** Kullanıcı Ana Galeri'den beğendiği bütün sahneleri veya tekil kahraman parçalarını kendi galerisine kaydedebilir (`user-gallery.json`), **"✏️ Düzenle"** ile başlıklarını, yayıncı adını, renk paletini, sosyal medya hesaplarını ve görünür modüllerini kendine göre değiştirebilir ve **"▶️ Yayına Ver"** ile tek tıkla yayına alabilir.
 * **🎨 %100 Bomboş Tuval (1920×1080 Blank Canvas Builder):** Kullanıcı **"🎨 Boş Tuval & Editör"** sekmesine tıkladığında içinde hiçbir hazır kart, orta rehber kutusu veya efekt bulunmayan **%100 bomboş (`1920×1080`)** bir tuval açılır; modül checkbox kalabalığı olmadan doğrudan **🗂️ Kendi Galerim** veya **🏪 Ana Mağaza (40 Kahraman Parçası & Kartlar)** üzerinden istediği kartları **tek tek** tuvaline ekleyip özgürce dizebilir ([`custom-overlay.html`](file:///home/zeus/Desktop/yayın/custom-overlay.html)).

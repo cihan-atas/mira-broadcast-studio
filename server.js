@@ -803,91 +803,91 @@ const HERO_PIECE_DEFINITIONS = [
   }
 ];
 
-HERO_PIECE_DEFINITIONS.forEach(h => {
-  const pieces = [
-    {
-      suffix: 'showcase',
-      cardType: 'showcase',
-      cardPos: 'top-left',
-      pieceIcon: '🃏',
-      pieceTitle: `${h.heroName} — Vitrin Kartı (Parça)`,
-      pieceSub: `${h.heroName} portresi, rol/koridor rozeti ve repliğini içeren tekil vitrin kartı.`,
-      badge: `${h.heroName.toUpperCase()} PARÇASI`
-    },
-    {
-      suffix: 'webcam',
-      cardType: 'webcam',
-      cardPos: 'bottom-left',
-      pieceIcon: '📷',
-      pieceTitle: `${h.heroName} — Kamera Çerçevesi (Parça)`,
-      pieceSub: `${h.heroName} neon temalı, canlı durum ve rütbe etiketli tekil kamera çerçevesi.`,
-      badge: `${h.heroName.toUpperCase()} PARÇASI`
-    },
-    {
-      suffix: 'skills',
-      cardType: 'skills',
-      cardPos: 'bottom-center',
-      pieceIcon: '⚡',
-      pieceTitle: `${h.heroName} — 4'lü Skill Rehberi (Parça)`,
-      pieceSub: `${h.heroName} Pasif, 1. Yetenek, 2. Yetenek ve Ulti açıklamalarını içeren tekil kart.`,
-      badge: `${h.heroName.toUpperCase()} PARÇASI`
-    },
-    {
-      suffix: 'topbar',
-      cardType: 'topbar',
-      cardPos: 'top-center',
-      pieceIcon: '📊',
-      pieceTitle: `${h.heroName} — Üst Yayın HUD Barı (Parça)`,
-      pieceSub: `${h.heroName} temalı yayıncı logosu, son takipçi/abone/destek ve canlı saat barı.`,
-      badge: `${h.heroName.toUpperCase()} PARÇASI`
-    },
-    {
-      suffix: 'gameframe',
-      cardType: 'gameframe',
-      cardPos: 'center',
-      pieceIcon: '🎮',
-      pieceTitle: `${h.heroName} — 16:9 Oyun Çerçevesi (Parça)`,
-      pieceSub: `${h.heroName} neon parlama efektli 16:9 ana oyun yakalama çerçevesi.`,
-      badge: `${h.heroName.toUpperCase()} PARÇASI`
-    },
-    {
-      suffix: 'music',
-      cardType: 'music',
-      cardPos: 'bottom-center',
-      pieceIcon: '🎵',
-      pieceTitle: `${h.heroName} — Müzik & Ekolayzer Kartı (Parça)`,
-      pieceSub: `${h.heroName} renk paletli 16 çubuklu ses dalgası ve çalan şarkı kartı.`,
-      badge: `${h.heroName.toUpperCase()} PARÇASI`
-    },
-    {
-      suffix: 'social',
-      cardType: 'social',
-      cardPos: 'middle-left',
-      pieceIcon: '🌐',
-      pieceTitle: `${h.heroName} — Sosyal Medya Kartı (Parça)`,
-      pieceSub: `${h.heroName} temalı Kick, TikTok ve YouTube sosyal medya adres kartı.`,
-      badge: `${h.heroName.toUpperCase()} PARÇASI`
-    },
-    {
-      suffix: 'chat',
-      cardType: 'chat',
-      cardPos: 'top-right',
-      pieceIcon: '💬',
-      pieceTitle: `${h.heroName} — Canlı Sohbet Paneli (Parça)`,
-      pieceSub: `${h.heroName} neon cam tasarımlı dikey canlı sohbet (Chat) kutusu.`,
-      badge: `${h.heroName.toUpperCase()} PARÇASI`
-    }
-  ];
+const PIECE_CARD_TYPES = [
+  {
+    suffix: 'showcase',
+    cardType: 'showcase',
+    cardPos: 'top-left',
+    pieceIcon: '🃏',
+    typeLabel: 'Vitrin Kartı',
+    badgeLabel: '🃏 VİTRİN KARTI',
+    getSub: (h) => `${h.heroName} portresi, rol/koridor rozeti ve repliğini içeren vitrin kartı.`
+  },
+  {
+    suffix: 'webcam',
+    cardType: 'webcam',
+    cardPos: 'bottom-left',
+    pieceIcon: '📷',
+    typeLabel: 'Kamera Kartı',
+    badgeLabel: '📷 KAMERA KARTI',
+    getSub: (h) => `${h.heroName} neon temalı, canlı durum ve rütbe etiketli kamera kartı.`
+  },
+  {
+    suffix: 'skills',
+    cardType: 'skills',
+    cardPos: 'bottom-center',
+    pieceIcon: '⚡',
+    typeLabel: '4\'lü Skill Kartı',
+    badgeLabel: '⚡ SKILL KARTI',
+    getSub: (h) => `${h.heroName} Pasif, 1. Yetenek, 2. Yetenek ve Ulti açıklamalarını içeren skill kartı.`
+  },
+  {
+    suffix: 'topbar',
+    cardType: 'topbar',
+    cardPos: 'top-center',
+    pieceIcon: '📊',
+    typeLabel: 'Üst Yayın Barı Kartı',
+    badgeLabel: '📊 ÜST BAR KARTI',
+    getSub: (h) => `${h.heroName} temalı yayıncı logosu, son takipçi/abone/destek ve canlı saat kartı.`
+  },
+  {
+    suffix: 'gameframe',
+    cardType: 'gameframe',
+    cardPos: 'center',
+    pieceIcon: '🎮',
+    typeLabel: 'Oyun Çerçevesi Kartı',
+    badgeLabel: '🎮 OYUN ÇERÇEVESİ',
+    getSub: (h) => `${h.heroName} neon parlama efektli 16:9 ana oyun yakalama çerçevesi kartı.`
+  },
+  {
+    suffix: 'music',
+    cardType: 'music',
+    cardPos: 'bottom-center',
+    pieceIcon: '🎵',
+    typeLabel: 'Müzik & Ekolayzer Kartı',
+    badgeLabel: '🎵 MÜZİK KARTI',
+    getSub: (h) => `${h.heroName} renk paletli 16 çubuklu ses dalgası ve çalan şarkı kartı.`
+  },
+  {
+    suffix: 'social',
+    cardType: 'social',
+    cardPos: 'middle-left',
+    pieceIcon: '🌐',
+    typeLabel: 'Sosyal Medya Kartı',
+    badgeLabel: '🌐 SOSYAL MEDYA KARTI',
+    getSub: (h) => `${h.heroName} temalı Kick, TikTok ve YouTube sosyal medya adres kartı.`
+  },
+  {
+    suffix: 'chat',
+    cardType: 'chat',
+    cardPos: 'top-right',
+    pieceIcon: '💬',
+    typeLabel: 'Canlı Sohbet Kartı',
+    badgeLabel: '💬 SOHBET KARTI',
+    getSub: (h) => `${h.heroName} neon cam tasarımlı dikey canlı sohbet (Chat) kartı.`
+  }
+];
 
-  pieces.forEach(p => {
+PIECE_CARD_TYPES.forEach(p => {
+  HERO_PIECE_DEFINITIONS.forEach(h => {
     APP_GALLERY_CATALOG.push({
       id: `tpl_piece_${h.key}_${p.suffix}`,
       category: 'card',
       heroPiece: h.key,
-      name: p.pieceTitle,
-      subtitle: p.pieceSub,
+      name: `${p.typeLabel} — ${h.heroName}`,
+      subtitle: p.getSub(h),
       icon: p.pieceIcon,
-      badge: `${h.icon} ${p.badge}`,
+      badge: p.badgeLabel,
       previewImg: h.thumbUrl,
       basePath: 'custom-overlay.html',
       config: {

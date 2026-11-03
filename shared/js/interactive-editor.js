@@ -1633,21 +1633,25 @@
     } else if (activeTab === 'store') {
       const filteredCatalog = catalogItems.filter(tpl => {
         if (currentStoreSubFilter === 'all') return true;
-        if (currentStoreSubFilter === 'pieces') return !!tpl.heroPiece;
-        if (currentStoreSubFilter === 'general') return !tpl.heroPiece;
-        return tpl.heroPiece === currentStoreSubFilter;
+        const cfg = tpl.config || {};
+        if (currentStoreSubFilter === 'goal_alert') {
+          return tpl.category === 'alert' || cfg.cardType === 'goal';
+        }
+        return cfg.cardType === currentStoreSubFilter;
       });
 
       const filterBarHtml = `
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
           <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'all' ? 'active' : ''}" data-sf="all" style="${currentStoreSubFilter === 'all' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🌟 Tümü (${catalogItems.length})</button>
-          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'pieces' ? 'active' : ''}" data-sf="pieces" style="${currentStoreSubFilter === 'pieces' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🧩 Tüm Kahraman Parçaları (40)</button>
-          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'vexana' ? 'active' : ''}" data-sf="vexana" style="${currentStoreSubFilter === 'vexana' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">💀 Vexana (8)</button>
-          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'zetian' ? 'active' : ''}" data-sf="zetian" style="${currentStoreSubFilter === 'zetian' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">👑 Zetian (8)</button>
-          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'nana' ? 'active' : ''}" data-sf="nana" style="${currentStoreSubFilter === 'nana' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🐾 Nana (8)</button>
-          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'carmilla' ? 'active' : ''}" data-sf="carmilla" style="${currentStoreSubFilter === 'carmilla' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🩸 Carmilla (8)</button>
-          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'atlas' ? 'active' : ''}" data-sf="atlas" style="${currentStoreSubFilter === 'atlas' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">⚓ Atlas (8)</button>
-          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'general' ? 'active' : ''}" data-sf="general" style="${currentStoreSubFilter === 'general' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🃏 Genel Kart & Alert (10)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'showcase' ? 'active' : ''}" data-sf="showcase" style="${currentStoreSubFilter === 'showcase' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🃏 Vitrin Kartı (6)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'webcam' ? 'active' : ''}" data-sf="webcam" style="${currentStoreSubFilter === 'webcam' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">📷 Kamera Kartı (6)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'skills' ? 'active' : ''}" data-sf="skills" style="${currentStoreSubFilter === 'skills' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">⚡ Skill Kartı (6)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'topbar' ? 'active' : ''}" data-sf="topbar" style="${currentStoreSubFilter === 'topbar' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">📊 Üst Bar Kartı (5)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'gameframe' ? 'active' : ''}" data-sf="gameframe" style="${currentStoreSubFilter === 'gameframe' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🎮 Oyun Çerçevesi (5)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'music' ? 'active' : ''}" data-sf="music" style="${currentStoreSubFilter === 'music' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🎵 Müzik Kartı (6)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'social' ? 'active' : ''}" data-sf="social" style="${currentStoreSubFilter === 'social' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🌐 Sosyal Medya Kartı (6)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'chat' ? 'active' : ''}" data-sf="chat" style="${currentStoreSubFilter === 'chat' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">💬 Sohbet Kartı (5)</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'goal_alert' ? 'active' : ''}" data-sf="goal_alert" style="${currentStoreSubFilter === 'goal_alert' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🎯 Hedef & ⚡ Alert (5)</button>
         </div>
       `;
 
