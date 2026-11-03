@@ -2296,164 +2296,408 @@
     }
 
     /* ========================================================
-       MİRA CHAT DECK & ALWAYS-ON-TOP LIVE CONSOLE STYLES
+       CLEAN STREAMER CHAT & IN-APP FLOATING CHAT OVERLAY
        ======================================================== */
-    .chat-deck-hero-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(135deg, rgba(20, 24, 42, 0.96), rgba(10, 13, 24, 0.96));
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      border-radius: 14px;
-      padding: 14px 18px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-    }
-    .chat-deck-hero-left {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .chat-deck-title {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 14px;
-      font-weight: 900;
-      letter-spacing: 0.8px;
-      color: #f1f5f9;
-    }
-    .chat-deck-status-chips {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .status-chip {
-      font-size: 11px;
-      font-weight: 700;
-      color: #94a3b8;
-      background: rgba(255, 255, 255, 0.04);
-      padding: 3px 9px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .status-chip strong {
-      color: #00f5a0;
-    }
-    .btn-popout-chat-hero {
-      background: linear-gradient(135deg, #00f5a0 0%, #06b6d4 100%);
-      color: #060911;
-      border: none;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 12px;
-      font-weight: 900;
-      padding: 10px 18px;
-      border-radius: 10px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      letter-spacing: 0.5px;
-      box-shadow: 0 4px 18px rgba(0, 245, 160, 0.45);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-popout-chat-hero:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(0, 245, 160, 0.65);
-    }
-    .hero-chip-badge {
-      background: rgba(6, 9, 17, 0.85);
-      color: #00f5a0;
-      font-size: 9.5px;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 4px;
-      letter-spacing: 0.4px;
-    }
-    .studio-chat-deck-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.45fr) minmax(340px, 0.85fr);
-      gap: 16px;
-      align-items: start;
-    }
-    @media (max-width: 1080px) {
-      .studio-chat-deck-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .studio-chat-main-card {
+    .mira-chat-panel {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       border-radius: 16px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      height: 620px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+      height: 660px;
+      max-height: calc(100vh - 240px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+      position: relative;
     }
-    .chat-main-header {
+
+    .mira-chat-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 16px;
+      padding: 12px 18px;
       background: linear-gradient(180deg, rgba(20, 24, 40, 0.98), rgba(12, 15, 26, 0.96));
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
     }
-    .studio-chat-feed {
+
+    .mira-chat-header-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13.5px;
+      font-weight: 900;
+      color: #f1f5f9;
+      letter-spacing: 0.8px;
+    }
+
+    .chat-status-pill {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #00f5a0;
+      background: rgba(0, 245, 160, 0.12);
+      border: 1px solid rgba(0, 245, 160, 0.3);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .mira-chat-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-opacity-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .chat-opacity-control input[type="range"] {
+      width: 75px;
+      height: 4px;
+      accent-color: #a855f7;
+      cursor: pointer;
+    }
+    .chat-opacity-control span:last-child {
+      font-family: monospace;
+      color: #c084fc;
+      font-weight: 800;
+      min-width: 32px;
+    }
+
+    .btn-float-chat {
+      background: linear-gradient(135deg, rgba(0, 245, 160, 0.25), rgba(6, 182, 212, 0.2));
+      border: 1px solid #00f5a0;
+      color: #00f5a0;
+      font-weight: 800;
+      font-size: 11.5px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .btn-float-chat:hover {
+      background: #00f5a0;
+      color: #060911;
+      box-shadow: 0 0 14px rgba(0, 245, 160, 0.45);
+    }
+
+    .btn-clear-chat {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn-clear-chat:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* Temiz Mesaj Akışı */
+    .mira-clean-chat-feed {
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 12px 16px;
+      padding: 14px 18px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      background: rgba(6, 8, 16, 0.65);
+      background: rgba(6, 8, 16, var(--chat-panel-opacity, 0.75));
+      backdrop-filter: blur(12px);
       scroll-behavior: smooth;
     }
-    .studio-chat-feed::-webkit-scrollbar {
+    .mira-clean-chat-feed::-webkit-scrollbar {
       width: 5px;
     }
-    .studio-chat-feed::-webkit-scrollbar-thumb {
-      background: rgba(168, 85, 247, 0.4);
+    .mira-clean-chat-feed::-webkit-scrollbar-thumb {
+      background: rgba(168, 85, 247, 0.35);
       border-radius: 4px;
     }
-    .studio-chat-side-card {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .studio-reply-console {
-      background: linear-gradient(180deg, rgba(16, 20, 36, 0.98), rgba(9, 12, 22, 0.98));
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 10px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .studio-chat-msg {
-      background: rgba(18, 22, 38, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+
+    .clean-chat-msg {
+      background: rgba(18, 22, 38, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-left: 3px solid rgba(168, 85, 247, 0.5);
       border-radius: 8px;
-      padding: 8px 11px;
+      padding: 8px 12px;
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.45;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      animation: msgPop 0.15s ease-out;
+    }
+    .clean-chat-msg.is-streamer {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(168, 85, 247, 0.12));
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      border-left: 4px solid #f59e0b;
+    }
+    .clean-chat-msg.is-system {
+      background: rgba(168, 85, 247, 0.08);
+      border-left-color: #a855f7;
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .clean-msg-time {
+      font-size: 10.5px;
+      color: #64748b;
+      font-family: monospace;
+      flex-shrink: 0;
+    }
+    .clean-msg-badge {
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      background: #00f5a0;
+      color: #000;
+    }
+    .clean-chat-msg.is-streamer .clean-msg-badge {
+      background: #f59e0b;
+      color: #000;
+    }
+    .clean-chat-msg.is-system .clean-msg-badge {
+      background: #a855f7;
+      color: #fff;
+    }
+    .clean-msg-user {
+      font-weight: 800;
+      color: #e2e8f0;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .clean-msg-user:hover {
+      text-decoration: underline;
+      color: #00f5a0;
+    }
+    .clean-chat-msg.is-streamer .clean-msg-user {
+      color: #fbbf24;
+    }
+    .clean-msg-text {
+      color: #f1f5f9;
+      word-break: break-word;
+      font-weight: 500;
+    }
+    .clean-chat-msg.is-streamer .clean-msg-text {
+      color: #fef3c7;
+      font-weight: 600;
+    }
+
+    /* Giriş Çubuğu */
+    .mira-clean-input-bar {
+      display: flex;
+      gap: 8px;
+      padding: 12px 18px;
+      background: linear-gradient(180deg, rgba(16, 20, 36, 0.98), rgba(9, 12, 22, 0.98));
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      align-items: center;
+    }
+    .mira-clean-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+    .mira-clean-input:focus {
+      border-color: #a855f7;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+    }
+    .mira-clean-send-btn {
+      background: linear-gradient(135deg, #a855f7, #06b6d4);
+      border: none;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11.5px;
+      font-weight: 900;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .mira-clean-send-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.5);
+    }
+
+    /* IN-APP DRAGGABLE FLOATING CHAT OVERLAY */
+    .mira-floating-chat-overlay {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 380px;
+      height: 540px;
+      min-width: 280px;
+      min-height: 320px;
+      max-width: calc(100vw - 40px);
+      max-height: calc(100vh - 40px);
+      background: rgba(10, 14, 26, var(--float-chat-opacity, 0.95));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1.5px solid rgba(168, 85, 247, 0.45);
+      border-radius: 14px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 24px rgba(168, 85, 247, 0.2);
       display: flex;
       flex-direction: column;
-      gap: 3px;
-      animation: msgPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+      resize: both;
+      z-index: 999999;
+      animation: floatWidgetPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .studio-chat-msg.is-streamer {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(168, 85, 247, 0.14));
-      border: 1px solid rgba(245, 158, 11, 0.6);
-      border-left: 4px solid #f59e0b;
-      box-shadow: 0 0 14px rgba(245, 158, 11, 0.2);
+
+    @keyframes floatWidgetPop {
+      from { opacity: 0; transform: scale(0.92) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .mira-float-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 12px;
+      background: linear-gradient(180deg, rgba(20, 24, 42, 0.98), rgba(12, 15, 28, 0.98));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: move;
+      user-select: none;
+      gap: 8px;
+    }
+
+    .mira-float-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      color: #c084fc;
+      letter-spacing: 0.6px;
+    }
+
+    .mira-float-opacity-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      color: #94a3b8;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: default;
+    }
+    .mira-float-opacity-wrap input[type="range"] {
+      width: 55px;
+      height: 3px;
+      accent-color: #a855f7;
+      cursor: pointer;
+    }
+    .mira-float-opacity-wrap span:last-child {
+      font-family: monospace;
+      color: #00f5a0;
+      font-weight: 800;
+      min-width: 28px;
+    }
+
+    .mira-float-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .mira-float-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .mira-float-btn:hover {
+      background: rgba(168, 85, 247, 0.3);
+      border-color: #a855f7;
+      color: #fff;
+    }
+    .mira-float-btn.btn-close:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: #fff;
+    }
+
+    .mira-float-feed {
+      padding: 10px 12px;
+      gap: 6px;
+      background: transparent;
+    }
+    .mira-float-feed .clean-chat-msg {
+      font-size: 12px;
+      padding: 5px 9px;
+    }
+
+    .mira-float-input-bar {
+      padding: 8px 12px;
+    }
+    .mira-float-input-bar .mira-clean-input {
+      font-size: 12px;
+      padding: 7px 10px;
+    }
+    .mira-float-input-bar .mira-clean-send-btn {
+      font-size: 10.5px;
+      padding: 7px 14px;
+    }
+
+    .mira-chat-bubble {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 99px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.6);
+      z-index: 999999;
+      animation: floatWidgetPop 0.2s ease-out;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .mira-chat-bubble:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(124, 58, 237, 0.8);
     }
 
   </style>
@@ -3662,206 +3906,55 @@
         </div>
       </div>
 
-      <!-- TAB 4: SOHBET & BOTRIX (MİRA STREAMER CHAT DECK) -->
+      <!-- TAB 4: SOHBET & CANLI CHAT -->
       <div id="tab-chat" class="tab-pane">
-        
-        <!-- Üst Banner & Always-On-Top Hızlı Aksiyon -->
-        <div class="chat-deck-hero-bar">
-          <div class="chat-deck-hero-left">
-            <div class="chat-deck-title">
-              <span class="live-dot" style="width:10px; height:10px; background:#00f5a0; box-shadow:0 0 10px #00f5a0;"></span>
-              <span>CANLI SOHBET & YAYINCI KONSOLU</span>
-              <span class="brand-badge" style="background:rgba(0,245,160,0.15); border-color:#00f5a0; color:#00f5a0;">MİRA CHAT DECK</span>
-            </div>
-            <div class="chat-deck-status-chips">
-              <span class="status-chip" id="chip-kick-live">🟢 Kick: <strong id="deck-kick-channel">cihanatas</strong></span>
-              <span class="status-chip" id="chip-tiktok-live">📱 TikTok: <strong id="deck-tiktok-status">Canlı Akış Hazır</strong></span>
-              <span class="status-chip" id="chip-total-msgs">💬 <strong id="deck-msg-count">0</strong> Mesaj</span>
-            </div>
-          </div>
-
-          <div class="chat-deck-hero-right">
-            <button type="button" class="btn-popout-chat-hero" onclick="openAlwaysOnTopChat()" title="Tarayıcı veya oyundayken arkasını görebileceğiniz şeffaf yüzen pencere">
-              <span>🪟</span>
-              <span>AYRI PENCEREDE EN ÜSTTE TUT</span>
-              <span class="hero-chip-badge">OPAKLIK AYARLI</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 2 Kolonlu Chat Masası Grid -->
-        <div class="studio-chat-deck-grid">
+        <div class="mira-chat-panel">
           
-          <!-- SOL KOLON: CANLI SOHBET AKIŞI & YAYINCI YANIT MASASI -->
-          <div class="studio-chat-main-card">
-            
-            <div class="chat-main-header">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-weight:900; font-size:12.5px; color:#e2e8f0; font-family:'Orbitron', sans-serif;">CANLI MESAJ AKIŞI</span>
-                <div class="filter-pills">
-                  <button type="button" class="filter-pill active" onclick="setStudioChatFilter('all', this)">Tümü</button>
-                  <button type="button" class="filter-pill" onclick="setStudioChatFilter('kick', this)">🟢 Kick</button>
-                  <button type="button" class="filter-pill" onclick="setStudioChatFilter('tiktok', this)">📱 TikTok</button>
-                  <button type="button" class="filter-pill" onclick="setStudioChatFilter('streamer', this)">👑 Yayıncı</button>
-                </div>
-              </div>
-
-              <div style="display:flex; align-items:center; gap:6px;">
-                <button type="button" class="control-btn" onclick="toggleStudioChatSound()" id="btn-studio-sound">🔔 Ses</button>
-                <button type="button" class="control-btn" onclick="clearStudioChatFeed()">🗑️ Temizle</button>
-              </div>
+          <!-- Üst Başlık & Kontroller -->
+          <div class="mira-chat-header">
+            <div class="mira-chat-header-title">
+              <span class="live-dot" style="width:9px; height:9px; background:#00f5a0; box-shadow:0 0 10px #00f5a0; border-radius:50%;"></span>
+              <span>CANLI SOHBET</span>
+              <span class="chat-status-pill">🟢 Kick: cihanatas</span>
             </div>
 
-            <!-- Canlı Mesaj Listesi -->
-            <div class="studio-chat-feed" id="studio-chat-feed">
-              <div class="studio-chat-msg is-streamer">
-                <div class="msg-header-row">
-                  <div class="msg-meta-left">
-                    <span class="msg-badge badge-streamer">👑 YAYINCI</span>
-                    <span class="msg-username">MİRA (Yayıncı)</span>
-                  </div>
-                  <span class="msg-time" id="deck-init-time">17:00</span>
-                </div>
-                <div class="msg-body-text">
-                  🚀 MİRA Sohbet Konsolu aktif! Kick ve TikTok mesajları buraya anlık akar. Sayfadan ayrılmadan doğrudan cevap verebilir veya sağ üstteki butonla her zaman en üstte tutabilirsiniz.
-                </div>
-              </div>
-            </div>
-
-            <!-- Yayıncı Hızlı Yanıt ve Yazı Konsolu -->
-            <div class="studio-reply-console">
-              
-              <!-- Hızlı Yanıt Çipleri -->
-              <div class="quick-chips-row">
-                <button type="button" class="quick-chip" onclick="quickStudioReply('👋 Hoş geldin! İyi seyirler dilerim.')">👋 Hoş geldin!</button>
-                <button type="button" class="quick-chip" onclick="quickStudioReply('🙏 Desteğin için çok teşekkür ederim!')">🙏 Teşekkürler!</button>
-                <button type="button" class="quick-chip" onclick="quickStudioReply('🎮 Birazdan yeni maç başlıyor, yerinizi alın!')">🎮 Yeni Maç!</button>
-                <button type="button" class="quick-chip" onclick="quickStudioReply('💬 Discord topluluğumuza bekleriz: discord.gg/cihanatas')">💬 !discord</button>
-                <button type="button" class="quick-chip" onclick="quickStudioReply('🔥 Hedefimiz: Mythic Immortal!')">🔥 !rank</button>
-                <button type="button" class="quick-chip" onclick="quickStudioReply('📱 TikTok canlı yayınlarımızı takip etmeyi unutmayın!')">📱 !tiktok</button>
+            <div class="mira-chat-header-actions">
+              <!-- Opaklık Slider'ı -->
+              <div class="chat-opacity-control" title="Sohbet zemininin saydamlığını ayarlar">
+                <span>🪟 Opaklık:</span>
+                <input type="range" id="studio-chat-opacity-slider" min="15" max="100" value="95" oninput="setStudioChatOpacity(this.value)">
+                <span id="studio-chat-opacity-label">%95</span>
               </div>
 
-              <!-- Emoji Seçici -->
-              <div class="quick-emojis-row" style="margin: 4px 0;">
-                <span style="font-size:10px; color:#64748b; font-weight:800;">HIZLI:</span>
-                <button type="button" class="quick-emoji-btn" onclick="insertStudioEmoji('🔥')">🔥</button>
-                <button type="button" class="quick-emoji-btn" onclick="insertStudioEmoji('❤️')">❤️</button>
-                <button type="button" class="quick-emoji-btn" onclick="insertStudioEmoji('👏')">👏</button>
-                <button type="button" class="quick-emoji-btn" onclick="insertStudioEmoji('👑')">👑</button>
-                <button type="button" class="quick-emoji-btn" onclick="insertStudioEmoji('⚡')">⚡</button>
-                <button type="button" class="quick-emoji-btn" onclick="insertStudioEmoji('🎮')">🎮</button>
-                <button type="button" class="quick-emoji-btn" onclick="insertStudioEmoji('💀')">💀</button>
-                <button type="button" class="quick-emoji-btn" onclick="insertStudioEmoji('✨')">✨</button>
-                <button type="button" class="quick-emoji-btn" onclick="insertStudioEmoji('🚀')">🚀</button>
-              </div>
+              <!-- Yüzen Karta Çıkar Butonu (Browser açmaz, ekranda üstte tutar) -->
+              <button type="button" class="btn-float-chat" onclick="openFloatingChatWidget()" title="Sohbeti ekranda serbestçe gezdirilebilir şeffaf yüzen karta dönüştürür">
+                📌 Ekranda Üstte Tut (Yüzen Kart)
+              </button>
 
-              <!-- Mesaj Giriş Satırı -->
-              <div class="reply-input-row">
-                <span class="sender-tag">👑 MİRA:</span>
-                <input type="text" id="studio-chat-input" class="reply-text-input" placeholder="Sohbete yayıncı olarak cevap yazın... (Enter ile gönder)" autocomplete="off">
-                <button type="button" class="btn-send-reply" onclick="sendStudioChatReply()">
-                  🚀 SOHBETE GÖNDER
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- SAĞ KOLON: BOT KOMUTLARI, WIDGET VE OBS AYARLARI -->
-          <div class="studio-chat-side-card">
-            
-            <!-- 1. KUTU: HER ZAMAN ÜSTTE PENCERE KILAVUZU -->
-            <div class="creator-section" style="background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(0,245,160,0.08)); border-color: rgba(0,245,160,0.35);">
-              <div class="creator-sec-title" style="color: #6ee7b7;">
-                <span>🪟</span> <span>HER ZAMAN ÜSTTE YÜZEN PENCERE</span>
-              </div>
-              <p style="font-size:11.5px; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">
-                Browser'da bişey ararken veya oyundayken chati kaçırmayın! Opaklığını kısarak arkadaki pencereleri rahatça görebilir ve buradan anında cevap yazabilirsiniz.
-              </p>
-              <div style="display:flex; flex-direction:column; gap:6px;">
-                <button type="button" class="btn-primary" style="background:linear-gradient(135deg, #00f5a0, #06b6d4); color:#000; font-weight:900;" onclick="openAlwaysOnTopChat()">
-                  🪟 Ayrı Pencerede Aç (Always-On-Top)
-                </button>
-                <button type="button" class="btn-secondary" onclick="copyObsChatUrl()">
-                  📋 OBS Şeffaf Chat Linkini Kopyala
-                </button>
-              </div>
-            </div>
-
-            <!-- 2. KUTU: TEK TIKLA BOT KOMUTU GÖNDER (BLAST COMMANDS) -->
-            <div class="creator-section">
-              <div class="creator-sec-title">
-                <span>🤖</span> <span>HIZLI BOT KOMUTLARI (1-TIKLA DUYURU)</span>
-              </div>
-              <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Butona bastığınızda komut ve cevap hem yayındaki chat overlay'ine hem de izleyicilere anında duyurulur:</p>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-                <button type="button" class="mira-mini-btn" onclick="triggerBotCommand('!discord')">
-                  💬 !discord
-                </button>
-                <button type="button" class="mira-mini-btn" onclick="triggerBotCommand('!rank')">
-                  🏆 !rank
-                </button>
-                <button type="button" class="mira-mini-btn" onclick="triggerBotCommand('!tiktok')">
-                  📱 !tiktok
-                </button>
-                <button type="button" class="mira-mini-btn" onclick="triggerBotCommand('!muzik')">
-                  🎵 !muzik
-                </button>
-                <button type="button" class="mira-mini-btn" onclick="triggerBotCommand('!sosyal')">
-                  🌐 !sosyal
-                </button>
-                <button type="button" class="mira-mini-btn" onclick="triggerBotCommand('!hedef')">
-                  🎯 !hedef
-                </button>
-              </div>
-            </div>
-
-            <!-- 3. KUTU: BOTRIX / TIKFINITY WIDGET BAĞLANTISI -->
-            <div class="creator-section">
-              <div class="creator-sec-title">
-                <span>🔗</span> <span>BOTRIX / DIŞ WIDGET BAĞLANTISI</span>
-              </div>
-              <div class="form-group">
-                <label>Widget URL</label>
-                <div style="display:flex; gap:6px;">
-                  <input type="text" id="live-chat-url-input" class="form-control" placeholder="https://botrix.live/widgets/chat/?bid=...">
-                  <button type="button" class="btn-primary" style="white-space:nowrap;" onclick="applyRealChatWidget()">
-                    Bağla
-                  </button>
-                  <button type="button" class="btn-secondary" style="white-space:nowrap;" onclick="resetToSimulatedChat()">
-                    Sıfırla
-                  </button>
-                </div>
-              </div>
-              <div style="font-size:10.5px; color:#94a3b8; margin-top:5px;">
-                <span id="chat-status-badge" style="color:#00f5a0; font-weight:700;">● BotRix Bağlantısı Hazır</span>
-              </div>
-            </div>
-
-            <!-- 4. KUTU: TEST CHAT SİMÜLASYONU -->
-            <div class="creator-section">
-              <div class="creator-sec-title">
-                <span>✍️</span> <span>SİMÜLASYON TEST MESAJI</span>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>İzleyici Adı</label>
-                  <input type="text" id="chat-author-input" class="form-control" value="Kagura_Player">
-                </div>
-                <div class="form-group">
-                  <label>Mesaj</label>
-                  <input type="text" id="chat-test-msg" class="form-control" value="Lordu aldık, push vakti!">
-                </div>
-              </div>
-              <button type="button" class="btn-secondary" style="width:100%; margin-top:6px;" onclick="triggerTestChat()">
-                💬 Test Mesajını Gönder
+              <button type="button" class="btn-clear-chat" onclick="clearStudioChatFeed()" title="Sohbeti Temizle">
+                🗑️ Temizle
               </button>
             </div>
+          </div>
 
+          <!-- Canlı Sohbet Akışı -->
+          <div class="mira-clean-chat-feed" id="studio-chat-feed">
+            <div class="clean-chat-msg is-system">
+              <span class="clean-msg-time" id="chat-start-time">17:00</span>
+              <span class="clean-msg-badge">MİRA</span>
+              <span class="clean-msg-text">Canlı sohbet bağlantısı aktif. Kick ve TikTok mesajları buraya anlık akar.</span>
+            </div>
+          </div>
+
+          <!-- Mesaj Gönderme Çubuğu -->
+          <div class="mira-clean-input-bar">
+            <input type="text" id="studio-chat-input" class="mira-clean-input" placeholder="Mesajınızı yazın ve Enter'a basın..." autocomplete="off">
+            <button type="button" class="mira-clean-send-btn" onclick="sendStudioChatReply()">
+              Gönder
+            </button>
           </div>
 
         </div>
-
       </div>
 
       <!-- TAB 5: MÜZİK & TUNA -->
@@ -6571,171 +6664,173 @@
 
     
     /* ========================================================
-       MİRA CHAT DECK ENGINE: REAL-TIME FEED, STREAMER REPLY & FLOATING WINDOW
+       CLEAN MİRA CHAT & IN-APP FLOATING WIDGET ENGINE
        ======================================================== */
-    let studioChatSoundEnabled = true;
-    let studioChatActiveFilter = 'all';
-    let studioChatMessageCount = 0;
+    let studioChatOpacity = 95;
+    let floatingWidgetOpacity = 95;
 
-    async function openAlwaysOnTopChat() {
-      const chatUrl = `${window.location.origin}/floating-chat.html`;
-
-      // 1. Document Picture-in-Picture API (Chrome/Edge Native Always-on-top window)
-      if (window.documentPictureInPicture && typeof window.documentPictureInPicture.requestWindow === 'function') {
-        try {
-          const pipWin = await window.documentPictureInPicture.requestWindow({
-            width: 440,
-            height: 720
-          });
-          const iframe = pipWin.document.createElement('iframe');
-          iframe.src = chatUrl;
-          iframe.style.width = '100vw';
-          iframe.style.height = '100vh';
-          iframe.style.border = 'none';
-          iframe.style.margin = '0';
-          iframe.style.padding = '0';
-          iframe.style.overflow = 'hidden';
-          pipWin.document.body.style.margin = '0';
-          pipWin.document.body.style.overflow = 'hidden';
-          pipWin.document.body.appendChild(iframe);
-          showToast('🪟 Sohbet her zaman en üstte kayan pencere (PiP) olarak açıldı!', 'success');
-          return;
-        } catch (err) {
-          console.log('PiP fallback:', err);
-        }
-      }
-
-      // 2. Electron veya Standart Pencere Açıcı
-      const win = window.open(chatUrl, 'MiraFloatingChat', 'width=440,height=720,menubar=no,toolbar=no,location=no,status=no,resizable=yes');
-      if (win) {
-        win.focus();
-        showToast('🪟 Canlı Sohbet Konsolu ayrı pencerede açıldı (Her zaman üstte tutabilirsiniz)!', 'success');
-      } else {
-        showToast('Pop-up pencere engellendi, lütfen tarayıcı izinlerini kontrol edin.', 'warning');
-      }
+    // 1. Opaklık Ayarları
+    function setStudioChatOpacity(val) {
+      studioChatOpacity = val;
+      const op = Math.max(0.15, Math.min(1.0, val / 100));
+      document.documentElement.style.setProperty('--chat-panel-opacity', op);
+      const lbl = document.getElementById('studio-chat-opacity-label');
+      if (lbl) lbl.textContent = `%${val}`;
     }
 
-    function copyObsChatUrl() {
-      const url = `${window.location.origin}/floating-chat.html?overlay=1`;
-      navigator.clipboard.writeText(url).then(() => {
-        showToast(`📋 OBS Şeffaf Chat Linki Kopyalandı: ${url}`, 'success');
-      }).catch(() => {
-        showToast(`OBS Chat Linki: ${url}`, 'info');
+    function setFloatingWidgetOpacity(val) {
+      floatingWidgetOpacity = val;
+      const op = Math.max(0.15, Math.min(1.0, val / 100));
+      document.documentElement.style.setProperty('--float-chat-opacity', op);
+      const lbl = document.getElementById('float-widget-opacity-label');
+      if (lbl) lbl.textContent = `%${val}`;
+    }
+
+    // 2. Yüzen Kart Açma / Kapatma / Küçültme (BROWSER AÇMAZ!)
+    function openFloatingChatWidget() {
+      const widget = document.getElementById('mira-floating-chat-widget');
+      const bubble = document.getElementById('mira-chat-bubble');
+      if (bubble) bubble.style.display = 'none';
+      if (widget) {
+        widget.style.display = 'flex';
+        // Otomatik odaklan
+        const inp = document.getElementById('floating-widget-input');
+        if (inp) setTimeout(() => inp.focus(), 100);
+      }
+      initFloatingChatDrag();
+      showToast('📌 Sohbet ekranda yüzen karta alındı! Başlığından tutarak istediğiniz yere sürükleyebilirsiniz.', 'info');
+    }
+
+    function openAlwaysOnTopChat() {
+      // Header butonuna basıldığında da browser açmak yerine doğrudan yüzen kartı aç
+      openFloatingChatWidget();
+    }
+
+    function closeFloatingWidget() {
+      const widget = document.getElementById('mira-floating-chat-widget');
+      if (widget) widget.style.display = 'none';
+      const bubble = document.getElementById('mira-chat-bubble');
+      if (bubble) bubble.style.display = 'none';
+      showToast('Yüzen sohbet kapatıldı.');
+    }
+
+    function minimizeFloatingWidget() {
+      const widget = document.getElementById('mira-floating-chat-widget');
+      if (widget) widget.style.display = 'none';
+      const bubble = document.getElementById('mira-chat-bubble');
+      if (bubble) bubble.style.display = 'flex';
+    }
+
+    function restoreFloatingWidget() {
+      const bubble = document.getElementById('mira-chat-bubble');
+      if (bubble) bubble.style.display = 'none';
+      const widget = document.getElementById('mira-floating-chat-widget');
+      if (widget) widget.style.display = 'flex';
+    }
+
+    // 3. Sürükleme (Drag & Drop)
+    let isFloatDragging = false;
+    let floatStartX = 0, floatStartY = 0;
+    let floatInitLeft = 0, floatInitTop = 0;
+
+    function initFloatingChatDrag() {
+      const header = document.getElementById('mira-float-header');
+      const widget = document.getElementById('mira-floating-chat-widget');
+      if (!header || !widget || header.dataset.dragInit === 'true') return;
+      header.dataset.dragInit = 'true';
+
+      header.addEventListener('mousedown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+        isFloatDragging = true;
+        const rect = widget.getBoundingClientRect();
+        floatStartX = e.clientX;
+        floatStartY = e.clientY;
+        floatInitLeft = rect.left;
+        floatInitTop = rect.top;
+
+        widget.style.right = 'auto';
+        widget.style.bottom = 'auto';
+        widget.style.left = `${floatInitLeft}px`;
+        widget.style.top = `${floatInitTop}px`;
+
+        const onMouseMove = (ev) => {
+          if (!isFloatDragging) return;
+          const dx = ev.clientX - floatStartX;
+          const dy = ev.clientY - floatStartY;
+          const maxL = window.innerWidth - widget.offsetWidth;
+          const maxT = window.innerHeight - widget.offsetHeight;
+          widget.style.left = `${Math.max(10, Math.min(maxL - 10, floatInitLeft + dx))}px`;
+          widget.style.top = `${Math.max(10, Math.min(maxT - 10, floatInitTop + dy))}px`;
+        };
+
+        const onMouseUp = () => {
+          isFloatDragging = false;
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
       });
     }
 
-    function toggleStudioChatSound() {
-      studioChatSoundEnabled = !studioChatSoundEnabled;
-      const btn = document.getElementById('btn-studio-sound');
-      if (btn) {
-        btn.textContent = studioChatSoundEnabled ? '🔔 Ses' : '🔕 Sessiz';
-        btn.classList.toggle('active', studioChatSoundEnabled);
-      }
-    }
-
+    // 4. Sohbeti Temizle
     function clearStudioChatFeed() {
-      const feed = document.getElementById('studio-chat-feed');
-      if (feed) feed.innerHTML = '';
+      const feed1 = document.getElementById('studio-chat-feed');
+      const feed2 = document.getElementById('floating-chat-feed');
+      if (feed1) feed1.innerHTML = '';
+      if (feed2) feed2.innerHTML = '';
       showToast('Sohbet akışı temizlendi.');
     }
 
-    function setStudioChatFilter(filter, btnEl) {
-      studioChatActiveFilter = filter;
-      document.querySelectorAll('#tab-chat .filter-pill').forEach(b => b.classList.remove('active'));
-      if (btnEl) btnEl.classList.add('active');
+    // 5. Mesaj Ekleme Motoru (Her iki akışa senkron ekler)
+    function appendStudioChatMessage(item) {
+      const feed1 = document.getElementById('studio-chat-feed');
+      const feed2 = document.getElementById('floating-chat-feed');
 
-      document.querySelectorAll('#studio-chat-feed .studio-chat-msg').forEach(card => {
-        const plat = card.dataset.platform || 'all';
-        const isStr = card.dataset.isStreamer === 'true';
+      const isStreamer = !!item.isStreamer || item.username === 'MİRA (Yayıncı)' || item.username === 'MİRA';
+      const d = new Date();
+      const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      const badge = isStreamer ? 'YAYINCI' : (item.badge === 'tiktok' ? 'TIKTOK' : 'KICK');
+      const user = item.username || 'İzleyici';
+      const content = item.content || item.text || '';
 
-        if (filter === 'all') {
-          card.style.display = 'flex';
-        } else if (filter === 'streamer') {
-          card.style.display = isStr ? 'flex' : 'none';
-        } else {
-          card.style.display = plat === filter ? 'flex' : 'none';
+      const html = `
+        <span class="clean-msg-time">${timeStr}</span>
+        <span class="clean-msg-badge">${badge}</span>
+        <span class="clean-msg-user" onclick="replyToUser('${escHtml(user)}')">${escHtml(user)}:</span>
+        <span class="clean-msg-text">${escHtml(content)}</span>
+      `;
+
+      [feed1, feed2].forEach(feed => {
+        if (!feed) return;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `clean-chat-msg ${isStreamer ? 'is-streamer' : ''}`;
+        msgDiv.innerHTML = html;
+        feed.appendChild(msgDiv);
+        while (feed.children.length > 70) {
+          feed.removeChild(feed.firstChild);
+        }
+        feed.scrollTop = feed.scrollHeight;
+      });
+    }
+
+    function replyToUser(uname) {
+      const inp1 = document.getElementById('studio-chat-input');
+      const inp2 = document.getElementById('floating-widget-input');
+      [inp1, inp2].forEach(inp => {
+        if (inp) {
+          inp.value = `@${uname} ` + inp.value;
+          inp.focus();
         }
       });
     }
 
-    function appendStudioChatMessage(item) {
-      const feed = document.getElementById('studio-chat-feed');
-      if (!feed) return;
-
-      studioChatMessageCount++;
-      const countEl = document.getElementById('deck-msg-count');
-      if (countEl) countEl.textContent = studioChatMessageCount;
-
-      const isStreamer = !!item.isStreamer || item.username === 'MİRA (Yayıncı)' || item.badge === 'streamer';
-      const platform = item.platform || (item.badge === 'tiktok' ? 'tiktok' : 'kick');
-
-      const d = new Date();
-      const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-
-      let badgeClass = 'badge-sub';
-      let badgeLabel = 'İZLEYİCİ';
-
-      if (isStreamer) {
-        badgeClass = 'badge-streamer';
-        badgeLabel = '👑 YAYINCI';
-      } else if (item.badge === 'mod' || item.isMod) {
-        badgeClass = 'badge-mod';
-        badgeLabel = '⚔️ MOD';
-      } else if (item.badge === 'sub' || item.isSub) {
-        badgeClass = 'badge-sub';
-        badgeLabel = '💎 ABONE';
-      } else if (item.badge === 'vip') {
-        badgeClass = 'badge-vip';
-        badgeLabel = '⭐ VIP';
-      } else if (platform === 'tiktok') {
-        badgeClass = 'badge-tiktok';
-        badgeLabel = 'TIKTOK';
-      } else if (platform === 'kick') {
-        badgeClass = 'badge-kick';
-        badgeLabel = 'KICK';
-      }
-
-      const card = document.createElement('div');
-      card.className = `studio-chat-msg ${isStreamer ? 'is-streamer' : ''}`;
-      card.dataset.platform = platform;
-      card.dataset.isStreamer = isStreamer ? 'true' : 'false';
-
-      card.innerHTML = `
-        <div class="msg-header-row">
-          <div class="msg-meta-left">
-            <span class="msg-badge ${badgeClass}">${badgeLabel}</span>
-            <span class="msg-username" onclick="replyInStudioChat('${escHtml(item.username)}')">${escHtml(item.username)}</span>
-          </div>
-          <span class="msg-time">${timeStr}</span>
-        </div>
-        <div class="msg-body-text">${escHtml(item.content)}</div>
-      `;
-
-      if (studioChatActiveFilter !== 'all') {
-        if (studioChatActiveFilter === 'streamer' && !isStreamer) card.style.display = 'none';
-        if (studioChatActiveFilter === 'kick' && platform !== 'kick') card.style.display = 'none';
-        if (studioChatActiveFilter === 'tiktok' && platform !== 'tiktok') card.style.display = 'none';
-      }
-
-      feed.appendChild(card);
-      while (feed.children.length > 80) {
-        feed.removeChild(feed.firstChild);
-      }
-      feed.scrollTop = feed.scrollHeight;
-    }
-
-    function replyInStudioChat(uname) {
-      const inp = document.getElementById('studio-chat-input');
-      if (inp) {
-        inp.value = `@${uname} ` + inp.value;
-        inp.focus();
-      }
-    }
-
+    // 6. Mesaj Gönderme
     function sendStudioChatReply() {
-      const input = document.getElementById('studio-chat-input');
-      if (!input) return;
-      const text = input.value.trim();
+      const inp = document.getElementById('studio-chat-input');
+      if (!inp) return;
+      const text = inp.value.trim();
       if (!text) return;
 
       const payload = {
@@ -6750,75 +6845,30 @@
 
       dispatchEventToOverlay(payload);
       appendStudioChatMessage(payload);
-
-      input.value = '';
-      input.focus();
-      showToast('Cevabınız sohbete iletildi!', 'success');
+      inp.value = '';
+      inp.focus();
     }
 
-    function quickStudioReply(text) {
-      const input = document.getElementById('studio-chat-input');
-      if (input) input.value = text;
-      sendStudioChatReply();
-    }
+    function sendFloatingWidgetReply() {
+      const inp = document.getElementById('floating-widget-input');
+      if (!inp) return;
+      const text = inp.value.trim();
+      if (!text) return;
 
-    function insertStudioEmoji(em) {
-      const input = document.getElementById('studio-chat-input');
-      if (input) {
-        input.value += em;
-        input.focus();
-      }
-    }
-
-    function triggerBotCommand(cmd) {
-      let replyText = '';
-      if (cmd === '!discord') {
-        replyText = '💬 Discord Topluluğumuz: discord.gg/cihanatas (Turnuvalar, sohbet ve oyun odaları)';
-      } else if (cmd === '!rank') {
-        replyText = '🏆 Mevcut Rank: Mythic Glory (58 Yıldız) • Ana Rol: Büyücü / Mid Lane • Hedef: Mythic Immortal!';
-      } else if (cmd === '!tiktok') {
-        replyText = '📱 TikTok Canlı Yayınlarımız & Klipler: tiktok.com/@mira_mlbb';
-      } else if (cmd === '!muzik') {
-        const curSong = document.getElementById('live-song-input')?.value || 'MLBB Arena - Necrokeep Lo-Fi Beats';
-        replyText = `🎵 Şu An Çalan Şarkı: ${curSong}`;
-      } else if (cmd === '!sosyal') {
-        replyText = '🌐 Kick: kick.com/cihanatas • TikTok: @mira_mlbb • Discord: discord.gg/cihanatas';
-      } else if (cmd === '!hedef') {
-        replyText = '🎯 Yayın Hedefi: 2,000 Takipçi & 500 Abone! Destekleyen herkese teşekkürler!';
-      } else {
-        replyText = `🤖 MİRA Bot Komutu: ${cmd}`;
-      }
-
-      const cmdPayload = {
+      const payload = {
         type: 'TEST_CHAT',
         username: 'MİRA (Yayıncı)',
-        content: cmd,
+        content: text,
         badge: 'streamer',
         isStreamer: true,
         platform: 'mira',
         time: Date.now()
       };
-      dispatchEventToOverlay(cmdPayload);
-      appendStudioChatMessage(cmdPayload);
 
-      setTimeout(() => {
-        const botPayload = {
-          type: 'TEST_CHAT',
-          username: 'MİRA Bot 🤖',
-          content: replyText,
-          badge: 'mod',
-          isMod: true,
-          platform: 'bot',
-          time: Date.now()
-        };
-        dispatchEventToOverlay(botPayload);
-        appendStudioChatMessage(botPayload);
-        try {
-          localTTS.speak(replyText.slice(0, 70));
-        } catch(e){}
-      }, 350);
-
-      showToast(`Bot komutu çalıştırıldı: ${cmd}`, 'success');
+      dispatchEventToOverlay(payload);
+      appendStudioChatMessage(payload);
+      inp.value = '';
+      inp.focus();
     }
 
     function triggerTestChat() {
@@ -7067,6 +7117,9 @@
       else if (initTab === 'chat' || initTab === 'tab-chat') {
         switchTab('tab-chat', document.getElementById('tab-btn-chat'));
       }
+      if (urlParams.get('openChat') === '1') {
+        setTimeout(openFloatingChatWidget, 100);
+      }
       else if (initTab === 'design-creator' || initTab === 'tab-design-creator') {
         switchTab('tab-design-creator', document.getElementById('tab-btn-design-creator'));
         if (initMode) {
@@ -7102,6 +7155,18 @@
         });
       }
 
+      const floatInp = document.getElementById('floating-widget-input');
+      if (floatInp) {
+        floatInp.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendFloatingWidgetReply();
+          }
+        });
+      }
+
+      initFloatingChatDrag();
+
       try {
         const bus = new BroadcastChannel('kick_stream_bus');
         bus.addEventListener('message', (e) => {
@@ -7113,5 +7178,49 @@
     });
 
 </script>
+
+  <!-- YÜZEN VE SERBESTÇE GEZDİRİLEBİLİR SOHBET KARTI (BROWSER AÇMAZ, EKRANDA ÜSTTE KALIR) -->
+  <div id="mira-floating-chat-widget" class="mira-floating-chat-overlay" style="display: none;">
+    <div class="mira-float-header" id="mira-float-header">
+      <div class="mira-float-title">
+        <span class="live-dot" style="width:8px; height:8px; background:#00f5a0; box-shadow:0 0 8px #00f5a0; border-radius:50%;"></span>
+        <span>CANLI SOHBET</span>
+      </div>
+
+      <!-- Opaklık Slider'ı -->
+      <div class="mira-float-opacity-wrap" title="Yüzen kartın saydamlığını ayarlar">
+        <span>🪟</span>
+        <input type="range" id="float-widget-opacity-slider" min="15" max="100" value="95" oninput="setFloatingWidgetOpacity(this.value)">
+        <span id="float-widget-opacity-label">%95</span>
+      </div>
+
+      <div class="mira-float-actions">
+        <button type="button" class="mira-float-btn" onclick="minimizeFloatingWidget()" title="Simge Durumuna Küçült">−</button>
+        <button type="button" class="mira-float-btn btn-close" onclick="closeFloatingWidget()" title="Kapat">✕</button>
+      </div>
+    </div>
+
+    <!-- Mesaj Listesi -->
+    <div class="mira-clean-chat-feed mira-float-feed" id="floating-chat-feed">
+      <div class="clean-chat-msg is-system">
+        <span class="clean-msg-time">17:00</span>
+        <span class="clean-msg-badge">MİRA</span>
+        <span class="clean-msg-text">Yüzen sohbet aktif. Opaklığı yukarıdan kısıp arkadaki ekranı görebilirsiniz.</span>
+      </div>
+    </div>
+
+    <!-- Mesaj Gönderme -->
+    <div class="mira-clean-input-bar mira-float-input-bar">
+      <input type="text" id="floating-widget-input" class="mira-clean-input" placeholder="Mesajınızı yazın... (Enter)" autocomplete="off">
+      <button type="button" class="mira-clean-send-btn" onclick="sendFloatingWidgetReply()">Gönder</button>
+    </div>
+  </div>
+
+  <!-- Minimized Floating Bubble (sağ altta minik buton) -->
+  <div id="mira-chat-bubble" class="mira-chat-bubble" style="display: none;" onclick="restoreFloatingWidget()">
+    <span class="live-dot" style="width:8px; height:8px; background:#00f5a0; border-radius:50%;"></span>
+    <span>💬 Sohbet</span>
+  </div>
+
 </body>
 </html>
