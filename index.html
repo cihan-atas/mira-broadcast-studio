@@ -4822,12 +4822,13 @@
               <span class="card-panel-title">
                 <span>📊</span> HUD İSTATİSTİKLERİ & SAYAÇLAR
               </span>
-              <span class="card-panel-badge">Üst Bar Canlı HUD</span>
+              <span class="card-panel-badge" style="background: rgba(0, 245, 160, 0.15); color: #00f5a0; border-color: rgba(0, 245, 160, 0.35);">🟢 Kick Otomatik Senkron</span>
             </div>
 
-            <p style="font-size: 11.5px; color: #94a3b8; margin-top: 0; margin-bottom: 12px; line-height: 1.4;">
-              Oyun içi ve sohbet sahnelerinin en üstünde yer alan <strong>SON TAKİP</strong>, <strong>SON ABONE</strong> ve <strong>SON DESTEK</strong> verilerini canlı yayın masanızdan anında yönetin.
-            </p>
+            <div style="background: rgba(0, 245, 160, 0.06); border: 1px solid rgba(0, 245, 160, 0.2); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; line-height: 1.45; color: #cbd5e1;">
+              <strong style="color: #00f5a0;">⚡ Otomatik Çalışır:</strong> Canlı yayında Kick veya TikTok'tan yeni takipçi, abone veya hediye geldiğinde bu sayaçlar ve ekrandaki üst bar <strong>%100 otomatik olarak güncellenir</strong>.
+              <br><span style="color: #94a3b8;">Aşağıdaki kutulardan ise dilediğiniz zaman istediğiniz ismi yazıp "Gönder" diyerek manuel müdahale edebilir veya eski destekçileri sabitleyebilirsiniz.</span>
+            </div>
 
             <!-- 1. Son Takipçi Düzenleme -->
             <div class="stat-edit-item">
@@ -10488,16 +10489,24 @@
                   if (aType === 'follower') {
                     const fEl = document.getElementById('session-count-followers');
                     if (fEl) fEl.textContent = `+${(parseInt(fEl.textContent.replace('+', ''), 10) || 0) + 1}`;
+                    const fInp = document.getElementById('stat-follower-input');
+                    if (fInp && ev.payload?.username) fInp.value = ev.payload.username;
                   } else if (aType === 'sub') {
                     const sEl = document.getElementById('session-count-subs');
                     if (sEl) sEl.textContent = `+${(parseInt(sEl.textContent.replace('+', ''), 10) || 0) + 1}`;
+                    const sInp = document.getElementById('stat-sub-input');
+                    if (sInp && ev.payload?.username) sInp.value = `${ev.payload.username} (${ev.payload.months || 1}. Ay)`;
                   } else if (aType === 'donation' || aType === 'kicks') {
                     const kEl = document.getElementById('session-count-kicks');
                     const amt = parseInt(ev.payload?.amount || 500, 10) || 500;
                     if (kEl) kEl.textContent = `+${(parseInt(kEl.textContent.replace('+', ''), 10) || 0) + amt}`;
+                    const dInp = document.getElementById('stat-donation-input');
+                    if (dInp && ev.payload?.username) dInp.value = `${ev.payload.username} (${ev.payload.amount || '500 Kicks'})`;
                   } else if (aType === 'gift') {
                     const gEl = document.getElementById('session-count-gifts');
                     if (gEl) gEl.textContent = `+${(parseInt(gEl.textContent.replace('+', ''), 10) || 0) + 1}`;
+                    const gInp = document.getElementById('stat-gift-input');
+                    if (gInp && ev.payload?.username) gInp.value = `${ev.payload.username} (${ev.payload.giftName || '5x Hediye'})`;
                   }
 
                   if (ev.payload && ev.payload.username && ev.senderSession !== MIRA_TAB_SESSION_ID) {
