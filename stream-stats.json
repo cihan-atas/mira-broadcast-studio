@@ -2,21 +2,21 @@
   "goal": {
     "title": "TAKİPÇİ HEDEFİ",
     "current": 1,
-    "target": 100,
+    "target": 50,
     "type": "follower",
     "autoSyncKick": true
   },
   "recent": {
-    "follower": "AylinGamer",
-    "sub": "Gamer_Deniz",
-    "donation": "EmrePro (500 Kicks)",
-    "gift": "MiraFan_01 (5x Hediye)"
+    "follower": "-",
+    "sub": "-",
+    "donation": "-",
+    "gift": "-"
   },
   "session": {
     "followers": 0,
     "subs": 0,
     "kicks": 0,
     "gifts": 0,
-    "startedAt": 1793735746010
+    "startedAt": 1793736890537
   }
 }

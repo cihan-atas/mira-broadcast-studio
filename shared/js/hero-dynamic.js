@@ -1036,6 +1036,21 @@
     initUserGalleryCustomization();
     updateGoalDisplay(currentGoal);
 
+    // Eski sahte/örnek isim kalıntılarını localStorage'dan temizle
+    const legacyMocks = [
+      'SelinGamer', 'AylinGamer', 'NecroLord', 'Gamer_Deniz', 'EmrePro (500 Kicks)',
+      'MiraFan_01 (5x Hediye)', 'MiraFan_01 (100₺)', 'Abyss_Titan', 'Cecilion_Vance',
+      'Molina_Paws', 'CadiaDragon', 'OkyanusKrali', 'GeceYuruyen', 'TatliKedi',
+      'ZetianKing', 'DerinMavi (175₺)', 'Zeynep_Rose (250₺)', 'PamukSeker (200₺)',
+      'EmirCarry (150₺)', 'Kral_01 (1.2K 💎)', 'MiraFan (Gül x10 🌹)', 'cihan'
+    ];
+    ['recent_follower', 'recent_sub', 'recent_donation', 'recent_gift'].forEach(key => {
+      const val = localStorage.getItem(key);
+      if (val && (legacyMocks.includes(val) || val.trim() === '')) {
+        localStorage.removeItem(key);
+      }
+    });
+
     const savedFollower = localStorage.getItem('recent_follower');
     updateRecentStat('follower', savedFollower || '-');
 
@@ -1044,6 +1059,9 @@
 
     const savedDonation = localStorage.getItem('recent_donation');
     updateRecentStat('donation', savedDonation || '-');
+
+    const savedGift = localStorage.getItem('recent_gift');
+    updateRecentStat('gift', savedGift || '-');
 
     fetch('/api/stream-stats')
       .then(r => r.json())

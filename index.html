@@ -4837,9 +4837,12 @@
                 <span style="font-size:10px; color:#94a3b8;">Üst Bar: #recent-follower</span>
               </div>
               <div class="stat-edit-input-row">
-                <input type="text" id="stat-follower-input" class="form-control" value="SelinGamer" placeholder="Takipçi adı...">
+                <input type="text" id="stat-follower-input" class="form-control" value="" placeholder="Henüz yok (-)">
                 <button type="button" class="btn-stat-sync" onclick="applySingleStat('follower')">
                   <span>⚡</span> Gönder
+                </button>
+                <button type="button" onclick="clearSingleStat('follower')" title="Temizle (-)" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:8px; padding:0 10px; font-size:11px; cursor:pointer; font-weight:700;">
+                  ✕
                 </button>
               </div>
             </div>
@@ -4851,9 +4854,12 @@
                 <span style="font-size:10px; color:#94a3b8;">Üst Bar: #recent-sub</span>
               </div>
               <div class="stat-edit-input-row">
-                <input type="text" id="stat-sub-input" class="form-control" value="NecroLord" placeholder="Abone adı & ay...">
+                <input type="text" id="stat-sub-input" class="form-control" value="" placeholder="Henüz yok (-)">
                 <button type="button" class="btn-stat-sync" onclick="applySingleStat('sub')">
                   <span>⚡</span> Gönder
+                </button>
+                <button type="button" onclick="clearSingleStat('sub')" title="Temizle (-)" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:8px; padding:0 10px; font-size:11px; cursor:pointer; font-weight:700;">
+                  ✕
                 </button>
               </div>
             </div>
@@ -4865,9 +4871,12 @@
                 <span style="font-size:10px; color:#94a3b8;">Üst Bar: #recent-donation</span>
               </div>
               <div class="stat-edit-input-row">
-                <input type="text" id="stat-donation-input" class="form-control" value="EmrePro (500 Kicks)" placeholder="Destekçi adı & miktar...">
+                <input type="text" id="stat-donation-input" class="form-control" value="" placeholder="Henüz yok (-)">
                 <button type="button" class="btn-stat-sync" onclick="applySingleStat('donation')">
                   <span>⚡</span> Gönder
+                </button>
+                <button type="button" onclick="clearSingleStat('donation')" title="Temizle (-)" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:8px; padding:0 10px; font-size:11px; cursor:pointer; font-weight:700;">
+                  ✕
                 </button>
               </div>
             </div>
@@ -4879,9 +4888,12 @@
                 <span style="font-size:10px; color:#94a3b8;">TikTok & Kick: #recent-gift</span>
               </div>
               <div class="stat-edit-input-row">
-                <input type="text" id="stat-gift-input" class="form-control" value="MiraFan_01 (5x Hediye)" placeholder="Hediye eden & adet...">
+                <input type="text" id="stat-gift-input" class="form-control" value="" placeholder="Henüz yok (-)">
                 <button type="button" class="btn-stat-sync" onclick="applySingleStat('gift')">
                   <span>⚡</span> Gönder
+                </button>
+                <button type="button" onclick="clearSingleStat('gift')" title="Temizle (-)" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:8px; padding:0 10px; font-size:11px; cursor:pointer; font-weight:700;">
+                  ✕
                 </button>
               </div>
             </div>
@@ -4917,6 +4929,9 @@
             <div style="display: flex; gap: 10px; margin-top: 14px;">
               <button type="button" class="btn-primary" style="flex: 1;" onclick="applyAllStatsLive()">
                 ⚡ TÜM İSTATİSTİKLERİ YAYINA GÖNDER
+              </button>
+              <button type="button" class="btn-outline" style="border-color: rgba(239,68,68,0.5); color:#fca5a5;" onclick="clearAllStatsLive()" title="Tüm HUD verilerini '-' yaparak temizler">
+                🧹 TÜMÜNÜ TEMİZLE (-)
               </button>
             </div>
           </div>
@@ -8121,7 +8136,7 @@
     let isGoalAutoSyncKick = true;
     let studioStatsData = {
       goal: { title: 'TAKİPÇİ HEDEFİ', current: 1, target: 50, type: 'follower', autoSyncKick: true },
-      recent: { follower: 'SelinGamer', sub: 'NecroLord', donation: 'EmrePro (500 Kicks)', gift: 'MiraFan_01 (5x Hediye)' },
+      recent: { follower: '-', sub: '-', donation: '-', gift: '-' },
       session: { followers: 0, subs: 0, kicks: 0, gifts: 0 }
     };
 
@@ -8262,14 +8277,21 @@
       showToast(`✓ Hedef yayına aktarıldı: ${title} (${current} / ${target})`, 'success');
     }
 
-    function applySingleStat(type) {
+    function clearSingleStat(type) {
+      const inp = document.getElementById(`stat-${type}-input`);
+      if (inp) inp.value = '';
+      applySingleStat(type, '-');
+    }
+
+    function applySingleStat(type, forcedVal) {
       let val = '';
-      if (type === 'follower') val = document.getElementById('stat-follower-input')?.value.trim();
+      if (forcedVal !== undefined) val = forcedVal;
+      else if (type === 'follower') val = document.getElementById('stat-follower-input')?.value.trim();
       else if (type === 'sub') val = document.getElementById('stat-sub-input')?.value.trim();
       else if (type === 'donation') val = document.getElementById('stat-donation-input')?.value.trim();
       else if (type === 'gift') val = document.getElementById('stat-gift-input')?.value.trim();
 
-      if (!val) return;
+      if (!val) val = '-';
 
       const statObj = { [type]: val };
       dispatchEventToOverlay({
@@ -8286,11 +8308,31 @@
       showToast(`✓ ${type.toUpperCase()} HUD verisi güncellendi: ${val}`, 'success');
     }
 
+    function clearAllStatsLive() {
+      ['follower', 'sub', 'donation', 'gift'].forEach(type => {
+        const inp = document.getElementById(`stat-${type}-input`);
+        if (inp) inp.value = '';
+      });
+      const allStats = { follower: '-', sub: '-', donation: '-', gift: '-' };
+      dispatchEventToOverlay({
+        type: 'UPDATE_STATS',
+        stats: allStats
+      });
+
+      fetch('/api/stream-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recent: allStats })
+      }).catch(() => {});
+
+      showToast('✓ Tüm HUD verileri temizlendi (-)', 'info');
+    }
+
     function applyAllStatsLive() {
-      const follower = document.getElementById('stat-follower-input')?.value.trim() || 'SelinGamer';
-      const sub = document.getElementById('stat-sub-input')?.value.trim() || 'NecroLord';
-      const donation = document.getElementById('stat-donation-input')?.value.trim() || 'EmrePro (500 Kicks)';
-      const gift = document.getElementById('stat-gift-input')?.value.trim() || 'MiraFan_01 (5x)';
+      const follower = document.getElementById('stat-follower-input')?.value.trim() || '-';
+      const sub = document.getElementById('stat-sub-input')?.value.trim() || '-';
+      const donation = document.getElementById('stat-donation-input')?.value.trim() || '-';
+      const gift = document.getElementById('stat-gift-input')?.value.trim() || '-';
 
       const allStats = { follower, sub, donation, gift };
       dispatchEventToOverlay({
@@ -8384,22 +8426,14 @@
 
           if (d.recent) {
             studioStatsData.recent = d.recent;
-            if (d.recent.follower) {
-              const fInp = document.getElementById('stat-follower-input');
-              if (fInp) fInp.value = d.recent.follower;
-            }
-            if (d.recent.sub) {
-              const sInp = document.getElementById('stat-sub-input');
-              if (sInp) sInp.value = d.recent.sub;
-            }
-            if (d.recent.donation) {
-              const dInp = document.getElementById('stat-donation-input');
-              if (dInp) dInp.value = d.recent.donation;
-            }
-            if (d.recent.gift) {
-              const gInp = document.getElementById('stat-gift-input');
-              if (gInp) gInp.value = d.recent.gift;
-            }
+            const fInp = document.getElementById('stat-follower-input');
+            if (fInp) fInp.value = (d.recent.follower && d.recent.follower !== '-') ? d.recent.follower : '';
+            const sInp = document.getElementById('stat-sub-input');
+            if (sInp) sInp.value = (d.recent.sub && d.recent.sub !== '-') ? d.recent.sub : '';
+            const dInp = document.getElementById('stat-donation-input');
+            if (dInp) dInp.value = (d.recent.donation && d.recent.donation !== '-') ? d.recent.donation : '';
+            const gInp = document.getElementById('stat-gift-input');
+            if (gInp) gInp.value = (d.recent.gift && d.recent.gift !== '-') ? d.recent.gift : '';
           }
 
           if (d.session) {
@@ -10443,21 +10477,31 @@
             }
             updateGoalProgressPreview();
           } else if (e.data && e.data.type === 'UPDATE_STATS' && e.data.stats) {
-            if (e.data.stats.follower) {
+            if (e.data.stats.follower !== undefined) {
               const fInp = document.getElementById('stat-follower-input');
-              if (fInp) fInp.value = e.data.stats.follower;
+              if (fInp) fInp.value = (e.data.stats.follower === '-' ? '' : e.data.stats.follower);
             }
-            if (e.data.stats.sub) {
+            if (e.data.stats.sub !== undefined) {
               const sInp = document.getElementById('stat-sub-input');
-              if (sInp) sInp.value = e.data.stats.sub;
+              if (sInp) sInp.value = (e.data.stats.sub === '-' ? '' : e.data.stats.sub);
             }
-            if (e.data.stats.donation) {
+            if (e.data.stats.donation !== undefined) {
               const dInp = document.getElementById('stat-donation-input');
-              if (dInp) dInp.value = e.data.stats.donation;
+              if (dInp) dInp.value = (e.data.stats.donation === '-' ? '' : e.data.stats.donation);
             }
-            if (e.data.stats.gift) {
+            if (e.data.stats.gift !== undefined) {
               const gInp = document.getElementById('stat-gift-input');
-              if (gInp) gInp.value = e.data.stats.gift;
+              if (gInp) gInp.value = (e.data.stats.gift === '-' ? '' : e.data.stats.gift);
+            }
+            if (e.data.session) {
+              const fEl = document.getElementById('session-count-followers');
+              const sEl = document.getElementById('session-count-subs');
+              const kEl = document.getElementById('session-count-kicks');
+              const gEl = document.getElementById('session-count-gifts');
+              if (fEl && e.data.session.followers !== undefined) fEl.textContent = `+${e.data.session.followers}`;
+              if (sEl && e.data.session.subs !== undefined) sEl.textContent = `+${e.data.session.subs}`;
+              if (kEl && e.data.session.kicks !== undefined) kEl.textContent = `+${e.data.session.kicks}`;
+              if (gEl && e.data.session.gifts !== undefined) gEl.textContent = `+${e.data.session.gifts}`;
             }
           } else if (e.data && e.data.type === 'UPDATE_SONG') {
             if (e.data.coverUrl) updateDeckCover(e.data.coverUrl);
@@ -10533,21 +10577,31 @@
                   }
                   updateGoalProgressPreview();
                 } else if (ev.type === 'UPDATE_STATS' && ev.stats) {
-                  if (ev.stats.follower) {
+                  if (ev.stats.follower !== undefined) {
                     const fInp = document.getElementById('stat-follower-input');
-                    if (fInp) fInp.value = ev.stats.follower;
+                    if (fInp) fInp.value = (ev.stats.follower === '-' ? '' : ev.stats.follower);
                   }
-                  if (ev.stats.sub) {
+                  if (ev.stats.sub !== undefined) {
                     const sInp = document.getElementById('stat-sub-input');
-                    if (sInp) sInp.value = ev.stats.sub;
+                    if (sInp) sInp.value = (ev.stats.sub === '-' ? '' : ev.stats.sub);
                   }
-                  if (ev.stats.donation) {
+                  if (ev.stats.donation !== undefined) {
                     const dInp = document.getElementById('stat-donation-input');
-                    if (dInp) dInp.value = ev.stats.donation;
+                    if (dInp) dInp.value = (ev.stats.donation === '-' ? '' : ev.stats.donation);
                   }
-                  if (ev.stats.gift) {
+                  if (ev.stats.gift !== undefined) {
                     const gInp = document.getElementById('stat-gift-input');
-                    if (gInp) gInp.value = ev.stats.gift;
+                    if (gInp) gInp.value = (ev.stats.gift === '-' ? '' : ev.stats.gift);
+                  }
+                  if (ev.session) {
+                    const fEl = document.getElementById('session-count-followers');
+                    const sEl = document.getElementById('session-count-subs');
+                    const kEl = document.getElementById('session-count-kicks');
+                    const gEl = document.getElementById('session-count-gifts');
+                    if (fEl && ev.session.followers !== undefined) fEl.textContent = `+${ev.session.followers}`;
+                    if (sEl && ev.session.subs !== undefined) sEl.textContent = `+${ev.session.subs}`;
+                    if (kEl && ev.session.kicks !== undefined) kEl.textContent = `+${ev.session.kicks}`;
+                    if (gEl && ev.session.gifts !== undefined) gEl.textContent = `+${ev.session.gifts}`;
                   }
                 } else if (ev.type === 'UPDATE_SONG') {
                   if (ev.coverUrl) updateDeckCover(ev.coverUrl);

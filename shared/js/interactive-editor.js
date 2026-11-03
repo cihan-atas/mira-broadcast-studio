@@ -1799,9 +1799,9 @@
             <span class="brand-sub" style="font-size:11px; font-weight:800; color:${accent}; padding:3px 9px; border-radius:99px; background:${accent}22;">${title}</span>
           </div>
           <div style="display:flex; gap:14px; font-size:11.5px; font-weight:800; color:#e2e8f0;">
-            <span>💜 SON TAKİP: <strong style="color:#fff;">SelinGamer</strong></span>
-            <span>🌟 SON ABONE: <strong style="color:#fff;">NecroLord</strong></span>
-            <span>💎 SON DESTEK: <strong style="color:${secondary};">MiraFan (100₺)</strong></span>
+            <span>💜 SON TAKİP: <strong style="color:#fff;">-</strong></span>
+            <span>🌟 SON ABONE: <strong style="color:#fff;">-</strong></span>
+            <span>💎 SON DESTEK: <strong style="color:${secondary};">-</strong></span>
           </div>
           <div style="font-family:'Orbitron',sans-serif; font-size:13px; font-weight:900; color:${accent};">CANLI YAYIN</div>
         </div>

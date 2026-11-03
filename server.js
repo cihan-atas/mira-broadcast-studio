@@ -216,10 +216,10 @@ let studioStats = {
     autoSyncKick: true
   },
   recent: {
-    follower: 'SelinGamer',
-    sub: 'NecroLord',
-    donation: 'EmrePro (500 Kicks)',
-    gift: 'MiraFan_01 (5x Hediye)'
+    follower: '-',
+    sub: '-',
+    donation: '-',
+    gift: '-'
   },
   session: {
     followers: 0,
@@ -416,20 +416,21 @@ function handleTiktokConnect(username, callback) {
   });
 
   conn.on('follow', data => {
-    console.log(`[TIKTOK LIVE] Yeni Takipci: ${data.uniqueId}`);
-    studioStats.recent.follower = data.uniqueId;
+    const user = data.uniqueId || data.nickname || 'Yeni Takipçi';
+    console.log(`[TIKTOK LIVE] Yeni Takipci: ${user}`);
+    studioStats.recent.follower = user;
     studioStats.session.followers = (studioStats.session.followers || 0) + 1;
     if (studioStats.goal.type === 'follower') {
       studioStats.goal.current = (studioStats.goal.current || 0) + 1;
       eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
     }
-    eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
+    eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, session: studioStats.session, time: Date.now() });
     saveStreamStats();
 
     eventQueue.push({
       type: 'LIVE_ALERT',
       alertType: 'follower',
-      payload: { username: data.uniqueId },
+      payload: { username: user },
       time: Date.now()
     });
   });
@@ -450,7 +451,7 @@ function handleTiktokConnect(username, callback) {
       studioStats.goal.current = (studioStats.goal.current || 0) + count;
       eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
     }
-    eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
+    eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, session: studioStats.session, time: Date.now() });
     saveStreamStats();
 
     eventQueue.push({
@@ -633,40 +634,50 @@ function startKickPusherBridge(slug = 'cihanatas') {
             activeKickStatus.lastMessageAt = Date.now();
             console.log(`[KICK CHAT] [${badge.toUpperCase()}] ${sender}: ${content}`);
           }
-          // Canlı Takipçi Güncellemesi
+          // Canlı Takipçi Güncellemesi (Kick Pusher FollowersUpdated)
           else if (packet.event === 'App\\Events\\FollowersUpdated') {
             const evData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
-            const newFollowerName = evData.follower?.username || 'Yeni Takipçi';
-            const updatedCount = evData.followersCount || evData.followers_count;
-            if (typeof updatedCount === 'number') activeKickStatus.followersCount = updatedCount;
+            const isFollow = evData.followed !== false;
+            const updatedCount = typeof evData.followersCount === 'number' ? evData.followersCount : (typeof evData.followers_count === 'number' ? evData.followers_count : null);
+            if (updatedCount !== null) activeKickStatus.followersCount = updatedCount;
 
-            studioStats.recent.follower = newFollowerName;
-            studioStats.session.followers = (studioStats.session.followers || 0) + 1;
-            if (studioStats.goal.type === 'follower') {
-              if (typeof updatedCount === 'number') studioStats.goal.current = updatedCount;
-              else studioStats.goal.current = (studioStats.goal.current || 0) + 1;
-              eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+            if (isFollow) {
+              const newFollowerName = evData.username || evData.follower?.username || evData.user?.username || evData.follower_username || 'Yeni Takipçi';
+              studioStats.recent.follower = newFollowerName;
+              studioStats.session.followers = (studioStats.session.followers || 0) + 1;
+              if (studioStats.goal.type === 'follower') {
+                if (updatedCount !== null) studioStats.goal.current = updatedCount;
+                else studioStats.goal.current = (studioStats.goal.current || 0) + 1;
+                eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+              }
+              eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, session: studioStats.session, time: Date.now() });
+              saveStreamStats();
+
+              const alertItem = {
+                type: 'LIVE_ALERT',
+                alertType: 'follower',
+                payload: {
+                  username: newFollowerName,
+                  followersCount: activeKickStatus.followersCount
+                },
+                time: Date.now()
+              };
+              eventQueue.push(alertItem);
+              if (eventQueue.length > 80) eventQueue.shift();
+              console.log(`[KICK TAKİPÇİ] ${newFollowerName} kanalı takip etti! (Toplam: ${activeKickStatus.followersCount})`);
+            } else {
+              if (studioStats.goal.type === 'follower' && updatedCount !== null) {
+                studioStats.goal.current = updatedCount;
+                eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+                saveStreamStats();
+              }
+              console.log(`[KICK TAKİP BİLGİSİ] Takip durumu güncellendi (Toplam: ${activeKickStatus.followersCount})`);
             }
-            eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
-            saveStreamStats();
-
-            const alertItem = {
-              type: 'LIVE_ALERT',
-              alertType: 'follower',
-              payload: {
-                username: newFollowerName,
-                followersCount: activeKickStatus.followersCount
-              },
-              time: Date.now()
-            };
-            eventQueue.push(alertItem);
-            if (eventQueue.length > 80) eventQueue.shift();
-            console.log(`[KICK TAKİPÇİ] ${newFollowerName} kanalı takip etti!`);
           }
           // Canlı Abonelik Olayı
           else if (packet.event === 'App\\Events\\SubscriptionEvent') {
             const sData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
-            const subUser = sData.username || sData.sender?.username || 'Abonemiz';
+            const subUser = sData.username || sData.sender?.username || sData.user?.username || 'Abonemiz';
             const months = sData.months || 1;
 
             studioStats.recent.sub = `${subUser} (${months}. Ay)`;
@@ -675,7 +686,7 @@ function startKickPusherBridge(slug = 'cihanatas') {
               studioStats.goal.current = (studioStats.goal.current || 0) + 1;
               eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
             }
-            eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
+            eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, session: studioStats.session, time: Date.now() });
             saveStreamStats();
 
             const alertItem = {
@@ -694,7 +705,7 @@ function startKickPusherBridge(slug = 'cihanatas') {
           // Canlı Hediye Abonelik Olayı (Topluluğa Dağıtılan Hediye Sub)
           else if (packet.event === 'App\\Events\\GiftedSubscriptionsEvent') {
             const gData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
-            const gifter = gData.gifter_username || gData.username || 'Destekçi';
+            const gifter = gData.gifter_username || gData.username || gData.sender?.username || 'Destekçi';
             const count = gData.gifted_usernames?.length || gData.count || 5;
 
             studioStats.recent.gift = `${gifter} (${count}x Hediye)`;
@@ -705,7 +716,7 @@ function startKickPusherBridge(slug = 'cihanatas') {
               studioStats.goal.current = (studioStats.goal.current || 0) + count;
               eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
             }
-            eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, time: Date.now() });
+            eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, session: studioStats.session, time: Date.now() });
             saveStreamStats();
 
             const alertItem = {
