@@ -167,3 +167,18 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
    * Stüdyo simge durumundayken veya oyundayken (Numpad 1-5 tuşlarıyla) sahne ve alert geçişlerinin yapılabilmesi.
 4. **Gelişmiş Ses Kartı & Mikrofon Entegrasyonu:**
    * Tuna ses eklentisine ek olarak yayıncının anlık mikrofon ses dalgasını overlay üzerinde görselleştirme desteği.
+
+---
+
+## 🎨 6. Özel Tasarım Atölyesi (Creator Studio) & Hazır Arka Planlar (Tamamlandı)
+
+- **🛠️ Özel Tasarım Atölyesi (Creator Studio / Design Lab):**
+  - **🃏 1. Özel Kart Tasarla:** 11 kart tipi/preseti (Vitrin, Kamera, Sohbet, Sosyal, Müzik, Skill, Üst Bar, Oyun Çerçevesi, Hedef, Resim/GIF, Duyuru), özel başlıklar, yayıncı adı, rozetler, avatar/logo yükleme, kart arka plan görseli, 2D hassas renk spektrumu, fontlar, yuvarlaklık ve opaklık ayarları.
+  - **🌌 2. Özel Arka Plan Tasarla:** CyberGrid, Nebula, Dark Glass, Gradient ve PC'den Resim/GIF yükleme, karartma slider (%0-%90), bulanıklık (0-20px), parçacık motoru (Ruhlar, Yıldızlar, Kar, Kapalı), tema ve parıltı renkleri.
+  - **⚡ 3. Özel Alert Tasarla:** Takipçi, Abone, Bağış, Hediye bildirimleri, başlık, kullanıcı adı, tebrik mesajı, ses efekti ve canlı ses test butonu.
+  - **💾 Kendi Galerime Kaydet:** Canlı 16:9 simülasyon sahnesinde anlık önizleme ve 1 tıkla `POST /api/gallery/user` ile kişisel galeriye kaydetme; ardından doğrudan boş tuvale aktarma seçeneği.
+- **🌌 Hazır Arka Planlar & Tuval/Edit Entegrasyonu:**
+  - 8 resmi hazır arka plan (`Vexana`, `Zetian`, `Nana`, `Carmilla`, `Atlas`, `CyberGrid`, `Nebula`, `Dark Glass`) Mağaza ve Tuval modallarına eklendi.
+  - Tuval düzenleme inspector'ına **"💾 Bu Kartı Kendi Galerime Kaydet"** butonu entegre edildi.
+  - Kendi Galerim sekmesinde **"🌌 Arka Planlar"** filtresi ve arka planları tuvale uygulama aksiyonları eklendi.
+

@@ -1070,6 +1070,24 @@
         bgLayerEl.className = `canvas-bg-layer bg-${bgStyle}`;
         particleMode = cfg.showParticles === false ? 'none' : (cfg.particleType || 'soul');
 
+        // 0. Hazır veya Özel Sahne Arka Planı Modu
+        if (item.category === 'background' || cfg.cardType === 'background') {
+          if (cfg.bgImage) {
+            bgLayerEl.style.backgroundImage = `url("${cfg.bgImage}")`;
+            bgLayerEl.style.backgroundSize = cfg.bgFit === 'stretch' ? '100% 100%' : (cfg.bgFit || 'cover');
+            bgLayerEl.style.backgroundRepeat = cfg.bgFit === 'repeat' ? 'repeat' : 'no-repeat';
+            bgLayerEl.style.backgroundPosition = 'center';
+          }
+          stageEl.innerHTML = `
+            <div class="pos-slot pos-bottom-center" style="opacity:0.85;">
+              <div class="mod-card" style="padding:12px 24px; font-size:13px;">
+                🌌 <strong>${esc(item.name)}</strong> Arka Planı Aktif • Tuvale tek tek kartlar ekleyebilirsiniz.
+              </div>
+            </div>
+          `;
+          return;
+        }
+
         // 1. Modüler Tekil Kart & Kahraman Parçası Modu
         if (item.category === 'card') {
           const posClass = `pos-${cfg.cardPosition || 'center'}`;

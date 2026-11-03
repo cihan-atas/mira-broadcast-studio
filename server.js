@@ -940,6 +940,195 @@ APP_GALLERY_CATALOG.push({
   }
 });
 
+// --- 5. HAZIR ARKA PLANLAR (BACKGROUND TEMPLATES) ---
+const READY_BACKGROUNDS = [
+  {
+    id: 'tpl_bg_vexana',
+    category: 'background',
+    cardType: 'background',
+    name: 'Vexana — Necrokeep Ruh Vadisi Arka Planı',
+    subtitle: 'Gotik Mor & Zümrüt Sis Efektli 1920×1080 Tam Ekran Sahne Arka Planı',
+    icon: '🌌',
+    badge: 'ARKA PLAN • VEXANA',
+    previewImg: 'kick/vexana/assets/images/portrait.jpg',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'background',
+      bgStyle: 'nebula',
+      bgImage: '/kick/vexana/assets/images/portrait.jpg',
+      bgFit: 'cover',
+      bgOpacity: 100,
+      bgDim: 45,
+      bgBlur: 2,
+      primaryColor: '#a855f7',
+      secondaryColor: '#10b981',
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_bg_zetian',
+    category: 'background',
+    cardType: 'background',
+    name: 'Zetian — İmparatorluk Altın Anka Arka Planı',
+    subtitle: 'Altın & Kızıl Anka Atmosferli 1920×1080 Tam Ekran Sahne Arka Planı',
+    icon: '🌌',
+    badge: 'ARKA PLAN • ZETIAN',
+    previewImg: 'kick/zetian/assets/images/portrait.jpg',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'background',
+      bgStyle: 'nebula',
+      bgImage: '/kick/zetian/assets/images/portrait.jpg',
+      bgFit: 'cover',
+      bgOpacity: 100,
+      bgDim: 45,
+      bgBlur: 2,
+      primaryColor: '#ffd700',
+      secondaryColor: '#ef4444',
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_bg_nana',
+    category: 'background',
+    cardType: 'background',
+    name: 'Nana — Molina Pastel Rüya Ormanı Arka Planı',
+    subtitle: 'Pastel Pembe & Mavi Parıltılı 1920×1080 Tam Ekran Sahne Arka Planı',
+    icon: '🌌',
+    badge: 'ARKA PLAN • NANA',
+    previewImg: 'kick/nana/assets/images/portrait.jpg',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'background',
+      bgStyle: 'nebula',
+      bgImage: '/kick/nana/assets/images/portrait.jpg',
+      bgFit: 'cover',
+      bgOpacity: 100,
+      bgDim: 40,
+      bgBlur: 2,
+      primaryColor: '#ff85a2',
+      secondaryColor: '#60a5fa',
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_bg_carmilla',
+    category: 'background',
+    cardType: 'background',
+    name: 'Carmilla — Gotik Kanlı Ay Şatosu Arka Planı',
+    subtitle: 'Kızıl Gül & Gümüş Gotik Atmosferli 1920×1080 Tam Ekran Sahne Arka Planı',
+    icon: '🌌',
+    badge: 'ARKA PLAN • CARMILLA',
+    previewImg: 'kick/carmilla/assets/images/portrait.jpg',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'background',
+      bgStyle: 'nebula',
+      bgImage: '/kick/carmilla/assets/images/portrait.jpg',
+      bgFit: 'cover',
+      bgOpacity: 100,
+      bgDim: 45,
+      bgBlur: 2,
+      primaryColor: '#e11d48',
+      secondaryColor: '#cbd5e1',
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_bg_atlas',
+    category: 'background',
+    cardType: 'background',
+    name: 'Atlas — Abis Okyanus Derinliği Arka Planı',
+    subtitle: 'Derin Okyanus Turkuazı & Kehribar Parçacıklı 1920×1080 Sahne Arka Planı',
+    icon: '🌌',
+    badge: 'ARKA PLAN • ATLAS',
+    previewImg: 'kick/atlas/assets/images/portrait.jpg',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'background',
+      bgStyle: 'nebula',
+      bgImage: '/kick/atlas/assets/images/portrait.jpg',
+      bgFit: 'cover',
+      bgOpacity: 100,
+      bgDim: 45,
+      bgBlur: 2,
+      primaryColor: '#06b6d4',
+      secondaryColor: '#f59e0b',
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_bg_cybergrid',
+    category: 'background',
+    cardType: 'background',
+    name: 'Siber Izgara (CyberGrid Neon Arena) Arka Planı',
+    subtitle: 'E-Spor Turnuva & FPS/MOBA Yayınları İçin Hareketli Siber Izgara Arka Plan',
+    icon: '🕸️',
+    badge: 'ARKA PLAN • CYBERGRID',
+    previewImg: 'assets/icon.png',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'background',
+      bgStyle: 'cybergrid',
+      bgImage: '',
+      bgFit: 'cover',
+      bgOpacity: 100,
+      bgDim: 20,
+      bgBlur: 0,
+      primaryColor: '#a855f7',
+      secondaryColor: '#06b6d4',
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_bg_nebula',
+    category: 'background',
+    cardType: 'background',
+    name: 'Kozmik Nebula (Uzay Bulutsusu) Arka Planı',
+    subtitle: 'Derin Uzay Mor & Zümrüt Gradyan Parçacıklı 1920×1080 Sahne Arka Planı',
+    icon: '✨',
+    badge: 'ARKA PLAN • NEBULA',
+    previewImg: 'assets/icon.png',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'background',
+      bgStyle: 'nebula',
+      bgImage: '',
+      bgFit: 'cover',
+      bgOpacity: 100,
+      bgDim: 20,
+      bgBlur: 0,
+      primaryColor: '#8b5cf6',
+      secondaryColor: '#10b981',
+      showParticles: true
+    }
+  },
+  {
+    id: 'tpl_bg_darkglass',
+    category: 'background',
+    cardType: 'background',
+    name: 'Koyu Stüdyo Camı (Dark Glass OLED) Arka Planı',
+    subtitle: 'Sohbet (Just Chatting) ve Gece Yayınları İçin Lüks Mat Siyah Cam Arka Plan',
+    icon: '🌑',
+    badge: 'ARKA PLAN • DARK GLASS',
+    previewImg: 'assets/icon.png',
+    basePath: 'custom-overlay.html',
+    config: {
+      cardType: 'background',
+      bgStyle: 'darkglass',
+      bgImage: '',
+      bgFit: 'cover',
+      bgOpacity: 100,
+      bgDim: 30,
+      bgBlur: 0,
+      primaryColor: '#3b82f6',
+      secondaryColor: '#ec4899',
+      showParticles: false
+    }
+  }
+];
+READY_BACKGROUNDS.forEach(b => APP_GALLERY_CATALOG.push(b));
+
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {
   try { fs.mkdirSync(UPLOADS_DIR, { recursive: true }); } catch (e) {}
@@ -1386,22 +1575,27 @@ const server = http.createServer((req, res) => {
             config: JSON.parse(JSON.stringify({ ...tpl.config, ...(data.config || {}) }))
           };
         } else {
-          // Boş Tuval (Blank Canvas) veya Özel Oluşturulan Öğe
-          const uid = 'canvas_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+          // Boş Tuval (Blank Canvas) veya Özel Tasarım Atölyesi'nde Oluşturulan Öğe (Kart / Arka Plan / Alert / Sahne)
+          const cat = data.category || 'canvas';
+          const prefix = cat === 'card' ? 'custom_card_' : (cat === 'background' ? 'custom_bg_' : (cat === 'alert' ? 'custom_alert_' : 'canvas_'));
+          const uid = prefix + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+          const cfg = data.config || {};
           newItem = {
             id: uid,
-            templateId: 'blank_canvas',
-            category: data.category || 'canvas',
-            name: data.name || 'Özel Tasarım Sahne',
-            subtitle: data.subtitle || 'Boş Tuval ile Sıfırdan Oluşturuldu',
-            icon: data.icon || '🎨',
-            badge: data.badge || 'ÖZEL TUVAL',
-            previewImg: null,
+            templateId: data.customTemplateType || 'blank_canvas',
+            category: cat,
+            cardType: data.cardType || cfg.cardType || (cat === 'background' ? 'background' : null),
+            isCustomDesigned: !!data.isCustomDesigned,
+            name: data.name || 'Özel Tasarım Öğe',
+            subtitle: data.subtitle || 'Özel Tasarım Atölyesi ile Sıfırdan Oluşturuldu',
+            icon: data.icon || (cat === 'background' ? '🌌' : (cat === 'card' ? '🃏' : (cat === 'alert' ? '⚡' : '🎨'))),
+            badge: data.badge || (cat === 'background' ? 'ÖZEL ARKA PLAN' : (cat === 'card' ? 'ÖZEL TASARIM KART' : (cat === 'alert' ? 'ÖZEL ALERT' : 'ÖZEL TUVAL'))),
+            previewImg: data.previewImg || cfg.bgImage || cfg.imageUrl || cfg.avatarUrl || null,
             basePath: 'custom-overlay.html',
             obsKey: null,
             createdAt: Date.now(),
             updatedAt: Date.now(),
-            config: data.config || {}
+            config: cfg
           };
         }
 

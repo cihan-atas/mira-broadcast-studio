@@ -1644,6 +1644,136 @@
         justify-content: center;
       }
     }
+
+    /* ========================================================
+       CREATOR STUDIO (ÖZEL TASARIM ATÖLYESİ) STİLLERİ
+       ======================================================== */
+    .creator-mode-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .creator-mode-tab {
+      padding: 7px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .creator-mode-tab:hover {
+      background: rgba(168, 85, 247, 0.15);
+      color: #fff;
+      border-color: rgba(168, 85, 247, 0.4);
+    }
+    .creator-mode-tab.active {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(6, 182, 212, 0.25));
+      border-color: var(--vexana);
+      color: #fff;
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.3);
+    }
+    .creator-studio-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr);
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .creator-studio-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .creator-section {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .creator-sec-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .creator-presets-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .creator-preset-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .creator-preset-btn:hover {
+      background: rgba(168, 85, 247, 0.18);
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #fff;
+    }
+    .creator-preset-btn.active {
+      background: rgba(168, 85, 247, 0.35);
+      border-color: #a855f7;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+    }
+    .creator-color-target-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .creator-target-pill {
+      padding: 5px 11px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .creator-target-pill.active {
+      background: #7c3aed;
+      border-color: #c084fc;
+      color: #fff;
+    }
+    .creator-studio-preview-pane {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 16px;
+      position: sticky;
+      top: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .creator-sim-canvas {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #080a12;
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.85);
+    }
   </style>
 </head>
 <body>
@@ -1719,6 +1849,9 @@
         <button class="studio-tab-btn" id="tab-btn-canvas-builder" onclick="openBlankCanvasBuilder()">
           🎨 Boş Tuval & Editör
         </button>
+        <button class="studio-tab-btn" id="tab-btn-design-creator" onclick="switchTab('tab-design-creator', this)" style="background: linear-gradient(135deg, rgba(168,85,247,0.22), rgba(6,182,212,0.18)); border-color: rgba(168,85,247,0.55); color: #f3e8ff;">
+          🛠️ Özel Tasarım Atölyesi
+        </button>
         <button class="studio-tab-btn" onclick="switchTab('tab-goal', this)">
           🎯 Hedef & İstatistik
         </button>
@@ -1750,13 +1883,17 @@
             <div class="gallery-filter-pills">
               <button class="gallery-filter-btn active" onclick="filterMyGallery('all', this)">Tümü</button>
               <button class="gallery-filter-btn" onclick="filterMyGallery('hero_scene', this)">⚔️ Hero & Sahneler</button>
+              <button class="gallery-filter-btn" onclick="filterMyGallery('background', this)">🌌 Arka Planlar</button>
               <button class="gallery-filter-btn" onclick="filterMyGallery('card', this)">🃏 Kartlar & Widget</button>
               <button class="gallery-filter-btn" onclick="filterMyGallery('alert', this)">⚡ Alertler</button>
               <button class="gallery-filter-btn" onclick="filterMyGallery('canvas', this)">🎨 Özel Tuval</button>
             </div>
             <div style="display: flex; gap: 8px;">
               <button class="btn-gal save-gal" onclick="openBlankCanvasBuilder()">
-                🎨 + Boş Tuval Oluştur
+                🎨 + Boş Tuval
+              </button>
+              <button class="btn-gal" onclick="switchTab('tab-design-creator', document.getElementById('tab-btn-design-creator'))" style="background: rgba(168,85,247,0.2); border-color: #a855f7; color: #e9d5ff;">
+                🛠️ Özel Tasarım Atölyesi
               </button>
               <button class="btn-gal" onclick="goToAppGallery()">
                 🏪 Ana Galeriye Git
@@ -1769,7 +1906,7 @@
             <div class="empty-gallery-icon">🗂️✨</div>
             <div class="empty-gallery-title">KENDİ GALERİNİZ HENÜZ BOŞ</div>
             <p class="empty-gallery-desc">
-              Uygulama açılışta hazır sahnelerle dolu gelmez. Kendi yayın tarzınızı oluşturmak için <strong>Ana Galeri (Mağaza)</strong>'dan beğendiğiniz Şampiyon, Sahne, Kart veya Alert şablonlarını kendi galerinize kaydedebilir, kendinize göre düzenleyebilir veya <strong>Boş Tuval</strong> ile sıfırdan kendi sahnenizi tasarlayabilirsiniz!
+              Uygulama açılışta hazır sahnelerle dolu gelmez. Kendi yayın tarzınızı oluşturmak için <strong>Ana Galeri (Mağaza)</strong>'dan beğendiğiniz Şampiyon, Sahne, Kart veya Alert şablonlarını kendi galerinize kaydedebilir, kendinize göre düzenleyebilir veya <strong>Boş Tuval</strong> ve <strong>Özel Tasarım Atölyesi</strong> ile sıfırdan kendi sahnenizi tasarlayabilirsiniz!
             </p>
             <div class="empty-gallery-actions">
               <button class="btn-primary" onclick="goToAppGallery()">
@@ -1777,6 +1914,9 @@
               </button>
               <button class="btn-primary btn-kick" onclick="openBlankCanvasBuilder()">
                 🎨 BOŞ TUVAL İLE SIFIRDAN OLUŞTUR
+              </button>
+              <button class="btn-primary" onclick="switchTab('tab-design-creator', document.getElementById('tab-btn-design-creator'))" style="background: linear-gradient(135deg, #a855f7, #06b6d4);">
+                🛠️ ÖZEL TASARIM ATÖLYESİ
               </button>
             </div>
           </div>
@@ -1811,16 +1951,17 @@
             <span class="card-panel-title">
               <span>🏪</span> ANA GALERİ (BÜTÜN SAHNELER + VİTRİN KARTI, KAMERA KARTI, SKILL KARTI VE MODÜL MAĞAZASI)
             </span>
-            <span class="card-panel-badge">60 Resmi Şablon & Kart</span>
+            <span class="card-panel-badge">68 Resmi Şablon & Kart</span>
           </div>
 
           <div class="info-tip-box" style="margin-bottom: 14px;">
-            ✨ <strong>Bütün Sahne veya Tek Tek Kart Türleri:</strong> Kahraman şablonlarını ister <strong>"⚔️ Bütün Kahraman Sahneleri (5)"</strong> olarak tam set kullanın, ister aşağıdaki <strong>🃏 Vitrin Kartı, 📷 Kamera Kartı, ⚡ Skill Kartı, 📊 Üst Bar Kartı, 🎮 Oyun Çerçevesi, 🎵 Müzik Kartı, 🌐 Sosyal Medya Kartı, 💬 Sohbet Kartı</strong> kategorilerinden istediğiniz kartı kendi galerinize kaydedip <strong>bomboş tuvalinize</strong> tek tek ekleyin!
+            ✨ <strong>Bütün Sahne, Arka Plan veya Tek Tek Kart Türleri:</strong> Kahraman şablonlarını ister <strong>"⚔️ Bütün Kahraman Sahneleri (5)"</strong> olarak tam set kullanın, ister <strong>"🌌 Hazır Arka Planlar (8)"</strong> veya <strong>🃏 Vitrin, 📷 Kamera, ⚡ Skill, 📊 Üst Bar, 🎮 Oyun Çerçevesi, 🎵 Müzik, 🌐 Sosyal Medya, 💬 Sohbet</strong> kategorilerinden istediğiniz kartı kendi galerinize kaydedip <strong>bomboş tuvalinize</strong> tek tek ekleyin!
           </div>
 
           <div class="gallery-toolbar" style="flex-wrap: wrap; gap: 10px;">
             <div class="gallery-filter-pills" style="flex-wrap: wrap;">
-              <button class="gallery-filter-btn active" onclick="filterAppCatalog('all', this)">🌟 Tümü (60)</button>
+              <button class="gallery-filter-btn active" onclick="filterAppCatalog('all', this)">🌟 Tümü (68)</button>
+              <button class="gallery-filter-btn" onclick="filterAppCatalog('background', this)">🌌 Hazır Arka Planlar (8)</button>
               <button class="gallery-filter-btn" onclick="filterAppCatalog('hero', this)">⚔️ Bütün Kahraman Sahneleri (5)</button>
               <button class="gallery-filter-btn" onclick="filterAppCatalog('scene', this)">📺 Yayın Sahneleri (5)</button>
               <button class="gallery-filter-btn" onclick="filterAppCatalog('ctype_showcase', this)">🃏 Vitrin Kartı (6)</button>
@@ -2007,6 +2148,431 @@
                 <button type="button" class="btn-gal" onclick="triggerAddCardOnCanvas('store')" style="flex: 1; justify-content: center; background: rgba(168,85,247,0.2); border-color: #a855f7; color: #fff; padding: 9px 12px;">
                   🧩 Mağazadan Kahraman Parçası & Kart Ekle
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: ÖZEL TASARIM ATÖLYESİ (CREATOR STUDIO) -->
+      <div id="tab-design-creator" class="tab-pane">
+        <div class="card-panel">
+          <div class="card-panel-header" style="flex-wrap: wrap; gap: 10px;">
+            <div>
+              <span class="card-panel-title">
+                <span>🛠️</span> ÖZEL TASARIM ATÖLYESİ (KART, ARKA PLAN & ALERT LAB)
+              </span>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted);">
+                Sıfırdan kendi özel kartlarınızı, yayın arka planlarınızı ve alertlerinizi tasarlayın, canlı önizleyin ve <strong>Kendi Galeriniz</strong>'e kaydedin!
+              </p>
+            </div>
+            <div class="creator-mode-tabs">
+              <button type="button" class="creator-mode-tab active" data-cmode="card" onclick="setCreatorMode('card', this)">
+                🃏 1. Özel Kart Tasarla
+              </button>
+              <button type="button" class="creator-mode-tab" data-cmode="background" onclick="setCreatorMode('background', this)">
+                🌌 2. Özel Arka Plan Tasarla
+              </button>
+              <button type="button" class="creator-mode-tab" data-cmode="alert" onclick="setCreatorMode('alert', this)">
+                ⚡ 3. Özel Alert Tasarla
+              </button>
+            </div>
+          </div>
+
+          <div class="creator-studio-grid">
+            <!-- SOL KOLON: KONTROLLER & ÖZELLEŞTİRME FORMU -->
+            <div class="creator-studio-controls">
+              
+              <!-- 1. KART TASARIM FORMU (MODE: CARD) -->
+              <div id="creator-form-card" class="creator-subform">
+                <!-- A. Kart Tipi / Preset Seçimi -->
+                <div class="creator-section">
+                  <div class="creator-sec-title">🎭 KART TİPİ VE ŞABLON DÜZENİ</div>
+                  <div class="creator-presets-grid" id="creator-card-type-pills">
+                    <button type="button" class="creator-preset-btn active" data-type="showcase" onclick="selectCreatorCardType('showcase', this)">🃏 Vitrin Kartı</button>
+                    <button type="button" class="creator-preset-btn" data-type="webcam" onclick="selectCreatorCardType('webcam', this)">📷 Kamera Çerçevesi</button>
+                    <button type="button" class="creator-preset-btn" data-type="chat" onclick="selectCreatorCardType('chat', this)">💬 Sohbet Kutusu</button>
+                    <button type="button" class="creator-preset-btn" data-type="social" onclick="selectCreatorCardType('social', this)">🌐 Sosyal Medya</button>
+                    <button type="button" class="creator-preset-btn" data-type="music" onclick="selectCreatorCardType('music', this)">🎵 Müzik & Player</button>
+                    <button type="button" class="creator-preset-btn" data-type="skills" onclick="selectCreatorCardType('skills', this)">⚡ Skill Yetenekleri</button>
+                    <button type="button" class="creator-preset-btn" data-type="topbar" onclick="selectCreatorCardType('topbar', this)">📊 Üst Bilgi Barı</button>
+                    <button type="button" class="creator-preset-btn" data-type="gameframe" onclick="selectCreatorCardType('gameframe', this)">🎮 Oyun Çerçevesi</button>
+                    <button type="button" class="creator-preset-btn" data-type="goal" onclick="selectCreatorCardType('goal', this)">🎯 Hedef Barı</button>
+                    <button type="button" class="creator-preset-btn" data-type="image" onclick="selectCreatorCardType('image', this)">🖼️ Resim & GIF Kartı</button>
+                    <button type="button" class="creator-preset-btn" data-type="custom" onclick="selectCreatorCardType('custom', this)">📌 Özel Duyuru Kartı</button>
+                  </div>
+                </div>
+
+                <!-- B. Metin & İçerik Bilgileri -->
+                <div class="creator-section">
+                  <div class="creator-sec-title">📝 METİNLER & YAYINCI BİLGİLERİ</div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Galeri Kayıt Adı (Galerinizde görünecek isim)</label>
+                      <input type="text" id="cr-card-name" class="form-control" value="Özel Mistik Vitrinim" oninput="updateCreatorLivePreview()">
+                    </div>
+                    <div class="form-group">
+                      <label>Kart Başlığı</label>
+                      <input type="text" id="cr-card-title" class="form-control" value="MİRA PRO SHOWCASE" oninput="updateCreatorLivePreview()">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Alt Başlık / Açıklama</label>
+                      <input type="text" id="cr-card-sub" class="form-control" value="Mythic Glory Streamer • Mid Lane" oninput="updateCreatorLivePreview()">
+                    </div>
+                    <div class="form-group">
+                      <label>Yayıncı Adı</label>
+                      <input type="text" id="cr-card-streamer" class="form-control" value="MİRA" oninput="updateCreatorLivePreview()">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Rol Rozeti</label>
+                      <input type="text" id="cr-card-role" class="form-control" value="PRO STREAMER" oninput="updateCreatorLivePreview()">
+                    </div>
+                    <div class="form-group">
+                      <label>Platform / Koridor Rozeti</label>
+                      <input type="text" id="cr-card-lane" class="form-control" value="KICK & TIKTOK" oninput="updateCreatorLivePreview()">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Alıntı / Slogan Metni</label>
+                    <input type="text" id="cr-card-quote" class="form-control" value='"Şafak Vadisi zaferimizi bekliyor!"' oninput="updateCreatorLivePreview()">
+                  </div>
+                </div>
+
+                <!-- C. Profil Görseli & Kart İçi Arka Plan Resmi -->
+                <div class="creator-section">
+                  <div class="creator-sec-title">🖼️ PROFİL GÖRSELİ & KART ARKA PLANI (STREAM ELEMENTS)</div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Profil / Avatar / Logo Görseli</label>
+                      <div style="display:flex; gap:6px;">
+                        <button type="button" class="btn-gal" onclick="uploadCreatorAvatar()" style="flex:0 0 auto; padding:8px 12px; background:rgba(56,189,248,0.2); border-color:#38bdf8; color:#bae6fd;">
+                          📤 PC'den Seç
+                        </button>
+                        <input type="text" id="cr-card-avatar" class="form-control" value="/kick/vexana/assets/images/portrait.jpg" oninput="updateCreatorLivePreview()">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>Kart Arka Plan Görseli (Opsiyonel)</label>
+                      <div style="display:flex; gap:6px;">
+                        <button type="button" class="btn-gal" onclick="uploadCreatorCardBg()" style="flex:0 0 auto; padding:8px 12px; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#e9d5ff;">
+                          📤 PC'den Seç
+                        </button>
+                        <input type="text" id="cr-card-bg-img" class="form-control" placeholder="Boş bırakılabilir veya resim URL" oninput="updateCreatorLivePreview()">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Kart Arka Plan Sığdırma (Fit)</label>
+                      <select id="cr-card-bg-fit" class="form-control" onchange="updateCreatorLivePreview()">
+                        <option value="cover" selected>Kapla (Cover)</option>
+                        <option value="contain">Sığdır (Contain)</option>
+                        <option value="stretch">Tam Uzat (100%)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Arka Plan Karartması: <strong id="cr-card-bg-dim-lbl">20%</strong></label>
+                      <input type="range" id="cr-card-bg-dim" min="0" max="90" step="5" value="20" oninput="document.getElementById('cr-card-bg-dim-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- D. Renk Laboratuvarı & Hassas 2D Spektrum Seçici -->
+                <div class="creator-section">
+                  <div class="creator-sec-title">🎨 RENK LABORATUVARI & 2D SPEKTRUM SEÇİCİ</div>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
+                    🎯 Düzenlemek istediğiniz rengi seçin, 2D renk tablasında mouse gezdirerek hassas ayar yapın:
+                  </div>
+                  <div class="creator-color-target-pills" id="cr-color-target-pills">
+                    <button type="button" class="creator-target-pill active" data-target="primary" onclick="setCreatorColorTarget('primary', this)">Ana Vurgu Rengi</button>
+                    <button type="button" class="creator-target-pill" data-target="secondary" onclick="setCreatorColorTarget('secondary', this)">İkincil Neon Rengi</button>
+                    <button type="button" class="creator-target-pill" data-target="textColor" onclick="setCreatorColorTarget('textColor', this)">Yazı Rengi</button>
+                    <button type="button" class="creator-target-pill" data-target="bgColor" onclick="setCreatorColorTarget('bgColor', this)">Kart Arka Plan Rengi</button>
+                    <button type="button" class="creator-target-pill" data-target="borderColor" onclick="setCreatorColorTarget('borderColor', this)">Çerçeve Rengi</button>
+                  </div>
+
+                  <!-- 2D Spektrum Pad -->
+                  <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 12px; margin-top: 10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                      <span id="cr-spectrum-rgb" style="font-family: monospace; font-size: 11px; color: #cbd5e1; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 6px;">rgb(168, 85, 247)</span>
+                      <span id="cr-spectrum-lock-badge" onclick="toggleCreatorSpectrumLock()" style="font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 99px; background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #6ee7b7; cursor: pointer;">
+                        🖱️ Mouse Takibi Aktif (Tıkla=Sabitle)
+                      </span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <div id="cr-spectrum-pad" style="position: relative; flex: 1; height: 76px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: hsl(271, 100%, 50%); cursor: crosshair; overflow: hidden; user-select: none;">
+                        <div style="position:absolute; inset:0; background: linear-gradient(to right, #fff, transparent);"></div>
+                        <div style="position:absolute; inset:0; background: linear-gradient(to top, #000, transparent);"></div>
+                        <div id="cr-spectrum-cursor" style="position: absolute; left: 66%; top: 15%; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1.5px rgba(0,0,0,0.85); transform: translate(-50%, -50%); pointer-events: none; background: #a855f7;"></div>
+                      </div>
+                      <div id="cr-hue-bar" style="position: relative; width: 22px; height: 76px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: linear-gradient(to bottom, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%); cursor: pointer; user-select: none;">
+                        <div id="cr-hue-cursor" style="position: absolute; left: 0; right: 0; top: 75%; height: 5px; border: 1.5px solid #fff; box-shadow: 0 0 4px #000; transform: translateY(-50%); pointer-events: none;"></div>
+                      </div>
+                      <div style="width: 80px; display: flex; flex-direction: column; gap: 4px;">
+                        <div id="cr-spectrum-preview-box" style="flex: 1; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: #a855f7; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 11px; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">#a855f7</div>
+                        <input type="text" id="cr-color-hex-inp" class="form-control" value="#a855f7" style="padding: 4px 6px; font-size: 11px; text-align: center; font-family: monospace;" oninput="onCreatorColorHexChange(this.value)">
+                      </div>
+                    </div>
+
+                    <!-- Hızlı Renk Paleti Düğmeleri -->
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px;">
+                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#a855f7')">💜 Mor</button>
+                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#10b981')">🟢 Zümrüt</button>
+                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#06b6d4')">🌊 Mavi</button>
+                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#ffd700')">👑 Altın</button>
+                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#ef4444')">🔥 Ateş</button>
+                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#ff85a2')">🌸 Pembe</button>
+                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#ffffff')">⚪ Beyaz</button>
+                      <button type="button" class="preset-color-btn" onclick="applyCreatorPresetColor('#0d0f18')">⚫ Koyu</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- E. Font, Yuvarlaklık & Opaklık -->
+                <div class="creator-section">
+                  <div class="creator-sec-title">🔤 FONT, KÖŞE YUVARLAKLIĞI & ŞEFFAFLIK</div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Yazı Fontu (Font Family)</label>
+                      <select id="cr-card-font" class="form-control" onchange="updateCreatorLivePreview()">
+                        <option value="'Orbitron', sans-serif" selected>Orbitron (Siber / E-Spor)</option>
+                        <option value="'Cinzel Decorative', cursive">Cinzel Decorative (Mistik / Epik)</option>
+                        <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Modern Net)</option>
+                        <option value="'Rajdhani', sans-serif">Rajdhani (Teknolojik)</option>
+                        <option value="'Montserrat', sans-serif">Montserrat (Temiz & Düz)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Köşe Yuvarlaklığı: <strong id="cr-card-radius-lbl">18px</strong></label>
+                      <input type="range" id="cr-card-radius" min="0" max="44" step="2" value="18" oninput="document.getElementById('cr-card-radius-lbl').textContent = this.value + 'px'; updateCreatorLivePreview();">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Kart Arka Plan Opaklığı: <strong id="cr-card-opacity-lbl">90%</strong></label>
+                    <input type="range" id="cr-card-opacity" min="10" max="100" step="5" value="90" oninput="document.getElementById('cr-card-opacity-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. ARKA PLAN TASARIM FORMU (MODE: BACKGROUND) -->
+              <div id="creator-form-background" class="creator-subform" style="display:none;">
+                <div class="creator-section">
+                  <div class="creator-sec-title">🌌 ARKA PLAN TÜRÜ & BİLGİLERİ</div>
+                  <div class="form-group">
+                    <label>Arka Plan Adı (Galerinizde görünecek isim)</label>
+                    <input type="text" id="cr-bg-name" class="form-control" value="Siber Karanlık Uzay" oninput="updateCreatorLivePreview()">
+                  </div>
+                  <div class="form-group">
+                    <label>Temel Stil / Görünüm</label>
+                    <select id="cr-bg-base-style" class="form-control" onchange="updateCreatorLivePreview()">
+                      <option value="cybergrid" selected>⚡ CyberGrid (Siber Tron Izgarası)</option>
+                      <option value="nebula">🌌 Nebula (Kozmik Mor & Mavi Parıltı)</option>
+                      <option value="darkglass">🪟 Dark Glass (Koyu Buzlu Cam)</option>
+                      <option value="gradient">🎨 İki Renkli Radyal Gradyan</option>
+                      <option value="custom_img">🖼️ PC'den Özel Resim / Hareketli GIF</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="creator-section">
+                  <div class="creator-sec-title">🖼️ ARKA PLAN GÖRSELİ (STREAM ELEMENTS SCENE BG)</div>
+                  <div class="form-group">
+                    <label>PC'den Arka Plan Görseli / GIF Yükle veya URL Gir</label>
+                    <div style="display:flex; gap:6px;">
+                      <button type="button" class="btn-gal" onclick="uploadCreatorSceneBg()" style="flex:0 0 auto; padding:8px 14px; background:linear-gradient(135deg,#0284c7,#2563eb); color:#fff; border:none;">
+                        📤 PC'den Görsel Seç
+                      </button>
+                      <input type="text" id="cr-bg-img-url" class="form-control" placeholder="https://... veya /uploads/..." oninput="updateCreatorLivePreview()">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Sığdırma Modu</label>
+                      <select id="cr-bg-fit" class="form-control" onchange="updateCreatorLivePreview()">
+                        <option value="cover" selected>Kapla (Cover)</option>
+                        <option value="contain">Sığdır (Contain)</option>
+                        <option value="stretch">Tam Uzat (100%)</option>
+                        <option value="repeat">Döşe (Repeat)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Parçacık Efekti</label>
+                      <select id="cr-bg-particles" class="form-control" onchange="updateCreatorLivePreview()">
+                        <option value="soul" selected>✨ Ruh Parçacıkları (Soul Glow)</option>
+                        <option value="star">⭐ Yıldız Parıltıları</option>
+                        <option value="snow">❄️ Kar / Toz Tanesi</option>
+                        <option value="none">Kapalı</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Karartma: <strong id="cr-bg-dim-lbl">20%</strong></label>
+                      <input type="range" id="cr-bg-dim" min="0" max="90" step="5" value="20" oninput="document.getElementById('cr-bg-dim-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
+                    </div>
+                    <div class="form-group">
+                      <label>Bulanıklık (Blur): <strong id="cr-bg-blur-lbl">0px</strong></label>
+                      <input type="range" id="cr-bg-blur" min="0" max="20" step="1" value="0" oninput="document.getElementById('cr-bg-blur-lbl').textContent = this.value + 'px'; updateCreatorLivePreview();">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Arka Plan Opaklığı: <strong id="cr-bg-op-lbl">100%</strong></label>
+                    <input type="range" id="cr-bg-op" min="10" max="100" step="5" value="100" oninput="document.getElementById('cr-bg-op-lbl').textContent = this.value + '%'; updateCreatorLivePreview();">
+                  </div>
+                </div>
+
+                <div class="creator-section">
+                  <div class="creator-sec-title">🎨 TEMA VE PARILTI RENKLERİ</div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Birincil Parıltı Rengi</label>
+                      <div style="display:flex; gap:6px;">
+                        <input type="color" id="cr-bg-color-prim" value="#a855f7" oninput="document.getElementById('cr-bg-color-prim-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
+                        <input type="text" id="cr-bg-color-prim-txt" class="form-control" value="#a855f7" oninput="document.getElementById('cr-bg-color-prim').value = this.value; updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>İkincil Parıltı Rengi</label>
+                      <div style="display:flex; gap:6px;">
+                        <input type="color" id="cr-bg-color-sec" value="#06b6d4" oninput="document.getElementById('cr-bg-color-sec-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
+                        <input type="text" id="cr-bg-color-sec-txt" class="form-control" value="#06b6d4" oninput="document.getElementById('cr-bg-color-sec').value = this.value; updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. ALERT TASARIM FORMU (MODE: ALERT) -->
+              <div id="creator-form-alert" class="creator-subform" style="display:none;">
+                <div class="creator-section">
+                  <div class="creator-sec-title">⚡ ALERT TÜRÜ & BİLGİLERİ</div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Alert Türü</label>
+                      <select id="cr-alert-type" class="form-control" onchange="onCreatorAlertTypeChange(this.value)">
+                        <option value="follower" selected>💜 Yeni Takipçi (Follower)</option>
+                        <option value="sub">🌟 Yeni Abone (Subscriber)</option>
+                        <option value="donation">💎 Bağış / Tip (Donation)</option>
+                        <option value="gift">🎁 Hediye (Gift)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Galeri Kayıt Adı</label>
+                      <input type="text" id="cr-alert-name" class="form-control" value="Mistik Takipçi Bildirimi" oninput="updateCreatorLivePreview()">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Başlık Etiketi</label>
+                      <input type="text" id="cr-alert-tag" class="form-control" value="CANLI BİLDİRİM!" oninput="updateCreatorLivePreview()">
+                    </div>
+                    <div class="form-group">
+                      <label>Örnek Kullanıcı Adı</label>
+                      <input type="text" id="cr-alert-user" class="form-control" value="SelinGamer" oninput="updateCreatorLivePreview()">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Alt Başlık / Tebrik</label>
+                      <input type="text" id="cr-alert-sub" class="form-control" value="Ailemize Hoş Geldin!" oninput="updateCreatorLivePreview()">
+                    </div>
+                    <div class="form-group">
+                      <label>Özel Mesaj (Opsiyonel)</label>
+                      <input type="text" id="cr-alert-msg" class="form-control" value="Yayın harika gidiyor!" oninput="updateCreatorLivePreview()">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Ses Efekti</label>
+                      <select id="cr-alert-sound" class="form-control">
+                        <option value="follower" selected>🔔 Takipçi Melodisi</option>
+                        <option value="sub">⭐ Abone Coşkusu</option>
+                        <option value="donation">💎 Bağış Çanı</option>
+                        <option value="gift">🎁 Hediye Efekti</option>
+                        <option value="none">Sessiz</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="display:flex; align-items:flex-end;">
+                      <button type="button" class="btn-gal" onclick="testCreatorAlertSound()" style="width:100%; padding:9px; justify-content:center; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#e9d5ff;">
+                        🔔 Sesi & Efekti Test Et
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="creator-section">
+                  <div class="creator-sec-title">🎨 ALERT RENK & GÖRÜNÜMÜ</div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Vurgu Rengi</label>
+                      <div style="display:flex; gap:6px;">
+                        <input type="color" id="cr-alert-color-prim" value="#a855f7" oninput="document.getElementById('cr-alert-color-prim-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
+                        <input type="text" id="cr-alert-color-prim-txt" class="form-control" value="#a855f7" oninput="document.getElementById('cr-alert-color-prim').value = this.value; updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>Kutu Arka Plan Rengi</label>
+                      <div style="display:flex; gap:6px;">
+                        <input type="color" id="cr-alert-color-bg" value="#0d0f18" oninput="document.getElementById('cr-alert-color-bg-txt').value = this.value; updateCreatorLivePreview();" style="width:40px; height:36px; border:none; border-radius:6px; cursor:pointer;">
+                        <input type="text" id="cr-alert-color-bg-txt" class="form-control" value="#0d0f18" oninput="document.getElementById('cr-alert-color-bg').value = this.value; updateCreatorLivePreview();">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- SAĞ KOLON: CANLI ETKİLEŞİMLİ ÖNİZLEME & GALERİYE KAYDET -->
+            <div class="creator-studio-preview-pane">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-family:'Orbitron', sans-serif; font-size:12.5px; font-weight:800; color:#fff; letter-spacing:0.8px;">
+                  👁️ CANLI TASARIM ÖNİZLEMESİ
+                </span>
+                <span id="cr-preview-type-badge" style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:99px; background:rgba(168,85,247,0.2); border:1px solid #a855f7; color:#e9d5ff;">
+                  🃏 Vitrin Kartı
+                </span>
+              </div>
+
+              <!-- 16:9 Simülasyon Sahnesi -->
+              <div id="creator-sim-canvas" class="creator-sim-canvas">
+                <!-- Arka plan simülasyon katmanı -->
+                <div id="creator-sim-bg-layer" style="position:absolute; inset:0; z-index:1; background-size:cover; background-position:center; transition: all 0.25s ease;"></div>
+                <div id="creator-sim-dim-layer" style="position:absolute; inset:0; z-index:2; background:#000; opacity:0.2; pointer-events:none; transition: opacity 0.25s;"></div>
+
+                <!-- Simüle edilen nesne (Kart / Alert) -->
+                <div id="creator-sim-content-layer" style="position:relative; z-index:3; width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:16px;">
+                  <!-- Dinamik Mockup buraya render edilecek -->
+                </div>
+              </div>
+
+              <!-- Kaydet Butonu -->
+              <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+                <button type="button" class="btn-primary" id="creator-save-to-gallery-btn" onclick="saveCreatorDesignToGallery()" style="width:100%; padding:14px 20px; font-size:13.5px; font-weight:800; letter-spacing:0.5px; background:linear-gradient(135deg, #10b981, #059669); border:none; box-shadow:0 6px 20px rgba(16,185,129,0.35); cursor:pointer;">
+                  💾 BU TASARIMI KENDİ GALERİME KAYDET
+                </button>
+                
+                <div id="creator-saved-success-box" style="display:none; background:rgba(16,185,129,0.12); border:1px solid #10b981; border-radius:12px; padding:12px; text-align:center;">
+                  <div style="font-size:12.5px; font-weight:800; color:#6ee7b7; margin-bottom:8px;">
+                    🎉 Tasarımınız Kendi Galerinize Başarıyla Kaydedildi!
+                  </div>
+                  <div style="display:flex; gap:8px;">
+                    <button type="button" class="btn-gal" onclick="openBlankCanvasWithCreatedDesign()" style="flex:1; justify-content:center; background:rgba(168,85,247,0.2); border-color:#a855f7; color:#fff;">
+                      ➕ Direkt Tuvale Ekle & Düzenle
+                    </button>
+                    <button type="button" class="btn-gal" onclick="switchTab('tab-my-gallery', document.getElementById('tab-btn-my-gallery'))" style="flex:1; justify-content:center;">
+                      🗂️ Galerime Git
+                    </button>
+                  </div>
+                </div>
+
+                <div style="font-size:11.5px; color:var(--text-muted); line-height:1.45; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 12px;">
+                  💡 <strong>Nasıl Kullanılır?</strong> Buradan kaydettiğiniz kartlar ve arka planlar anında <strong>"🗂️ Kendi Galerim"</strong> sekmenize eklenir. Ayrıca <strong>Boş Tuval Stüdyosu</strong>'nda <em>"🗂️ Kendi Galerimden Seç"</em> penceresinde görünür ve 1 tıkla sahnenize ekleyebilirsiniz.
+                </div>
               </div>
             </div>
           </div>
@@ -2573,6 +3139,733 @@
       showToast(`🎨 Renk kodu kopyalandı: ${code}`, 'success');
     }
 
+    /* ========================================================
+       CREATOR STUDIO (ÖZEL TASARIM ATÖLYESİ) MOTORU
+       ======================================================== */
+    let creatorActiveMode = 'card'; // 'card' | 'background' | 'alert'
+    let creatorActiveCardType = 'showcase';
+    let creatorActiveColorTarget = 'primary'; // 'primary' | 'secondary' | 'textColor' | 'bgColor' | 'borderColor'
+    let creatorColors = {
+      primary: '#a855f7',
+      secondary: '#10b981',
+      textColor: '#ffffff',
+      bgColor: '#0d0f18',
+      borderColor: '#a855f7'
+    };
+    let creatorSpectrumHsv = { h: 271, s: 67, v: 97 };
+    let creatorSpectrumLocked = false;
+    let lastSavedCreatorItem = null;
+
+    function uploadStudioMediaFile(onUploaded) {
+      let inp = document.getElementById('studio-global-file-input');
+      if (!inp) {
+        inp = document.createElement('input');
+        inp.id = 'studio-global-file-input';
+        inp.type = 'file';
+        inp.accept = 'image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml';
+        inp.style.display = 'none';
+        document.body.appendChild(inp);
+      }
+      inp.value = '';
+      inp.onchange = () => {
+        const file = inp.files && inp.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          showToast('📤 Resim yükleniyor...', 'info');
+          fetch('/api/media/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: file.name, dataUrl: reader.result })
+          })
+            .then(r => r.json())
+            .then(res => {
+              if (res && res.item && res.item.url) {
+                showToast(`✓ "${res.item.name}" yüklendi!`, 'success');
+                onUploaded(res.item.url, res.item);
+              } else {
+                showToast('Yükleme başarısız oldu.', 'error');
+              }
+            })
+            .catch(() => showToast('Yükleme hatası', 'error'));
+        };
+        reader.readAsDataURL(file);
+      };
+      inp.click();
+    }
+
+    function uploadCreatorAvatar() {
+      uploadStudioMediaFile((url) => {
+        const el = document.getElementById('cr-card-avatar');
+        if (el) el.value = url;
+        updateCreatorLivePreview();
+      });
+    }
+
+    function uploadCreatorCardBg() {
+      uploadStudioMediaFile((url) => {
+        const el = document.getElementById('cr-card-bg-img');
+        if (el) el.value = url;
+        updateCreatorLivePreview();
+      });
+    }
+
+    function uploadCreatorSceneBg() {
+      uploadStudioMediaFile((url) => {
+        const el = document.getElementById('cr-bg-img-url');
+        if (el) el.value = url;
+        const sel = document.getElementById('cr-bg-base-style');
+        if (sel) sel.value = 'custom_img';
+        updateCreatorLivePreview();
+      });
+    }
+
+    function setCreatorMode(mode, btnEl) {
+      creatorActiveMode = mode;
+      document.querySelectorAll('.creator-mode-tab').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      const cardForm = document.getElementById('creator-form-card');
+      const bgForm = document.getElementById('creator-form-background');
+      const alertForm = document.getElementById('creator-form-alert');
+
+      if (cardForm) cardForm.style.display = mode === 'card' ? 'block' : 'none';
+      if (bgForm) bgForm.style.display = mode === 'background' ? 'block' : 'none';
+      if (alertForm) alertForm.style.display = mode === 'alert' ? 'block' : 'none';
+
+      const typeBadge = document.getElementById('cr-preview-type-badge');
+      if (typeBadge) {
+        if (mode === 'card') typeBadge.textContent = '🃏 Özel Kart';
+        else if (mode === 'background') typeBadge.textContent = '🌌 Sahne Arka Planı';
+        else if (mode === 'alert') typeBadge.textContent = '⚡ Canlı Alert';
+      }
+
+      const saveBox = document.getElementById('creator-saved-success-box');
+      if (saveBox) saveBox.style.display = 'none';
+
+      updateCreatorLivePreview();
+    }
+
+    function selectCreatorCardType(cardType, btnEl) {
+      creatorActiveCardType = cardType;
+      document.querySelectorAll('#creator-card-type-pills .creator-preset-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      const typeLabels = {
+        showcase: '🃏 Vitrin Kartı',
+        webcam: '📷 Kamera Çerçevesi',
+        chat: '💬 Sohbet Kutusu',
+        social: '🌐 Sosyal Medya',
+        music: '🎵 Müzik & Player',
+        skills: '⚡ Skill Yetenekleri',
+        topbar: '📊 Üst Bilgi Barı',
+        gameframe: '🎮 Oyun Çerçevesi',
+        goal: '🎯 Hedef Barı',
+        image: '🖼️ Resim & GIF',
+        custom: '📌 Özel Duyuru'
+      };
+      const badge = document.getElementById('cr-preview-type-badge');
+      if (badge) badge.textContent = typeLabels[cardType] || '🃏 Özel Kart';
+
+      // Akıllı varsayılan metinler
+      const titleInp = document.getElementById('cr-card-title');
+      const nameInp = document.getElementById('cr-card-name');
+      if (titleInp && nameInp) {
+        if (cardType === 'webcam') {
+          titleInp.value = 'MİRA WEBCAM';
+          nameInp.value = 'Özel Kamera Çerçevem';
+        } else if (cardType === 'chat') {
+          titleInp.value = 'CANLI SOHBET';
+          nameInp.value = 'Özel Sohbet Kartım';
+        } else if (cardType === 'music') {
+          titleInp.value = 'NOW PLAYING';
+          nameInp.value = 'Özel Müzik Widgetim';
+        } else if (cardType === 'social') {
+          titleInp.value = 'SOSYAL MEDYA';
+          nameInp.value = 'Özel Sosyal Medya Kartım';
+        } else if (cardType === 'skills') {
+          titleInp.value = 'KAHRAMAN SKİLLERİ';
+          nameInp.value = 'Özel Yetenek Kartım';
+        } else if (cardType === 'goal') {
+          titleInp.value = 'TAKİPÇİ HEDEFİ';
+          nameInp.value = 'Özel Hedef Barım';
+        } else if (cardType === 'topbar') {
+          titleInp.value = 'MİRA E-SPORTS ARENA';
+          nameInp.value = 'Özel Üst Barım';
+        } else if (cardType === 'image') {
+          titleInp.value = 'ÖZEL GÖRSEL / LOGO';
+          nameInp.value = 'Özel Logo Kartım';
+        } else if (cardType === 'showcase') {
+          titleInp.value = 'MİRA PRO SHOWCASE';
+          nameInp.value = 'Özel Mistik Vitrinim';
+        }
+      }
+
+      updateCreatorLivePreview();
+    }
+
+    function setCreatorColorTarget(target, btnEl) {
+      creatorActiveColorTarget = target;
+      document.querySelectorAll('#cr-color-target-pills .creator-target-pill').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      const curHex = creatorColors[target] || '#a855f7';
+      creatorSpectrumHsv = studioHexToHsv(curHex);
+      updateCreatorSpectrumVisuals();
+    }
+
+    function updateCreatorSpectrumVisuals() {
+      const pad = document.getElementById('cr-spectrum-pad');
+      const cur = document.getElementById('cr-spectrum-cursor');
+      const hCur = document.getElementById('cr-hue-cursor');
+      const prev = document.getElementById('cr-spectrum-preview-box');
+      const rgbEl = document.getElementById('cr-spectrum-rgb');
+      const hexInp = document.getElementById('cr-color-hex-inp');
+
+      const out = studioHsvToHex(creatorSpectrumHsv.h, creatorSpectrumHsv.s, creatorSpectrumHsv.v);
+      if (pad) pad.style.background = `hsl(${Math.round(creatorSpectrumHsv.h)}, 100%, 50%)`;
+      if (cur) {
+        cur.style.left = `${creatorSpectrumHsv.s}%`;
+        cur.style.top = `${100 - creatorSpectrumHsv.v}%`;
+        cur.style.background = out.hex;
+      }
+      if (hCur) hCur.style.top = `${(creatorSpectrumHsv.h / 360) * 100}%`;
+      if (prev) {
+        prev.style.background = out.hex;
+        prev.textContent = out.hex;
+      }
+      if (rgbEl) rgbEl.textContent = out.rgb;
+      if (hexInp && hexInp.value !== out.hex) hexInp.value = out.hex;
+
+      creatorColors[creatorActiveColorTarget] = out.hex;
+      updateCreatorLivePreview();
+    }
+
+    function toggleCreatorSpectrumLock(forceVal) {
+      creatorSpectrumLocked = typeof forceVal === 'boolean' ? forceVal : !creatorSpectrumLocked;
+      const badge = document.getElementById('cr-spectrum-lock-badge');
+      if (!badge) return;
+      if (creatorSpectrumLocked) {
+        badge.textContent = '📌 Renk Sabitlendi (Tıkla=Çöz)';
+        badge.style.background = 'rgba(245,158,11,0.22)';
+        badge.style.borderColor = '#f59e0b';
+        badge.style.color = '#fde68a';
+      } else {
+        badge.textContent = '🖱️ Mouse Takibi Aktif (Tıkla=Sabitle)';
+        badge.style.background = 'rgba(16,185,129,0.2)';
+        badge.style.borderColor = '#10b981';
+        badge.style.color = '#6ee7b7';
+      }
+    }
+
+    function initCreatorSpectrumPalette() {
+      const pad = document.getElementById('cr-spectrum-pad');
+      const hue = document.getElementById('cr-hue-bar');
+      if (pad && !pad.__crBound) {
+        pad.__crBound = true;
+        const pickPad = (e) => {
+          const r = pad.getBoundingClientRect();
+          const x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+          const y = Math.max(0, Math.min(r.height, e.clientY - r.top));
+          creatorSpectrumHsv.s = (x / (r.width || 1)) * 100;
+          creatorSpectrumHsv.v = 100 - (y / (r.height || 1)) * 100;
+          updateCreatorSpectrumVisuals();
+        };
+        pad.addEventListener('mousemove', (e) => {
+          if (!creatorSpectrumLocked || e.buttons === 1) pickPad(e);
+        });
+        pad.addEventListener('mousedown', (e) => {
+          pickPad(e);
+          toggleCreatorSpectrumLock(!creatorSpectrumLocked);
+        });
+      }
+      if (hue && !hue.__crBound) {
+        hue.__crBound = true;
+        const pickHue = (e) => {
+          const r = hue.getBoundingClientRect();
+          const y = Math.max(0, Math.min(r.height, e.clientY - r.top));
+          creatorSpectrumHsv.h = (y / (r.height || 1)) * 360;
+          updateCreatorSpectrumVisuals();
+        };
+        hue.addEventListener('mousemove', (e) => {
+          if (!creatorSpectrumLocked || e.buttons === 1) pickHue(e);
+        });
+        hue.addEventListener('mousedown', (e) => {
+          pickHue(e);
+        });
+      }
+    }
+
+    function onCreatorColorHexChange(val) {
+      const clean = (val || '').trim();
+      if (/^#[0-9a-fA-F]{6}$/.test(clean)) {
+        creatorSpectrumHsv = studioHexToHsv(clean);
+        updateCreatorSpectrumVisuals();
+      }
+    }
+
+    function applyCreatorPresetColor(hex) {
+      creatorColors[creatorActiveColorTarget] = hex;
+      creatorSpectrumHsv = studioHexToHsv(hex);
+      updateCreatorSpectrumVisuals();
+    }
+
+    function onCreatorAlertTypeChange(type) {
+      const tags = { follower: 'CANLI BİLDİRİM!', sub: 'YENİ ABONE!', donation: 'BÜYÜK BAĞIŞ!', gift: 'HEDİYE GELDİ!' };
+      const names = { follower: 'Mistik Takipçi Bildirimi', sub: 'Altın Taç Abone Bildirimi', donation: 'Elmas Bağış Bildirimi', gift: 'Gül Hediyesi Bildirimi' };
+      const colors = { follower: '#a855f7', sub: '#ffd700', donation: '#06b6d4', gift: '#ef4444' };
+      const tagInp = document.getElementById('cr-alert-tag');
+      const nameInp = document.getElementById('cr-alert-name');
+      const soundSel = document.getElementById('cr-alert-sound');
+      const colorPrim = document.getElementById('cr-alert-color-prim');
+      const colorPrimTxt = document.getElementById('cr-alert-color-prim-txt');
+
+      if (tagInp) tagInp.value = tags[type] || 'BİLDİRİM!';
+      if (nameInp) nameInp.value = names[type] || 'Özel Bildirim';
+      if (soundSel) soundSel.value = type;
+      if (colorPrim) colorPrim.value = colors[type] || '#a855f7';
+      if (colorPrimTxt) colorPrimTxt.value = colors[type] || '#a855f7';
+
+      updateCreatorLivePreview();
+    }
+
+    function testCreatorAlertSound() {
+      const soundSel = document.getElementById('cr-alert-sound');
+      const sound = soundSel ? soundSel.value : 'follower';
+      if (sound !== 'none' && window.localSFX) {
+        localSFX.play(sound);
+      }
+      showToast('🔔 Alert sesi çalındı!', 'info');
+      const box = document.querySelector('.cr-preview-alert-card');
+      if (box) {
+        box.style.transform = 'scale(1.08)';
+        box.style.boxShadow = `0 0 35px ${document.getElementById('cr-alert-color-prim')?.value || '#a855f7'}`;
+        setTimeout(() => {
+          box.style.transform = 'scale(1)';
+          box.style.boxShadow = '';
+        }, 500);
+      }
+    }
+
+    function updateCreatorLivePreview() {
+      const bgLayer = document.getElementById('creator-sim-bg-layer');
+      const dimLayer = document.getElementById('creator-sim-dim-layer');
+      const contentLayer = document.getElementById('creator-sim-content-layer');
+      if (!bgLayer || !dimLayer || !contentLayer) return;
+
+      if (creatorActiveMode === 'background') {
+        const baseStyle = document.getElementById('cr-bg-base-style')?.value || 'cybergrid';
+        const bgUrl = (document.getElementById('cr-bg-img-url')?.value || '').trim();
+        const bgFit = document.getElementById('cr-bg-fit')?.value || 'cover';
+        const dimVal = parseInt(document.getElementById('cr-bg-dim')?.value || '20', 10);
+        const blurVal = parseInt(document.getElementById('cr-bg-blur')?.value || '0', 10);
+        const opVal = parseInt(document.getElementById('cr-bg-op')?.value || '100', 10);
+        const primCol = document.getElementById('cr-bg-color-prim')?.value || '#a855f7';
+        const secCol = document.getElementById('cr-bg-color-sec')?.value || '#06b6d4';
+
+        dimLayer.style.opacity = (dimVal / 100).toString();
+        bgLayer.style.opacity = (opVal / 100).toString();
+        bgLayer.style.filter = blurVal > 0 ? `blur(${blurVal}px)` : 'none';
+
+        if (baseStyle === 'custom_img' && bgUrl) {
+          bgLayer.style.backgroundImage = `url("${bgUrl}")`;
+          bgLayer.style.backgroundSize = bgFit === 'stretch' ? '100% 100%' : bgFit;
+          bgLayer.style.backgroundRepeat = bgFit === 'repeat' ? 'repeat' : 'no-repeat';
+        } else if (baseStyle === 'cybergrid') {
+          bgLayer.style.backgroundImage = `linear-gradient(rgba(168,85,247,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.18) 1px, transparent 1px)`;
+          bgLayer.style.backgroundColor = '#060810';
+          bgLayer.style.backgroundSize = '32px 32px';
+        } else if (baseStyle === 'nebula') {
+          bgLayer.style.backgroundImage = `radial-gradient(ellipse at 25% 30%, ${primCol}44 0%, transparent 60%), radial-gradient(ellipse at 80% 75%, ${secCol}44 0%, transparent 60%)`;
+          bgLayer.style.backgroundColor = '#04060c';
+        } else if (baseStyle === 'darkglass') {
+          bgLayer.style.backgroundImage = 'radial-gradient(circle at center, rgba(30,35,55,0.7) 0%, rgba(8,10,18,0.95) 100%)';
+          bgLayer.style.backgroundColor = '#05070d';
+        } else if (baseStyle === 'gradient') {
+          bgLayer.style.backgroundImage = `linear-gradient(135deg, ${primCol}33 0%, ${secCol}33 100%)`;
+          bgLayer.style.backgroundColor = '#0a0d18';
+        }
+
+        contentLayer.innerHTML = `
+          <div style="text-align:center; background:rgba(0,0,0,0.65); border:1px solid ${primCol}; border-radius:14px; padding:16px 24px; backdrop-filter:blur(10px); box-shadow:0 8px 30px rgba(0,0,0,0.8);">
+            <div style="font-size:26px; margin-bottom:4px;">🌌</div>
+            <div style="font-family:'Orbitron', sans-serif; font-size:14px; font-weight:800; color:#fff; letter-spacing:1px;">${escHtml(document.getElementById('cr-bg-name')?.value || 'Özel Arka Plan')}</div>
+            <div style="font-size:11.5px; color:${secCol}; margin-top:4px;">1920×1080 Yayın Tuval Arka Planı</div>
+            <div style="display:flex; gap:8px; justify-content:center; margin-top:10px;">
+              <span style="font-size:10px; padding:2px 8px; border-radius:6px; background:${primCol}25; border:1px solid ${primCol}; color:#e9d5ff;">${baseStyle.toUpperCase()}</span>
+              <span style="font-size:10px; padding:2px 8px; border-radius:6px; background:${secCol}25; border:1px solid ${secCol}; color:#bae6fd;">Karartma: ${dimVal}%</span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (creatorActiveMode === 'alert') {
+        dimLayer.style.opacity = '0.35';
+        bgLayer.style.backgroundImage = 'radial-gradient(circle at center, rgba(20,25,45,0.85) 0%, #05070f 100%)';
+        bgLayer.style.filter = 'none';
+
+        const alertType = document.getElementById('cr-alert-type')?.value || 'follower';
+        const tag = document.getElementById('cr-alert-tag')?.value || 'CANLI BİLDİRİM!';
+        const user = document.getElementById('cr-alert-user')?.value || 'SelinGamer';
+        const sub = document.getElementById('cr-alert-sub')?.value || 'Ailemize Hoş Geldin!';
+        const msg = document.getElementById('cr-alert-msg')?.value || '';
+        const primCol = document.getElementById('cr-alert-color-prim')?.value || '#a855f7';
+        const bgCol = document.getElementById('cr-alert-color-bg')?.value || '#0d0f18';
+        const iconMap = { follower: '💜', sub: '🌟', donation: '💎', gift: '🌹' };
+        const icon = iconMap[alertType] || '✨';
+
+        contentLayer.innerHTML = `
+          <div class="cr-preview-alert-card" style="display:flex; align-items:center; gap:16px; background:${bgCol}; border:2px solid ${primCol}; border-radius:18px; padding:18px 24px; box-shadow:0 0 25px ${primCol}66; max-width:440px; width:100%; transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+            <div style="font-size:38px; filter:drop-shadow(0 0 10px ${primCol});">${icon}</div>
+            <div style="flex:1;">
+              <span style="font-size:10px; font-weight:900; letter-spacing:1px; color:${primCol}; text-transform:uppercase;">${escHtml(tag)}</span>
+              <div style="font-family:'Orbitron', sans-serif; font-size:18px; font-weight:900; color:#fff; text-shadow:0 0 10px ${primCol}88;">${escHtml(user)}</div>
+              <div style="font-size:12px; font-weight:700; color:#cbd5e1; margin-top:2px;">${escHtml(sub)}</div>
+              ${msg ? `<div style="font-size:11px; font-style:italic; color:#94a3b8; margin-top:4px;">"${escHtml(msg)}"</div>` : ''}
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // MODE: CARD
+      dimLayer.style.opacity = '0.35';
+      bgLayer.style.backgroundImage = 'radial-gradient(circle at center, rgba(16,20,38,0.9) 0%, #060810 100%)';
+      bgLayer.style.filter = 'none';
+
+      const cType = creatorActiveCardType;
+      const title = document.getElementById('cr-card-title')?.value || 'BAŞLIK';
+      const sub = document.getElementById('cr-card-sub')?.value || 'Açıklama';
+      const streamer = document.getElementById('cr-card-streamer')?.value || 'MİRA';
+      const role = document.getElementById('cr-card-role')?.value || 'PRO STREAMER';
+      const lane = document.getElementById('cr-card-lane')?.value || 'KICK & TIKTOK';
+      const quote = document.getElementById('cr-card-quote')?.value || '';
+      const avatar = (document.getElementById('cr-card-avatar')?.value || '').trim() || '/kick/vexana/assets/images/portrait.jpg';
+      const cardBgImg = (document.getElementById('cr-card-bg-img')?.value || '').trim();
+      const cardBgFit = document.getElementById('cr-card-bg-fit')?.value || 'cover';
+      const cardBgDim = parseInt(document.getElementById('cr-card-bg-dim')?.value || '20', 10);
+      const fontFam = document.getElementById('cr-card-font')?.value || "'Orbitron', sans-serif";
+      const rad = parseInt(document.getElementById('cr-card-radius')?.value || '18', 10);
+      const op = parseInt(document.getElementById('cr-card-opacity')?.value || '90', 10);
+
+      const primCol = creatorColors.primary || '#a855f7';
+      const secCol = creatorColors.secondary || '#10b981';
+      const textCol = creatorColors.textColor || '#ffffff';
+      const bgCol = creatorColors.bgColor || '#0d0f18';
+      const borderCol = creatorColors.borderColor || primCol;
+
+      const cardStyle = `
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        max-width: 480px;
+        background: ${bgCol};
+        opacity: ${op / 100};
+        border: 2px solid ${borderCol};
+        border-radius: ${rad}px;
+        padding: 16px 20px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.65), 0 0 20px ${primCol}44;
+        font-family: ${fontFam};
+        color: ${textCol};
+        transition: all 0.2s ease;
+      `;
+
+      let cardInnerBgHtml = '';
+      if (cardBgImg) {
+        cardInnerBgHtml = `
+          <div style="position:absolute; inset:0; z-index:0; background-image:url('${escHtml(cardBgImg)}'); background-size:${cardBgFit === 'stretch' ? '100% 100%' : cardBgFit}; background-position:center; pointer-events:none;"></div>
+          <div style="position:absolute; inset:0; z-index:0; background:#000; opacity:${cardBgDim / 100}; pointer-events:none;"></div>
+        `;
+      }
+
+      let innerContentHtml = '';
+
+      if (cType === 'showcase') {
+        innerContentHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; gap:14px; align-items:center;">
+              <div style="position:relative; width:56px; height:56px; border-radius:14px; overflow:hidden; border:2px solid ${primCol}; box-shadow:0 0 12px ${primCol}66; flex-shrink:0;">
+                <img src="${escHtml(avatar)}" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <div style="flex:1; min-width:0;">
+                <span style="font-size:10px; font-weight:800; color:${secCol}; letter-spacing:0.8px;">${escHtml(streamer)} VİTRİNİ</span>
+                <div style="font-size:15px; font-weight:900; color:${textCol}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escHtml(title)}</div>
+                <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">${escHtml(sub)}</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:6px; background:${primCol}22; border:1px solid ${primCol}; color:#e9d5ff;">${escHtml(role)}</span>
+              <span style="font-size:9.5px; font-weight:800; padding:2px 8px; border-radius:6px; background:${secCol}22; border:1px solid ${secCol}; color:#6ee7b7;">${escHtml(lane)}</span>
+            </div>
+            ${quote ? `<div style="font-size:11px; font-style:italic; color:#cbd5e1; border-left:2px solid ${primCol}; padding-left:8px;">${escHtml(quote)}</div>` : ''}
+          </div>
+        `;
+      } else if (cType === 'webcam') {
+        innerContentHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11.5px; font-weight:800; color:${textCol};">📷 ${escHtml(title)}</span>
+              <span style="font-size:10px; font-weight:800; color:${secCol};">● LIVE</span>
+            </div>
+            <div style="height:120px; border-radius:10px; border:1px dashed ${primCol}88; background:rgba(0,0,0,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <span style="font-size:12px; font-weight:800; color:#fff;">KAMERA YAYIN ALANI</span>
+              <span style="font-size:9.5px; color:#94a3b8; margin-top:2px;">OBS Video Yakalama Aygıtı</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:10.5px; color:#cbd5e1;">
+              <span>${escHtml(streamer)}</span>
+              <span style="color:${secCol}; font-weight:700;">${escHtml(sub)}</span>
+            </div>
+          </div>
+        `;
+      } else if (cType === 'chat') {
+        innerContentHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid ${primCol}44; padding-bottom:6px;">
+              <span style="font-size:12px; font-weight:800; color:${textCol};">💬 ${escHtml(title)}</span>
+              <span style="font-size:9.5px; color:${secCol};">BotRix Bağlı</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:5px; font-size:11px;">
+              <div><strong style="color:${primCol};">AhmetPro:</strong> Yayın efsane gidiyor! 🔥</div>
+              <div><strong style="color:${secCol};">SelinGamer:</strong> Rank kaç oldu hocam? 🎮</div>
+              <div><strong style="color:#ffd700;">VexanaFan:</strong> GG WP! 💜</div>
+            </div>
+          </div>
+        `;
+      } else if (cType === 'music') {
+        innerContentHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:12px; font-weight:800; color:${textCol};">🎵 ${escHtml(title)}</span>
+              <span style="font-size:10px; color:${secCol}; font-weight:800;">BGM PLAYING</span>
+            </div>
+            <div style="display:flex; gap:3px; height:18px; align-items:flex-end;">
+              ${Array.from({ length: 14 }).map((_, i) => `<div style="flex:1; background:${primCol}; height:${25 + ((i * 17) % 75)}%; border-radius:2px;"></div>`).join('')}
+            </div>
+            <div style="font-size:11.5px; font-weight:700; color:#fff;">♪ MLBB Arena - Chill Lo-Fi Beats</div>
+          </div>
+        `;
+      } else if (cType === 'goal') {
+        innerContentHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800;">
+              <span>🎯 ${escHtml(title)}</span>
+              <span style="color:${secCol};">35 / 50 (%70)</span>
+            </div>
+            <div style="height:14px; border-radius:99px; background:rgba(0,0,0,0.6); overflow:hidden; border:1px solid ${primCol}66;">
+              <div style="width:70%; height:100%; background:linear-gradient(90deg, ${primCol}, ${secCol}); border-radius:99px;"></div>
+            </div>
+            <div style="font-size:10.5px; color:#cbd5e1; text-align:right;">Hedefe son 15 takipçi!</div>
+          </div>
+        `;
+      } else if (cType === 'image') {
+        innerContentHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px; align-items:center;">
+            <div style="font-size:12px; font-weight:800; color:${textCol}; align-self:flex-start;">🖼️ ${escHtml(title)}</div>
+            <div style="width:100%; max-height:160px; border-radius:10px; overflow:hidden; border:1px solid ${primCol};">
+              <img src="${escHtml(avatar)}" alt="Görsel" style="width:100%; height:100%; object-fit:cover; display:block;">
+            </div>
+            <div style="font-size:10.5px; color:#cbd5e1;">${escHtml(sub)}</div>
+          </div>
+        `;
+      } else {
+        innerContentHtml = `
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:13px; font-weight:900; color:${textCol};">📌 ${escHtml(title)}</div>
+            <div style="font-size:11.5px; color:#cbd5e1; line-height:1.5;">${escHtml(sub || 'Bu karta tıklayarak metinleri, renkleri ve boyutları özelleştirebilirsiniz.')}</div>
+            ${quote ? `<div style="font-size:10.5px; font-style:italic; color:${secCol};">${escHtml(quote)}</div>` : ''}
+          </div>
+        `;
+      }
+
+      contentLayer.innerHTML = `
+        <div style="${cardStyle}">
+          ${cardInnerBgHtml}
+          ${innerContentHtml}
+        </div>
+      `;
+    }
+
+    function saveCreatorDesignToGallery() {
+      const btn = document.getElementById('creator-save-to-gallery-btn');
+      if (btn) {
+        btn.textContent = '⏳ Galerime Kaydediliyor...';
+        btn.disabled = true;
+      }
+
+      let payload = null;
+
+      if (creatorActiveMode === 'card') {
+        const title = (document.getElementById('cr-card-title')?.value || '').trim() || 'Özel Kartım';
+        const name = (document.getElementById('cr-card-name')?.value || '').trim() || `${title} (Kişisel Tasarımım)`;
+        const sub = (document.getElementById('cr-card-sub')?.value || '').trim();
+        const streamer = (document.getElementById('cr-card-streamer')?.value || '').trim();
+        const role = (document.getElementById('cr-card-role')?.value || '').trim();
+        const lane = (document.getElementById('cr-card-lane')?.value || '').trim();
+        const quote = (document.getElementById('cr-card-quote')?.value || '').trim();
+        const avatar = (document.getElementById('cr-card-avatar')?.value || '').trim() || '/kick/vexana/assets/images/portrait.jpg';
+        const cardBgImg = (document.getElementById('cr-card-bg-img')?.value || '').trim();
+        const cardBgFit = document.getElementById('cr-card-bg-fit')?.value || 'cover';
+        const cardBgDim = parseInt(document.getElementById('cr-card-bg-dim')?.value || '20', 10);
+        const fontFam = document.getElementById('cr-card-font')?.value || "'Orbitron', sans-serif";
+        const rad = parseInt(document.getElementById('cr-card-radius')?.value || '18', 10);
+        const op = parseInt(document.getElementById('cr-card-opacity')?.value || '90', 10);
+
+        payload = {
+          name: name,
+          category: 'card',
+          icon: '🃏',
+          previewImg: avatar || cardBgImg || '/kick/vexana/assets/images/portrait.jpg',
+          badge: '🎨 Özel Tasarımım',
+          config: {
+            cardType: creatorActiveCardType,
+            title: title,
+            subtitleText: sub,
+            streamerName: streamer,
+            roleBadge: role,
+            laneBadge: lane,
+            quote: quote,
+            avatarUrl: avatar,
+            imageUrl: avatar,
+            bgImage: cardBgImg,
+            bgFit: cardBgFit,
+            bgDim: cardBgDim,
+            primaryColor: creatorColors.primary,
+            secondaryColor: creatorColors.secondary,
+            textColor: creatorColors.textColor,
+            bgColor: creatorColors.bgColor,
+            borderColor: creatorColors.borderColor,
+            borderRadius: rad,
+            bgOpacity: op,
+            fontFamily: fontFam
+          }
+        };
+      } else if (creatorActiveMode === 'background') {
+        const name = (document.getElementById('cr-bg-name')?.value || '').trim() || 'Özel Arka Planım';
+        const baseStyle = document.getElementById('cr-bg-base-style')?.value || 'cybergrid';
+        const bgUrl = (document.getElementById('cr-bg-img-url')?.value || '').trim();
+        const bgFit = document.getElementById('cr-bg-fit')?.value || 'cover';
+        const dimVal = parseInt(document.getElementById('cr-bg-dim')?.value || '20', 10);
+        const blurVal = parseInt(document.getElementById('cr-bg-blur')?.value || '0', 10);
+        const opVal = parseInt(document.getElementById('cr-bg-op')?.value || '100', 10);
+        const particles = document.getElementById('cr-bg-particles')?.value || 'soul';
+        const primCol = document.getElementById('cr-bg-color-prim')?.value || '#a855f7';
+        const secCol = document.getElementById('cr-bg-color-sec')?.value || '#06b6d4';
+
+        payload = {
+          name: name,
+          category: 'background',
+          icon: '🌌',
+          previewImg: bgUrl || '/kick/vexana/assets/images/portrait.jpg',
+          badge: '🌌 Özel Arka Plan',
+          config: {
+            cardType: 'background',
+            bgStyle: baseStyle,
+            bgImage: bgUrl,
+            bgFit: bgFit,
+            bgDim: dimVal,
+            bgBlur: blurVal,
+            bgOpacity: opVal,
+            showParticles: particles !== 'none',
+            particleType: particles,
+            primaryColor: primCol,
+            secondaryColor: secCol
+          }
+        };
+      } else if (creatorActiveMode === 'alert') {
+        const alertType = document.getElementById('cr-alert-type')?.value || 'follower';
+        const name = (document.getElementById('cr-alert-name')?.value || '').trim() || 'Özel Alertim';
+        const tag = (document.getElementById('cr-alert-tag')?.value || '').trim() || 'CANLI BİLDİRİM!';
+        const user = (document.getElementById('cr-alert-user')?.value || '').trim() || 'SelinGamer';
+        const sub = (document.getElementById('cr-alert-sub')?.value || '').trim() || 'Ailemize Hoş Geldin!';
+        const msg = (document.getElementById('cr-alert-msg')?.value || '').trim();
+        const sound = document.getElementById('cr-alert-sound')?.value || 'follower';
+        const primCol = document.getElementById('cr-alert-color-prim')?.value || '#a855f7';
+        const bgCol = document.getElementById('cr-alert-color-bg')?.value || '#0d0f18';
+
+        payload = {
+          name: name,
+          category: 'alert',
+          icon: alertType === 'sub' ? '🌟' : (alertType === 'donation' ? '💎' : (alertType === 'gift' ? '🎁' : '💜')),
+          badge: '⚡ Özel Alert',
+          config: {
+            alertType: alertType,
+            headerTag: tag,
+            sampleUser: user,
+            subTitle: sub,
+            message: msg,
+            soundType: sound,
+            primaryColor: primCol,
+            secondaryColor: primCol,
+            bgColor: bgCol
+          }
+        };
+      }
+
+      fetch('/api/gallery/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(r => r.json())
+        .then(res => {
+          if (btn) {
+            btn.textContent = '✓ KENDİ GALERİME KAYDEDİLDİ!';
+            btn.disabled = false;
+          }
+          if (res && res.items) userGallery = res.items;
+          lastSavedCreatorItem = (res && res.item) ? res.item : payload;
+          renderMyGalleryGrid();
+          showToast(`🎉 "${payload.name}" Kendi Galerine başarıyla eklendi!`, 'success');
+
+          const successBox = document.getElementById('creator-saved-success-box');
+          if (successBox) successBox.style.display = 'block';
+
+          setTimeout(() => {
+            if (btn) btn.textContent = '💾 BU TASARIMI KENDİ GALERİME KAYDET';
+          }, 3000);
+        })
+        .catch(() => {
+          if (btn) {
+            btn.textContent = '❌ Kaydetme Hatası';
+            btn.disabled = false;
+            setTimeout(() => (btn.textContent = '💾 BU TASARIMI KENDİ GALERİME KAYDET'), 2000);
+          }
+          showToast('Tasarım kaydedilirken bir hata oluştu.', 'error');
+        });
+    }
+
+    function openBlankCanvasWithCreatedDesign() {
+      if (!lastSavedCreatorItem) return;
+      openBlankCanvasBuilder();
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        if (lastSavedCreatorItem.category === 'background') {
+          const cfg = lastSavedCreatorItem.config || {};
+          iframe.contentWindow.postMessage({
+            type: 'MIRA_APPLY_OVERRIDE',
+            overrides: {
+              __canvasBg: {
+                bgImage: cfg.bgImage || lastSavedCreatorItem.previewImg || '',
+                bgStyle: cfg.bgStyle || 'cover',
+                bgFit: cfg.bgFit || 'cover',
+                bgOpacity: cfg.bgOpacity !== undefined ? cfg.bgOpacity : 100,
+                bgDim: cfg.bgDim !== undefined ? cfg.bgDim : 20,
+                bgBlur: cfg.bgBlur !== undefined ? cfg.bgBlur : 0,
+                primaryColor: cfg.primaryColor || '#a855f7',
+                secondaryColor: cfg.secondaryColor || '#06b6d4'
+              }
+            }
+          }, '*');
+          showToast(`🌌 Arka plan tuvalinize uygulandı!`, 'success');
+        } else {
+          setTimeout(() => {
+            iframe.contentWindow.postMessage({ type: 'MIRA_OPEN_ADD_CARD_MODAL', tab: 'user' }, '*');
+          }, 400);
+        }
+      }
+    }
+
     function requestCanvasCardsRefresh() {
       const iframe = document.getElementById('preview-iframe');
       if (iframe && iframe.contentWindow) {
@@ -2707,7 +4000,7 @@
        ===================================================== */
     function resolveItemUrl(item, isUserItem) {
       if (!item) return 'custom-overlay.html?standby=1';
-      if (item.category === 'canvas' || item.category === 'card' || item.category === 'alert' || item.basePath === 'custom-overlay.html') {
+      if (item.category === 'canvas' || item.category === 'card' || item.category === 'alert' || item.category === 'background' || item.basePath === 'custom-overlay.html') {
         const paramKey = isUserItem ? 'id' : 'tpl';
         return `custom-overlay.html?${paramKey}=${encodeURIComponent(item.id)}&platform=${activePlatform}`;
       }
@@ -2722,7 +4015,8 @@
         scene: '📺 YAYIN SAHNESİ',
         card: '🃏 KART & WIDGET',
         alert: '⚡ ALERT ŞABLONU',
-        canvas: '🎨 ÖZEL TUVAL'
+        canvas: '🎨 ÖZEL TUVAL',
+        background: '🌌 ARKA PLAN'
       };
       return map[cat] || 'SAHNE';
     }
@@ -3729,13 +5023,23 @@
       }
       resizePreview();
       initStudioSpectrumPalette();
+      initCreatorSpectrumPalette();
+      updateCreatorLivePreview();
       loadGalleries();
       const urlParams = new URLSearchParams(window.location.search);
       const initTab = urlParams.get('tab');
       const initFilter = urlParams.get('filter');
+      const initMode = urlParams.get('mode');
       if (initFilter) appCatalogFilter = initFilter;
       if (initTab === 'app-gallery') goToAppGallery();
       else if (initTab === 'canvas-builder') openBlankCanvasBuilder();
+      else if (initTab === 'design-creator' || initTab === 'tab-design-creator') {
+        switchTab('tab-design-creator', document.getElementById('tab-btn-design-creator'));
+        if (initMode) {
+          const mBtn = document.querySelector(`.creator-mode-tab[data-cmode="${initMode}"]`);
+          if (mBtn) setCreatorMode(initMode, mBtn);
+        }
+      }
       updateGoalProgressPreview();
       syncKickFollowersLive();
       checkObsWsStatus();

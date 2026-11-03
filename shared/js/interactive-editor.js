@@ -1179,7 +1179,7 @@
     const root = getCanvasRoot();
     if (!root) return;
     let bgLayer = document.getElementById('mira-custom-canvas-bg');
-    if (!bgCfg || !bgCfg.bgImage) {
+    if (!bgCfg || (!bgCfg.bgImage && (!bgCfg.bgStyle || bgCfg.bgStyle === 'transparent'))) {
       if (bgLayer) bgLayer.style.display = 'none';
       return;
     }
@@ -1201,12 +1201,25 @@
     const opVal = bgCfg.bgOpacity !== undefined ? (Number(bgCfg.bgOpacity) / 100) : 1;
     const blurVal = bgCfg.bgBlur !== undefined ? Number(bgCfg.bgBlur) : 0;
     const dimVal = bgCfg.bgDim !== undefined ? (Number(bgCfg.bgDim) / 100) : 0.2;
+    const pCol = bgCfg.primaryColor || '#a855f7';
+    const sCol = bgCfg.secondaryColor || '#10b981';
 
     if (imgDiv) {
-      imgDiv.style.backgroundImage = `url("${bgCfg.bgImage}")`;
-      imgDiv.style.backgroundSize = fitVal;
-      imgDiv.style.backgroundPosition = 'center center';
-      imgDiv.style.backgroundRepeat = repVal;
+      if (bgCfg.bgImage) {
+        imgDiv.style.backgroundImage = `url("${bgCfg.bgImage}")`;
+        imgDiv.style.backgroundSize = fitVal;
+        imgDiv.style.backgroundPosition = 'center center';
+        imgDiv.style.backgroundRepeat = repVal;
+      } else if (bgCfg.bgStyle === 'cybergrid') {
+        imgDiv.style.backgroundImage = `radial-gradient(circle at 50% 35%, ${pCol}35, #05070e 75%), linear-gradient(${pCol}22 1px, transparent 1px), linear-gradient(90deg, ${sCol}22 1px, transparent 1px)`;
+        imgDiv.style.backgroundSize = '100% 100%, 48px 48px, 48px 48px';
+      } else if (bgCfg.bgStyle === 'darkglass') {
+        imgDiv.style.backgroundImage = `radial-gradient(circle at 20% 20%, ${pCol}28, transparent 50%), radial-gradient(circle at 80% 80%, ${sCol}25, transparent 50%), linear-gradient(135deg, #060812, #0d1021)`;
+        imgDiv.style.backgroundSize = 'cover';
+      } else {
+        imgDiv.style.backgroundImage = `radial-gradient(circle at 25% 25%, ${pCol}44, transparent 55%), radial-gradient(circle at 75% 75%, ${sCol}38, transparent 55%), linear-gradient(160deg, #070512, #0e0a24)`;
+        imgDiv.style.backgroundSize = 'cover';
+      }
       imgDiv.style.opacity = String(opVal);
       imgDiv.style.filter = blurVal > 0 ? `blur(${blurVal}px)` : 'none';
     }
@@ -2003,7 +2016,7 @@
       const userItems = (userData && userData.items) ? userData.items : [];
       const rawCatalog = (catData && (catData.items || catData.catalog)) ? (catData.items || catData.catalog) : [];
       const catalogItems = rawCatalog.filter(
-        t => t.category === 'card' || t.category === 'alert'
+        t => t.category === 'card' || t.category === 'alert' || t.category === 'background'
       );
       if (mediaData && Array.isArray(mediaData.items)) {
         cachedMediaLibrary = mediaData.items;
@@ -2028,12 +2041,12 @@
         bodyHtml = `
           <div style="text-align:center; padding:36px 20px; background:rgba(168,85,247,0.06); border:1px dashed rgba(168,85,247,0.4); border-radius:18px;">
             <div style="font-size:40px; margin-bottom:10px;">🗂️</div>
-            <h4 style="margin:0 0 8px 0; font-size:17px; color:#fff;">Kendi Galerinizde Henüz Kayıtlı Kart Yok</h4>
+            <h4 style="margin:0 0 8px 0; font-size:17px; color:#fff;">Kendi Galerinizde Henüz Kayıtlı Kart veya Arka Plan Yok</h4>
             <p style="margin:0 auto 18px auto; max-width:520px; font-size:13px; color:#cbd5e1; line-height:1.5;">
-              Önce <strong>🏪 Ana Mağazadan Keşfet</strong> sekmesine geçerek beğendiğiniz Kahraman Parçalarını veya Kartları kendi galerinize kaydedin, ardından buradan tuvalinize tek tek ekleyin!
+              Önce <strong>🏪 Ana Mağazadan Keşfet</strong> sekmesine geçerek beğendiğiniz Kahraman Parçalarını, Kartları ve Arka Planları kendi galerinize kaydedin veya <strong>🛠️ Özel Tasarım Atölyesi</strong>nde kendi özel kart ve arka planlarınızı tasarlayıp galerinize kaydedin!
             </p>
             <button type="button" class="mira-btn primary" id="mira-go-store-tab-btn" style="max-width:340px; padding:12px 20px; font-size:13px;">
-              🏪 Ana Mağazadan Kahraman Parçası & Kart Keşfet
+              🏪 Ana Mağazadan Kart & Arka Plan Keşfet
             </button>
           </div>
         `;
@@ -2041,19 +2054,20 @@
         const cardsGrid = userCardItems.map(item => {
           const cfg = item.config || {};
           const acc = cfg.primaryColor || cfg.accent || '#a855f7';
+          const isBg = item.category === 'background' || cfg.cardType === 'background';
           return `
             <div class="mira-picker-card">
               <div class="mira-picker-top">
-                <div class="mira-picker-icon" style="border-color:${acc}; background:${acc}22;">${item.icon || '🃏'}</div>
+                <div class="mira-picker-icon" style="border-color:${acc}; background:${acc}22;">${item.icon || (isBg ? '🌌' : '🃏')}</div>
                 <div class="mira-picker-info">
                   <h4>${item.name}</h4>
-                  <p>${item.subtitle || item.description || cfg.title || 'Kişisel galerinizdeki özelleştirilebilir kart.'}</p>
+                  <p>${item.subtitle || item.description || cfg.title || 'Kişisel galerinizdeki özelleştirilebilir öğe.'}</p>
                 </div>
               </div>
               <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                <span style="font-size:11px; font-weight:800; color:${acc};">● Kendi Galerimde Kayıtlı</span>
+                <span style="font-size:11px; font-weight:800; color:${acc};">● ${isBg ? 'Arka Plan (Galerimde)' : 'Kart (Galerimde)'}</span>
                 <button type="button" class="mira-btn success mira-pick-user-card-btn" data-uid="${item.id}" style="flex:0 0 auto; padding:8px 16px;">
-                  ➕ Tuvale Ekle
+                  ${isBg ? '🌌 Arka Plan Yap' : '➕ Tuvale Ekle'}
                 </button>
               </div>
             </div>
@@ -2063,7 +2077,7 @@
         bodyHtml = `
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.28); padding:10px 16px; border-radius:12px;">
             <span style="font-size:12.5px; color:#d1fae5;">
-              💡 <strong>Kendi Galerim:</strong> Aşağıdaki kayıtlı kart veya kahraman parçalarınızdan istediğinizi seçip bomboş tuvale tek tek ekleyebilirsiniz.
+              💡 <strong>Kendi Galerim:</strong> Kaydettiğiniz veya kendi tasarladığınız özel kartları ve arka planları buradan seçip tuvale tek tıkla ekleyebilirsiniz.
             </span>
             <button type="button" class="mira-btn primary" id="mira-go-store-tab-btn" style="flex:0 0 auto; padding:7px 14px;">
               🏪 Mağazadan Parça Keşfet
@@ -2076,6 +2090,9 @@
       const filteredCatalog = catalogItems.filter(tpl => {
         if (currentStoreSubFilter === 'all') return true;
         const cfg = tpl.config || {};
+        if (currentStoreSubFilter === 'background') {
+          return tpl.category === 'background' || cfg.cardType === 'background';
+        }
         if (currentStoreSubFilter === 'goal_alert') {
           return tpl.category === 'alert' || cfg.cardType === 'goal';
         }
@@ -2085,6 +2102,7 @@
       const filterBarHtml = `
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
           <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'all' ? 'active' : ''}" data-sf="all" style="${currentStoreSubFilter === 'all' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🌟 Tümü (${catalogItems.length})</button>
+          <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'background' ? 'active' : ''}" data-sf="background" style="${currentStoreSubFilter === 'background' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🌌 Hazır Arka Planlar (8)</button>
           <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'showcase' ? 'active' : ''}" data-sf="showcase" style="${currentStoreSubFilter === 'showcase' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">🃏 Vitrin Kartı (6)</button>
           <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'webcam' ? 'active' : ''}" data-sf="webcam" style="${currentStoreSubFilter === 'webcam' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">📷 Kamera Kartı (6)</button>
           <button type="button" class="mira-mini-btn store-sub-filter ${currentStoreSubFilter === 'skills' ? 'active' : ''}" data-sf="skills" style="${currentStoreSubFilter === 'skills' ? 'background:#7c3aed; border-color:#c084fc; color:#fff;' : ''}">⚡ Skill Kartı (6)</button>
@@ -2102,10 +2120,11 @@
         const cfg = tpl.config || {};
         const acc = cfg.primaryColor || cfg.accent || '#a855f7';
         const isSaved = savedTplIds.has(tpl.id);
+        const isBg = tpl.category === 'background' || cfg.cardType === 'background';
         return `
           <div class="mira-picker-card">
             <div class="mira-picker-top">
-              <div class="mira-picker-icon" style="border-color:${acc}; background:${acc}22;">${tpl.icon || '🃏'}</div>
+              <div class="mira-picker-icon" style="border-color:${acc}; background:${acc}22;">${tpl.icon || (isBg ? '🌌' : '🃏')}</div>
               <div class="mira-picker-info">
                 <h4>${tpl.name}</h4>
                 <p>${tpl.subtitle || tpl.description || ''}</p>
@@ -2113,14 +2132,14 @@
             </div>
             <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
               <span style="font-size:10.5px; font-weight:800; color:${isSaved ? '#10b981' : '#c084fc'};">
-                ${isSaved ? '✓ Galerinizde Kayıtlı' : (tpl.badge || '🏪 Mağaza Parçası')}
+                ${isSaved ? '✓ Galerinizde Kayıtlı' : (tpl.badge || (isBg ? '🌌 Hazır Arka Plan' : '🏪 Mağaza Parçası'))}
               </span>
               <div style="display:flex; gap:6px;">
                 <button type="button" class="mira-btn primary mira-save-tpl-to-gallery-btn" data-tpl="${tpl.id}" style="flex:0 0 auto; padding:7px 11px; font-size:11px;">
                   📥 Galerime Kaydet
                 </button>
                 <button type="button" class="mira-btn success mira-direct-add-tpl-btn" data-tpl="${tpl.id}" style="flex:0 0 auto; padding:7px 11px; font-size:11px;">
-                  ➕ Direkt Tuvale Ekle
+                  ${isBg ? '🌌 Tuvale Arka Plan Yap' : '➕ Direkt Tuvale Ekle'}
                 </button>
               </div>
             </div>
@@ -2561,6 +2580,26 @@
   function addGalleryItemCardToCanvas(galleryItem) {
     if (!galleryItem) return;
     const cfg = galleryItem.config || {};
+    
+    // Eğer seçilen öğe bir Arka Plan ise, tuval arka planına uygula
+    if (galleryItem.category === 'background' || cfg.cardType === 'background') {
+      if (!widgetOverrides.__canvasBg) widgetOverrides.__canvasBg = {};
+      Object.assign(widgetOverrides.__canvasBg, {
+        bgImage: cfg.bgImage || galleryItem.previewImg || '',
+        bgStyle: cfg.bgStyle || 'cover',
+        bgFit: cfg.bgFit || 'cover',
+        bgOpacity: cfg.bgOpacity !== undefined ? cfg.bgOpacity : 100,
+        bgDim: cfg.bgDim !== undefined ? cfg.bgDim : 20,
+        bgBlur: cfg.bgBlur !== undefined ? cfg.bgBlur : 0,
+        primaryColor: cfg.primaryColor || '#a855f7',
+        secondaryColor: cfg.secondaryColor || '#06b6d4'
+      });
+      applyCanvasBackground(widgetOverrides.__canvasBg);
+      notifyParentOfLiveChange();
+      showMiraToast(`🌌 Arka plan uygulandı: ${galleryItem.name}`);
+      return;
+    }
+
     let cType = cfg.cardType || 'custom';
     if (galleryItem.category === 'alert') cType = 'alert';
     else if (!cfg.cardType && galleryItem.category === 'hero') cType = 'showcase';
@@ -2570,15 +2609,26 @@
       cardType: cType,
       title: cfg.title || cfg.headerTag || galleryItem.name,
       subtitle: cfg.subtitleText || cfg.subTitle || galleryItem.subtitle || galleryItem.description || 'Mythic Glory Streamer',
+      body: cfg.body || cfg.subtitleText || cfg.description,
       streamerName: cfg.streamerName || 'MİRA',
       roleBadge: cfg.roleBadge,
       laneBadge: cfg.laneBadge,
       quote: cfg.quote,
       accent: cfg.primaryColor || cfg.accent || '#a855f7',
       secondary: cfg.secondaryColor || cfg.secondary || '#10b981',
-      avatar: cfg.avatarUrl || galleryItem.previewImg || '/kick/vexana/assets/images/portrait.jpg',
+      avatar: cfg.avatarUrl || cfg.avatar || galleryItem.previewImg || '/kick/vexana/assets/images/portrait.jpg',
       imageUrl: cfg.imageUrl || cfg.avatarUrl || galleryItem.previewImg || '/kick/vexana/assets/images/portrait.jpg',
       imageFit: cfg.imageFit || 'cover',
+      bgImage: cfg.bgImage || '',
+      bgFit: cfg.bgFit || 'cover',
+      bgDim: cfg.bgDim !== undefined ? cfg.bgDim : 0,
+      bgColor: cfg.bgColor || '',
+      textColor: cfg.textColor || '',
+      subTextColor: cfg.subTextColor || '',
+      borderColor: cfg.borderColor || '',
+      borderRadius: cfg.borderRadius !== undefined ? cfg.borderRadius : undefined,
+      fontFamily: cfg.fontFamily || undefined,
+      fontScale: cfg.fontScale !== undefined ? cfg.fontScale : undefined,
       socials: cfg.socials || { kick: cfg.kickHandle, tiktok: cfg.tiktokHandle, instagram: cfg.youtubeHandle },
       goalTitle: cfg.goalTitle,
       goalCurrent: cfg.goalCurrent,
@@ -2651,6 +2701,16 @@
       x: basePos.x,
       y: basePos.y
     };
+    if (customOpts.bgImage) widgetOverrides[newId].bgImage = customOpts.bgImage;
+    if (customOpts.bgFit) widgetOverrides[newId].bgFit = customOpts.bgFit;
+    if (customOpts.bgDim !== undefined) widgetOverrides[newId].bgDim = customOpts.bgDim;
+    if (customOpts.bgColor) widgetOverrides[newId].bgColor = customOpts.bgColor;
+    if (customOpts.textColor) widgetOverrides[newId].textColor = customOpts.textColor;
+    if (customOpts.subTextColor) widgetOverrides[newId].subTextColor = customOpts.subTextColor;
+    if (customOpts.borderColor) widgetOverrides[newId].borderColor = customOpts.borderColor;
+    if (customOpts.borderRadius !== undefined) widgetOverrides[newId].borderRadius = customOpts.borderRadius;
+    if (customOpts.fontFamily) widgetOverrides[newId].fontFamily = customOpts.fontFamily;
+    if (customOpts.fontScale !== undefined) widgetOverrides[newId].fontScale = customOpts.fontScale;
     applyAllWidgetOverrides(widgetOverrides);
     const newEl = document.querySelector(`[data-mira-widget="${newId}"]`);
     if (newEl) {
@@ -2952,6 +3012,7 @@
 
       <div class="mira-insp-footer">
         <button type="button" class="mira-btn danger" id="mira-insp-footer-del-btn" style="flex:0.8; background:rgba(239,68,68,0.18); border-color:#ef4444; color:#fca5a5;">🗑️ Kartı Sil</button>
+        <button type="button" class="mira-btn warn" id="mira-insp-save-to-my-gallery-btn" style="flex:1.2; background:rgba(245,158,11,0.18); border-color:#f59e0b; color:#fde68a;" title="Bu kartın tüm renk, font, görsel ve metin ayarlarını Kendi Galerine kaydet">💾 Kendi Galerime Kaydet</button>
         <button type="button" class="mira-btn primary" id="mira-insp-add-card-btn">➕ Kart Ekle</button>
         <button type="button" class="mira-btn success" id="mira-insp-save-btn">💾 KAYDET</button>
       </div>
@@ -3377,6 +3438,47 @@
     inspectorEl.querySelector('#mira-rst-all-design').addEventListener('click', () => executeResetScope('design', 'all'));
     inspectorEl.querySelector('#mira-rst-all-all').addEventListener('click', () => executeResetScope('all', 'all'));
 
+    const saveToMyGalBtn = inspectorEl.querySelector('#mira-insp-save-to-my-gallery-btn');
+    if (saveToMyGalBtn) {
+      saveToMyGalBtn.addEventListener('click', () => {
+        saveToMyGalBtn.textContent = '⏳ Kaydediliyor...';
+        const cardTitle = (ov.texts && ov.texts['title']) || ov.title || label;
+        const cardSubtitle = (ov.texts && ov.texts['subtitle']) || ov.subtitle || 'Kişisel özel kartım';
+        const cardPayload = {
+          name: `${cardTitle} (Kişisel Kartım)`,
+          category: 'card',
+          icon: '🃏',
+          previewImg: ov.cardImgSrc || ov.bgImage || '/kick/vexana/assets/images/portrait.jpg',
+          badge: '🎨 Tuvalden Kaydedildi',
+          config: {
+            ...ov,
+            cardType: widgetEl.getAttribute('data-mira-card-type') || 'custom',
+            title: cardTitle,
+            subtitleText: cardSubtitle,
+            body: (ov.texts && (ov.texts['body'] || ov.texts['quote'])) || cardSubtitle
+          }
+        };
+        fetch('/api/gallery/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cardPayload)
+        })
+          .then(r => r.json())
+          .then(() => {
+            saveToMyGalBtn.textContent = '✓ Galerime Eklendi!';
+            showMiraToast(`🎉 "${cardTitle}" Kendi Galerine başarıyla kaydedildi!`);
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({ type: 'MIRA_GALLERY_SAVED_OK' }, '*');
+            }
+            setTimeout(() => { saveToMyGalBtn.textContent = '💾 Kendi Galerime Kaydet'; }, 2200);
+          })
+          .catch(() => {
+            saveToMyGalBtn.textContent = '❌ Hata Oluştu';
+            setTimeout(() => { saveToMyGalBtn.textContent = '💾 Kendi Galerime Kaydet'; }, 2000);
+          });
+      });
+    }
+
     inspectorEl.querySelector('#mira-insp-add-card-btn').addEventListener('click', () => {
       openAddCardModal('user');
     });
@@ -3763,6 +3865,10 @@
     loadSavedWidgetOverrides();
     if (isEditMode) {
       setEditMode(true);
+      const urlP = new URLSearchParams(window.location.search);
+      if (urlP.get('openAdd')) {
+        setTimeout(() => openAddCardModal(urlP.get('openAdd')), 250);
+      }
     }
   }
 
