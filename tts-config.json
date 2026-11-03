@@ -1,21 +1,23 @@
 {
   "ttsAlertsEnabled": true,
   "ttsChatEnabled": true,
-  "outputMode": "overlay",
+  "outputMode": "all",
   "volume": 1,
   "rate": 1,
   "pitch": 1,
   "voiceName": "mira_natural_tr",
   "voiceLang": "tr-TR",
   "chatFormat": "{user}: {message}",
-  "readStreamerSelf": true,
+  "readStreamerSelf": false,
   "filterBotCommands": true,
   "filterUrls": true,
   "maxChatLength": 100,
   "alertTemplates": {
     "follower": "{user} aramıza katıldı, hoş geldin!",
     "sub": "Teşekkürler {user}, {months}. ayında abone oldu!",
+    "gift": "{user}, topluluğa {gift} hediye abonelik dağıttı!",
     "donation": "{user}, {amount} destek gönderdi: {message}",
-    "gift": "{user}, {gift} hediyesi gönderdi!"
+    "kicks": "{user}, {amount} gönderdi: {message}",
+    "raid": "{user}, {count} izleyiciyle baskın yaptı!"
   }
 }

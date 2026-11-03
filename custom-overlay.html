@@ -714,6 +714,7 @@
       const SFX = {
         ctx: null,
         tone(freq, type, dur, delay = 0) {
+          if (window.self !== window.top) return; // Önizleme iframe'inde ASLA ses çalma!
           try {
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
             if (!this.ctx && AudioCtx) this.ctx = new AudioCtx();
@@ -756,13 +757,13 @@
       const OverlayTTS = {
         config: {
           ttsAlertsEnabled: true,
-          ttsChatEnabled: false,
+          ttsChatEnabled: true,
           outputMode: 'all',
           volume: 1.0,
           rate: 1.0,
           pitch: 1.0,
           voiceName: 'mira_natural_tr',
-          chatFormat: '{user} diyor ki: {message}',
+          chatFormat: '{user}: {message}',
           readStreamerSelf: false,
           filterBotCommands: true,
           filterUrls: true,
@@ -770,8 +771,10 @@
           alertTemplates: {
             follower: '{user} aramıza katıldı, hoş geldin!',
             sub: 'Teşekkürler {user}, {months}. ayında abone oldu!',
+            gift: '{user}, topluluğa {gift} hediye abonelik dağıttı!',
             donation: '{user}, {amount} destek gönderdi: {message}',
-            gift: '{user}, {gift} hediyesi gönderdi!'
+            kicks: '{user}, {amount} gönderdi: {message}',
+            raid: '{user}, {count} izleyiciyle baskın yaptı!'
           }
         },
         selectedVoice: null,
@@ -824,10 +827,29 @@
           this.initVoices();
         },
         speak(text) {
+          if (window.self !== window.top) return; // Önizleme iframe'inde ASLA ses çalma!
           if (this.config.outputMode === 'studio') return; // Yalnızca stüdyo modundaysa OBS overlay sessiz kalır
           if (!text || !text.trim()) return;
 
-          this.queue.push(text.trim());
+          const clean = text.trim();
+          const norm = clean.toLowerCase().substring(0, 80);
+          const lockKey = 'mira_tts_audio_lock';
+          const now = Date.now();
+          try {
+            const raw = localStorage.getItem(lockKey);
+            if (raw) {
+              const data = JSON.parse(raw);
+              if (data.text === norm && (now - data.time) < 4000) {
+                return; // Başka bir pencere veya MİRA Stüdyo bu sesi zaten tek sefer okuyor!
+              }
+              if ((now - data.time) < 1400 && data.text === norm) {
+                return;
+              }
+            }
+            localStorage.setItem(lockKey, JSON.stringify({ text: norm, time: now, win: 'obs' }));
+          } catch(e) {}
+
+          this.queue.push(clean);
           this.process();
         },
         process() {
@@ -1226,11 +1248,13 @@
         const user = p.username || cfg.sampleUser || 'SelinGamer';
         const sub = p.subTitle || cfg.subTitle || 'Ailemize Hoş Geldin!';
         const msg = p.message !== undefined ? p.message : (cfg.message || '');
-        const iconMap = { follower: '💜', sub: '🌟', donation: '💎', gift: '🌹' };
+        const iconMap = { follower: '💜', sub: '👑', gift: '🎁', donation: '💎', kicks: '💎', raid: '🚀' };
         const icon = iconMap[cfg.alertType] || '✨';
 
-        SFX.play(cfg.soundType || cfg.alertType || 'follower');
-        OverlayTTS.speakAlert(cfg.alertType || 'follower', { ...cfg, ...p });
+        if (window.self === window.top) {
+          SFX.play(cfg.soundType || cfg.alertType || 'follower');
+          OverlayTTS.speakAlert(cfg.alertType || 'follower', { ...cfg, ...p });
+        }
 
         alertLayerEl.innerHTML = `
           <div class="custom-alert-box">

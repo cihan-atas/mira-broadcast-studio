@@ -4516,16 +4516,16 @@
               <button type="button" class="alert-btn alert-donation" onclick="triggerEnhancedTestAlert('donation')">
                 <div class="alert-icon-wrap">💎</div>
                 <div>
-                  <div class="alert-title">Bağış Testi (250₺)</div>
-                  <div class="alert-desc">Emre_Pro • Mesajı sesli oku</div>
+                  <div class="alert-title">500 Kicks & Bağış</div>
+                  <div class="alert-desc">Emre_Pro • Kicks / Bağış seslendir</div>
                 </div>
               </button>
 
               <button type="button" class="alert-btn alert-gift" onclick="triggerEnhancedTestAlert('gift')">
                 <div class="alert-icon-wrap">🎁</div>
                 <div>
-                  <div class="alert-title">TikTok Gül (x10)</div>
-                  <div class="alert-desc">MiraFan_01 • Hediye seslendirme</div>
+                  <div class="alert-title">5x Hediye Abonelik</div>
+                  <div class="alert-desc">MiraFan_01 • Hediye sub seslendir</div>
                 </div>
               </button>
             </div>
@@ -4540,10 +4540,11 @@
                 <div class="form-group" style="margin-bottom:0;">
                   <label style="font-size:11px;">Bildirim Türü</label>
                   <select id="sim-alert-type" class="form-control" onchange="onSimAlertTypeChange()">
-                    <option value="follower">💜 Yeni Takipçi</option>
-                    <option value="sub">⭐ Yeni Abone</option>
-                    <option value="donation" selected>💎 Bağış & Destek</option>
-                    <option value="gift">🎁 TikTok Canlı Hediye</option>
+                    <option value="follower">💜 Yeni Takipçi (Follower)</option>
+                    <option value="sub">⭐ Yeni Abone (Tier 1)</option>
+                    <option value="gift">🎁 Hediye Abonelik (Gifted Subs)</option>
+                    <option value="donation" selected>💎 Kicks & Bağış (Donation)</option>
+                    <option value="raid">🚀 Raid / Baskın (Host)</option>
                   </select>
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
@@ -4554,8 +4555,8 @@
 
               <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
                 <div class="form-group" style="margin-bottom:0;">
-                  <label style="font-size:11px;" id="sim-meta-label">Tutar / Ay / Hediye</label>
-                  <input type="text" id="sim-meta" class="form-control" value="250₺" placeholder="250₺, 3. Ay, Gül vb.">
+                  <label style="font-size:11px;" id="sim-meta-label">Tutar / Hediye / Ay</label>
+                  <input type="text" id="sim-meta" class="form-control" value="500 Kicks" placeholder="500 Kicks, 5x Hediye, 3. Ay vb.">
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
                   <label style="font-size:11px;">Bağış & Tebrik Mesajı</label>
@@ -7603,7 +7604,7 @@
        ======================================================== */
     let miraTtsConfig = {
       ttsAlertsEnabled: true,
-      ttsChatEnabled: false,
+      ttsChatEnabled: true,
       outputMode: 'all',
       volume: 1.0,
       rate: 1.0,
@@ -7970,20 +7971,24 @@
         metaInput.value = '3. Ay';
         msgInput.value = 'Rozeti parıldıyor!';
       } else if (type === 'donation') {
-        metaLabel.textContent = 'Bağış Tutarı';
-        metaInput.value = '250₺';
-        msgInput.value = 'Mükemmel ulti, tebrikler!';
+        metaLabel.textContent = 'Kicks / Bağış Tutarı';
+        metaInput.value = '500 Kicks';
+        msgInput.value = 'Mükemmel ulti zamanlaması!';
       } else if (type === 'gift') {
-        metaLabel.textContent = 'TikTok Hediyesi';
-        metaInput.value = 'Gül (x10)';
-        msgInput.value = 'Canlı yayın hediyesi gönderdi!';
+        metaLabel.textContent = 'Hediye Abonelik';
+        metaInput.value = '5x Hediye';
+        msgInput.value = 'Topluluğa 5 adet hediye abonelik dağıttı!';
+      } else if (type === 'raid') {
+        metaLabel.textContent = 'İzleyici Sayısı';
+        metaInput.value = '35 İzleyici';
+        msgInput.value = 'Kanalıyla baskın yaptı!';
       }
     }
 
     function sendCustomSimulatedAlert() {
       const type = document.getElementById('sim-alert-type').value || 'follower';
       const user = document.getElementById('sim-user').value || 'Aylin_Mage';
-      const meta = document.getElementById('sim-meta').value || '100₺';
+      const meta = document.getElementById('sim-meta').value || '500 Kicks';
       const msg = document.getElementById('sim-msg').value || '';
 
       let payload = { username: user, message: msg };
@@ -7995,12 +8000,15 @@
         localSFX.playSubscriberSound();
       } else if (type === 'gift') {
         payload.giftName = meta;
-        payload.amount = meta;
+        payload.gift = meta;
+        localSFX.playSubscriberSound();
+        // HEDİYE TAKİPÇİ SAYISINI ARTIRMAZ!
+      } else if (type === 'raid') {
+        payload.count = meta;
         localSFX.playDonationSound();
-        stepGoal(1);
       } else {
         localSFX.playFollowerSound();
-        stepGoal(1);
+        stepGoal(1); // YALNIZCA TAKİPÇİ HEDEFİ ARTIRIR!
       }
 
       // Stüdyoda seslendir
@@ -8031,17 +8039,19 @@
       if (type === 'follower') {
         payload = { username: 'Aylin_MLBB' };
         localSFX.playFollowerSound();
-        stepGoal(1);
+        stepGoal(1); // YALNIZCA TAKİPÇİDE ARTIR
       } else if (type === 'sub') {
         payload = { username: 'Gamer_Deniz', months: 3 };
         localSFX.playSubscriberSound();
       } else if (type === 'donation') {
-        payload = { username: 'Emre_Pro', amount: '250₺', message: 'Mükemmel ulti zamanlaması!' };
+        payload = { username: 'Emre_Pro', amount: '500 Kicks', message: 'Mükemmel ulti zamanlaması!' };
         localSFX.playDonationSound();
       } else if (type === 'gift') {
-        payload = { username: 'MiraFan_01', giftName: 'Gül (x10)', message: 'Harika oyun tebrikler!' };
+        payload = { username: 'MiraFan_01', giftName: '5x Hediye Abonelik', gift: '5x', message: 'Topluluğa 5 adet hediye abonelik dağıttı!' };
+        localSFX.playSubscriberSound();
+      } else if (type === 'raid') {
+        payload = { username: 'Gamer_TR', count: 35, message: '35 izleyiciyle baskın yaptı!' };
         localSFX.playDonationSound();
-        stepGoal(1);
       }
 
       // Sesli oku
@@ -8084,9 +8094,6 @@
 
       appendStudioChatMessage(payload);
       dispatchEventToOverlay(payload);
-
-      // TTS konuş
-      localTTS.speakChat(author, text, false);
       showToast(`Chat TTS test edildi: ${author}`);
     }
 

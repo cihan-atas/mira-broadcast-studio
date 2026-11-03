@@ -378,8 +378,8 @@ function startKickPusherBridge(slug = 'cihanatas') {
             if (eventQueue.length > 80) eventQueue.shift();
             console.log(`[KICK TAKİPÇİ] ${newFollowerName} kanalı takip etti!`);
           }
-          // Abonelik veya Hediye
-          else if (packet.event === 'App\\Events\\SubscriptionEvent' || packet.event === 'App\\Events\\GiftedSubscriptionsEvent') {
+          // Canlı Abonelik Olayı
+          else if (packet.event === 'App\\Events\\SubscriptionEvent') {
             const sData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
             const subUser = sData.username || sData.sender?.username || 'Abonemiz';
             const months = sData.months || 1;
@@ -394,6 +394,26 @@ function startKickPusherBridge(slug = 'cihanatas') {
             };
             eventQueue.push(alertItem);
             if (eventQueue.length > 80) eventQueue.shift();
+            console.log(`[KICK ABONE] ${subUser} kanala abone oldu (${months}. ay)!`);
+          }
+          // Canlı Hediye Abonelik Olayı (Topluluğa Dağıtılan Hediye Sub)
+          else if (packet.event === 'App\\Events\\GiftedSubscriptionsEvent') {
+            const gData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
+            const gifter = gData.gifter_username || gData.username || 'Destekçi';
+            const count = gData.gifted_usernames?.length || gData.count || 5;
+            const alertItem = {
+              type: 'LIVE_ALERT',
+              alertType: 'gift',
+              payload: {
+                username: gifter,
+                giftName: `${count}x Hediye Abonelik`,
+                gift: `${count}x`
+              },
+              time: Date.now()
+            };
+            eventQueue.push(alertItem);
+            if (eventQueue.length > 80) eventQueue.shift();
+            console.log(`[KICK HEDİYE SUB] ${gifter} ${count} adet hediye abonelik dağıttı!`);
           }
         } catch (err) {}
       };
@@ -1803,8 +1823,10 @@ const server = http.createServer((req, res) => {
         alertTemplates: {
           follower: '{user} aramıza katıldı, hoş geldin!',
           sub: 'Teşekkürler {user}, {months}. ayında abone oldu!',
+          gift: '{user}, topluluğa {gift} hediye abonelik dağıttı!',
           donation: '{user}, {amount} destek gönderdi: {message}',
-          gift: '{user}, {gift} hediyesi gönderdi!'
+          kicks: '{user}, {amount} gönderdi: {message}',
+          raid: '{user}, {count} izleyiciyle baskın yaptı!'
         }
       };
       res.writeHead(200, { 'Content-Type': 'application/json' });

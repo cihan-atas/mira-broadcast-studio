@@ -175,7 +175,7 @@ class HeroTTSManager {
   constructor(options = {}) {
     this.enabled = options.ttsEnabled !== undefined ? options.ttsEnabled : true;
     this.ttsAlertsEnabled = options.ttsAlertsEnabled !== undefined ? options.ttsAlertsEnabled : true;
-    this.ttsChatEnabled = options.ttsChatEnabled !== undefined ? options.ttsChatEnabled : false;
+    this.ttsChatEnabled = options.ttsChatEnabled !== undefined ? options.ttsChatEnabled : true;
     this.outputMode = options.outputMode || 'all';
     this.heroName = (options.heroName || 'vexana').toLowerCase();
     this.volume = options.volume !== undefined ? options.volume : 1.0;
@@ -269,22 +269,75 @@ class HeroTTSManager {
     return clean.trim();
   }
 
+  // ========================================================
+  // TEKİL SES KİLİDİ (MUTEX) — ÇOKLU OKUMAYI (2-4 DEFA) KESİNLİKLE ENGELLER
+  // ========================================================
+  acquireAudioLock(text, durationSec = 4.0) {
+    if (typeof window === 'undefined') return true;
+    if (window.self !== window.top) return false; // İframe içinde (ör: önizleme iframe'i) KESİNLİKLE ses çalma!
+
+    const norm = String(text || '').trim().toLowerCase().substring(0, 80);
+    const lockKey = 'mira_tts_audio_lock';
+    const now = Date.now();
+    try {
+      const raw = localStorage.getItem(lockKey);
+      if (raw) {
+        const data = JSON.parse(raw);
+        // Aynı metin son 4 saniye içinde çalındıysa ikinci kez çalma
+        if (data.text === norm && (now - data.time) < (durationSec * 1000)) {
+          return false;
+        }
+        // Son 1.4 saniye içinde herhangi bir ses zaten başladıysa pas geç
+        if ((now - data.time) < 1400 && data.text === norm) {
+          return false;
+        }
+      }
+      localStorage.setItem(lockKey, JSON.stringify({ text: norm, time: now, win: Math.random().toString(36).substr(2, 6) }));
+      return true;
+    } catch (e) {
+      return true;
+    }
+  }
+
   speak(text) {
     if (!this.enabled) return;
-    if (this.outputMode === 'overlay') return; // Sadece OBS overlay konuşacak şekilde ayarlanmışsa stüdyoda ses çıkarma
+    if (window.self !== window.top) return; // İframe içinde (ör: önizleme kutusu) ASLA ses çıkarma!
+
+    // Ses çıkış hedefi kontrolü (MİRA vs OBS):
+    const isStudioWindow = (window.location.pathname === '/' || window.location.pathname.endsWith('index.html'));
+    if (this.outputMode === 'overlay' && isStudioWindow) return; // Yalnızca OBS modu ise Stüdyo sessiz kalır
+    if (this.outputMode === 'studio' && !isStudioWindow) return;  // Yalnızca Stüdyo modu ise OBS sessiz kalır
+
     if (!text || !text.trim()) return;
 
-    this.queue.push(text.trim());
+    const cleanText = text.trim();
+    if (!this.acquireAudioLock(cleanText)) {
+      // Bu ses zaten başka bir pencere veya OBS sahnesi tarafından tek sefer oynatılıyor!
+      return;
+    }
+
+    this.queue.push(cleanText);
     this.processQueue();
   }
 
   speakAlert(alertType, data = {}) {
     if (!this.ttsAlertsEnabled) return;
-    const tpl = this.alertTemplates[alertType] || '{user} aramıza katıldı!';
+    const tpls = this.alertTemplates || {};
+    let tpl = tpls[alertType];
+    if (!tpl) {
+      if (alertType === 'follower') tpl = '{user} aramıza katıldı, hoş geldin!';
+      else if (alertType === 'sub') tpl = 'Teşekkürler {user}, {months}. ayında abone oldu!';
+      else if (alertType === 'gift' || alertType === 'subgift') tpl = '{user}, topluluğa {gift} hediye abonelik dağıttı!';
+      else if (alertType === 'donation' || alertType === 'kicks') tpl = '{user}, {amount} destek gönderdi: {message}';
+      else if (alertType === 'raid') tpl = '{user}, {count} izleyiciyle baskın yaptı!';
+      else tpl = '{user} bildirim gönderdi!';
+    }
+
     const user = data.username || data.user || 'İzleyici';
-    const amount = data.amount || '100₺';
+    const amount = data.amount || '500 Kicks';
     const months = data.months || 1;
-    const gift = data.giftName || data.gift || 'Hediye';
+    const gift = data.giftName || data.gift || '5x Hediye Abonelik';
+    const count = data.count || data.viewers || '35';
     const message = data.message || '';
 
     let text = tpl
@@ -292,6 +345,7 @@ class HeroTTSManager {
       .replace(/\{amount\}/g, amount)
       .replace(/\{months\}/g, months)
       .replace(/\{gift\}/g, gift)
+      .replace(/\{count\}/g, count)
       .replace(/\{message\}/g, message);
 
     this.speak(text);

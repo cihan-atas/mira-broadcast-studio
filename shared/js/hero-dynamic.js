@@ -316,6 +316,7 @@
       return this.ctx;
     },
     playTone(freq, type, duration, delay = 0, gainLevel = 0.15) {
+      if (window.self !== window.top) return; // Önizleme iframe'inde ASLA ses çalma!
       const c = this.getCtx();
       if (!c) return;
       setTimeout(() => {
@@ -391,23 +392,28 @@
     const container = document.getElementById('alert-container');
     if (!container) return;
 
-    // Ses çal
-    if (alertType === 'follower') WebAudioSFX.playFollower();
-    else if (alertType === 'sub') WebAudioSFX.playSub();
-    else if (alertType === 'donation' || alertType === 'gift') WebAudioSFX.playDonation();
+    // Ses çal (Yalnızca üst pencere ise, iframe önizlemesinde sessiz)
+    if (window.self === window.top) {
+      if (alertType === 'follower') WebAudioSFX.playFollower();
+      else if (alertType === 'sub') WebAudioSFX.playSub();
+      else if (alertType === 'donation' || alertType === 'gift' || alertType === 'kicks') WebAudioSFX.playDonation();
+    }
 
     const titleMap = {
       follower: 'YENİ TAKİPÇİ!',
       sub: 'YENİ ABONE!',
-      donation: 'BAĞIŞ / DESTEK!',
-      gift: 'TIKTOK HEDİYESİ!'
+      donation: 'KICKS & BAĞIŞ!',
+      kicks: 'KICKS DESTEK!',
+      gift: 'HEDİYE ABONELİK!',
+      raid: 'YAYIN BASKINI!'
     };
 
     const headerTag = titleMap[alertType] || 'CANLI BİLDİRİM';
     const username = payload.username || 'Gizemli Kahraman';
     let subTitle = 'Ailemize Hoş Geldin!';
-    if (alertType === 'donation') subTitle = `${payload.amount || '100₺'} Bağış Yaptı!`;
-    else if (alertType === 'gift') subTitle = `${payload.giftName || 'Gül (x10)'} Gönderdi! 🌹`;
+    if (alertType === 'donation' || alertType === 'kicks') subTitle = `${payload.amount || '500 Kicks'} Gönderdi! 💎`;
+    else if (alertType === 'gift') subTitle = `${payload.giftName || '5x Hediye Abonelik'} Dağıttı! 🎁`;
+    else if (alertType === 'raid') subTitle = `${payload.count || payload.viewers || '35'} İzleyiciyle Baskın Yaptı! 🚀`;
     const userMsg = payload.message || '';
 
     container.innerHTML = `
@@ -433,26 +439,18 @@
       }
     }, 4500);
 
-    // Üst Bar & Hedef Güncelleme
+    // Üst Bar & Hedef Güncelleme (YALNIZCA GERÇEK TAKİPÇİ TAKİPÇİ HEDEFİNİ ARTIRIR!)
     if (alertType === 'follower') {
       updateRecentStat('follower', username);
       currentGoal.current += 1;
       updateGoalDisplay(currentGoal);
     } else if (alertType === 'sub') {
       updateRecentStat('sub', username);
-    } else if (alertType === 'donation') {
-      updateRecentStat('donation', `${username} (${payload.amount || '100₺'})`);
-      currentGoal.current += Math.max(1, Math.floor(parseInt(payload.amount || 20) / 10));
-      updateGoalDisplay(currentGoal);
-    } else if (alertType === 'gift') {
-      const giftVal = `${username} (${payload.giftName || 'Gül x10'})`;
+    } else if (alertType === 'donation' || alertType === 'kicks') {
+      updateRecentStat('donation', `${username} (${payload.amount || '500 Kicks'})`);
+    } else if (alertType === 'gift' || alertType === 'subgift') {
+      const giftVal = `${username} (${payload.giftName || '5x Hediye Abonelik'})`;
       updateRecentStat('gift', giftVal);
-      updateRecentStat('donation', giftVal);
-      if (payload.topDonor || (payload.diamonds && payload.diamonds >= 100)) {
-        updateRecentStat('top-donor', `${username} (${payload.amount || payload.diamonds + ' 💎'})`);
-      }
-      currentGoal.current += 1;
-      updateGoalDisplay(currentGoal);
     }
   }
 
