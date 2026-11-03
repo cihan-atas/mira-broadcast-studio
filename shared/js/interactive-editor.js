@@ -1,13 +1,18 @@
 /**
  * ============================================================================
- * MİRA BROADCAST STUDIO — INTERACTIVE DRAG, RESIZE & CARD EDITOR ENGINE (v5.0)
+ * MİRA BROADCAST STUDIO — INTERACTIVE DRAG, RESIZE & CARD EDITOR ENGINE (v5.5)
  * - Tüm sahne, hero, kart ve boş tuval öğelerini sürükle-bırak (Drag & Drop) yapar
  * - 8 yönlü tutamaç ile yeniden boyutlandırma (Resize) sağlar
- * - Herhangi bir karta tıklandığında hemen yanında "Kart Düzenleme Kartı" açar:
- *   * Kart içindeki tüm yazıları anlık düzenleme
- *   * Yazı rengi, başlık rengi, yazı fontu (8 profesyonel font) ve yazı boyutu
- *   * Kart çerçeve rengi, arka plan rengi/saydamlığı ve köşe yuvarlaklığı
- *   * X, Y, Genişlik, Yükseklik, Katman (Z-Index) ve Gizleme kontrolleri
+ * - "➕ Yeni Kart Ekle" Modalı:
+ *   * 🗂️ Kendi Galerimden Kart Seçip Tuvale Ekleme
+ *   * 🏪 Ana Mağazadan Keşfedip -> Kendi Galerime Kaydedip -> Galerimden Seçme
+ *   * ✏️ Özel Metin / Duyuru Kartı Oluşturma
+ * - Gelişmiş Renk Paleti & Renk Kodu Üretici (HEX + RGB Kod Alma & Tek Tıkla Uygulama)
+ * - Seçili Kart veya Tüm Kartlar İçin Ayrı Ayrı Sıfırlama Merkezi:
+ *   * 📍 Konumu Default'a Çek (Seçili / Tümü)
+ *   * 📐 Boyutu Sıfırla (Seçili / Tümü)
+ *   * 🎨 Tasarımı & Renkleri Sıfırla (Seçili / Tümü)
+ *   * 🔄 Tamamen Default'a Çek (Seçili / Tümü)
  * ============================================================================
  */
 (function () {
@@ -20,11 +25,13 @@
   let isEditMode = params.get('edit') === '1';
   let currentItemId = params.get('uid') || params.get('id') || params.get('tpl') || null;
   let currentItemData = null;
-  let widgetOverrides = {}; // { [widgetId]: { x, y, w, h, fontFamily, fontScale, textColor, subTextColor, borderColor, bgColor, bgOpacity, borderRadius, zIndex, hidden, texts: {} } }
+  let widgetOverrides = {};
   let selectedWidgetEl = null;
   let selectedWidgetId = null;
+  let activePaletteTarget = 'borderColor'; // 'borderColor' | 'textColor' | 'subTextColor' | 'bgColor' | 'allTheme'
+  let lastLabColor = '#a855f7';
 
-  // Zengin Google Font Ailelerini Yükle
+  // Zengin Google Font Aileleri
   const FONT_LIST = [
     { label: 'Plus Jakarta Sans (Modern)', value: "'Plus Jakarta Sans', sans-serif" },
     { label: 'Orbitron (Siber Espor)', value: "'Orbitron', sans-serif" },
@@ -34,6 +41,22 @@
     { label: 'Montserrat (Temiz Stüdyo)', value: "'Montserrat', sans-serif" },
     { label: 'Playfair Display (Zarif Serif)', value: "'Playfair Display', serif" },
     { label: 'JetBrains Mono (Kod / Teknik)', value: "'JetBrains Mono', monospace" }
+  ];
+
+  // 12'li Lüks Yayıncı & MLBB Renk Paleti
+  const COLOR_PALETTE = [
+    { hex: '#a855f7', name: 'Ametist Mor' },
+    { hex: '#10b981', name: 'Zümrüt Yeşil' },
+    { hex: '#f59e0b', name: 'İmparatorluk Altın' },
+    { hex: '#ec4899', name: 'Şeker Pembe' },
+    { hex: '#e11d48', name: 'Vampir Kızıl' },
+    { hex: '#06b6d4', name: 'Okyanus Turkuaz' },
+    { hex: '#53fc18', name: 'Kick Yeşili' },
+    { hex: '#3b82f6', name: 'Siber Mavi' },
+    { hex: '#8b5cf6', name: 'Kraliyet Moru' },
+    { hex: '#f43f5e', name: 'Neon Mercan' },
+    { hex: '#ffffff', name: 'Saf Beyaz' },
+    { hex: '#0d0f18', name: 'Gece Siyahı' }
   ];
 
   function injectFontsAndEditorStyles() {
@@ -146,53 +169,61 @@
       /* Üst Düzenleme Modu Araç Çubuğu (Canvas Top Pill) */
       .mira-canvas-toolbar {
         position: absolute;
-        top: 14px;
+        top: 12px;
         left: 50%;
         transform: translateX(-50%);
         z-index: 9995;
-        background: rgba(11, 14, 23, 0.95);
+        background: rgba(11, 14, 23, 0.96);
         border: 2px solid #a855f7;
         border-radius: 999px;
-        padding: 8px 20px;
+        padding: 7px 16px;
         display: none;
         align-items: center;
-        gap: 12px;
-        box-shadow: 0 16px 40px rgba(0,0,0,0.8), 0 0 25px rgba(168, 85, 247, 0.45);
+        gap: 8px;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.85), 0 0 25px rgba(168, 85, 247, 0.45);
         font-family: 'Plus Jakarta Sans', sans-serif;
         backdrop-filter: blur(16px);
+        white-space: nowrap;
       }
       body.mira-edit-mode .mira-canvas-toolbar {
         display: flex;
       }
       .mira-tb-badge {
-        font-size: 12.5px;
+        font-size: 11.5px;
         font-weight: 800;
         color: #e9d5ff;
         display: flex;
         align-items: center;
-        gap: 7px;
+        gap: 6px;
+        margin-right: 4px;
       }
       .mira-tb-btn {
-        padding: 6px 13px;
+        padding: 6px 11px;
         border-radius: 999px;
         border: 1px solid rgba(255,255,255,0.16);
         background: rgba(255,255,255,0.07);
         color: #fff;
-        font-size: 12px;
+        font-size: 11.5px;
         font-weight: 800;
         cursor: pointer;
-        transition: all 0.18s;
+        transition: all 0.16s;
       }
       .mira-tb-btn:hover {
-        background: rgba(168, 85, 247, 0.3);
+        background: rgba(168, 85, 247, 0.32);
+        border-color: #a855f7;
+      }
+      .mira-tb-btn.accent {
+        background: linear-gradient(135deg, #7c3aed, #9333ea);
         border-color: #a855f7;
       }
       .mira-tb-btn.save {
         background: linear-gradient(135deg, #10b981, #059669);
         border-color: #10b981;
       }
-      .mira-tb-btn.save:hover {
-        filter: brightness(1.15);
+      .mira-tb-btn.warn:hover {
+        background: rgba(245, 158, 11, 0.28);
+        border-color: #f59e0b;
+        color: #fde68a;
       }
 
       /* =========================================================
@@ -200,15 +231,15 @@
          ========================================================= */
       .mira-card-inspector {
         position: absolute;
-        top: 90px;
+        top: 76px;
         right: 40px;
-        width: 410px;
-        max-height: 920px;
-        z-index: 9999;
+        width: 430px;
+        max-height: 960px;
+        z-index: 9998;
         background: rgba(11, 14, 24, 0.97);
         border: 2px solid #a855f7;
         border-radius: 22px;
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(168, 85, 247, 0.45);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.92), 0 0 40px rgba(168, 85, 247, 0.45);
         backdrop-filter: blur(24px);
         font-family: 'Plus Jakarta Sans', sans-serif;
         color: #f8fafc;
@@ -218,7 +249,7 @@
         animation: miraInspectorPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
       @keyframes miraInspectorPop {
-        from { opacity: 0; transform: scale(0.94) translateY(8px); }
+        from { opacity: 0; transform: scale(0.95) translateY(8px); }
         to   { opacity: 1; transform: scale(1) translateY(0); }
       }
       body.mira-edit-mode .mira-card-inspector.open {
@@ -226,8 +257,8 @@
       }
 
       .mira-insp-header {
-        padding: 15px 18px;
-        background: linear-gradient(135deg, rgba(124, 58, 237, 0.28), rgba(16, 185, 129, 0.15));
+        padding: 13px 16px;
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(16, 185, 129, 0.16));
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         display: flex;
         align-items: center;
@@ -236,7 +267,7 @@
       }
       .mira-insp-title {
         font-family: 'Orbitron', sans-serif;
-        font-size: 13.5px;
+        font-size: 13px;
         font-weight: 800;
         color: #fff;
         display: flex;
@@ -260,18 +291,18 @@
       }
 
       .mira-insp-body {
-        padding: 16px 18px;
+        padding: 13px 15px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        gap: 14px;
-        max-height: 760px;
+        gap: 11px;
+        max-height: 820px;
       }
       .mira-insp-body::-webkit-scrollbar {
         width: 6px;
       }
       .mira-insp-body::-webkit-scrollbar-thumb {
-        background: rgba(168, 85, 247, 0.4);
+        background: rgba(168, 85, 247, 0.45);
         border-radius: 99px;
       }
 
@@ -279,19 +310,20 @@
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 14px;
-        padding: 12px 14px;
+        padding: 11px 13px;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 9px;
       }
       .mira-insp-sec-title {
-        font-size: 11px;
+        font-size: 10.5px;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
+        letter-spacing: 0.7px;
         color: #c084fc;
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 6px;
       }
 
@@ -301,21 +333,22 @@
         gap: 4px;
       }
       .mira-field label {
-        font-size: 11px;
+        font-size: 10.5px;
         font-weight: 700;
         color: #94a3b8;
       }
       .mira-input, .mira-select {
         width: 100%;
-        background: rgba(7, 9, 16, 0.9);
+        background: rgba(7, 9, 16, 0.92);
         border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 9px;
-        padding: 8px 11px;
+        border-radius: 8px;
+        padding: 7px 10px;
         color: #fff;
         font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 12.5px;
+        font-size: 12px;
         font-weight: 600;
         outline: none;
+        box-sizing: border-box;
       }
       .mira-input:focus, .mira-select:focus {
         border-color: #a855f7;
@@ -324,7 +357,7 @@
       .mira-row-2 {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 8px;
       }
       .mira-row-4 {
         display: grid;
@@ -337,8 +370,8 @@
         gap: 6px;
       }
       .mira-color-picker {
-        width: 34px;
-        height: 32px;
+        width: 32px;
+        height: 30px;
         border: none;
         background: transparent;
         cursor: pointer;
@@ -356,28 +389,156 @@
         cursor: pointer;
       }
       .mira-range-val {
-        font-size: 11.5px;
+        font-size: 11px;
         font-weight: 800;
         color: #e2e8f0;
-        min-width: 44px;
+        min-width: 42px;
         text-align: right;
       }
 
+      /* Renk Paleti & Renk Kodu Üretici (Color Lab) */
+      .mira-color-lab-box {
+        background: rgba(124, 58, 237, 0.09);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 11px;
+        padding: 9px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .mira-lab-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .mira-lab-big-picker {
+        width: 42px;
+        height: 38px;
+        border: 2px solid rgba(255,255,255,0.25);
+        border-radius: 9px;
+        background: transparent;
+        cursor: pointer;
+        padding: 0;
+        flex-shrink: 0;
+      }
+      .mira-lab-codes {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .mira-lab-code-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .mira-lab-rgb {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10.5px;
+        color: #cbd5e1;
+        background: rgba(0,0,0,0.45);
+        padding: 3px 7px;
+        border-radius: 6px;
+      }
+      .mira-Target-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .mira-target-pill {
+        flex: 1;
+        min-width: 72px;
+        padding: 5px 6px;
+        border-radius: 7px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: #cbd5e1;
+        font-size: 10px;
+        font-weight: 800;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.14s;
+      }
+      .mira-target-pill:hover {
+        background: rgba(168, 85, 247, 0.22);
+        color: #fff;
+      }
+      .mira-target-pill.active {
+        background: linear-gradient(135deg, #7c3aed, #9333ea);
+        border-color: #c084fc;
+        color: #fff;
+      }
+      .mira-palette-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 6px;
+      }
+      .mira-swatch-btn {
+        height: 26px;
+        border-radius: 7px;
+        border: 2px solid rgba(255,255,255,0.2);
+        cursor: pointer;
+        transition: transform 0.12s, border-color 0.12s;
+        position: relative;
+      }
+      .mira-swatch-btn:hover {
+        transform: scale(1.12);
+        border-color: #fff;
+        z-index: 2;
+      }
+
+      /* Sıfırlama Grid Butonları */
+      .mira-reset-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .mira-mini-btn {
+        padding: 7px 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.13);
+        background: rgba(255,255,255,0.05);
+        color: #e2e8f0;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.14s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+      }
+      .mira-mini-btn:hover {
+        background: rgba(168, 85, 247, 0.25);
+        border-color: #a855f7;
+        color: #fff;
+      }
+      .mira-mini-btn.warn:hover {
+        background: rgba(245, 158, 11, 0.25);
+        border-color: #f59e0b;
+        color: #fde68a;
+      }
+      .mira-mini-btn.danger:hover {
+        background: rgba(239, 68, 68, 0.25);
+        border-color: #ef4444;
+        color: #fca5a5;
+      }
+
       .mira-insp-footer {
-        padding: 12px 18px;
+        padding: 11px 16px;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(8, 10, 18, 0.95);
+        background: rgba(8, 10, 18, 0.96);
         display: flex;
         gap: 8px;
       }
       .mira-btn {
         flex: 1;
-        padding: 9px 12px;
+        padding: 9px 11px;
         border-radius: 10px;
         border: 1px solid rgba(255,255,255,0.14);
         background: rgba(255,255,255,0.06);
         color: #fff;
-        font-size: 12px;
+        font-size: 11.5px;
         font-weight: 800;
         cursor: pointer;
         transition: all 0.15s;
@@ -397,6 +558,137 @@
         background: rgba(239, 68, 68, 0.25);
         border-color: #ef4444;
         color: #fca5a5;
+      }
+
+      /* =========================================================
+         "➕ TUVALE KART EKLE" MODALI (KENDİ GALERİM & ANA MAĞAZA)
+         ========================================================= */
+      .mira-add-modal-backdrop {
+        position: absolute;
+        inset: 0;
+        z-index: 99999;
+        background: rgba(5, 7, 13, 0.82);
+        backdrop-filter: blur(14px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      body.mira-edit-mode .mira-add-modal-backdrop.open {
+        display: flex;
+      }
+      .mira-add-modal {
+        width: 920px;
+        max-height: 820px;
+        background: rgba(12, 15, 26, 0.98);
+        border: 2px solid #a855f7;
+        border-radius: 24px;
+        box-shadow: 0 35px 90px rgba(0,0,0,0.92), 0 0 45px rgba(168, 85, 247, 0.4);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        color: #f8fafc;
+      }
+      .mira-add-modal-head {
+        padding: 18px 24px;
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.28), rgba(16, 185, 129, 0.14));
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .mira-add-modal-head h3 {
+        margin: 0;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 16px;
+        font-weight: 900;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .mira-add-tabs {
+        display: flex;
+        gap: 10px;
+        padding: 14px 24px;
+        background: rgba(7, 9, 16, 0.85);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+      .mira-add-tab {
+        padding: 10px 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: #cbd5e1;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.16s;
+      }
+      .mira-add-tab:hover {
+        background: rgba(168, 85, 247, 0.2);
+        color: #fff;
+      }
+      .mira-add-tab.active {
+        background: linear-gradient(135deg, #7c3aed, #9333ea);
+        border-color: #c084fc;
+        color: #fff;
+        box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+      }
+      .mira-add-body {
+        padding: 20px 24px;
+        overflow-y: auto;
+        max-height: 600px;
+      }
+      .mira-add-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+      .mira-picker-card {
+        background: rgba(255,255,255,0.035);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 12px;
+        transition: all 0.16s;
+      }
+      .mira-picker-card:hover {
+        border-color: #a855f7;
+        background: rgba(168, 85, 247, 0.08);
+        transform: translateY(-2px);
+      }
+      .mira-picker-top {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .mira-picker-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: rgba(168, 85, 247, 0.18);
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+      .mira-picker-info h4 {
+        margin: 0 0 4px 0;
+        font-size: 14.5px;
+        font-weight: 800;
+        color: #fff;
+      }
+      .mira-picker-info p {
+        margin: 0;
+        font-size: 12px;
+        color: #94a3b8;
+        line-height: 1.4;
       }
     `;
     document.head.appendChild(style);
@@ -424,7 +716,6 @@
            document.body;
   }
 
-  // Tuvalin mevcut CSS scale değerini hesapla (fare hareketlerinin 1:1 oturması için)
   function getCanvasScale() {
     const root = getCanvasRoot();
     if (!root) return 1;
@@ -435,26 +726,44 @@
     return 1;
   }
 
-  // Sayfadaki kartları keşfet ve `data-mira-widget` ata
+  // Kartın ilk (default) DOM ebeveynini ve metinlerini kaydet (Default'a sıfırlama için)
+  function rememberOriginalState(el) {
+    if (!el) return;
+    const target = (el.parentElement && el.parentElement.classList.contains('pos-slot')) ? el.parentElement : el;
+    if (!target.__miraOrigRecorded) {
+      target.__miraOrigRecorded = true;
+      target.__miraOrigParent = target.parentElement;
+      target.__miraOrigNextSibling = target.nextElementSibling;
+      target.__miraOrigStyle = target.getAttribute('style') || '';
+    }
+    if (!el.__miraOrigRecorded) {
+      el.__miraOrigRecorded = true;
+      el.__miraOrigParent = el.parentElement;
+      el.__miraOrigNextSibling = el.nextElementSibling;
+      el.__miraOrigStyle = el.getAttribute('style') || '';
+    }
+    getEditableTextElements(el); // Orijinal metinleri data-mira-orig-text olarak kaydeder
+  }
+
   function discoverWidgets() {
     KNOWN_WIDGET_SELECTORS.forEach(def => {
       const el = document.querySelector(def.sel);
       if (el) {
         el.setAttribute('data-mira-widget', def.id);
         el.setAttribute('data-mira-label', def.label);
+        rememberOriginalState(el);
       }
     });
-    // Ekstra kullanıcı kartları
     document.querySelectorAll('[data-widget-id]').forEach(el => {
       const wid = el.getAttribute('data-widget-id');
       if (!el.getAttribute('data-mira-widget')) {
         el.setAttribute('data-mira-widget', wid);
         el.setAttribute('data-mira-label', el.getAttribute('data-widget-label') || '📌 Özel Kart');
       }
+      rememberOriginalState(el);
     });
   }
 
-  // Kartın içindeki düzenlenebilir metin düğümlerini bul
   function getEditableTextElements(widgetEl) {
     if (!widgetEl) return [];
     const candidates = widgetEl.querySelectorAll(
@@ -472,13 +781,15 @@
     const seen = new Set();
     candidates.forEach((el, idx) => {
       if (seen.has(el)) return;
-      // İçinde başka candidate barındıran kapsayıcıları atla
       if (el.querySelector('h1, h2, h3, .social-user-tag, .mod-skill-name')) return;
       const txt = (el.textContent || '').trim();
       if (!txt && !el.getAttribute('data-mira-text-idx')) return;
       seen.add(el);
       const key = el.getAttribute('data-mira-text-idx') || `txt_${idx}`;
       el.setAttribute('data-mira-text-idx', key);
+      if (el.getAttribute('data-mira-orig-text') === null) {
+        el.setAttribute('data-mira-orig-text', txt);
+      }
       results.push({ key, el, text: txt });
     });
     return results;
@@ -495,63 +806,82 @@
     return `#${r}${g}${b}`;
   }
 
+  function hexToRgbString(hex) {
+    const clean = (hex || '#a855f7').replace('#', '');
+    const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16) || 0;
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
   function hexToRgba(hex, alpha = 0.9) {
     const clean = (hex || '#0d0f18').replace('#', '');
-    const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16);
+    const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16) || 0;
     const r = (num >> 16) & 255;
     const g = (num >> 8) & 255;
     const b = num & 255;
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
+  function getLayoutTarget(widgetEl) {
+    if (!widgetEl) return null;
+    if (widgetEl.parentElement && widgetEl.parentElement.classList.contains('pos-slot')) {
+      return widgetEl.parentElement;
+    }
+    return widgetEl;
+  }
+
+  function getStyleTarget(widgetEl) {
+    if (!widgetEl) return null;
+    if (widgetEl.classList.contains('pos-slot') && widgetEl.firstElementChild) {
+      return widgetEl.firstElementChild;
+    }
+    return widgetEl;
+  }
+
   // Bir karta kaydedilmiş konum, boyut, renk, font ve metin özelleştirmelerini uygula
   function applyWidgetOverride(widgetEl, wid, ov) {
     if (!widgetEl || !ov) return;
+    rememberOriginalState(widgetEl);
+
+    let layoutEl = getLayoutTarget(widgetEl);
+    const styleTarget = getStyleTarget(widgetEl);
 
     if (ov.hidden !== undefined) {
+      layoutEl.style.display = ov.hidden ? 'none' : '';
       widgetEl.style.display = ov.hidden ? 'none' : '';
     }
 
-    // Eğer kart `.center-bottom-deck` gibi flex/grid içindeyse ve sürüklendiyse mutlak konuma geçir
     if (ov.x !== undefined || ov.y !== undefined) {
       const root = getCanvasRoot();
-      if (widgetEl.parentElement && widgetEl.parentElement !== root && widgetEl.parentElement.id !== 'dynamic-stage') {
-        if (widgetEl.parentElement.classList.contains('pos-slot')) {
-          widgetEl = widgetEl.parentElement;
-        } else if (root) {
-          root.appendChild(widgetEl);
-        }
+      if (layoutEl.parentElement && layoutEl.parentElement !== root && layoutEl.parentElement.id !== 'dynamic-stage') {
+        if (root) root.appendChild(layoutEl);
       }
-      widgetEl.style.position = 'absolute';
-      widgetEl.style.margin = '0';
-      widgetEl.style.right = 'auto';
-      widgetEl.style.bottom = 'auto';
-      widgetEl.style.transform = 'none';
-      if (ov.x !== undefined) widgetEl.style.left = `${Math.round(ov.x)}px`;
-      if (ov.y !== undefined) widgetEl.style.top = `${Math.round(ov.y)}px`;
+      layoutEl.style.position = 'absolute';
+      layoutEl.style.margin = '0';
+      layoutEl.style.right = 'auto';
+      layoutEl.style.bottom = 'auto';
+      layoutEl.style.transform = 'none';
+      if (ov.x !== undefined) layoutEl.style.left = `${Math.round(ov.x)}px`;
+      if (ov.y !== undefined) layoutEl.style.top = `${Math.round(ov.y)}px`;
     }
 
     if (ov.w !== undefined && ov.w > 40) {
-      widgetEl.style.width = `${Math.round(ov.w)}px`;
-      const innerCard = widgetEl.querySelector('.mod-card, .hero-webcam-frame, .scene-card');
-      if (innerCard && widgetEl.classList.contains('pos-slot')) {
-        innerCard.style.width = '100%';
-      }
+      layoutEl.style.width = `${Math.round(ov.w)}px`;
+      if (styleTarget !== layoutEl) styleTarget.style.width = '100%';
+      const innerCard = layoutEl.querySelector('.mod-card, .hero-webcam-frame, .scene-card');
+      if (innerCard) innerCard.style.width = '100%';
     }
     if (ov.h !== undefined && ov.h > 30) {
-      widgetEl.style.height = `${Math.round(ov.h)}px`;
-      const innerCard = widgetEl.querySelector('.mod-card, .hero-webcam-frame, .scene-card');
-      if (innerCard && widgetEl.classList.contains('pos-slot')) {
-        innerCard.style.height = '100%';
-      }
+      layoutEl.style.height = `${Math.round(ov.h)}px`;
+      if (styleTarget !== layoutEl) styleTarget.style.height = '100%';
+      const innerCard = layoutEl.querySelector('.mod-card, .hero-webcam-frame, .scene-card');
+      if (innerCard) innerCard.style.height = '100%';
     }
 
-    const styleTarget = (widgetEl.classList.contains('pos-slot') && widgetEl.firstElementChild)
-      ? widgetEl.firstElementChild
-      : widgetEl;
-
     if (ov.zIndex !== undefined) {
-      widgetEl.style.zIndex = ov.zIndex;
+      layoutEl.style.zIndex = ov.zIndex;
     }
     if (ov.fontFamily) {
       styleTarget.style.setProperty('font-family', ov.fontFamily, 'important');
@@ -589,7 +919,6 @@
       styleTarget.style.setProperty('border-radius', `${ov.borderRadius}px`, 'important');
     }
 
-    // Metin içeriklerini uygula
     if (ov.texts && typeof ov.texts === 'object') {
       const textItems = getEditableTextElements(widgetEl);
       textItems.forEach(tItem => {
@@ -600,12 +929,288 @@
     }
   }
 
+  // ============================================================================
+  // SIFIRLAMA & DEFAULT'A ÇEKME FONKSİYONLARI (KONUM / BOYUT / TASARIM / TÜMÜ)
+  // ============================================================================
+  function resetWidgetPosition(widgetEl, wid) {
+    if (!widgetEl) return;
+    const ov = widgetOverrides[wid];
+    if (ov) {
+      delete ov.x;
+      delete ov.y;
+      delete ov.zIndex;
+    }
+    const layoutEl = getLayoutTarget(widgetEl);
+    if (layoutEl) {
+      layoutEl.style.left = '';
+      layoutEl.style.top = '';
+      layoutEl.style.right = '';
+      layoutEl.style.bottom = '';
+      layoutEl.style.position = '';
+      layoutEl.style.margin = '';
+      layoutEl.style.transform = '';
+      layoutEl.style.zIndex = '';
+      if (layoutEl.__miraOrigParent && layoutEl.parentElement !== layoutEl.__miraOrigParent) {
+        if (layoutEl.__miraOrigNextSibling && layoutEl.__miraOrigNextSibling.parentElement === layoutEl.__miraOrigParent) {
+          layoutEl.__miraOrigParent.insertBefore(layoutEl, layoutEl.__miraOrigNextSibling);
+        } else {
+          layoutEl.__miraOrigParent.appendChild(layoutEl);
+        }
+      }
+    }
+    // Eğer ekstra eklenen bir kartsa merkeze çek
+    if (wid && wid.startsWith('custom_card_') && ov) {
+      ov.x = 780;
+      ov.y = 420;
+      applyWidgetOverride(widgetEl, wid, ov);
+    }
+  }
+
+  function resetWidgetSize(widgetEl, wid) {
+    if (!widgetEl) return;
+    const ov = widgetOverrides[wid];
+    if (ov) {
+      delete ov.w;
+      delete ov.h;
+      delete ov.fontScale;
+    }
+    const layoutEl = getLayoutTarget(widgetEl);
+    const styleTarget = getStyleTarget(widgetEl);
+    if (layoutEl) {
+      layoutEl.style.width = '';
+      layoutEl.style.height = '';
+      const innerCard = layoutEl.querySelector('.mod-card, .hero-webcam-frame, .scene-card');
+      if (innerCard) {
+        innerCard.style.width = '';
+        innerCard.style.height = '';
+      }
+    }
+    if (styleTarget) {
+      styleTarget.style.width = '';
+      styleTarget.style.height = '';
+      styleTarget.style.zoom = '';
+    }
+  }
+
+  function resetWidgetDesign(widgetEl, wid) {
+    if (!widgetEl) return;
+    const ov = widgetOverrides[wid];
+    if (ov) {
+      delete ov.fontFamily;
+      delete ov.textColor;
+      delete ov.subTextColor;
+      delete ov.borderColor;
+      delete ov.bgColor;
+      delete ov.bgOpacity;
+      delete ov.borderRadius;
+    }
+    const styleTarget = getStyleTarget(widgetEl);
+    if (styleTarget) {
+      styleTarget.style.fontFamily = '';
+      styleTarget.style.color = '';
+      styleTarget.style.borderColor = '';
+      styleTarget.style.boxShadow = '';
+      styleTarget.style.background = '';
+      styleTarget.style.borderRadius = '';
+      styleTarget.querySelectorAll('[style]').forEach(ch => {
+        ch.style.fontFamily = '';
+        ch.style.color = '';
+      });
+    }
+  }
+
+  function resetWidgetTexts(widgetEl, wid) {
+    if (!widgetEl) return;
+    const ov = widgetOverrides[wid];
+    if (ov) delete ov.texts;
+    widgetEl.querySelectorAll('[data-mira-orig-text]').forEach(el => {
+      el.textContent = el.getAttribute('data-mira-orig-text');
+    });
+  }
+
+  function resetWidgetCompletely(widgetEl, wid) {
+    if (!widgetEl) return;
+    resetWidgetPosition(widgetEl, wid);
+    resetWidgetSize(widgetEl, wid);
+    resetWidgetDesign(widgetEl, wid);
+    resetWidgetTexts(widgetEl, wid);
+    const layoutEl = getLayoutTarget(widgetEl);
+    if (layoutEl) layoutEl.style.display = '';
+    widgetEl.style.display = '';
+    delete widgetOverrides[wid];
+  }
+
+  function executeResetScope(mode, scope) {
+    discoverWidgets();
+    if (scope === 'selected') {
+      if (!selectedWidgetEl || !selectedWidgetId) return;
+      if (mode === 'position') resetWidgetPosition(selectedWidgetEl, selectedWidgetId);
+      else if (mode === 'size') resetWidgetSize(selectedWidgetEl, selectedWidgetId);
+      else if (mode === 'design') resetWidgetDesign(selectedWidgetEl, selectedWidgetId);
+      else if (mode === 'all') resetWidgetCompletely(selectedWidgetEl, selectedWidgetId);
+    } else if (scope === 'all') {
+      document.querySelectorAll('[data-mira-widget]').forEach(el => {
+        const wid = el.getAttribute('data-mira-widget');
+        if (mode === 'position') resetWidgetPosition(el, wid);
+        else if (mode === 'size') resetWidgetSize(el, wid);
+        else if (mode === 'design') resetWidgetDesign(el, wid);
+        else if (mode === 'all') {
+          if (wid && wid.startsWith('custom_card_')) {
+            const lEl = getLayoutTarget(el);
+            if (lEl) lEl.remove();
+          } else {
+            resetWidgetCompletely(el, wid);
+          }
+        }
+      });
+      if (mode === 'all') {
+        widgetOverrides = {};
+      }
+    }
+    updateSelectionBox();
+    if (selectedWidgetEl && document.body.contains(selectedWidgetEl)) {
+      openCardInspectorForWidget(selectedWidgetEl);
+    }
+    notifyParentOfLiveChange();
+  }
+
+  // Galeriden veya Özel Olarak Eklenen Kartların Zengin HTML Üreticisi
+  function buildExtraCardInnerHtml(cDef) {
+    const accent = cDef.accent || '#a855f7';
+    const secondary = cDef.secondary || '#10b981';
+    const streamer = cDef.streamerName || 'MİRA LIVE';
+    const title = cDef.title || 'MİRA ÖZEL KART';
+    const sub = cDef.subtitle || 'Mythic Glory Streamer';
+    const cType = cDef.cardType || 'custom';
+
+    if (cType === 'showcase') {
+      return `
+        <div class="mod-card mod-showcase-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 18px; width: 320px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <img src="${cDef.avatar || '/kick/vexana/img-hero.png'}" style="width:64px; height:64px; border-radius:14px; object-fit:cover; border:2px solid ${accent};" onerror="this.style.display='none'">
+            <div>
+              <div class="mod-showcase-tag" style="font-size:10px; font-weight:800; color:${secondary}; letter-spacing:1.2px;">MİRA VİTRİNİ</div>
+              <div class="mod-showcase-title" style="font-family:'Orbitron',sans-serif; font-size:18px; font-weight:900; color:#fff;">${streamer}</div>
+              <div class="mod-showcase-sub" style="font-size:12px; color:#cbd5e1;">${sub}</div>
+            </div>
+          </div>
+          <div class="mod-showcase-quote" style="margin-top:10px; font-size:12px; font-style:italic; color:#e2e8f0; border-left:3px solid ${accent}; padding-left:10px;">
+            "${title}"
+          </div>
+        </div>
+      `;
+    }
+
+    if (cType === 'webcam') {
+      return `
+        <div class="mod-card mod-webcam-card" style="background: rgba(13,15,24,0.88); border: 2px solid ${accent}; border-radius: 18px; padding: 14px; width: 310px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+          <div class="mod-webcam-header" style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:${accent}; margin-bottom:8px;">
+            <span>📷 ${streamer}</span>
+            <span style="color:${secondary};">● LIVE</span>
+          </div>
+          <div style="height:165px; border:1px dashed rgba(255,255,255,0.2); border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#94a3b8; font-size:12px;">
+            <strong style="color:#fff;">KAMERA ALANI</strong>
+            <span>OBS Video Yakalama Aygıtı</span>
+          </div>
+          <div class="mod-webcam-footer" style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-top:8px; color:#e2e8f0;">
+            <span>MİRA</span>
+            <span style="color:${secondary};">${sub}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (cType === 'social') {
+      const s = cDef.socials || { kick: 'kick.com/mira', tiktok: '@mira_mlbb', instagram: '@mira.gaming' };
+      return `
+        <div class="mod-card mod-social-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 16px; width: 310px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+          <div class="mod-card-header" style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:${accent}; margin-bottom:10px;">
+            <span>🌐 ${streamer} SOSYAL</span>
+            <span style="color:${secondary};">● AKTİF</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:7px;">
+            <div class="mod-social-item" style="background:rgba(255,255,255,0.04); padding:7px 11px; border-radius:9px; font-size:12px; font-weight:700; color:#fff;">🟢 <span>${s.kick || 'kick.com/mira'}</span></div>
+            <div class="mod-social-item" style="background:rgba(255,255,255,0.04); padding:7px 11px; border-radius:9px; font-size:12px; font-weight:700; color:#fff;">📱 <span>${s.tiktok || '@mira_mlbb'}</span></div>
+            <div class="mod-social-item" style="background:rgba(255,255,255,0.04); padding:7px 11px; border-radius:9px; font-size:12px; font-weight:700; color:#fff;">📸 <span>${s.instagram || '@mira.gaming'}</span></div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (cType === 'music') {
+      return `
+        <div class="mod-card mod-music-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 15px 18px; width: 350px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+          <div class="mod-card-header" style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:${accent}; margin-bottom:8px;">
+            <span>🎵 ${streamer} MÜZİK</span>
+            <span style="color:${secondary};">BGM</span>
+          </div>
+          <div class="mod-song-title" style="font-size:13.5px; font-weight:800; color:#fff;">♪ ${title || 'MLBB Arena - Lo-Fi Chill Beats'}</div>
+        </div>
+      `;
+    }
+
+    if (cType === 'goal') {
+      return `
+        <div class="mod-card mod-goal-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 15px 18px; width: 340px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+          <div class="mod-card-header" style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:800; color:#fff; margin-bottom:8px;">
+            <span>🎯 ${cDef.goalTitle || 'TAKİPÇİ HEDEFİ'}</span>
+            <span style="color:${secondary};">${cDef.goalCurrent || 120} / ${cDef.goalTarget || 500}</span>
+          </div>
+          <div style="height:10px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden;">
+            <div style="width:45%; height:100%; background:linear-gradient(90deg, ${accent}, ${secondary});"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (cType === 'skills') {
+      return `
+        <div class="mod-card mod-skills-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 14px 16px; width: 440px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+          <div class="mod-card-header" style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:${accent}; margin-bottom:8px;">
+            <span>⚡ ${title}</span>
+            <span style="color:${secondary};">MLBB REHBER</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div style="background:rgba(255,255,255,0.04); padding:7px 9px; border-radius:8px;">
+              <div class="mod-skill-name" style="font-size:11.5px; font-weight:800; color:#fff;">1. Yetenek (Q)</div>
+              <div class="mod-skill-desc" style="font-size:10.5px; color:#94a3b8;">Alan hasarı ve kitle kontrolü</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.04); padding:7px 9px; border-radius:8px;">
+              <div class="mod-skill-name" style="font-size:11.5px; font-weight:800; color:#fff;">Ulti (R)</div>
+              <div class="mod-skill-desc" style="font-size:10.5px; color:#94a3b8;">Takım savaşını başlatan güç</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (cType === 'alert') {
+      return `
+        <div class="mod-card mod-custom-card" style="background: rgba(13,15,24,0.95); border: 2px solid ${accent}; border-radius: 20px; padding: 18px 22px; width: 380px; text-align:center; box-shadow: 0 14px 36px rgba(0,0,0,0.75), 0 0 28px ${accent}77;">
+          <div class="mod-showcase-tag" style="font-size:11px; font-weight:800; color:${secondary}; letter-spacing:1.5px;">⚡ ${title}</div>
+          <div class="mod-showcase-title" style="font-family:'Orbitron',sans-serif; font-size:20px; font-weight:900; color:#fff; margin:6px 0;">${streamer}</div>
+          <div class="mod-custom-body" style="font-size:12.5px; color:#cbd5e1;">${sub}</div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="mod-card mod-custom-card" style="background: rgba(13,15,24,0.92); border: 2px solid ${accent}; border-radius: 18px; padding: 18px; width: 340px; box-shadow: 0 14px 36px rgba(0,0,0,0.65), 0 0 22px ${accent}55;">
+        <div class="mod-card-header" style="font-family:'Orbitron',sans-serif; font-size:12px; font-weight:800; color:${accent}; margin-bottom:8px;">
+          <span>${title}</span>
+        </div>
+        <div class="mod-custom-body" style="font-size:13.5px; color:#e2e8f0; line-height:1.5;">
+          ${cDef.body || sub || 'Bu karta tıklayarak yazısını, fontunu, rengini ve boyutunu değiştirebilirsiniz.'}
+        </div>
+      </div>
+    `;
+  }
+
   function applyAllWidgetOverrides(widgetsMap) {
     if (!widgetsMap || typeof widgetsMap !== 'object') return;
     widgetOverrides = JSON.parse(JSON.stringify(widgetsMap));
     discoverWidgets();
 
-    // Kullanıcı sonradan ekstra özel kart eklediyse onları da oluştur
     if (widgetOverrides.__extraCards && Array.isArray(widgetOverrides.__extraCards)) {
       const root = document.getElementById('dynamic-stage') || getCanvasRoot();
       widgetOverrides.__extraCards.forEach(cDef => {
@@ -614,18 +1219,10 @@
           div.className = 'pos-slot pos-center';
           div.setAttribute('data-widget-id', cDef.id);
           div.setAttribute('data-mira-widget', cDef.id);
-          div.setAttribute('data-mira-label', cDef.label || '📌 Özel Metin Kartı');
-          div.innerHTML = `
-            <div class="mod-card mod-custom-card" style="background: rgba(13,15,24,0.92); border: 2px solid #a855f7; border-radius: 18px; padding: 18px; width: 340px;">
-              <div class="mod-card-header" style="font-family:'Orbitron',sans-serif; font-size:12px; font-weight:800; color:#a855f7; margin-bottom:8px;">
-                <span>${cDef.title || '📌 ÖZEL KART BAŞLIĞI'}</span>
-              </div>
-              <div class="mod-custom-body" style="font-size:13.5px; color:#e2e8f0; line-height:1.5;">
-                ${cDef.body || 'Bu karta tıklayarak yazısını, fontunu, rengini ve boyutunu değiştirebilirsiniz.'}
-              </div>
-            </div>
-          `;
+          div.setAttribute('data-mira-label', cDef.label || '📌 Özel Kart');
+          div.innerHTML = buildExtraCardInnerHtml(cDef);
           root.appendChild(div);
+          rememberOriginalState(div);
         }
       });
     }
@@ -639,13 +1236,14 @@
     updateSelectionBox();
   }
 
-  // Seçim Çerçevesi, Tutamaçlar ve Kart Düzenleme Kartı UI Oluşturumu
+  // Seçim Çerçevesi, Tutamaçlar, Kart Düzenleme Kartı ve Kart Ekleme Modalı UI
   let selectionBoxEl = null;
   let selectionTagEl = null;
   let snapXEl = null;
   let snapYEl = null;
   let inspectorEl = null;
   let toolbarEl = null;
+  let addCardModalBackdropEl = null;
 
   function ensureEditorUI() {
     injectFontsAndEditorStyles();
@@ -656,15 +1254,35 @@
       toolbarEl = document.createElement('div');
       toolbarEl.className = 'mira-canvas-toolbar';
       toolbarEl.innerHTML = `
-        <span class="mira-tb-badge">✨ <strong>ETKİLEŞİMLİ TUVAL:</strong> Karta Tıkla = Düzenle • Sürükle = Taşı • Köşeden Çek = Boyutlandır</span>
-        <button type="button" class="mira-tb-btn" id="mira-tb-add-card">➕ Yeni Kart Ekle</button>
+        <span class="mira-tb-badge">✨ <strong>ETKİLEŞİMLİ TUVAL:</strong> Tıkla = Düzenle • Sürükle = Taşı</span>
+        <button type="button" class="mira-tb-btn accent" id="mira-tb-add-card">➕ Yeni Kart Ekle (Galerim / Mağaza)</button>
+        <button type="button" class="mira-tb-btn warn" id="mira-tb-reset-pos" title="Tüm kartların konumlarını varsayılan yerlerine çeker">📍 Konumları Default'a Çek</button>
+        <button type="button" class="mira-tb-btn warn" id="mira-tb-reset-size" title="Tüm kartların boyutlarını varsayılana sıfırlar">📐 Boyutları Sıfırla</button>
+        <button type="button" class="mira-tb-btn warn" id="mira-tb-reset-design" title="Tüm kartların renk/font tasarımlarını varsayılana sıfırlar">🎨 Tasarımı Sıfırla</button>
+        <button type="button" class="mira-tb-btn warn" id="mira-tb-reset-all" title="Tüm tuvali tamamen ilk haline döndürür">🔄 Tümünü Sıfırla</button>
         <button type="button" class="mira-tb-btn save" id="mira-tb-save-all">💾 Tasarımı Kaydet</button>
       `;
       root.appendChild(toolbarEl);
 
       toolbarEl.querySelector('#mira-tb-add-card').addEventListener('click', (e) => {
         e.stopPropagation();
-        addNewCustomCardOnCanvas();
+        openAddCardModal('user');
+      });
+      toolbarEl.querySelector('#mira-tb-reset-pos').addEventListener('click', (e) => {
+        e.stopPropagation();
+        executeResetScope('position', 'all');
+      });
+      toolbarEl.querySelector('#mira-tb-reset-size').addEventListener('click', (e) => {
+        e.stopPropagation();
+        executeResetScope('size', 'all');
+      });
+      toolbarEl.querySelector('#mira-tb-reset-design').addEventListener('click', (e) => {
+        e.stopPropagation();
+        executeResetScope('design', 'all');
+      });
+      toolbarEl.querySelector('#mira-tb-reset-all').addEventListener('click', (e) => {
+        e.stopPropagation();
+        executeResetScope('all', 'all');
       });
       toolbarEl.querySelector('#mira-tb-save-all').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -698,7 +1316,6 @@
       root.appendChild(selectionBoxEl);
       selectionTagEl = selectionBoxEl.querySelector('#mira-selection-tag');
 
-      // Resize tutamaçlarını dinle
       selectionBoxEl.querySelectorAll('.mira-resize-handle').forEach(handle => {
         handle.addEventListener('mousedown', (e) => {
           e.stopPropagation();
@@ -716,9 +1333,22 @@
       inspectorEl.addEventListener('click', (e) => e.stopPropagation());
       root.appendChild(inspectorEl);
     }
+
+    if (!addCardModalBackdropEl) {
+      addCardModalBackdropEl = document.createElement('div');
+      addCardModalBackdropEl.className = 'mira-add-modal-backdrop';
+      addCardModalBackdropEl.id = 'mira-add-card-modal';
+      addCardModalBackdropEl.addEventListener('mousedown', (e) => e.stopPropagation());
+      addCardModalBackdropEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (e.target === addCardModalBackdropEl) {
+          addCardModalBackdropEl.classList.remove('open');
+        }
+      });
+      root.appendChild(addCardModalBackdropEl);
+    }
   }
 
-  // Kartın 1920x1080 tuval içindeki yerel koordinatlarını hesapla
   function getWidgetCanvasRect(el) {
     const root = getCanvasRoot();
     const scale = getCanvasScale();
@@ -751,7 +1381,294 @@
     }
   }
 
-  // Karta Tıklayınca Açılan "Kartı Düzenleme Kartı" (Inspector) İçeriğini Oluştur
+  // ============================================================================
+  // "➕ TUVALE KART EKLE" MODALI (KENDİ GALERİMDEN SEÇ VEYA ANA MAĞAZADAN KEŞFET)
+  // ============================================================================
+  function openAddCardModal(activeTab = 'user') {
+    ensureEditorUI();
+    if (!addCardModalBackdropEl) return;
+    addCardModalBackdropEl.classList.add('open');
+
+    Promise.all([
+      fetch('/api/gallery/user').then(r => r.json()).catch(() => ({ items: [] })),
+      fetch('/api/gallery/catalog').then(r => r.json()).catch(() => ({ items: [] }))
+    ]).then(([userData, catData]) => {
+      const userItems = (userData && userData.items) ? userData.items : [];
+      const rawCatalog = (catData && (catData.items || catData.catalog)) ? (catData.items || catData.catalog) : [];
+      const catalogItems = rawCatalog.filter(
+        t => t.category === 'card' || t.category === 'alert'
+      );
+
+      renderAddCardModalContent(activeTab, userItems, catalogItems);
+    });
+  }
+
+  function renderAddCardModalContent(activeTab, userItems, catalogItems) {
+    if (!addCardModalBackdropEl) return;
+
+    const userCardItems = userItems;
+    const savedTplIds = new Set(userItems.map(u => u.templateId));
+
+    let bodyHtml = '';
+
+    if (activeTab === 'user') {
+      if (userCardItems.length === 0) {
+        bodyHtml = `
+          <div style="text-align:center; padding:36px 20px; background:rgba(168,85,247,0.06); border:1px dashed rgba(168,85,247,0.4); border-radius:18px;">
+            <div style="font-size:40px; margin-bottom:10px;">🗂️</div>
+            <h4 style="margin:0 0 8px 0; font-size:17px; color:#fff;">Kendi Galerinizde Henüz Kayıtlı Kart Yok</h4>
+            <p style="margin:0 auto 18px auto; max-width:520px; font-size:13px; color:#cbd5e1; line-height:1.5;">
+              Önce <strong>🏪 Ana Mağazadan Keşfet</strong> sekmesine geçerek beğendiğiniz kartları kendi galerinize kaydedin, ardından buradan tuvalinize ekleyin!
+            </p>
+            <button type="button" class="mira-btn primary" id="mira-go-store-tab-btn" style="max-width:320px; padding:12px 20px; font-size:13px;">
+              🏪 Ana Mağazadan Kart Keşfet & Galerime Kaydet
+            </button>
+          </div>
+        `;
+      } else {
+        const cardsGrid = userCardItems.map(item => {
+          const cfg = item.config || {};
+          const acc = cfg.primaryColor || cfg.accent || '#a855f7';
+          return `
+            <div class="mira-picker-card">
+              <div class="mira-picker-top">
+                <div class="mira-picker-icon" style="border-color:${acc}; background:${acc}22;">${item.icon || '🃏'}</div>
+                <div class="mira-picker-info">
+                  <h4>${item.name}</h4>
+                  <p>${item.subtitle || item.description || cfg.title || 'Kişisel galerinizdeki özelleştirilebilir kart.'}</p>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                <span style="font-size:11px; font-weight:800; color:${acc};">● Kendi Galerimde Kayıtlı</span>
+                <button type="button" class="mira-btn success mira-pick-user-card-btn" data-uid="${item.id}" style="flex:0 0 auto; padding:8px 16px;">
+                  ➕ Tuvale Ekle
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        bodyHtml = `
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.28); padding:10px 16px; border-radius:12px;">
+            <span style="font-size:12.5px; color:#d1fae5;">
+              💡 <strong>Kendi Galerim:</strong> Aşağıdaki kayıtlı kartlarınızdan istediğinizi seçip tuvale ekleyebilir veya Ana Mağaza'dan yeni kart keşfedebilirsiniz.
+            </span>
+            <button type="button" class="mira-btn primary" id="mira-go-store-tab-btn" style="flex:0 0 auto; padding:7px 14px;">
+              🏪 Mağazadan Yeni Kart Keşfet
+            </button>
+          </div>
+          <div class="mira-add-grid">${cardsGrid}</div>
+        `;
+      }
+    } else if (activeTab === 'store') {
+      const storeGrid = catalogItems.map(tpl => {
+        const cfg = tpl.config || {};
+        const acc = cfg.primaryColor || cfg.accent || '#a855f7';
+        const isSaved = savedTplIds.has(tpl.id);
+        return `
+          <div class="mira-picker-card">
+            <div class="mira-picker-top">
+              <div class="mira-picker-icon" style="border-color:${acc}; background:${acc}22;">${tpl.icon || '🃏'}</div>
+              <div class="mira-picker-info">
+                <h4>${tpl.name}</h4>
+                <p>${tpl.subtitle || tpl.description || ''}</p>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+              <span style="font-size:11px; font-weight:800; color:${isSaved ? '#10b981' : '#c084fc'};">
+                ${isSaved ? '✓ Galerinizde Mevcut' : '🏪 Ana Mağaza Şablonu'}
+              </span>
+              <div style="display:flex; gap:6px;">
+                <button type="button" class="mira-btn primary mira-save-tpl-to-gallery-btn" data-tpl="${tpl.id}" style="flex:0 0 auto; padding:8px 13px;">
+                  📥 Galerime Kaydet
+                </button>
+                ${isSaved ? `
+                  <button type="button" class="mira-btn success mira-switch-to-user-btn" style="flex:0 0 auto; padding:8px 12px;">
+                    🗂️ Galerimden Seç
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      bodyHtml = `
+        <div style="margin-bottom:14px; background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.3); padding:10px 16px; border-radius:12px; font-size:12.5px; color:#e9d5ff;">
+          🏪 <strong>Ana Mağaza Keşfi:</strong> Beğendiğiniz kartı <strong>"📥 Galerime Kaydet"</strong> ile kendi galerinize ekleyin, ardından <strong>"🗂️ Kendi Galerimden Seç"</strong> sekmesinden tuvalinize yerleştirin!
+        </div>
+        <div class="mira-add-grid">${storeGrid}</div>
+      `;
+    } else if (activeTab === 'custom') {
+      bodyHtml = `
+        <div style="max-width:540px; margin:0 auto; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:14px;">
+          <h4 style="margin:0; font-size:15px; color:#fff;">✏️ Sıfırdan Özel Metin / Duyuru Kartı Oluştur</h4>
+          <div class="mira-field">
+            <label>Kart Başlığı</label>
+            <input type="text" class="mira-input" id="mira-new-custom-title" value="📌 ÖZEL DUYURU KARTI">
+          </div>
+          <div class="mira-field">
+            <label>Kart İçerik Yazısı</label>
+            <input type="text" class="mira-input" id="mira-new-custom-body" value="Turnuva saat 21:00'de başlıyor! Takip etmeyi unutmayın.">
+          </div>
+          <button type="button" class="mira-btn success" id="mira-create-custom-card-btn" style="padding:11px;">
+            ➕ Özel Kartı Tuvale Ekle
+          </button>
+        </div>
+      `;
+    }
+
+    addCardModalBackdropEl.innerHTML = `
+      <div class="mira-add-modal">
+        <div class="mira-add-modal-head">
+          <h3><span>➕</span> <span>Tuvale Kart Ekle (Kendi Galerim & Ana Mağaza)</span></h3>
+          <button type="button" class="mira-insp-close" id="mira-add-modal-close">✕</button>
+        </div>
+        <div class="mira-add-tabs">
+          <button type="button" class="mira-add-tab ${activeTab === 'user' ? 'active' : ''}" data-tab="user">
+            🗂️ 1. Kendi Galerimden Seç (${userCardItems.length})
+          </button>
+          <button type="button" class="mira-add-tab ${activeTab === 'store' ? 'active' : ''}" data-tab="store">
+            🏪 2. Ana Mağazadan Keşfet & Galerime Kaydet (${catalogItems.length})
+          </button>
+          <button type="button" class="mira-add-tab ${activeTab === 'custom' ? 'active' : ''}" data-tab="custom">
+            ✏️ 3. Sıfırdan Özel Yazı Kartı
+          </button>
+        </div>
+        <div class="mira-add-body">
+          ${bodyHtml}
+        </div>
+      </div>
+    `;
+
+    addCardModalBackdropEl.querySelector('#mira-add-modal-close').addEventListener('click', () => {
+      addCardModalBackdropEl.classList.remove('open');
+    });
+
+    addCardModalBackdropEl.querySelectorAll('.mira-add-tab').forEach(tabBtn => {
+      tabBtn.addEventListener('click', () => {
+        renderAddCardModalContent(tabBtn.getAttribute('data-tab'), userItems, catalogItems);
+      });
+    });
+
+    const goStoreBtn = addCardModalBackdropEl.querySelector('#mira-go-store-tab-btn');
+    if (goStoreBtn) {
+      goStoreBtn.addEventListener('click', () => {
+        renderAddCardModalContent('store', userItems, catalogItems);
+      });
+    }
+
+    addCardModalBackdropEl.querySelectorAll('.mira-switch-to-user-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        renderAddCardModalContent('user', userItems, catalogItems);
+      });
+    });
+
+    // 1. Kendi Galerimden Seçip Tuvale Ekle
+    addCardModalBackdropEl.querySelectorAll('.mira-pick-user-card-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const uid = btn.getAttribute('data-uid');
+        const picked = userItems.find(u => u.id === uid);
+        if (picked) {
+          addGalleryItemCardToCanvas(picked);
+          addCardModalBackdropEl.classList.remove('open');
+        }
+      });
+    });
+
+    // 2. Ana Mağazadan Kendi Galerime Kaydet
+    addCardModalBackdropEl.querySelectorAll('.mira-save-tpl-to-gallery-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tplId = btn.getAttribute('data-tpl');
+        btn.textContent = '⏳ Kaydediliyor...';
+        fetch('/api/gallery/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ templateId: tplId })
+        })
+          .then(r => r.json())
+          .then(() => {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({ type: 'MIRA_GALLERY_SAVED_OK' }, '*');
+            }
+            // Güncel kullanıcı galerisini çek ve Kendi Galerim sekmesine geçir
+            openAddCardModal('user');
+          });
+      });
+    });
+
+    // 3. Özel Yazı Kartı Oluştur
+    const createCustomBtn = addCardModalBackdropEl.querySelector('#mira-create-custom-card-btn');
+    if (createCustomBtn) {
+      createCustomBtn.addEventListener('click', () => {
+        const tVal = addCardModalBackdropEl.querySelector('#mira-new-custom-title').value.trim() || '📌 ÖZEL KART';
+        const bVal = addCardModalBackdropEl.querySelector('#mira-new-custom-body').value.trim() || 'Kart açıklaması';
+        addNewCustomCardOnCanvas({ title: tVal, body: bVal, cardType: 'custom' });
+        addCardModalBackdropEl.classList.remove('open');
+      });
+    }
+  }
+
+  function addGalleryItemCardToCanvas(galleryItem) {
+    if (!galleryItem) return;
+    const cfg = galleryItem.config || {};
+    let cType = cfg.cardType || 'custom';
+    if (galleryItem.category === 'alert') cType = 'alert';
+    else if (!cfg.cardType && galleryItem.category === 'hero') cType = 'showcase';
+
+    addNewCustomCardOnCanvas({
+      label: `${galleryItem.icon || '🃏'} ${galleryItem.name}`,
+      cardType: cType,
+      title: cfg.title || cfg.headerTag || galleryItem.name,
+      subtitle: cfg.subtitleText || cfg.subTitle || galleryItem.subtitle || galleryItem.description || 'Mythic Glory Streamer',
+      streamerName: cfg.streamerName || 'MİRA LIVE',
+      accent: cfg.primaryColor || cfg.accent || '#a855f7',
+      secondary: cfg.secondaryColor || cfg.secondary || '#10b981',
+      avatar: galleryItem.previewImg || '/kick/vexana/img-hero.png',
+      socials: cfg.socials || { kick: cfg.kickHandle, tiktok: cfg.tiktokHandle, instagram: cfg.youtubeHandle },
+      goalTitle: cfg.goalTitle,
+      goalCurrent: cfg.goalCurrent,
+      goalTarget: cfg.goalTarget
+    });
+  }
+
+  function addNewCustomCardOnCanvas(customOpts = {}) {
+    if (!widgetOverrides.__extraCards) widgetOverrides.__extraCards = [];
+    const count = widgetOverrides.__extraCards.length + 1;
+    const newId = 'custom_card_' + Date.now().toString(36);
+    const cardDef = {
+      id: newId,
+      label: customOpts.label || ('📌 Özel Kart #' + count),
+      cardType: customOpts.cardType || 'custom',
+      title: customOpts.title || 'ÖZEL KART BAŞLIĞI',
+      subtitle: customOpts.subtitle || 'Mythic Glory Streamer',
+      body: customOpts.body || customOpts.subtitle || 'Bu karta tıklayarak yazısını, fontunu, rengini ve boyutunu değiştirebilirsiniz.',
+      streamerName: customOpts.streamerName || 'MİRA LIVE',
+      accent: customOpts.accent || '#a855f7',
+      secondary: customOpts.secondary || '#10b981',
+      avatar: customOpts.avatar || '/kick/vexana/img-hero.png',
+      socials: customOpts.socials,
+      goalTitle: customOpts.goalTitle,
+      goalCurrent: customOpts.goalCurrent,
+      goalTarget: customOpts.goalTarget
+    };
+    widgetOverrides.__extraCards.push(cardDef);
+    widgetOverrides[newId] = {
+      x: 740 + ((count % 4) * 28),
+      y: 380 + ((count % 4) * 28)
+    };
+    applyAllWidgetOverrides(widgetOverrides);
+    const newEl = document.querySelector(`[data-mira-widget="${newId}"]`);
+    if (newEl) {
+      selectWidget(newEl);
+      openCardInspectorForWidget(newEl);
+    }
+    notifyParentOfLiveChange();
+  }
+
+  // ============================================================================
+  // KARTA TIKLAYINCA AÇILAN "KARTI DÜZENLEME KARTI" (INSPECTOR)
+  // ============================================================================
   function openCardInspectorForWidget(widgetEl) {
     ensureEditorUI();
     if (!widgetEl || !inspectorEl) return;
@@ -761,9 +1678,7 @@
     const ov = widgetOverrides[wid] || (widgetOverrides[wid] = {});
     const rect = getWidgetCanvasRect(widgetEl);
 
-    const styleTarget = (widgetEl.classList.contains('pos-slot') && widgetEl.firstElementChild)
-      ? widgetEl.firstElementChild
-      : widgetEl;
+    const styleTarget = getStyleTarget(widgetEl);
     const comp = window.getComputedStyle(styleTarget);
 
     const curTextColor = ov.textColor || rgbToHex(comp.color, '#ffffff');
@@ -784,10 +1699,14 @@
             <input type="text" class="mira-input mira-live-text-input" data-text-key="${item.key}" value="${String(item.text).replace(/"/g, '&quot;')}">
           </div>
         `).join('')
-      : `<div style="font-size:11.5px; color:#94a3b8;">Bu modülde düzenlenebilir alt metin bulunmuyor.</div>`;
+      : `<div style="font-size:11px; color:#94a3b8;">Bu modülde düzenlenebilir alt metin bulunmuyor.</div>`;
 
     const fontOptionsHtml = FONT_LIST.map(f => `
       <option value="${f.value.replace(/"/g, '&quot;')}" ${curFontFamily.includes(f.label.split(' ')[0]) ? 'selected' : ''}>${f.label}</option>
+    `).join('');
+
+    const paletteSwatchesHtml = COLOR_PALETTE.map(p => `
+      <button type="button" class="mira-swatch-btn" data-hex="${p.hex}" title="${p.name} (${p.hex})" style="background:${p.hex};"></button>
     `).join('');
 
     inspectorEl.innerHTML = `
@@ -802,26 +1721,42 @@
       <div class="mira-insp-body">
         <!-- 1. KARTTAKİ YAZILAR -->
         <div class="mira-insp-section">
-          <div class="mira-insp-sec-title">📝 KARTTAKİ YAZILAR (ANLIK DEĞİŞİR)</div>
+          <div class="mira-insp-sec-title">
+            <span>📝 KARTTAKİ YAZILAR (ANLIK DEĞİŞİR)</span>
+          </div>
           ${textInputsHtml}
         </div>
 
-        <!-- 2. YAZI FONTU, BOYUTU VE YAZI RENKLERİ -->
+        <!-- 2. RENK PALETİ & RENK KODU ÜRETİCİ (LABORATUVAR) -->
         <div class="mira-insp-section">
-          <div class="mira-insp-sec-title">🔤 YAZI FONTU, BOYUTU VE RENKLERİ</div>
-
-          <div class="mira-field">
-            <label>Yazı Fontu (Font Family)</label>
-            <select class="mira-select" id="mira-insp-font">
-              ${fontOptionsHtml}
-            </select>
+          <div class="mira-insp-sec-title">
+            <span>🎨 RENK PALETİ & RENK KODU ÜRETİCİ</span>
           </div>
 
-          <div class="mira-field">
-            <label>Yazı Boyutu Ölçeği (%)</label>
-            <div class="mira-range-wrap">
-              <input type="range" id="mira-insp-fontscale" min="70" max="160" step="5" value="${curFontScale}">
-              <span class="mira-range-val" id="mira-insp-fontscale-val">${curFontScale}%</span>
+          <!-- Tekil Renk Ayarla & Kodu Al Kutusu -->
+          <div class="mira-color-lab-box">
+            <div style="font-size:10.5px; font-weight:800; color:#e9d5ff;">
+              🧪 Rengi Ayarla → Sana Renk Kodunu Versin (Veya Direkt Uygula):
+            </div>
+            <div class="mira-lab-top">
+              <input type="color" class="mira-lab-big-picker" id="mira-lab-picker" value="${lastLabColor}">
+              <div class="mira-lab-codes">
+                <div class="mira-lab-code-row">
+                  <input type="text" class="mira-input" id="mira-lab-hex-out" value="${lastLabColor}" style="font-family:'JetBrains Mono',monospace; font-weight:800; width:96px; padding:5px 8px;">
+                  <span class="mira-lab-rgb" id="mira-lab-rgb-out">${hexToRgbString(lastLabColor)}</span>
+                  <button type="button" class="mira-mini-btn" id="mira-lab-copy-btn" style="padding:5px 9px;">📋 Kodu Kopyala</button>
+                </div>
+              </div>
+            </div>
+            <div class="mira-Target-pills">
+              <button type="button" class="mira-target-pill ${activePaletteTarget === 'borderColor' ? 'active' : ''}" data-target="borderColor">🟣 Çerçeveye Ver</button>
+              <button type="button" class="mira-target-pill ${activePaletteTarget === 'textColor' ? 'active' : ''}" data-target="textColor">🔤 Başlığa Ver</button>
+              <button type="button" class="mira-target-pill ${activePaletteTarget === 'subTextColor' ? 'active' : ''}" data-target="subTextColor">📝 Alt Yazıya Ver</button>
+              <button type="button" class="mira-target-pill ${activePaletteTarget === 'bgColor' ? 'active' : ''}" data-target="bgColor">🖼️ Arka Plana Ver</button>
+              <button type="button" class="mira-target-pill ${activePaletteTarget === 'allTheme' ? 'active' : ''}" data-target="allTheme">⚡ Tüm Karta Ver</button>
+            </div>
+            <div class="mira-palette-grid">
+              ${paletteSwatchesHtml}
             </div>
           </div>
 
@@ -841,11 +1776,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- 3. KART ÇERÇEVE VE ARKA PLAN STİLİ -->
-        <div class="mira-insp-section">
-          <div class="mira-insp-sec-title">🎨 KART ÇERÇEVE & ARKA PLAN TASARIMI</div>
 
           <div class="mira-row-2">
             <div class="mira-field">
@@ -863,27 +1793,48 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- 3. YAZI FONTU, BOYUTU VE ÇERÇEVE AYARLARI -->
+        <div class="mira-insp-section">
+          <div class="mira-insp-sec-title">🔤 YAZI FONTU, BOYUTU & ÇERÇEVE</div>
 
           <div class="mira-field">
-            <label>Arka Plan Opaklığı / Saydamlık (%)</label>
-            <div class="mira-range-wrap">
-              <input type="range" id="mira-insp-bgopacity" min="0" max="100" step="5" value="${curBgOpacity}">
-              <span class="mira-range-val" id="mira-insp-bgopacity-val">${curBgOpacity}%</span>
-            </div>
+            <label>Yazı Fontu (Font Family)</label>
+            <select class="mira-select" id="mira-insp-font">
+              ${fontOptionsHtml}
+            </select>
           </div>
 
           <div class="mira-field">
-            <label>Köşe Yuvarlaklığı (Border Radius)</label>
+            <label>Yazı Boyutu Ölçeği (%)</label>
             <div class="mira-range-wrap">
-              <input type="range" id="mira-insp-radius" min="0" max="44" step="2" value="${curRadius}">
-              <span class="mira-range-val" id="mira-insp-radius-val">${curRadius}px</span>
+              <input type="range" id="mira-insp-fontscale" min="70" max="160" step="5" value="${curFontScale}">
+              <span class="mira-range-val" id="mira-insp-fontscale-val">${curFontScale}%</span>
+            </div>
+          </div>
+
+          <div class="mira-row-2">
+            <div class="mira-field">
+              <label>Arka Plan Opaklığı (%)</label>
+              <div class="mira-range-wrap">
+                <input type="range" id="mira-insp-bgopacity" min="0" max="100" step="5" value="${curBgOpacity}">
+                <span class="mira-range-val" id="mira-insp-bgopacity-val">${curBgOpacity}%</span>
+              </div>
+            </div>
+            <div class="mira-field">
+              <label>Köşe Yuvarlaklığı (px)</label>
+              <div class="mira-range-wrap">
+                <input type="range" id="mira-insp-radius" min="0" max="44" step="2" value="${curRadius}">
+                <span class="mira-range-val" id="mira-insp-radius-val">${curRadius}px</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- 4. KONUM (X, Y) VE BOYUT (W, H) -->
         <div class="mira-insp-section">
-          <div class="mira-insp-sec-title">📐 KONUM & BOYUT (PİKSEL)</div>
+          <div class="mira-insp-sec-title">📐 KONUM, BOYUT & KATMAN</div>
           <div class="mira-row-4">
             <div class="mira-field">
               <label>Sol (X)</label>
@@ -902,26 +1853,47 @@
               <input type="number" class="mira-input" id="mira-insp-h" value="${Math.round(rect.h)}">
             </div>
           </div>
-          <div style="display:flex; gap:6px; margin-top:4px;">
-            <button type="button" class="mira-btn" id="mira-insp-front">⬆️ Öne Getir</button>
-            <button type="button" class="mira-btn" id="mira-insp-back">⬇️ Arkaya Gönder</button>
-            <button type="button" class="mira-btn" id="mira-insp-reset">🔄 Sıfırla</button>
-            <button type="button" class="mira-btn danger" id="mira-insp-hide">👁️‍🗨️ Gizle</button>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="mira-mini-btn" id="mira-insp-front" style="flex:1;">⬆️ Öne Getir</button>
+            <button type="button" class="mira-mini-btn" id="mira-insp-back" style="flex:1;">⬇️ Arkaya Gönder</button>
+            <button type="button" class="mira-mini-btn danger" id="mira-insp-hide" style="flex:1;">👁️‍🗨️ Kartı Gizle</button>
+          </div>
+        </div>
+
+        <!-- 5. SIFIRLAMA & DEFAULT'A ÇEKME MERKEZİ (SEÇİLİ KART VEYA TÜM KARTLAR) -->
+        <div class="mira-insp-section">
+          <div class="mira-insp-sec-title">🛠️ HIZLI SIFIRLAMA & DEFAULT'A ÇEKME MERKEZİ</div>
+
+          <div style="font-size:10.5px; font-weight:700; color:#94a3b8;">🎯 Sadece Seçili Kart (${label}):</div>
+          <div class="mira-reset-grid">
+            <button type="button" class="mira-mini-btn warn" id="mira-rst-sel-pos">📍 Konumu Default'a Çek</button>
+            <button type="button" class="mira-mini-btn warn" id="mira-rst-sel-size">📐 Boyutu Sıfırla</button>
+            <button type="button" class="mira-mini-btn warn" id="mira-rst-sel-design">🎨 Tasarımı Sıfırla</button>
+            <button type="button" class="mira-mini-btn danger" id="mira-rst-sel-all">🔄 Seçili Kartı Sıfırla</button>
+          </div>
+
+          <div style="font-size:10.5px; font-weight:700; color:#94a3b8; margin-top:4px;">🌐 Tuvaldeki Tüm Kartlar:</div>
+          <div class="mira-reset-grid">
+            <button type="button" class="mira-mini-btn warn" id="mira-rst-all-pos">📍 Tüm Konumları Default'a Çek</button>
+            <button type="button" class="mira-mini-btn warn" id="mira-rst-all-size">📐 Tüm Boyutları Sıfırla</button>
+            <button type="button" class="mira-mini-btn warn" id="mira-rst-all-design">🎨 Tüm Tasarımı Sıfırla</button>
+            <button type="button" class="mira-mini-btn danger" id="mira-rst-all-all">🔄 Tüm Tuvali Sıfırla</button>
           </div>
         </div>
       </div>
 
       <div class="mira-insp-footer">
+        <button type="button" class="mira-btn primary" id="mira-insp-add-card-btn">➕ Kart Ekle</button>
         <button type="button" class="mira-btn success" id="mira-insp-save-btn">💾 DEĞİŞİKLİKLERİ KAYDET</button>
       </div>
     `;
 
-    // Kart Düzenleme Kartını seçilen kartın yanına (ekrandan taşmayacak şekilde) konumlandır
+    // Kart Düzenleme Kartını seçilen kartın yanına konumlandır
     let popX = rect.x + rect.w + 24;
-    if (popX + 420 > 1900) {
-      popX = Math.max(24, rect.x - 434);
+    if (popX + 440 > 1900) {
+      popX = Math.max(24, rect.x - 450);
     }
-    let popY = Math.max(68, Math.min(1080 - 880, rect.y));
+    let popY = Math.max(64, Math.min(1080 - 960, rect.y));
     inspectorEl.style.left = `${Math.round(popX)}px`;
     inspectorEl.style.top = `${Math.round(popY)}px`;
     inspectorEl.style.right = 'auto';
@@ -932,7 +1904,6 @@
       inspectorEl.classList.remove('open');
     });
 
-    // Inspector başlığından sürükleme
     initInspectorHeaderDrag(inspectorEl.querySelector('#mira-insp-drag-handle'));
 
     // 1. Metin Değişiklikleri
@@ -947,7 +1918,91 @@
       });
     });
 
-    // 2. Font & Renk Değişiklikleri
+    // 2. Renk Laboratuvarı (Rengi Ayarla -> Sana Kodunu Versin & Hedefe Uygula)
+    const labPicker = inspectorEl.querySelector('#mira-lab-picker');
+    const labHexOut = inspectorEl.querySelector('#mira-lab-hex-out');
+    const labRgbOut = inspectorEl.querySelector('#mira-lab-rgb-out');
+    const labCopyBtn = inspectorEl.querySelector('#mira-lab-copy-btn');
+
+    const applyColorToTarget = (hexColor, targetKey) => {
+      lastLabColor = hexColor;
+      labPicker.value = hexColor;
+      labHexOut.value = hexColor;
+      labRgbOut.textContent = hexToRgbString(hexColor);
+
+      if (targetKey === 'allTheme') {
+        ov.borderColor = hexColor;
+        ov.textColor = '#ffffff';
+        ov.subTextColor = hexColor;
+        syncColorInputsInInspector();
+      } else if (targetKey) {
+        ov[targetKey] = hexColor;
+        syncColorInputsInInspector();
+      }
+      applyWidgetOverride(widgetEl, wid, ov);
+      notifyParentOfLiveChange();
+    };
+
+    const syncColorInputsInInspector = () => {
+      if (ov.textColor) {
+        inspectorEl.querySelector('#mira-insp-textcolor').value = ov.textColor;
+        inspectorEl.querySelector('#mira-insp-textcolor-txt').value = ov.textColor;
+      }
+      if (ov.subTextColor) {
+        inspectorEl.querySelector('#mira-insp-subcolor').value = ov.subTextColor;
+        inspectorEl.querySelector('#mira-insp-subcolor-txt').value = ov.subTextColor;
+      }
+      if (ov.borderColor) {
+        inspectorEl.querySelector('#mira-insp-bordercolor').value = ov.borderColor;
+        inspectorEl.querySelector('#mira-insp-bordercolor-txt').value = ov.borderColor;
+      }
+      if (ov.bgColor) {
+        inspectorEl.querySelector('#mira-insp-bgcolor').value = ov.bgColor;
+        inspectorEl.querySelector('#mira-insp-bgcolor-txt').value = ov.bgColor;
+      }
+    };
+
+    labPicker.addEventListener('input', () => {
+      const hex = labPicker.value;
+      lastLabColor = hex;
+      labHexOut.value = hex;
+      labRgbOut.textContent = hexToRgbString(hex);
+      applyColorToTarget(hex, activePaletteTarget);
+    });
+
+    labHexOut.addEventListener('input', () => {
+      const val = labHexOut.value.trim();
+      if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+        applyColorToTarget(val, activePaletteTarget);
+      }
+    });
+
+    labCopyBtn.addEventListener('click', () => {
+      const code = labHexOut.value;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).catch(() => {});
+      }
+      labCopyBtn.textContent = `✓ ${code} Kopyalandı!`;
+      setTimeout(() => (labCopyBtn.textContent = '📋 Kodu Kopyala'), 1600);
+    });
+
+    inspectorEl.querySelectorAll('.mira-target-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        inspectorEl.querySelectorAll('.mira-target-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activePaletteTarget = pill.getAttribute('data-target');
+        applyColorToTarget(labHexOut.value, activePaletteTarget);
+      });
+    });
+
+    inspectorEl.querySelectorAll('.mira-swatch-btn').forEach(sw => {
+      sw.addEventListener('click', () => {
+        const hex = sw.getAttribute('data-hex');
+        applyColorToTarget(hex, activePaletteTarget);
+      });
+    });
+
+    // 3. Font & Renk Değişiklikleri
     const fontSel = inspectorEl.querySelector('#mira-insp-font');
     fontSel.addEventListener('change', () => {
       ov.fontFamily = fontSel.value;
@@ -972,13 +2027,22 @@
       picker.addEventListener('input', () => {
         txt.value = picker.value;
         ov[propName] = picker.value;
+        lastLabColor = picker.value;
+        labPicker.value = picker.value;
+        labHexOut.value = picker.value;
+        labRgbOut.textContent = hexToRgbString(picker.value);
         applyWidgetOverride(widgetEl, wid, ov);
         notifyParentOfLiveChange();
       });
       txt.addEventListener('input', () => {
         if (/^#[0-9a-fA-F]{6}$/.test(txt.value.trim())) {
-          picker.value = txt.value.trim();
-          ov[propName] = txt.value.trim();
+          const cleanHex = txt.value.trim();
+          picker.value = cleanHex;
+          ov[propName] = cleanHex;
+          lastLabColor = cleanHex;
+          labPicker.value = cleanHex;
+          labHexOut.value = cleanHex;
+          labRgbOut.textContent = hexToRgbString(cleanHex);
           applyWidgetOverride(widgetEl, wid, ov);
           notifyParentOfLiveChange();
         }
@@ -1029,13 +2093,6 @@
       applyWidgetOverride(widgetEl, wid, ov);
       notifyParentOfLiveChange();
     });
-    inspectorEl.querySelector('#mira-insp-reset').addEventListener('click', () => {
-      delete widgetOverrides[wid];
-      widgetEl.removeAttribute('style');
-      updateSelectionBox();
-      openCardInspectorForWidget(widgetEl);
-      notifyParentOfLiveChange();
-    });
     inspectorEl.querySelector('#mira-insp-hide').addEventListener('click', () => {
       ov.hidden = true;
       applyWidgetOverride(widgetEl, wid, ov);
@@ -1044,6 +2101,20 @@
       notifyParentOfLiveChange();
     });
 
+    // 5. Sıfırlama & Default'a Çekme Butonları (Seçili Kart & Tüm Kartlar)
+    inspectorEl.querySelector('#mira-rst-sel-pos').addEventListener('click', () => executeResetScope('position', 'selected'));
+    inspectorEl.querySelector('#mira-rst-sel-size').addEventListener('click', () => executeResetScope('size', 'selected'));
+    inspectorEl.querySelector('#mira-rst-sel-design').addEventListener('click', () => executeResetScope('design', 'selected'));
+    inspectorEl.querySelector('#mira-rst-sel-all').addEventListener('click', () => executeResetScope('all', 'selected'));
+
+    inspectorEl.querySelector('#mira-rst-all-pos').addEventListener('click', () => executeResetScope('position', 'all'));
+    inspectorEl.querySelector('#mira-rst-all-size').addEventListener('click', () => executeResetScope('size', 'all'));
+    inspectorEl.querySelector('#mira-rst-all-design').addEventListener('click', () => executeResetScope('design', 'all'));
+    inspectorEl.querySelector('#mira-rst-all-all').addEventListener('click', () => executeResetScope('all', 'all'));
+
+    inspectorEl.querySelector('#mira-insp-add-card-btn').addEventListener('click', () => {
+      openAddCardModal('user');
+    });
     inspectorEl.querySelector('#mira-insp-save-btn').addEventListener('click', () => {
       persistOverridesToServer(true);
     });
@@ -1061,7 +2132,6 @@
     if (hInp) hInp.value = Math.round(r.h);
   }
 
-  // Inspector Kartını Başlığından Sürükleme
   function initInspectorHeaderDrag(handleEl) {
     if (!handleEl) return;
     handleEl.addEventListener('mousedown', (e) => {
@@ -1076,8 +2146,8 @@
       function onMove(ev) {
         const dx = (ev.clientX - startX) / scale;
         const dy = (ev.clientY - startY) / scale;
-        inspectorEl.style.left = `${Math.max(10, Math.min(1500, origLeft + dx))}px`;
-        inspectorEl.style.top = `${Math.max(10, Math.min(900, origTop + dy))}px`;
+        inspectorEl.style.left = `${Math.max(10, Math.min(1480, origLeft + dx))}px`;
+        inspectorEl.style.top = `${Math.max(10, Math.min(880, origTop + dy))}px`;
       }
       function onUp() {
         window.removeEventListener('mousemove', onMove);
@@ -1106,7 +2176,6 @@
       let newX = startRect.x + dx;
       let newY = startRect.y + dy;
 
-      // Merkez Hizalama Mıknatısı (Snap to Center)
       const centerX = newX + startRect.w / 2;
       const centerY = newY + startRect.h / 2;
       if (Math.abs(centerX - 960) < 12) {
@@ -1205,32 +2274,6 @@
     window.addEventListener('mouseup', onMouseUp);
   }
 
-  // Tuvale Yeni Özel Kart Ekle
-  function addNewCustomCardOnCanvas() {
-    if (!widgetOverrides.__extraCards) widgetOverrides.__extraCards = [];
-    const newId = 'custom_card_' + Date.now().toString(36);
-    const cardDef = {
-      id: newId,
-      label: '📌 Özel Kart #' + (widgetOverrides.__extraCards.length + 1),
-      title: 'ÖZEL KART BAŞLIĞI',
-      body: 'Bu karta tıklayarak yazısını, fontunu, rengini ve boyutunu değiştirebilirsiniz.'
-    };
-    widgetOverrides.__extraCards.push(cardDef);
-    widgetOverrides[newId] = {
-      x: 780,
-      y: 420,
-      w: 360,
-      h: 150
-    };
-    applyAllWidgetOverrides(widgetOverrides);
-    const newEl = document.querySelector(`[data-mira-widget="${newId}"]`);
-    if (newEl) {
-      selectWidget(newEl);
-      openCardInspectorForWidget(newEl);
-    }
-    notifyParentOfLiveChange();
-  }
-
   function selectWidget(widgetEl) {
     document.querySelectorAll('[data-mira-widget]').forEach(el => el.classList.remove('mira-widget-selected'));
     selectedWidgetEl = widgetEl;
@@ -1241,7 +2284,6 @@
     updateSelectionBox();
   }
 
-  // Üst pencereye (Studio index.html) anlık bildirim gönder
   function notifyParentOfLiveChange() {
     if (window.parent && window.parent !== window) {
       window.parent.postMessage({
@@ -1252,7 +2294,6 @@
     }
   }
 
-  // Sunucuya (`user-gallery.json`) kaydet
   function persistOverridesToServer(showFeedback = false) {
     notifyParentOfLiveChange();
     if (!currentItemId || currentItemId === 'preview_canvas' || currentItemId.startsWith('tpl_')) {
@@ -1335,16 +2376,21 @@
     if (!isEditMode) {
       selectWidget(null);
       if (inspectorEl) inspectorEl.classList.remove('open');
+      if (addCardModalBackdropEl) addCardModalBackdropEl.classList.remove('open');
     } else {
       setTimeout(autoSelectDefaultWidget, 80);
     }
   }
 
-  // Fare Tıklama & Sürükleme Dinleyicisi
   function initCanvasInteractions() {
     document.addEventListener('mousedown', (e) => {
       if (!isEditMode) return;
-      if (e.target.closest('.mira-card-inspector') || e.target.closest('.mira-canvas-toolbar') || e.target.closest('.mira-resize-handle')) {
+      if (
+        e.target.closest('.mira-card-inspector') ||
+        e.target.closest('.mira-canvas-toolbar') ||
+        e.target.closest('.mira-resize-handle') ||
+        e.target.closest('.mira-add-modal-backdrop')
+      ) {
         return;
       }
 
@@ -1362,7 +2408,6 @@
     }, true);
   }
 
-  // Başlangıçta Kayıtlı Öğenin `config.widgets` Verisini Yükle
   function loadSavedWidgetOverrides() {
     discoverWidgets();
     if (!currentItemId || currentItemId === 'preview_canvas') return;
@@ -1379,7 +2424,6 @@
       .catch(() => {});
   }
 
-  // Mesaj Dinleyicisi (Studio'dan gelen Edit Modu ve Güncelleme komutları)
   window.addEventListener('message', (e) => {
     const msg = e.data;
     if (!msg || typeof msg !== 'object') return;
@@ -1405,7 +2449,10 @@
       }, 60);
     } else if (msg.type === 'ADD_NEW_CARD_ON_CANVAS') {
       setEditMode(true);
-      addNewCustomCardOnCanvas();
+      openAddCardModal(msg.tab || 'user');
+    } else if (msg.type === 'MIRA_RESET_CANVAS') {
+      setEditMode(true);
+      executeResetScope(msg.mode || 'all', msg.scope || 'all');
     }
   });
 

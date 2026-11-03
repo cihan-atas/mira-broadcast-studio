@@ -1836,20 +1836,24 @@
       <!-- TAB 3: BOŞ TUVAL STÜDYOSU & ETKİLEŞİMLİ SÜRÜKLE-BIRAK EDİTÖR -->
       <div id="tab-canvas-builder" class="tab-pane">
         <div class="card-panel" style="padding: 16px 20px;">
-          <div class="card-panel-header" style="margin-bottom: 12px;">
+          <div class="card-panel-header" style="margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
             <span class="card-panel-title" id="builder-header-title">
               <span>🎨</span> ETKİLEŞİMLİ TUVAL EDİTÖRÜ (SÜRÜKLE • BOYUTLANDIR • KARTA TIKLA DÜZENLE)
             </span>
-            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
               <span class="card-panel-badge" id="builder-mode-badge">Etkileşimli Tuval Aktif</span>
-              <button class="btn-gal" onclick="triggerAddCardOnCanvas()" style="background: rgba(168,85,247,0.2); border-color:#a855f7;">➕ Yeni Özel Kart Ekle</button>
-              <button class="btn-gal" onclick="openBlankCanvasBuilder()" title="Sıfırlayıp yeni boş tuval aç">🔄 Yeni Boş Tuval</button>
+              <button class="btn-gal" onclick="triggerAddCardOnCanvas('user')" style="background: rgba(16,185,129,0.2); border-color:#10b981; color:#fff;">🗂️ Kendi Galerimden Kart Ekle</button>
+              <button class="btn-gal" onclick="triggerAddCardOnCanvas('store')" style="background: rgba(168,85,247,0.22); border-color:#a855f7; color:#fff;">🏪 Mağazadan Keşfet & Kaydet</button>
+              <button class="btn-gal" onclick="triggerCanvasReset('position', 'all')" title="Tüm kartların yerlerini varsayılana çeker">📍 Konumları Default'a Çek</button>
+              <button class="btn-gal" onclick="triggerCanvasReset('size', 'all')" title="Tüm kartların boyutlarını varsayılana sıfırlar">📐 Boyutları Sıfırla</button>
+              <button class="btn-gal" onclick="triggerCanvasReset('design', 'all')" title="Tüm kartların renk/font tasarımlarını sıfırlar">🎨 Tasarımı Sıfırla</button>
+              <button class="btn-gal" onclick="openBlankCanvasBuilder()" title="Tüm tuvali tamamen ilk haline sıfırlar">🔄 Tümünü Sıfırla</button>
               <button class="btn-gal go-live" onclick="saveBuilderItemToMyGallery()" style="padding: 8px 16px;">💾 Kaydet & Yayına Ver</button>
             </div>
           </div>
 
           <div class="info-tip-box" style="margin-bottom: 14px; border-left-color: #53fc18; background: rgba(83, 252, 24, 0.06);">
-            🖱️ <strong>Nasıl Düzenlenir?</strong> Aşağıdaki <strong>Canlı Tuval</strong> üzerindeki herhangi bir <strong>karta fareyle tıkladığınızda</strong> hemen yanında <strong>"✏️ Kartı Düzenleme Kartı"</strong> açılır! Oradan kartın içindeki <strong>yazıları, yazı rengini, yazı fontunu, yazı boyutunu ve çerçevesini</strong> anında değiştirebilirsiniz. Kartları tutup <strong>sürükleyerek taşıyabilir</strong> ve yeşil köşe noktalarından <strong>yeniden boyutlandırabilirsiniz</strong>!
+            🖱️ <strong>Nasıl Düzenlenir?</strong> Aşağıdaki <strong>Canlı Tuval</strong> üzerindeki herhangi bir <strong>karta fareyle tıkladığınızda</strong> hemen yanında <strong>"✏️ Kartı Düzenleme Kartı"</strong> açılır! Oradan kartın <strong>yazılarını, yazı rengini, renk paletini, fontunu, boyutunu</strong> değiştirebilir; sadece <strong>seçili kartın veya tüm kartların konumunu/boyutunu/tasarımını default'a</strong> çekebilirsiniz!
           </div>
 
           <input type="hidden" id="builder-edit-id" value="">
@@ -1874,52 +1878,61 @@
           <input type="hidden" id="b-customcard-title" value="YAYIN PROGRAMI & DUYURU">
           <input type="hidden" id="b-customcard-body" value="Her akşam 20:00'de MLBB sıralama maçları!">
 
-          <!-- Kompakt Üst Ayar Satırı: Sahne Adı, Arka Plan, Parçacık ve Genel Tema Rengi -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px;">
+          <!-- Kompakt Üst Ayar Satırı: Sahne Adı, Arka Plan, Genel Tema Rengi & Renk Kodu Üretici -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 12px;">
             <div class="form-group" style="margin-bottom: 0;">
               <label>Galerideki Sahne / Öğe Adı</label>
               <input type="text" id="b-item-name" class="form-control" value="MİRA Özel Yayın Sahnesi" oninput="livePreviewBuilder()">
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
-              <label>Tuval Arka Plan Stili</label>
-              <select id="b-bg-style" class="form-control" onchange="livePreviewBuilder()">
-                <option value="transparent">Şeffaf OBS Katmanı (Oyun Üstü)</option>
-                <option value="nebula">Uzay Bulutsusu (Nebula Tam Ekran)</option>
-                <option value="cybergrid">Siber Izgara (CyberGrid)</option>
-                <option value="darkglass">Koyu Stüdyo Camı (DarkGlass)</option>
-              </select>
+              <label>Tuval Arka Plan Stili & Parçacık</label>
+              <div style="display: flex; gap: 6px;">
+                <select id="b-bg-style" class="form-control" onchange="livePreviewBuilder()">
+                  <option value="transparent">Şeffaf OBS Katmanı</option>
+                  <option value="nebula">Uzay Bulutsusu (Nebula)</option>
+                  <option value="cybergrid">Siber Izgara (CyberGrid)</option>
+                  <option value="darkglass">Koyu Stüdyo Camı</option>
+                </select>
+                <select id="b-particles" class="form-control" style="max-width: 115px;" onchange="livePreviewBuilder()">
+                  <option value="true">✨ Efekt Açık</option>
+                  <option value="false">🚫 Kapalı</option>
+                </select>
+              </div>
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
-              <label>Canlı Parçacık Efekti</label>
-              <select id="b-particles" class="form-control" onchange="livePreviewBuilder()">
-                <option value="true">✨ Parçacık Efektleri Açık</option>
-                <option value="false">🚫 Parçacık Efektleri Kapalı</option>
-              </select>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 0;">
-              <label>Genel Sahne Neon Renkleri</label>
+              <label>Genel Sahne Neon Renkleri (Ana & İkincil)</label>
               <div style="display: flex; gap: 6px; align-items: center;">
-                <input type="color" id="b-primary-color" value="#a855f7" style="width: 38px; height: 36px; border: none; background: transparent; cursor: pointer;" oninput="livePreviewBuilder()">
-                <input type="text" id="b-primary-color-txt" class="form-control" style="padding: 8px;" value="#a855f7" oninput="document.getElementById('b-primary-color').value=this.value; livePreviewBuilder()">
-                <input type="color" id="b-secondary-color" value="#10b981" style="width: 38px; height: 36px; border: none; background: transparent; cursor: pointer;" oninput="livePreviewBuilder()">
-                <input type="text" id="b-secondary-color-txt" class="form-control" style="padding: 8px;" value="#10b981" oninput="document.getElementById('b-secondary-color').value=this.value; livePreviewBuilder()">
+                <input type="color" id="b-primary-color" value="#a855f7" style="width: 36px; height: 34px; border: none; background: transparent; cursor: pointer;" oninput="document.getElementById('b-primary-color-txt').value=this.value; livePreviewBuilder()">
+                <input type="text" id="b-primary-color-txt" class="form-control" style="padding: 7px 8px; font-family: monospace;" value="#a855f7" oninput="document.getElementById('b-primary-color').value=this.value; livePreviewBuilder()">
+                <input type="color" id="b-secondary-color" value="#10b981" style="width: 36px; height: 34px; border: none; background: transparent; cursor: pointer;" oninput="document.getElementById('b-secondary-color-txt').value=this.value; livePreviewBuilder()">
+                <input type="text" id="b-secondary-color-txt" class="form-control" style="padding: 7px 8px; font-family: monospace;" value="#10b981" oninput="document.getElementById('b-secondary-color').value=this.value; livePreviewBuilder()">
+              </div>
+            </div>
+
+            <!-- Tekil Renk Ayarla & Sana Renk Kodunu Versin Kutusu -->
+            <div class="form-group" style="margin-bottom: 0; background: rgba(168,85,247,0.09); border: 1px solid rgba(168,85,247,0.3); border-radius: 10px; padding: 6px 10px;">
+              <label style="color:#e9d5ff; font-size:10.5px;">🧪 Renk Ayarla → Sana Renk Kodunu Versin:</label>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <input type="color" id="studio-color-lab-picker" value="#a855f7" style="width: 34px; height: 30px; border: none; background: transparent; cursor: pointer;" oninput="onStudioColorLabChange(this.value)">
+                <input type="text" id="studio-color-lab-hex" class="form-control" style="padding: 5px 8px; font-family: monospace; font-weight: 800; max-width: 92px;" value="#a855f7" oninput="onStudioColorLabChange(this.value)">
+                <button type="button" class="btn-gal" id="studio-color-lab-copy" onclick="copyStudioColorLabCode()" style="padding: 5px 9px; font-size: 11px;">📋 Kodu Al</button>
+                <button type="button" class="btn-gal" onclick="applyBuilderColorPreset(document.getElementById('studio-color-lab-hex').value, document.getElementById('b-secondary-color').value)" style="padding: 5px 9px; font-size: 11px;">🎨 Sahneye Ver</button>
               </div>
             </div>
           </div>
 
           <!-- Hızlı Renk Paletleri & Modül Aç/Kapa Çipleri -->
           <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.07);">
-            <div class="preset-colors-bar" style="margin-top: 0;">
-              <span style="font-size: 11px; font-weight: 800; color: #94a3b8; align-self: center;">HIZLI TEMA:</span>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#a855f7', '#10b981')">💀 Ametist</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ffd700', '#ef4444')">👑 Altın</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ff85a2', '#60a5fa')">🐾 Pembe</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#e11d48', '#94a3b8')">🩸 Kızıl</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#00f5d4', '#38bdf8')">⚓ Turkuaz</button>
-              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#53fc18', '#a855f7')">🟢 Kick</button>
+            <div class="preset-colors-bar" style="margin-top: 0; align-items: center;">
+              <span style="font-size: 11px; font-weight: 800; color: #94a3b8; align-self: center;">RENK PALETİ:</span>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#a855f7', '#10b981')">💀 Ametist (#a855f7)</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ffd700', '#ef4444')">👑 Altın (#ffd700)</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#ff85a2', '#60a5fa')">🐾 Pembe (#ff85a2)</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#e11d48', '#94a3b8')">🩸 Kızıl (#e11d48)</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#00f5d4', '#38bdf8')">⚓ Turkuaz (#00f5d4)</button>
+              <button type="button" class="preset-color-btn" onclick="applyBuilderColorPreset('#53fc18', '#a855f7')">🟢 Kick (#53fc18)</button>
             </div>
 
             <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
@@ -2291,12 +2304,47 @@
       setTimeout(sendMsg, 550);
     }
 
-    function triggerAddCardOnCanvas() {
+    function triggerAddCardOnCanvas(tab = 'user') {
       const iframe = document.getElementById('preview-iframe');
       if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'ADD_NEW_CARD_ON_CANVAS' }, '*');
-        showToast('📌 Yeni özel kart tuvale eklendi! Üzerine tıklayıp düzenleyebilirsiniz.', 'success');
+        iframe.contentWindow.postMessage({ type: 'ADD_NEW_CARD_ON_CANVAS', tab }, '*');
       }
+    }
+
+    function triggerCanvasReset(mode = 'all', scope = 'all') {
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'MIRA_RESET_CANVAS', mode, scope }, '*');
+        const labels = {
+          position: '📍 Kart konumları varsayılan (default) yerlerine çekildi!',
+          size: '📐 Kart boyutları varsayılan ölçülerine sıfırlandı!',
+          design: '🎨 Kart renk ve font tasarımları sıfırlandı!',
+          all: '🔄 Tüm kartlar varsayılan ayarlarına sıfırlandı!'
+        };
+        showToast(labels[mode] || labels.all, 'success');
+      }
+    }
+
+    function onStudioColorLabChange(val) {
+      const clean = (val || '').trim();
+      const picker = document.getElementById('studio-color-lab-picker');
+      const hexInp = document.getElementById('studio-color-lab-hex');
+      if (picker && /^#[0-9a-fA-F]{6}$/.test(clean)) picker.value = clean;
+      if (hexInp && hexInp.value !== clean) hexInp.value = clean;
+    }
+
+    function copyStudioColorLabCode() {
+      const hexInp = document.getElementById('studio-color-lab-hex');
+      const btn = document.getElementById('studio-color-lab-copy');
+      const code = hexInp ? hexInp.value : '#a855f7';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).catch(() => {});
+      }
+      if (btn) {
+        btn.textContent = `✓ ${code}`;
+        setTimeout(() => (btn.textContent = '📋 Kodu Al'), 1600);
+      }
+      showToast(`🎨 Renk kodu kopyalandı: ${code}`, 'success');
     }
 
     window.addEventListener('message', (e) => {

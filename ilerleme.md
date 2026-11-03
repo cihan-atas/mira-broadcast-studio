@@ -68,9 +68,18 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
   * Tuval üzerindeki herhangi bir karta tıklandığında hemen yanında yüzen **"Kartı Düzenleme Kartı"** açılır:
     1. **📝 Karttaki Yazılar:** Tıklanan kartın içindeki tüm başlıklar, alt başlıklar, etiketler, sosyal medya linkleri ve açıklamalar otomatik algılanır; kullanıcı yazdıkça kart üzerindeki yazı anında canlı olarak değişir.
     2. **🔤 Yazı Fontu & Boyutu:** 8 farklı yayıncı fontu (`Plus Jakarta Sans`, `Orbitron`, `Cinzel Decorative`, `Rajdhani`, `Bebas Neue`, `Montserrat`, `Playfair Display`, `JetBrains Mono`) ve `%70 - %160` arası yazı boyutu ölçeklendirme sürgüsü.
-    3. **🎨 Yazı Renkleri:** Ana başlık/metin rengi ve alt başlık rengi için canlı renk seçiciler (Color Picker).
+    3. **🎨 Renk Paleti & Renk Kodu Üretici (Color Lab):**
+       * **Tekil Renk Ayarla → Sana Renk Kodunu Versin:** Kullanıcı tek bir büyük renk seçiciden istediği rengi ayarladığında anında **HEX (`#a855f7`)** ve **RGB (`rgb(168, 85, 247)`)** kodunu alır, **📋 Kodu Kopyala** ile panoya kopyalayabilir veya tek tıkla (`🟣 Çerçeveye Ver`, `🔤 Başlığa Ver`, `📝 Alt Yazıya Ver`, `🖼️ Arka Plana Ver`, `⚡ Tüm Karta Ver`) karta uygulayabilir.
+       * **12'li Lüks Neon Renk Paleti:** Tek tıkla uygulanabilen hazır yayıncı renk paleti ve ayrı renk seçiciler.
     4. **🖼️ Kart Çerçeve & Arka Plan Tasarımı:** Çerçeve/neon parlama rengi, arka plan rengi, arka plan saydamlığı (`%0 - %100`) ve köşe yuvarlaklığı (`0px - 44px`).
-    5. **📐 Konum, Boyut & Katman Yönetimi:** Hassas `X`, `Y`, `Genişlik`, `Yükseklik` kutuları, **⬆️ Öne Getir**, **⬇️ Arkaya Gönder**, **🔄 Sıfırla**, **👁️‍🗨️ Gizle** ve **➕ Yeni Kart Ekle** özellikleri.
+    5. **📐 Konum, Boyut & Katman Yönetimi:** Hassas `X`, `Y`, `Genişlik`, `Yükseklik` kutuları, **⬆️ Öne Getir**, **⬇️ Arkaya Gönder** ve **👁️‍🗨️ Kartı Gizle** kontrolleri.
+    6. **🛠️ Hızlı Sıfırlama & Default'a Çekme Merkezi (Seçili Kart veya Tüm Kartlar):**
+       * **Sadece Seçili Kart İçin:** `📍 Konumu Default'a Çek`, `📐 Boyutu Sıfırla`, `🎨 Tasarımı Sıfırla`, `🔄 Seçili Kartı Sıfırla`.
+       * **Tuvaldeki Tüm Kartlar İçin:** `📍 Tüm Konumları Default'a Çek`, `📐 Tüm Boyutları Sıfırla`, `🎨 Tüm Tasarımı Sıfırla`, `🔄 Tüm Tuvali Sıfırla`.
+* **➕ Kendi Galerimden & Ana Mağazadan Yeni Kart Ekleme Modalı (`#mira-add-card-modal`):**
+  * **🗂️ 1. Kendi Galerimden Seç:** Kullanıcının kişisel galerisine kaydettiği kartları listeler ve tek tıkla (`➕ Tuvale Ekle`) mevcut tuvalin üzerine ekler.
+  * **🏪 2. Ana Mağazadan Keşfet & Galerime Kaydet:** Resmi mağazadaki modüler kartları ve alertleri keşfedip önce **📥 Galerime Kaydet** ile kişisel galeriye kaydetme, ardından kendi galerisinden seçip tuvale yerleştirme akışı sağlar.
+  * **✏️ 3. Sıfırdan Özel Yazı Kartı:** Özel başlık ve açıklamayla serbest duyuru kartı ekleme imkanı sunar.
   * Tüm sürükleme, boyutlandırma, yazı ve stil değişiklikleri `user-gallery.json` içindeki `config.widgets` altında kalıcı olarak kaydedilir ve OBS Studio'da birebir aynı şekilde görünür.
 
 ---
