@@ -1,7 +1,8 @@
 const { app, BrowserWindow, Tray, Menu, nativeImage, shell, clipboard } = require('electron');
 const path = require('path');
 const http = require('http');
-const { fork } = require('child_process');
+const fs = require('fs');
+const { fork, exec } = require('child_process');
 
 let mainWindow = null;
 let previewWindow = null;
@@ -11,6 +12,15 @@ let serverProcess = null;
 let isQuitting = false;
 let isCreatingWindow = false;
 let serverCheckDone = false;
+
+function getAppIcon() {
+  const icoPath = path.join(__dirname, 'assets', 'icon.ico');
+  const pngPath = path.join(__dirname, 'assets', 'icon.png');
+  if (process.platform === 'win32' && fs.existsSync(icoPath)) {
+    return nativeImage.createFromPath(icoPath);
+  }
+  return nativeImage.createFromPath(pngPath);
+}
 
 function isServerAlreadyRunning(callback) {
   let called = false;
@@ -89,8 +99,7 @@ function openFloatingChatWindow(url) {
     return;
   }
 
-  const iconPath = path.join(__dirname, 'assets', 'icon.png');
-  const appIcon = nativeImage.createFromPath(iconPath);
+  const appIcon = getAppIcon();
 
   floatingChatWindow = new BrowserWindow({
     width: 440,
@@ -137,8 +146,7 @@ function openPreviewWindow(url) {
     return;
   }
 
-  const iconPath = path.join(__dirname, 'assets', 'icon.png');
-  const appIcon = nativeImage.createFromPath(iconPath);
+  const appIcon = getAppIcon();
 
   previewWindow = new BrowserWindow({
     width: 1280,
@@ -177,8 +185,7 @@ function createWindow() {
   if (isCreatingWindow) return;
   isCreatingWindow = true;
 
-  const iconPath = path.join(__dirname, 'assets', 'icon.png');
-  const appIcon = nativeImage.createFromPath(iconPath);
+  const appIcon = getAppIcon();
 
   mainWindow = new BrowserWindow({
     width: 1480,
@@ -231,8 +238,7 @@ function createWindow() {
 function createTray() {
   if (tray) return;
 
-  const iconPath = path.join(__dirname, 'assets', 'icon.png');
-  const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 22, height: 22 });
+  const trayIcon = getAppIcon().resize({ width: 22, height: 22 });
 
   tray = new Tray(trayIcon);
   tray.setToolTip('MİRA BROADCAST STUDIO');
@@ -312,7 +318,11 @@ function killServerProcess() {
   }
   if (serverProcess) {
     try {
-      serverProcess.kill('SIGTERM');
+      if (process.platform === 'win32' && serverProcess.pid) {
+        exec(`taskkill /pid ${serverProcess.pid} /T /F`, () => {});
+      } else {
+        serverProcess.kill('SIGTERM');
+      }
     } catch (e) {}
     serverProcess = null;
   }

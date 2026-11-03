@@ -61,9 +61,10 @@ Her iki platform için sahneler **`kick/`** ve **`tiktok/`** klasörlerine ayrı
 
 ## 🚀 Hızlı Başlatma (Windows & Linux)
 
-### 🪟 Windows İçin (Sıfır Kurulum — Node veya Python GEREKTİRMEZ):
-1. [`yayın/baslat.bat`](file:///home/zeus/Desktop/yayın/baslat.bat) dosyasına çift tıklayın.
-2. Windows'un dahili PowerShell'i üzerinden yerel web sunucusu (Port: 8080) otomatik başlar ve tarayıcınızda Kontrol Masası açılır.
+### 🪟 Windows İçin:
+1. **Masaüstü Uygulaması:** [`yayın/baslat.bat`](file:///home/zeus/Desktop/yayın/baslat.bat) dosyasına çift tıklayın. Node.js ve gerekli tüm paketler otomatik denetlenir, MİRA Masaüstü Uygulaması (Electron) ve yerel sunucu (Port: 8080) tek pencerede açılır.
+2. **Hafif Sunucu & Web Modu:** İsterseniz doğrudan [`yayın/baslat-server.bat`](file:///home/zeus/Desktop/yayın/baslat-server.bat) dosyasına tıklayarak sadece web arayüzünü tarayıcınızda açıp OBS yayınınıza odaklanabilirsiniz.
+3. **OBS Studio Uyumluluğu:** Windows OBS 28, 29, 30 ve 31 sürümleriyle tam uyumludur. OBS WebSocket (Port: 4455) üzerinden sahne geçişleri, metin güncellemeleri, ses kontrolleri ve Audio Ducking (müzik kısma) tak-çalıştır aktiftir. Türkçe veya İngilizce OBS'teki ses aygıtlarını (`Desktop Audio`, `Masaüstü Sesi`) otomatik tanır.
 
 ### 🐧 Linux İçin:
 1. Terminali açıp `./baslat.sh` komutunu çalıştırın.

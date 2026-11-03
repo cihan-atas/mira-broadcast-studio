@@ -100,7 +100,7 @@ function setObsTextSource(sourceName, text, callback) {
     if (callback) callback(new Error('OBS WebSocket bağlı değil'));
     return;
   }
-  const targets = [sourceName, 'Now Playing', 'Müzik Başlığı', 'Music Title', 'NowPlaying'].filter(Boolean);
+  const targets = [sourceName, 'Now Playing', 'Müzik Başlığı', 'Music Title', 'NowPlaying', 'Şu An Çalan', 'Calan Sarki', 'Müzik'].filter(Boolean);
   let updated = false;
   let remaining = targets.length;
 
@@ -122,6 +122,26 @@ function setObsTextSource(sourceName, text, callback) {
 
 let obsSavedMusicVolume = 1.0;
 let obsIsDucked = false;
+
+// Windows & Linux Çoklu Dil Destekli OBS Ses Ayarlama Yardımcısı
+async function callObsSetInputVolume(inputName, volumeMul) {
+  if (!obsWsClient) throw new Error('OBS WebSocket bağlı değil');
+  const candidates = [inputName];
+  if (!inputName || inputName === 'Desktop Audio') {
+    candidates.push('Desktop Audio', 'Masaüstü Sesi', 'Masaüstü Ses', 'DesktopAudio', 'Müzik', 'Spotify');
+  }
+  const uniqueCandidates = [...new Set(candidates.filter(Boolean))];
+  let lastErr = null;
+  for (const name of uniqueCandidates) {
+    try {
+      await obsWsClient.call('SetInputVolume', { inputName: name, inputVolumeMul: volumeMul });
+      return name;
+    } catch(err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr || new Error('OBS ses kaynağı bulunamadı');
+}
 
 function getObsAudioInputs(callback) {
   if (!obsWsConnected || !obsWsClient) {
@@ -156,16 +176,13 @@ function setObsAudioVolume(inputName, volumeMul, callback) {
   if (!obsIsDucked) {
     obsSavedMusicVolume = mul;
   }
-  obsWsClient.call('SetInputVolume', {
-    inputName: inputName || 'Desktop Audio',
-    inputVolumeMul: mul
-  })
-  .then(() => {
-    if (callback) callback(null, { inputName: inputName || 'Desktop Audio', volumeMul: mul });
-  })
-  .catch(err => {
-    if (callback) callback(err);
-  });
+  callObsSetInputVolume(inputName || 'Desktop Audio', mul)
+    .then((matchedName) => {
+      if (callback) callback(null, { inputName: matchedName, volumeMul: mul });
+    })
+    .catch(err => {
+      if (callback) callback(err);
+    });
 }
 
 function setObsDucking(duck, inputName = 'Desktop Audio', callback) {
@@ -176,13 +193,13 @@ function setObsDucking(duck, inputName = 'Desktop Audio', callback) {
   if (duck) {
     obsIsDucked = true;
     const duckedVolume = Math.max(0.05, obsSavedMusicVolume * 0.25); // %75 kıs
-    obsWsClient.call('SetInputVolume', { inputName: inputName, inputVolumeMul: duckedVolume })
-      .then(() => callback && callback(null, { ducked: true, volume: duckedVolume }))
+    callObsSetInputVolume(inputName || 'Desktop Audio', duckedVolume)
+      .then((matchedName) => callback && callback(null, { ducked: true, volume: duckedVolume, inputName: matchedName }))
       .catch(err => callback && callback(err));
   } else {
     obsIsDucked = false;
-    obsWsClient.call('SetInputVolume', { inputName: inputName, inputVolumeMul: obsSavedMusicVolume })
-      .then(() => callback && callback(null, { ducked: false, volume: obsSavedMusicVolume }))
+    callObsSetInputVolume(inputName || 'Desktop Audio', obsSavedMusicVolume)
+      .then((matchedName) => callback && callback(null, { ducked: false, volume: obsSavedMusicVolume, inputName: matchedName }))
       .catch(err => callback && callback(err));
   }
 }
