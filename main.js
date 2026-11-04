@@ -334,29 +334,42 @@ function uninstallApp() {
   isQuitting = true;
   killServerProcess();
 
-  const wipe = () => { if (wipeData) { try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {} } };
+  // Silme işlemi uygulama kapandıktan SONRA yapılmalı (Chromium çıkışta klasörü yeniden yazar)
+  const q = (s) => `'${String(s).replace(/'/g, `'\\''`)}'`;
+  const wipeLater = () => {
+    if (!wipeData) return;
+    if (process.platform === 'win32') {
+      exec(`cmd /c ping 127.0.0.1 -n 4 >nul & rmdir /s /q "${dataDir}"`, { windowsHide: true });
+    } else {
+      spawn('sh', ['-c', `sleep 2; rm -rf ${q(dataDir)}`], { detached: true, stdio: 'ignore' }).unref();
+    }
+  };
+  const spawn = require('child_process').spawn;
+  let note = '';
 
   try {
-    if (process.platform === 'win32') {
+    if (!app.isPackaged) {
+      note = 'Uygulama kurulu değil, kaynak koddan çalışıyor; kaldırılacak paket yok.' + (wipeData ? ' Kullanıcı verisi silinecek.' : '');
+      wipeLater();
+    } else if (process.platform === 'win32') {
       const un = fs.existsSync(exeDir) ? fs.readdirSync(exeDir).find(f => /^uninstall.*\.exe$/i.test(f)) : null;
+      wipeLater();
       if (un) {
-        // Kaldırıcı (NSIS) başlatılır; veri silme için ayrıca cmd ile gecikmeli temizlik
-        if (wipeData) exec(`cmd /c ping 127.0.0.1 -n 8 >nul & rmdir /s /q "${dataDir}"`, { windowsHide: true });
-        require('child_process').spawn(path.join(exeDir, un), [], { detached: true, stdio: 'ignore' }).unref();
+        spawn(path.join(exeDir, un), [], { detached: true, stdio: 'ignore' }).unref();
       } else {
-        dialog.showMessageBoxSync({ type: 'info', message: 'Kaldırıcı bulunamadı (portable sürüm).', detail: 'Uygulama klasörünü elle silebilirsin.' + (wipeData ? ' Kullanıcı verisi silindi.' : '') });
-        wipe();
+        note = 'Kaldırıcı bulunamadı (portable sürüm). Uygulama klasörünü elle silebilirsin.';
       }
     } else if (process.env.APPIMAGE) {
-      wipe();
-      try { fs.unlinkSync(process.env.APPIMAGE); } catch (e) {}
+      wipeLater();
+      spawn('sh', ['-c', `sleep 2; rm -f ${q(process.env.APPIMAGE)}`], { detached: true, stdio: 'ignore' }).unref();
     } else {
-      wipe();
-      exec('pkexec apt-get remove -y mira-broadcast-studio || pkexec dpkg -r mira-broadcast-studio');
+      const wipeCmd = wipeData ? `; rm -rf ${q(dataDir)}` : '';
+      spawn('sh', ['-c', `sleep 2; pkexec apt-get remove -y mira-broadcast-studio${wipeCmd}`], { detached: true, stdio: 'ignore' }).unref();
     }
   } catch (e) {
     console.error('[APP] Kaldırma hatası:', e);
   }
+  if (note) dialog.showMessageBoxSync({ type: 'info', message: note });
   app.quit();
 }
 
