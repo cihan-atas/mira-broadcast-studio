@@ -5751,7 +5751,9 @@
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 16px;">
+      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 16px;">
+        <button type="button" id="app-uninstall-btn" class="btn-clean-subtle" style="display:none; margin-right:auto; color:#f87171; border-color:rgba(248,113,113,0.4);" onclick="window.location.href='mira-action://uninstall'">🗑️ Uygulamayı Kaldır</button>
+        <script>if (/Electron/i.test(navigator.userAgent)) document.getElementById('app-uninstall-btn').style.display = '';</script>
         <button type="button" class="btn-clean-subtle" onclick="closeStreamerSettingsModal()">Kapat</button>
         <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #a855f7, #00f5a0); color: #060911; font-weight: 900; padding: 9px 18px;" onclick="saveAndConnectKickChannel()">
           💾 KAYDET & BAĞLAN

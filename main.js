@@ -217,6 +217,14 @@ function createWindow() {
     return { action: 'deny' };
   });
 
+  // Arayüzdeki "Kaldır" düğmesi mira-action://uninstall adresine gider
+  mainWindow.webContents.on('will-navigate', (e, navUrl) => {
+    if (navUrl.startsWith('mira-action://')) {
+      e.preventDefault();
+      if (navUrl === 'mira-action://uninstall') uninstallApp();
+    }
+  });
+
   mainWindow.loadURL('http://localhost:8080/');
 
   mainWindow.on('close', () => {
