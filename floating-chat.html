@@ -319,11 +319,11 @@
       <div class="chat-title-box">
         <span class="live-dot"></span>
         <span>CANLI SOHBET</span>
-        <span class="chat-status-pill">🟢 Kick: cihanatas</span>
+        <span class="chat-status-pill" id="float-chat-pill">🟢 Kick Chat</span>
       </div>
 
       <div class="chat-header-actions">
-        <a href="https://kick.com/popout/cihanatas/chat" target="_blank" onclick="window.open(this.href, 'kick_chat_popout', 'width=420,height=680,scrollbars=yes,resizable=yes'); return false;" class="btn-tts" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.4); color: #00f5a0; text-decoration: none;" title="Kick resmi sohbetini açar; yayıncı hesabınızla izleyicilere yanıt verebilirsiniz">
+        <a id="kick-popout-link" href="https://kick.com" target="_blank" onclick="window.open(this.href, 'kick_chat_popout', 'width=420,height=680,scrollbars=yes,resizable=yes'); return false;" class="btn-tts" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.4); color: #00f5a0; text-decoration: none;" title="Kick resmi sohbetini açar; yayıncı hesabınızla izleyicilere yanıt verebilirsiniz">
           <span>⚡</span> <span>Kick Chat</span>
         </a>
         <button type="button" class="btn-tts" id="floating-tts-btn" onclick="toggleFloatingTTS()" title="Sohbet Sesli Okuma (TTS) Aç/Kapat">
@@ -340,13 +340,13 @@
       <div class="clean-chat-msg is-system">
         <span class="clean-msg-time" id="init-time">17:00</span>
         <span class="clean-msg-badge">MİRA</span>
-        <span class="clean-msg-text">Canlı sohbet konsolu aktif. Mesajlarınızı buradan cihanatas olarak yanıtlayabilirsiniz.</span>
+        <span class="clean-msg-text" id="float-system-intro">Canlı sohbet konsolu aktif. Mesajlarınızı doğrudan buradan yanıtlayabilirsiniz.</span>
       </div>
     </main>
 
     <!-- Mesaj Gönderme Çubuğu -->
     <footer class="chat-input-bar">
-      <input type="text" id="streamer-input" class="chat-input" placeholder="cihanatas olarak mesaj yazın... (Enter)" autocomplete="off">
+      <input type="text" id="streamer-input" class="chat-input" placeholder="Yayıncı olarak mesaj yazın... (Enter)" autocomplete="off">
       <button type="button" class="chat-send-btn" onclick="sendReply()">
         Gönder
       </button>
@@ -362,8 +362,13 @@
       const chatFeed = document.getElementById('chat-feed');
       const inputEl = document.getElementById('streamer-input');
 
-      const streamerName = localStorage.getItem('mira_streamer_username') || 'cihanatas';
+      const streamerName = localStorage.getItem('mira_streamer_username') || 'Yayıncı';
+      const kickSlug = localStorage.getItem('mira_kick_slug') || (streamerName !== 'Yayıncı' ? streamerName : '');
       if (inputEl) inputEl.placeholder = `${streamerName} olarak mesaj yazın... (Enter)`;
+      const popLink = document.getElementById('kick-popout-link');
+      if (popLink && kickSlug) popLink.href = `https://kick.com/popout/${encodeURIComponent(kickSlug)}/chat`;
+      const pill = document.getElementById('float-chat-pill');
+      if (pill && kickSlug) pill.textContent = `🟢 Kick: ${kickSlug}`;
 
       function getNowTimeStr() {
         const d = new Date();

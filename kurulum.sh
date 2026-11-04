@@ -48,19 +48,19 @@ if [ "$INSTALL_NODE" -eq 1 ]; then
   if command -v apt-get >/dev/null 2>&1; then
     echo "[1/3] Debian/Ubuntu tabanlı sistem tespit edildi (apt)..."
     $SUDO apt-get update -qq || true
-    $SUDO apt-get install -y nodejs npm curl || true
+    $SUDO apt-get install -y nodejs npm curl ffmpeg || true
   # Arch Linux / Manjaro / EndeavourOS
   elif command -v pacman >/dev/null 2>&1; then
     echo "[1/3] Arch Linux tabanlı sistem tespit edildi (pacman)..."
-    $SUDO pacman -Sy --noconfirm nodejs npm || true
+    $SUDO pacman -Sy --noconfirm nodejs npm ffmpeg || true
   # Fedora / RHEL / CentOS
   elif command -v dnf >/dev/null 2>&1; then
     echo "[1/3] Fedora tabanlı sistem tespit edildi (dnf)..."
-    $SUDO dnf install -y nodejs npm || true
+    $SUDO dnf install -y nodejs npm ffmpeg || true
   # openSUSE
   elif command -v zypper >/dev/null 2>&1; then
     echo "[1/3] openSUSE tabanlı sistem tespit edildi (zypper)..."
-    $SUDO zypper --non-interactive install nodejs npm || true
+    $SUDO zypper --non-interactive install nodejs npm ffmpeg || true
   fi
 
   # Hala bulunamadıysa kullanıcı dizinine resmi Node.js LTS static binary indir

@@ -73,6 +73,19 @@ echo [✓] Node.js basariyla kuruldu ve aktif edildi!
 echo.
 
 :: ---------------------------------------------------------
+:: 1.5. ADIM: FFmpeg Kontrolü (Ses Perde & Efekt Desteği)
+:: ---------------------------------------------------------
+where ffmpeg >nul 2>nul
+if %errorlevel% neq 0 (
+    echo [*] Ses perde & donusturme motoru icin FFmpeg kontrol ediliyor...
+    where winget >nul 2>nul
+    if %errorlevel% equ 0 (
+        echo [*] FFmpeg (Gyan.FFmpeg) winget ile sessizce yukleniyor...
+        winget install Gyan.FFmpeg -e --silent --accept-package-agreements --accept-source-agreements >nul 2>nul
+    )
+)
+
+:: ---------------------------------------------------------
 :: 2. ADIM: Paket Bagimliliklarinin Kurulumu (npm install)
 :: ---------------------------------------------------------
 :CHECK_DEPENDENCIES

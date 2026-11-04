@@ -4,7 +4,7 @@
 
 class KickClient {
   constructor(config = {}, onMessage = null, onAlert = null) {
-    this.channelSlug = config.kickChannel || "cihanatas";
+    this.channelSlug = config.kickChannel || (typeof localStorage !== 'undefined' ? localStorage.getItem('mira_streamer_username') : null) || "";
     this.onMessage = onMessage;
     this.onAlert = onAlert;
     this.ws = null;

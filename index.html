@@ -3602,19 +3602,19 @@
 
     <!-- Status Badges -->
     <div class="header-status-pills">
-      <div class="status-pill active-server">
+      <div class="status-pill active-server" title="MİRA Sunucu Portu">
         <span class="pulse-dot"></span>
         <span>PORT 8080</span>
       </div>
-      <div class="status-pill active-kick" id="kick-status-pill">
+      <div class="status-pill active-kick" id="kick-status-pill" onclick="openStreamerSettingsModal()" style="cursor: pointer;" title="Kick & Yayıncı Kanalını Değiştirmek İçin Tıklayın">
         <span class="pulse-dot"></span>
-        <span>KICK: <strong id="kick-user-name">cihanatas</strong> (<span id="kick-follower-badge">1</span>)</span>
+        <span>KICK: <strong id="kick-user-name">⚙️ Kanal Bağla</strong> (<span id="kick-follower-badge">0</span>)</span>
       </div>
-      <div class="status-pill" id="obs-status-pill">
+      <div class="status-pill" id="obs-status-pill" onclick="openObsSettingsModal()" style="cursor: pointer;" title="OBS WebSocket Ayarları İçin Tıklayın">
         <span class="pulse-dot" id="obs-pulse-dot" style="background: #64748b; box-shadow: none;"></span>
         <span id="obs-status-txt">OBS: ÇEVRİMDIŞI</span>
       </div>
-      <div class="status-pill" id="tiktok-live-pill">
+      <div class="status-pill" id="tiktok-live-pill" onclick="switchTab('tab-tiktok', document.getElementById('tab-btn-tiktok'))" style="cursor: pointer;" title="TikTok Canlı Yayın Ayarları">
         <span>TIKTOK: <strong id="tiktok-live-txt">Çevrimdışı</strong></span>
       </div>
     </div>
@@ -5143,7 +5143,7 @@
             <div class="tts-filter-grid">
               <label class="tts-checkbox-item">
                 <input type="checkbox" id="tts-filter-self" onchange="onTtsFilterChange()">
-                <span>Kendi Mesajlarımı Oku (cihanatas) — <em>Kapalı: Yayıncının kendi yazdığı seslendirilmez</em></span>
+                <span>Kendi Mesajlarımı Oku (<span id="tts-streamer-label">Yayıncı</span>) — <em>Kapalı: Yayıncının kendi yazdığı seslendirilmez</em></span>
               </label>
               <label class="tts-checkbox-item">
                 <input type="checkbox" id="tts-filter-bots" checked onchange="onTtsFilterChange()">
@@ -5268,12 +5268,12 @@
             <div class="mira-chat-header-title">
               <span class="live-dot" style="width:9px; height:9px; background:#00f5a0; box-shadow:0 0 10px #00f5a0; border-radius:50%;"></span>
               <span>CANLI SOHBET</span>
-              <span class="chat-status-pill" id="mira-chat-conn-status">🟢 Kick: cihanatas</span>
+              <span class="chat-status-pill" id="mira-chat-conn-status" onclick="openStreamerSettingsModal()" style="cursor:pointer;" title="Kanalı Değiştirmek İçin Tıklayın">⚪ Kick Bekleniyor</span>
             </div>
 
             <div class="mira-chat-header-actions">
               <!-- Kick Resmi Popout Sohbet Butonu (Yayıncının Direkt Kick Chat'e Yazması İçin) -->
-              <a href="https://kick.com/popout/cihanatas/chat" target="_blank" onclick="window.open(this.href, 'kick_chat_popout', 'width=420,height=680,scrollbars=yes,resizable=yes'); return false;" class="btn-clean-subtle" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.45); color: #00f5a0; font-weight: 800;" title="Kick resmi canlı sohbet penceresini açar; yayıncı hesabınızla izleyicilere direkt yanıt verebilirsiniz">
+              <a id="studio-kick-popout-btn" href="https://kick.com" target="_blank" onclick="window.open(this.href, 'kick_chat_popout', 'width=420,height=680,scrollbars=yes,resizable=yes'); return false;" class="btn-clean-subtle" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.45); color: #00f5a0; font-weight: 800;" title="Kick resmi canlı sohbet penceresini açar; yayıncı hesabınızla izleyicilere direkt yanıt verebilirsiniz">
                 ⚡ Kick'te Sohbete Yaz
               </a>
 
@@ -5325,7 +5325,7 @@
 
           <!-- Mesaj Gönderme Çubuğu -->
           <div class="mira-clean-input-bar">
-            <input type="text" id="studio-chat-input" class="mira-clean-input" placeholder="cihanatas olarak mesaj yazın... (Enter)" autocomplete="off">
+            <input type="text" id="studio-chat-input" class="mira-clean-input" placeholder="Yayıncı olarak mesaj yazın... (Enter)" autocomplete="off">
             <button type="button" class="mira-clean-send-btn" onclick="sendStudioChatReply()">
               Gönder
             </button>
@@ -5701,6 +5701,118 @@
     </div>
   </div>
 
+  <!-- Modal: Kick & Yayıncı Kanal Ayarları -->
+  <div class="modal-backdrop" id="streamer-settings-modal" style="display: none;" onclick="handleModalBackdropClick(event)">
+    <div class="modal-card" style="max-width: 500px; text-align: left; border: 1px solid rgba(0,245,160,0.35); box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 25px rgba(0,245,160,0.15);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">⚡</span>
+          <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 800; color: #fff;">Kick & Yayıncı Kanal Ayarları</h3>
+        </div>
+        <button class="modal-close-btn" style="position: static;" onclick="closeStreamerSettingsModal()">✕</button>
+      </div>
+
+      <p style="margin: 0 0 14px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
+        Kick canlı sohbetini, takipçi/abone alertlerini ve canlı istatistikleri kendi kanalınıza bağlamak için bilgilerinizi girin.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 800; color: #00f5a0; text-transform: uppercase; margin-bottom: 6px;">
+            🟢 Kick Kanal Adı (Slug / Nickname)
+          </label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="modal-kick-slug-input" class="mira-clean-input" style="flex: 1; font-size: 13px;" placeholder="Örn: gamer_deniz veya kanal adınız" autocomplete="off">
+            <button type="button" class="btn-primary" style="background: #00f5a0; color: #060911; font-weight: 900; padding: 0 16px;" onclick="saveAndConnectKickChannel()">
+              Bağla
+            </button>
+          </div>
+          <small style="display: block; margin-top: 4px; font-size: 11px; color: #94a3b8;">
+            Kick profil linkiniz: kick.com/<strong>kanal_adiniz</strong>
+          </small>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; margin-bottom: 6px;">
+            👑 Yayıncı Görünen Adı (Nickname)
+          </label>
+          <input type="text" id="modal-streamer-nick-input" class="mira-clean-input" style="font-size: 13px;" placeholder="Örn: Deniz (Sohbette yanıt verirken kullanılır)" autocomplete="off">
+        </div>
+
+        <!-- Canlı Bağlantı Durumu Kartı -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 11.5px; font-weight: 700; color: #fff;">Canlı Pusher Köprüsü:</div>
+            <div id="modal-kick-status-text" style="font-size: 11px; color: #94a3b8;">Kontrol ediliyor...</div>
+          </div>
+          <div id="modal-kick-follower-display" style="font-size: 13px; font-weight: 800; color: #00f5a0;">
+            - Takipçi
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 16px;">
+        <button type="button" class="btn-clean-subtle" onclick="closeStreamerSettingsModal()">Kapat</button>
+        <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #a855f7, #00f5a0); color: #060911; font-weight: 900; padding: 9px 18px;" onclick="saveAndConnectKickChannel()">
+          💾 KAYDET & BAĞLAN
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: OBS Studio WebSocket Ayarları -->
+  <div class="modal-backdrop" id="obs-settings-modal" style="display: none;" onclick="handleModalBackdropClick(event)">
+    <div class="modal-card" style="max-width: 480px; text-align: left; border: 1px solid rgba(168,85,247,0.35); box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 25px rgba(168,85,247,0.15);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">🎥</span>
+          <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 800; color: #fff;">OBS Studio WebSocket Ayarları</h3>
+        </div>
+        <button class="modal-close-btn" style="position: static;" onclick="closeObsSettingsModal()">✕</button>
+      </div>
+
+      <p style="margin: 0 0 14px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
+        MİRA'nın OBS sahnelerini değiştirebilmesi ve müzik sesini otomatik kısabilmesi için OBS WebSocket bağlantısı gereklidir.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 800; color: #c084fc; text-transform: uppercase; margin-bottom: 6px;">
+            🔌 OBS WebSocket Portu
+          </label>
+          <input type="number" id="modal-obs-port-input" class="mira-clean-input" value="4455" placeholder="4455">
+          <small style="display: block; margin-top: 4px; font-size: 11px; color: #94a3b8;">
+            OBS Studio ➡️ Araçlar ➡️ WebSocket Sunucusu Ayarları (Varsayılan: 4455)
+          </small>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 800; color: #c084fc; text-transform: uppercase; margin-bottom: 6px;">
+            🔒 OBS WebSocket Şifresi (Opsiyonel)
+          </label>
+          <input type="password" id="modal-obs-pass-input" class="mira-clean-input" placeholder="Şifresiz ise boş bırakın">
+        </div>
+
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 11.5px; font-weight: 700; color: #fff;">OBS Bağlantı Durumu:</div>
+            <div id="modal-obs-status-detail" style="font-size: 11px; color: #94a3b8;">Kontrol ediliyor...</div>
+          </div>
+          <button type="button" class="btn-clean-subtle" onclick="reconnectObsFromModal()" style="padding: 6px 12px; font-size: 11px; font-weight: 800;">
+            🔄 Yeniden Dene
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 16px;">
+        <button type="button" class="btn-clean-subtle" onclick="closeObsSettingsModal()">Kapat</button>
+        <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #a855f7, #00f5a0); color: #060911; font-weight: 900; padding: 9px 18px;" onclick="saveAndConnectObsSettings()">
+          💾 KAYDET & BAĞLAN
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notifications Container -->
   <div class="toast-container" id="toast-container"></div>
 
@@ -5983,7 +6095,7 @@
       badge2: '● LIVE',
       badgeStyle: 'pill',
       showSocials: false,
-      kickHandle: 'cihanatas',
+      kickHandle: 'mira',
       tiktokHandle: '@mira',
       showQuote: true,
       quoteText: '"Şafak Vadisi zaferimizi bekliyor!"',
@@ -6904,7 +7016,7 @@
       if (forgeState.showSocials) {
         socialsHtml = `
           <div class="canva-interactive-elem" data-canva-hint="📱 Tıkla: Sosyal Medya Linkleri" onclick="onCanvaElementClick('socials', event)" style="display:flex; gap:12px; font-size:11px; font-weight:700; color:#cbd5e1; flex-wrap:wrap; padding:2px; border-radius:6px; cursor:pointer;">
-            <span>🟢 kick.com/${escHtml(forgeState.kickHandle || 'cihanatas')}</span>
+            <span>🟢 kick.com/${escHtml(forgeState.kickHandle || (typeof localStorage !== 'undefined' ? localStorage.getItem('mira_kick_slug') : null) || 'mira')}</span>
             <span>📱 ${escHtml(forgeState.tiktokHandle || '@mira')}</span>
           </div>
         `;
@@ -8452,7 +8564,7 @@
     }
 
     function syncKickFollowersLive() {
-      fetch('/api/kick/channel?slug=cihanatas')
+      fetch('/api/kick/channel')
         .then(r => r.json())
         .then(data => {
           const count = data.followers_count ?? data.followersCount;
@@ -8472,7 +8584,7 @@
     // 30 saniyede bir otomatik Kick takipçi senkronizasyonu
     setInterval(() => {
       if (isGoalAutoSyncKick && currentGoalType === 'follower') {
-        fetch('/api/kick/channel?slug=cihanatas')
+        fetch('/api/kick/channel')
           .then(r => r.json())
           .then(data => {
             const count = data.followers_count ?? data.followersCount;
@@ -9046,13 +9158,15 @@
     const MIRA_TAB_SESSION_ID = 'session_' + Math.random().toString(36).substr(2, 9);
     const seenChatMessageIds = new Set();
 
-    // Yayıncı Kullanıcı Adı Belirleyici (Varsayılan: cihanatas)
+    // Yayıncı Kullanıcı Adı Belirleyici (Dinamik)
     function getStreamerUsername() {
-      const kickUserEl = document.getElementById('kick-user-name');
       const saved = localStorage.getItem('mira_streamer_username');
       if (saved && saved.trim()) return saved.trim();
-      if (kickUserEl && kickUserEl.textContent.trim()) return kickUserEl.textContent.trim();
-      return 'cihanatas';
+      const kickUserEl = document.getElementById('kick-user-name');
+      if (kickUserEl && kickUserEl.textContent.trim() && !kickUserEl.textContent.includes('Kanal Bağla')) {
+        return kickUserEl.textContent.trim();
+      }
+      return 'Yayıncı';
     }
 
     // Geriye dönük uyumluluk (Opaklık ayarları kaldırıldı, temiz koyu tema devrede)
@@ -9090,7 +9204,8 @@
       }
 
       const statusPill = document.getElementById('mira-chat-conn-status');
-      if (statusPill) statusPill.textContent = '🟢 Kick: cihanatas | 🔗 BotRix Bağlı';
+      const curSlug = localStorage.getItem('mira_kick_slug') || getStreamerUsername();
+      if (statusPill) statusPill.textContent = (curSlug && curSlug !== 'Yayıncı') ? `🟢 Kick: ${curSlug} | 🔗 BotRix Bağlı` : '🔗 BotRix Bağlı';
 
       showToast('BotRix widget linki kaydedildi ve canlı yayın sahnelerine aktarıldı!', 'success');
       toggleBotrixConfigDrawer(false);
@@ -9112,7 +9227,8 @@
       }
 
       const statusPill = document.getElementById('mira-chat-conn-status');
-      if (statusPill) statusPill.textContent = '🟢 Kick: cihanatas';
+      const curSlug = localStorage.getItem('mira_kick_slug') || getStreamerUsername();
+      if (statusPill) statusPill.textContent = (curSlug && curSlug !== 'Yayıncı') ? `🟢 Kick: ${curSlug}` : '⚪ Kick Bekleniyor';
 
       showToast('BotRix widget linki sıfırlandı.');
       toggleBotrixConfigDrawer(false);
@@ -9605,7 +9721,7 @@
       });
     }
 
-    // 7. Mesaj Gönderme (Yayıncı: cihanatas olarak canlı yayına ve sohbet akışına basar)
+    // 7. Mesaj Gönderme (Yayıncı olarak canlı yayına ve sohbet akışına basar)
     function sendStudioChatReply() {
       const inp = document.getElementById('studio-chat-input');
       if (!inp) return;
@@ -10266,15 +10382,180 @@
     }
 
     function handleModalBackdropClick(e) {
-      if (e.target.id === 'mobile-remote-modal') {
-        closeMobileRemoteModal();
-      }
+      if (e.target.id === 'mobile-remote-modal') closeMobileRemoteModal();
+      if (e.target.id === 'streamer-settings-modal') closeStreamerSettingsModal();
+      if (e.target.id === 'obs-settings-modal') closeObsSettingsModal();
     }
 
     function copyMobileRemoteUrl() {
       navigator.clipboard.writeText(currentLanUrl).then(() => {
         showToast('Mobil Kumanda linki kopyalandı!', 'success');
       });
+    }
+
+    /* KICK & YAYINCI KANAL AYARLARI KONTROLÜ */
+    let currentKickSlug = '';
+    let currentStreamerNick = '';
+
+    function openStreamerSettingsModal() {
+      const modal = document.getElementById('streamer-settings-modal');
+      if (!modal) return;
+      const slugInput = document.getElementById('modal-kick-slug-input');
+      const nickInput = document.getElementById('modal-streamer-nick-input');
+      if (slugInput) slugInput.value = currentKickSlug || localStorage.getItem('mira_kick_slug') || '';
+      if (nickInput) nickInput.value = currentStreamerNick || localStorage.getItem('mira_streamer_username') || '';
+      modal.style.display = 'flex';
+      refreshModalKickStatus();
+      if (slugInput) setTimeout(() => slugInput.focus(), 80);
+    }
+
+    function closeStreamerSettingsModal() {
+      const modal = document.getElementById('streamer-settings-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function refreshModalKickStatus() {
+      fetch('/api/kick/status')
+        .then(r => r.json())
+        .then(st => {
+          const statusText = document.getElementById('modal-kick-status-text');
+          const followerDisplay = document.getElementById('modal-kick-follower-display');
+          if (statusText) {
+            statusText.textContent = st.connected ? `🟢 Pusher Canlı Bağlı (${st.slug})` : (st.slug ? `🟡 Bağlanıyor: ${st.slug}` : '⚪ Kanal Belirtilmedi');
+            statusText.style.color = st.connected ? '#00f5a0' : (st.slug ? '#f59e0b' : '#94a3b8');
+          }
+          if (followerDisplay && typeof st.followersCount === 'number') {
+            followerDisplay.textContent = `${st.followersCount} Takipçi`;
+          }
+        }).catch(() => {});
+    }
+
+    function saveAndConnectKickChannel() {
+      const slugInput = document.getElementById('modal-kick-slug-input');
+      const nickInput = document.getElementById('modal-streamer-nick-input');
+      const slug = (slugInput ? slugInput.value : '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
+      const nick = (nickInput ? nickInput.value : '').trim() || slug;
+
+      if (!slug) {
+        alert('Lütfen geçerli bir Kick kanal adı girin (Örn: gamer_deniz)');
+        return;
+      }
+
+      currentKickSlug = slug;
+      currentStreamerNick = nick;
+      localStorage.setItem('mira_kick_slug', slug);
+      localStorage.setItem('mira_streamer_username', nick);
+
+      updateAllStreamerLabels(slug, nick);
+
+      fetch('/api/kick/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: slug, username: nick })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showToast(`Kick kanalı bağlandı: ${slug}`, 'success');
+          syncKickFollowersLive();
+          refreshModalKickStatus();
+          setTimeout(closeStreamerSettingsModal, 600);
+        } else {
+          showToast(data.error || 'Bağlantı hatası', 'error');
+        }
+      })
+      .catch(err => {
+        showToast('Sunucu bağlantı hatası: ' + err.message, 'error');
+      });
+    }
+
+    function updateAllStreamerLabels(slug, nick) {
+      const kickUserEl = document.getElementById('kick-user-name');
+      if (kickUserEl) kickUserEl.textContent = slug || '⚙️ Kanal Bağla';
+
+      const ttsLabel = document.getElementById('tts-streamer-label');
+      if (ttsLabel) ttsLabel.textContent = nick || slug || 'Yayıncı';
+
+      const studioInp = document.getElementById('studio-chat-input');
+      if (studioInp) studioInp.placeholder = `${nick || slug || 'Yayıncı'} olarak mesaj yazın... (Enter)`;
+
+      const floatInp = document.getElementById('floating-widget-input');
+      if (floatInp) floatInp.placeholder = `${nick || slug || 'Yayıncı'} olarak mesaj yazın... (Enter)`;
+
+      const floatBadge = document.getElementById('float-streamer-badge');
+      if (floatBadge) floatBadge.textContent = `👑 ${nick || slug || 'Yayıncı'}`;
+
+      const popBtn = document.getElementById('studio-kick-popout-btn');
+      if (popBtn && slug) popBtn.href = `https://kick.com/popout/${encodeURIComponent(slug)}/chat`;
+
+      const chatPill = document.getElementById('mira-chat-conn-status');
+      if (chatPill && slug) {
+        chatPill.textContent = `🟢 Kick: ${slug}`;
+        chatPill.style.color = '#00f5a0';
+      }
+    }
+
+    /* OBS WEBSOCKET AYARLARI KONTROLÜ */
+    function openObsSettingsModal() {
+      const modal = document.getElementById('obs-settings-modal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      refreshModalObsStatus();
+    }
+
+    function closeObsSettingsModal() {
+      const modal = document.getElementById('obs-settings-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function refreshModalObsStatus() {
+      fetch('/api/obs/status')
+        .then(r => r.json())
+        .then(data => {
+          const detail = document.getElementById('modal-obs-status-detail');
+          const portInput = document.getElementById('modal-obs-port-input');
+          if (portInput && data.port) portInput.value = data.port;
+          if (detail) {
+            if (data.connected) {
+              detail.textContent = `🟢 OBS Bağlı (Port: ${data.port || 4455}, Sahne: ${data.currentScene || 'Varsayılan'})`;
+              detail.style.color = '#00f5a0';
+            } else {
+              detail.textContent = `🟡 OBS Bekleniyor (Port: ${data.port || 4455})`;
+              detail.style.color = '#f59e0b';
+            }
+          }
+        }).catch(() => {});
+    }
+
+    function saveAndConnectObsSettings() {
+      const portInput = document.getElementById('modal-obs-port-input');
+      const passInput = document.getElementById('modal-obs-pass-input');
+      const port = parseInt(portInput?.value || 4455, 10) || 4455;
+      const pass = passInput ? passInput.value : '';
+
+      fetch('/api/obs/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ port: port, password: pass })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showToast(data.connected ? 'OBS Studio WebSocket bağlantısı sağlandı!' : 'OBS ayarları kaydedildi (OBS bekleniyor)', data.connected ? 'success' : 'info');
+          refreshModalObsStatus();
+          checkObsWsStatus();
+          setTimeout(closeObsSettingsModal, 600);
+        } else {
+          showToast(data.error || 'OBS bağlantı hatası', 'error');
+        }
+      })
+      .catch(err => {
+        showToast('Sunucu hatası: ' + err.message, 'error');
+      });
+    }
+
+    function reconnectObsFromModal() {
+      saveAndConnectObsSettings();
     }
 
     /* OBS WebSocket Status & Auto-Switch */
@@ -10389,6 +10670,19 @@
           }
         }).catch(() => {});
 
+      // Yayıncı ve Kick bilgilerini sunucudan çek & senkronize et
+      fetch('/api/streamer/config')
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.streamer) {
+            const sSlug = data.streamer.kickSlug || localStorage.getItem('mira_kick_slug') || '';
+            const sNick = data.streamer.username || localStorage.getItem('mira_streamer_username') || sSlug;
+            currentKickSlug = sSlug;
+            currentStreamerNick = sNick;
+            updateAllStreamerLabels(sSlug, sNick);
+          }
+        }).catch(() => {});
+
       // Kick Canlı Köprü Durumu Kontrolü
       function checkKickBridgeStatus() {
         if (!window.location.protocol.startsWith('http')) return;
@@ -10396,15 +10690,30 @@
           .then(r => r.json())
           .then(st => {
             const pill = document.getElementById('mira-chat-conn-status');
+            const topPill = document.getElementById('kick-user-name');
+            const topFollower = document.getElementById('kick-follower-badge');
+
+            if (st.slug) {
+              currentKickSlug = st.slug;
+              if (topPill) topPill.textContent = st.slug;
+              if (topFollower && typeof st.followersCount === 'number') topFollower.textContent = st.followersCount;
+              const popBtn = document.getElementById('studio-kick-popout-btn');
+              if (popBtn) popBtn.href = `https://kick.com/popout/${encodeURIComponent(st.slug)}/chat`;
+            }
+
             if (!pill) return;
             if (st.connected) {
               pill.textContent = `🟢 Kick: ${st.slug} (CANLI BAĞLI)`;
               pill.style.color = '#00f5a0';
               pill.style.borderColor = 'rgba(0,245,160,0.5)';
-            } else {
-              pill.textContent = `🟡 Kick: ${st.slug || 'cihanatas'} (Bağlanıyor...)`;
+            } else if (st.slug) {
+              pill.textContent = `🟡 Kick: ${st.slug} (Bağlanıyor...)`;
               pill.style.color = '#f59e0b';
               pill.style.borderColor = 'rgba(245,158,11,0.5)';
+            } else {
+              pill.textContent = `⚪ Kick: Bağlantı Yok`;
+              pill.style.color = '#94a3b8';
+              pill.style.borderColor = 'rgba(255,255,255,0.15)';
             }
           })
           .catch(() => {});
@@ -10637,7 +10946,7 @@
       <div class="mira-float-title">
         <span class="live-dot" style="width:8px; height:8px; background:#00f5a0; box-shadow:0 0 8px #00f5a0; border-radius:50%;"></span>
         <span>CANLI SOHBET</span>
-        <span class="clean-msg-badge" style="background:#f59e0b; color:#000; font-size:9px; font-weight:800;">👑 cihanatas</span>
+        <span class="clean-msg-badge" id="float-streamer-badge" style="background:#f59e0b; color:#000; font-size:9px; font-weight:800;">👑 Yayıncı</span>
       </div>
 
       <div class="mira-float-actions">
@@ -10654,13 +10963,13 @@
       <div class="clean-chat-msg is-system">
         <span class="clean-msg-time">17:00</span>
         <span class="clean-msg-badge">MİRA</span>
-        <span class="clean-msg-text">Yüzen sohbet konsolu aktif. Mesajlarınızı doğrudan buradan cihanatas olarak yanıtlayabilirsiniz.</span>
+        <span class="clean-msg-text">Yüzen sohbet konsolu aktif. Mesajlarınızı doğrudan buradan yanıtlayabilirsiniz.</span>
       </div>
     </div>
 
     <!-- Mesaj Gönderme -->
     <div class="mira-clean-input-bar mira-float-input-bar">
-      <input type="text" id="floating-widget-input" class="mira-clean-input" placeholder="cihanatas olarak mesaj yazın... (Enter)" autocomplete="off">
+      <input type="text" id="floating-widget-input" class="mira-clean-input" placeholder="Yayıncı olarak mesaj yazın... (Enter)" autocomplete="off">
       <button type="button" class="mira-clean-send-btn" onclick="sendFloatingWidgetReply()">Gönder</button>
     </div>
   </div>

@@ -550,8 +550,8 @@
     window.addCustomChatMessage = addChatMessage;
 
     // Kick Pusher WebSocket doğrudan bağlantısı
-    const kickSlug = (window.HERO_CONFIG && window.HERO_CONFIG.kickChannel) || (window.OVERLAY_CONFIG && window.OVERLAY_CONFIG.kickChannel) || localStorage.getItem('kick_channel') || 'cihanatas';
-    initKickPusher(kickSlug, addChatMessage);
+    const kickSlug = (window.HERO_CONFIG && window.HERO_CONFIG.kickChannel) || (window.OVERLAY_CONFIG && window.OVERLAY_CONFIG.kickChannel) || localStorage.getItem('mira_streamer_username') || localStorage.getItem('kick_channel') || '';
+    if (kickSlug) initKickPusher(kickSlug, addChatMessage);
   }
 
   function initKickPusher(channelSlug, onMessage) {
@@ -1042,7 +1042,7 @@
       'MiraFan_01 (5x Hediye)', 'MiraFan_01 (100₺)', 'Abyss_Titan', 'Cecilion_Vance',
       'Molina_Paws', 'CadiaDragon', 'OkyanusKrali', 'GeceYuruyen', 'TatliKedi',
       'ZetianKing', 'DerinMavi (175₺)', 'Zeynep_Rose (250₺)', 'PamukSeker (200₺)',
-      'EmirCarry (150₺)', 'Kral_01 (1.2K 💎)', 'MiraFan (Gül x10 🌹)', 'cihan'
+      'EmirCarry (150₺)', 'Kral_01 (1.2K 💎)', 'MiraFan (Gül x10 🌹)', 'Destekçi'
     ];
     ['recent_follower', 'recent_sub', 'recent_donation', 'recent_gift'].forEach(key => {
       const val = localStorage.getItem(key);

@@ -1,7 +1,15 @@
 {
+  "streamer": {
+    "username": "",
+    "kickSlug": ""
+  },
+  "obs": {
+    "port": 4455,
+    "password": ""
+  },
   "goal": {
     "title": "TAKİPÇİ HEDEFİ",
-    "current": 1,
+    "current": 0,
     "target": 50,
     "type": "follower",
     "autoSyncKick": true

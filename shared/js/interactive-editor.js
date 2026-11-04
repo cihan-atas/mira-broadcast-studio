@@ -1573,7 +1573,7 @@
     // 7. Socials
     let socialsHtml = '';
     if (comps.showSocials) {
-      const kick = comps.kickHandle || 'cihanatas';
+      const kick = comps.kickHandle || (typeof localStorage !== 'undefined' ? localStorage.getItem('mira_streamer_username') : null) || 'mira';
       const tiktok = comps.tiktokHandle || '@mira';
       socialsHtml = `
         <div class="forge-comp-socials" style="display:flex; gap:12px; font-size:11px; font-weight:700; color:#cbd5e1; flex-wrap:wrap;">

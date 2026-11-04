@@ -42,6 +42,8 @@ try {
 let obsWsClient = null;
 let obsWsConnected = false;
 let obsCurrentScene = null;
+let obsWsPort = 4455;
+let obsWsPassword = '';
 
 const OBS_SCENE_MAP = {
   'vexana': '🎮 3 - Oyun (Vexana)',
@@ -56,14 +58,17 @@ const OBS_SCENE_MAP = {
   '4-yayin-bitti.html': '🎬 5 - Yayin Bitti'
 };
 
-function connectObsWebSocket() {
+function connectObsWebSocket(port = obsWsPort, password = obsWsPassword) {
   if (!OBSWebSocket || obsWsConnected) return;
+  obsWsPort = port || 4455;
+  obsWsPassword = password !== undefined ? password : obsWsPassword;
   const client = new OBSWebSocket();
-  client.connect('ws://127.0.0.1:4455')
+  const url = `ws://127.0.0.1:${obsWsPort}`;
+  client.connect(url, obsWsPassword || undefined)
     .then(() => {
       obsWsClient = client;
       obsWsConnected = true;
-      console.log('[OBS WS] OBS Studio WebSocket bağlantısı kuruldu (Port: 4455)');
+      console.log(`[OBS WS] OBS Studio WebSocket bağlantısı kuruldu (Port: ${obsWsPort})`);
       return client.call('GetCurrentProgramScene');
     })
     .then(data => {
@@ -208,6 +213,14 @@ pollTunaBackground();
 // ========================================================
 const streamStatsFile = path.join(__dirname, 'stream-stats.json');
 let studioStats = {
+  streamer: {
+    username: '',
+    kickSlug: ''
+  },
+  obs: {
+    port: 4455,
+    password: ''
+  },
   goal: {
     title: 'TAKİPÇİ HEDEFİ',
     current: 1,
@@ -236,10 +249,18 @@ function loadStreamStats() {
       const raw = fs.readFileSync(streamStatsFile, 'utf-8');
       const parsed = JSON.parse(raw);
       studioStats = {
+        streamer: { ...studioStats.streamer, ...(parsed.streamer || {}) },
+        obs: { ...studioStats.obs, ...(parsed.obs || {}) },
         goal: { ...studioStats.goal, ...(parsed.goal || {}) },
         recent: { ...studioStats.recent, ...(parsed.recent || {}) },
         session: { ...studioStats.session, ...(parsed.session || {}) }
       };
+      if (studioStats.obs && studioStats.obs.port) {
+        obsWsPort = studioStats.obs.port;
+      }
+      if (studioStats.obs && studioStats.obs.password !== undefined) {
+        obsWsPassword = studioStats.obs.password;
+      }
     }
   } catch(e) {}
 }
@@ -522,9 +543,9 @@ let kickPingInterval = null;
 let kickReconnectTimeout = null;
 let activeKickStatus = {
   connected: false,
-  slug: 'cihanatas',
-  chatroomId: 58578228,
-  channelId: 58866639,
+  slug: '',
+  chatroomId: null,
+  channelId: null,
   followersCount: 0,
   lastMessageAt: null,
   error: null
@@ -532,7 +553,8 @@ let activeKickStatus = {
 
 function fetchKickChannelInfo(slug) {
   return new Promise((resolve, reject) => {
-    const cleanSlug = (slug || 'cihanatas').replace(/[^a-zA-Z0-9_-]/g, '');
+    const cleanSlug = (slug || activeKickStatus.slug || (studioStats.streamer && studioStats.streamer.kickSlug) || '').replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!cleanSlug) return reject(new Error('Kanal adı belirtilmedi'));
     const options = {
       hostname: 'kick.com',
       path: `/api/v2/channels/${encodeURIComponent(cleanSlug)}`,
@@ -563,7 +585,7 @@ function fetchKickChannelInfo(slug) {
   });
 }
 
-function startKickPusherBridge(slug = 'cihanatas') {
+function startKickPusherBridge(slug) {
   if (kickReconnectTimeout) {
     clearTimeout(kickReconnectTimeout);
     kickReconnectTimeout = null;
@@ -581,19 +603,25 @@ function startKickPusherBridge(slug = 'cihanatas') {
     kickPusherWs = null;
   }
 
-  activeKickStatus.slug = slug;
+  const targetSlug = (slug || activeKickStatus.slug || (studioStats.streamer && studioStats.streamer.kickSlug) || '').trim();
+  if (!targetSlug) {
+    activeKickStatus = { connected: false, slug: '', chatroomId: null, channelId: null, followersCount: 0, lastMessageAt: null, error: 'Kanal adı bekleniyor' };
+    return;
+  }
 
-  fetchKickChannelInfo(slug)
+  activeKickStatus.slug = targetSlug;
+
+  fetchKickChannelInfo(targetSlug)
     .then(channelData => {
-      const chatroomId = channelData?.chatroom?.id || activeKickStatus.chatroomId || 58578228;
-      const channelId = channelData?.id || activeKickStatus.channelId || 58866639;
+      const chatroomId = channelData?.chatroom?.id || activeKickStatus.chatroomId;
+      const channelId = channelData?.id || activeKickStatus.channelId;
       const fCount = channelData?.followers_count ?? channelData?.followersCount ?? 0;
 
       activeKickStatus.chatroomId = chatroomId;
       activeKickStatus.channelId = channelId;
       activeKickStatus.followersCount = fCount;
 
-      console.log(`[KICK BRIDGE] Kanal bulundu: ${slug} (Chatroom ID: ${chatroomId}, Channel ID: ${channelId}, Takipçi: ${fCount})`);
+      console.log(`[KICK BRIDGE] Kanal bulundu: ${targetSlug} (Chatroom ID: ${chatroomId}, Channel ID: ${channelId}, Takipçi: ${fCount})`);
 
       const pusherKey = '34bf7a0ff419a2a775b9';
       const wsUrl = `wss://ws-us2.pusher.com/app/${pusherKey}?protocol=7&client=js&version=7.4.0&flash=false`;
@@ -790,8 +818,11 @@ function startKickPusherBridge(slug = 'cihanatas') {
     });
 }
 
-// Sunucu başlatıldığında Kick canlı köprüsünü otomatik başlat
-startKickPusherBridge('cihanatas');
+// Sunucu başlatıldığında kaydedilmiş Kick kanalına otomatik bağlan
+loadStreamStats();
+if (studioStats.streamer && studioStats.streamer.kickSlug) {
+  startKickPusherBridge(studioStats.streamer.kickSlug);
+}
 
 // ==========================================
 // 0.3 ANA GALERİ ŞABLON KATALOĞU & KULLANICI GALERİSİ YÖNETİMİ
@@ -1993,7 +2024,11 @@ const server = http.createServer((req, res) => {
 
   // 2.4 API: Kick Kanal Bilgisi Proxy (CORS engelsiz chatroom ID çözümü)
   if (pathname === '/api/kick/channel' && req.method === 'GET') {
-    const slug = (parsedUrl.searchParams.get('slug') || activeKickStatus.slug || 'cihanatas').replace(/[^a-zA-Z0-9_-]/g, '');
+    const slug = (parsedUrl.searchParams.get('slug') || activeKickStatus.slug || (studioStats.streamer && studioStats.streamer.kickSlug) || '').replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!slug) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ followers_count: 0, followersCount: 0 }));
+    }
     const options = {
       hostname: 'kick.com',
       path: `/api/v2/channels/${encodeURIComponent(slug)}`,
@@ -2027,18 +2062,55 @@ const server = http.createServer((req, res) => {
   // 2.41 API: Kick Canlı Durumu
   if (pathname === '/api/kick/status' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify(activeKickStatus));
+    return res.end(JSON.stringify({
+      ...activeKickStatus,
+      streamerUsername: studioStats.streamer?.username || activeKickStatus.slug || 'Yayıncı'
+    }));
   }
 
-  // 2.42 API: Kick Yeniden Bağlan / Kanal Değiştir
+  // 2.42 API: Kick Kanalını Bağla & Pusher Başlat
+  if (pathname === '/api/kick/connect' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const d = JSON.parse(body || '{}');
+        const cleanSlug = (d.slug || d.kickSlug || '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
+        if (!cleanSlug) throw new Error('Geçerli bir Kick kanal adı giriniz');
+        
+        if (!studioStats.streamer) studioStats.streamer = {};
+        studioStats.streamer.kickSlug = cleanSlug;
+        if (d.username) studioStats.streamer.username = d.username;
+        else if (!studioStats.streamer.username) studioStats.streamer.username = cleanSlug;
+        saveStreamStats();
+
+        startKickPusherBridge(cleanSlug);
+
+        eventQueue.push({
+          type: 'UPDATE_STREAMER',
+          streamer: studioStats.streamer,
+          time: Date.now()
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, slug: cleanSlug, streamer: studioStats.streamer, status: activeKickStatus }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 2.421 API: Kick Yeniden Bağlan / Kanal Değiştir
   if (pathname === '/api/kick/reconnect' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
       try {
         const d = JSON.parse(body || '{}');
-        const slug = (d.slug || activeKickStatus.slug || 'cihanatas').trim();
-        startKickPusherBridge(slug);
+        const slug = (d.slug || activeKickStatus.slug || studioStats.streamer?.kickSlug || '').trim();
+        if (slug) startKickPusherBridge(slug);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, status: activeKickStatus }));
       } catch (err) {
@@ -2047,6 +2119,55 @@ const server = http.createServer((req, res) => {
       }
     });
     return;
+  }
+
+  // 2.422 API: Yayıncı Ayarları (GET / POST)
+  if (pathname === '/api/streamer/config') {
+    if (req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({
+        streamer: studioStats.streamer || { username: '', kickSlug: '' },
+        kickStatus: activeKickStatus,
+        obs: { port: obsWsPort, connected: obsWsConnected, currentScene: obsCurrentScene }
+      }));
+    }
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const d = JSON.parse(body || '{}');
+          if (!studioStats.streamer) studioStats.streamer = {};
+          if (d.username !== undefined) studioStats.streamer.username = d.username;
+          if (d.kickSlug !== undefined) {
+            const clean = d.kickSlug.replace(/[^a-zA-Z0-9_-]/g, '').trim();
+            studioStats.streamer.kickSlug = clean;
+            if (clean && clean !== activeKickStatus.slug) {
+              startKickPusherBridge(clean);
+            } else if (!clean) {
+              if (kickPusherWs) { try { kickPusherWs.close(); } catch(e){} kickPusherWs = null; }
+              activeKickStatus = {
+                connected: false,
+                slug: '',
+                chatroomId: null,
+                channelId: null,
+                followersCount: 0,
+                lastMessageAt: null,
+                error: null
+              };
+            }
+          }
+          saveStreamStats();
+          eventQueue.push({ type: 'UPDATE_STREAMER', streamer: studioStats.streamer, time: Date.now() });
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, streamer: studioStats.streamer }));
+        } catch (err) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+      return;
+    }
   }
 
   // 2.43 API: Canlı Chat Mesajı Gönder (Yayıncı Mesajı)
@@ -2061,7 +2182,7 @@ const server = http.createServer((req, res) => {
           senderSession: d.senderSession,
           type: 'CHAT_MESSAGE',
           platform: d.platform || 'kick',
-          username: d.username || 'cihanatas',
+          username: d.username || studioStats.streamer?.username || activeKickStatus.slug || 'Yayıncı',
           content: d.content || '',
           badge: d.badge || 'streamer',
           isStreamer: d.isStreamer !== undefined ? d.isStreamer : true,
@@ -2577,8 +2698,50 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({
       connected: obsWsConnected,
+      port: obsWsPort,
+      hasPassword: !!obsWsPassword,
       currentScene: obsCurrentScene
     }));
+  }
+
+  // 2.71 API: OBS WebSocket Bağlan / Ayarları Güncelle
+  if (pathname === '/api/obs/connect' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const d = JSON.parse(body || '{}');
+        const port = parseInt(d.port || 4455, 10) || 4455;
+        const password = d.password !== undefined ? d.password : obsWsPassword;
+
+        if (!studioStats.obs) studioStats.obs = {};
+        studioStats.obs.port = port;
+        studioStats.obs.password = password;
+        saveStreamStats();
+
+        if (obsWsClient) {
+          try { obsWsClient.disconnect(); } catch(e){}
+          obsWsClient = null;
+          obsWsConnected = false;
+        }
+
+        connectObsWebSocket(port, password);
+
+        setTimeout(() => {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            success: true,
+            connected: obsWsConnected,
+            port: obsWsPort,
+            currentScene: obsCurrentScene
+          }));
+        }, 1000);
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
   }
 
   // 2.8 API: OBS Sahnesi Değiştir (Otomatik Sahne Geçişi)

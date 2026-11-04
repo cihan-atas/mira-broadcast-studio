@@ -56,7 +56,7 @@ class StateManager {
 
   // Kick API'den Gerçek Canlı Takipçi Sayısını Çek
   async fetchLiveKickStats(channelSlug) {
-    const slug = channelSlug || this.config.kickChannel || 'cihanatas';
+    const slug = channelSlug || this.config.kickChannel || localStorage.getItem('mira_streamer_username') || '';
     if (!slug) return null;
 
     try {

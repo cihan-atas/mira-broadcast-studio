@@ -4,9 +4,9 @@
 window.OVERLAY_CONFIG = {
   // Yayıncı Bilgileri
   streamerName: "MİRA",
-  kickChannel: "cihanatas",
+  kickChannel: "",
   currentRank: "MYTHIC GLORY", // MLBB Rütbesi: Epic, Legend, Mythic, Mythic Glory, Mythic Immortal
-  chatWidgetUrl: "https://botrix.live/widgets/chat/?bid=gLZkQNzbXESRyieK6e3y4A&theme=default&messageSound=0&messageDirection=up&platformIcon=false&bots=false&emojis=true&hideCommands=false&hideMessages=true&hideMessagesSeconds=15&widgetSize=21&streamTogether=true&cheer=true&pointsReward=false&animation=popIn&showTimestamp=false&shadowThickness=1&twitch=true&youtube=true&kick=true&trovo=false",
+  chatWidgetUrl: "",
   
   // -------------------------------------------------------------
   // SESLİ OKUMA (TTS) AYARLARI
@@ -53,7 +53,7 @@ window.OVERLAY_CONFIG = {
   // SOSYAL MEDYA HESAPLARI (Alt bantta sırayla döner)
   // -------------------------------------------------------------
   socials: [
-    { platform: "kick", name: "kick.com/cihanatas", icon: "kick" },
+    { platform: "kick", name: "kick.com/mira", icon: "kick" },
     { platform: "tiktok", name: "@miralive", icon: "tiktok" },
     { platform: "youtube", name: "Mira MLBB", icon: "youtube" }
   ],

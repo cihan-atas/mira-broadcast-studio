@@ -135,7 +135,7 @@
 
     // Kick Pusher WebSocket doğrudan bağlantısı
     const config = window.OVERLAY_CONFIG || {};
-    const kickSlug = config.kickChannel || localStorage.getItem('kick_channel') || 'cihanatas';
+    const kickSlug = config.kickChannel || localStorage.getItem('mira_streamer_username') || localStorage.getItem('kick_channel') || '';
     if (kickSlug) {
       fetch(`/api/kick/channel?slug=${encodeURIComponent(kickSlug)}`)
         .then(r => {
