@@ -126,6 +126,40 @@ try {
             continue
         }
 
+        # API: Canli Chat Mesaji Gonder (Yayin ve Overlay)
+        if ($rawPath -eq "/api/chat-message" -and $request.HttpMethod -eq "POST") {
+            try {
+                $reader = New-Object System.IO.StreamReader($request.InputStream, [System.Text.Encoding]::UTF8)
+                $body = $reader.ReadToEnd()
+                $json = ConvertFrom-Json $body
+
+                $nowTime = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+                $chatItem = @{
+                    id = if ($json.id) { $json.id } else { [Guid]::NewGuid().ToString() }
+                    time = $nowTime
+                    type = "CHAT_MESSAGE"
+                    username = if ($json.username) { $json.username } else { "cihanatas" }
+                    content = if ($json.content) { $json.content } else { "" }
+                    badge = if ($json.badge) { $json.badge } else { "streamer" }
+                    isStreamer = if ($null -ne $json.isStreamer) { $json.isStreamer } else { $true }
+                    platform = "kick"
+                }
+
+                [void]$global:eventList.Add($chatItem)
+                if ($global:eventList.Count -gt 80) {
+                    [void]$global:eventList.RemoveAt(0)
+                }
+
+                $respBytes = [System.Text.Encoding]::UTF8.GetBytes('{"success":true}')
+                $response.ContentType = "application/json"
+                $response.OutputStream.Write($respBytes, 0, $respBytes.Length)
+            } catch {
+                $response.StatusCode = 400
+            }
+            $response.Close()
+            continue
+        }
+
         # API: Olaylari Dagit (Polling)
         if ($rawPath -eq "/api/poll") {
             $since = [int64]0

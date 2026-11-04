@@ -528,12 +528,18 @@
       let badgeLabel = (badge || 'CHAT').toUpperCase();
       if (badgeClass === 'tiktok') badgeLabel = 'TIKTOK';
       if (badgeClass === 'kick') badgeLabel = 'KICK';
+      if (badgeClass === 'streamer') {
+        badgeLabel = '👑 YAYINCI';
+        entry.classList.add('is-streamer');
+      }
 
-      const badgeHtml = badgeClass ? `<span class="chat-badge ${badgeClass}">${badgeLabel}</span>` : '';
+      const badgeStyle = badgeClass === 'streamer' ? 'style="background:rgba(245,158,11,0.25); color:#f59e0b; border:1px solid rgba(245,158,11,0.5); font-weight:800;"' : '';
+      const authorStyle = badgeClass === 'streamer' ? 'style="color:#f59e0b; font-weight:800;"' : 'style="color: var(--primary-color, #c084fc);"';
+      const badgeHtml = badgeClass ? `<span class="chat-badge ${badgeClass}" ${badgeStyle}>${badgeLabel}</span>` : '';
       entry.innerHTML = `
         <div class="hero-chat-entry-header">
           ${badgeHtml}
-          <span class="hero-chat-author" style="color: var(--primary-color, #c084fc);">${escapeHtml(author)}</span>
+          <span class="hero-chat-author" ${authorStyle}>${escapeHtml(author)}</span>
         </div>
         <span class="hero-chat-text">${escapeHtml(text)}</span>
       `;
@@ -550,7 +556,7 @@
     window.addCustomChatMessage = addChatMessage;
 
     // Kick Pusher WebSocket doğrudan bağlantısı
-    const kickSlug = (window.HERO_CONFIG && window.HERO_CONFIG.kickChannel) || (window.OVERLAY_CONFIG && window.OVERLAY_CONFIG.kickChannel) || localStorage.getItem('mira_streamer_username') || localStorage.getItem('kick_channel') || '';
+    const kickSlug = (window.HERO_CONFIG && window.HERO_CONFIG.kickChannel) || (window.OVERLAY_CONFIG && window.OVERLAY_CONFIG.kickChannel) || localStorage.getItem('mira_streamer_username') || localStorage.getItem('mira_kick_slug') || 'cihanatas';
     if (kickSlug) initKickPusher(kickSlug, addChatMessage);
   }
 

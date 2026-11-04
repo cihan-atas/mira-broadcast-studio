@@ -95,9 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
     bus2.onmessage = (e) => processServerPayload(e.data);
   } catch (e) {}
 
-  // 6. YEREL SUNUCU CANLI VERİ KÖPRÜSÜ (SSE + PowerShell Polling)
+  // 6. YEREL SUNUCU CANLI VERİ KÖPRÜSÜ (SSE + Polling)
   if (window.location.protocol.startsWith('http')) {
-    let lastPollTime = Date.now();
+    let lastPollTime = Date.now() - 5000;
 
     function processServerPayload(payload) {
       if (!payload) return;
@@ -106,7 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (payload.type === 'TEST_CHAT' || payload.type === 'CHAT_MESSAGE' || payload.type === 'chat') {
         const u = payload.username || payload.user || payload.sender?.username || "İzleyici";
         const c = payload.content || payload.text || payload.message || "";
-        const b = payload.badge || (payload.platform ? payload.platform.toLowerCase() : 'sub');
+        const isStreamer = !!payload.isStreamer || payload.badge === 'streamer' || (u && u.toLowerCase() === 'cihanatas');
+        const b = isStreamer ? 'streamer' : (payload.badge || (payload.platform ? payload.platform.toLowerCase() : 'sub'));
         addChatMessage(u, c, b);
         if (config.tts?.enabled) {
           ttsManager.speak(`${u} diyor ki: ${c}`);
@@ -310,14 +311,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let badgeLabel = (badge || 'CHAT').toUpperCase();
     if (badgeClass === 'tiktok') badgeLabel = 'TIKTOK';
     if (badgeClass === 'kick') badgeLabel = 'KICK';
+    if (badgeClass === 'streamer') {
+      badgeLabel = '👑 YAYINCI';
+      msgDiv.classList.add('is-streamer');
+    }
 
-    const badgeHtml = badgeClass ? `<span class="chat-badge ${badgeClass}">${badgeLabel}</span>` : '';
+    const badgeStyle = badgeClass === 'streamer' ? 'style="background:rgba(245,158,11,0.25); color:#f59e0b; border:1px solid rgba(245,158,11,0.5); font-weight:800;"' : '';
+    const authorStyle = badgeClass === 'streamer' ? 'style="color:#f59e0b; font-weight:800;"' : '';
+    const badgeHtml = badgeClass ? `<span class="chat-badge ${badgeClass}" ${badgeStyle}>${badgeLabel}</span>` : '';
 
     if (isLarge) {
       msgDiv.innerHTML = `
         <div class="large-chat-header-row">
           ${badgeHtml}
-          <span class="large-chat-author">${escapeHtml(user)}</span>
+          <span class="large-chat-author" ${authorStyle}>${escapeHtml(user)}</span>
         </div>
         <span class="large-chat-text">${escapeHtml(text)}</span>
       `;
@@ -325,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
       msgDiv.innerHTML = `
         <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
           ${badgeHtml}
-          <span class="deluxe-chat-author">${escapeHtml(user)}</span>
+          <span class="deluxe-chat-author" ${authorStyle}>${escapeHtml(user)}</span>
         </div>
         <span class="deluxe-chat-text">${escapeHtml(text)}</span>
       `;

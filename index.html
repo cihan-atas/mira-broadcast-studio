@@ -3608,7 +3608,7 @@
       </div>
       <div class="status-pill active-kick" id="kick-status-pill" onclick="openStreamerSettingsModal()" style="cursor: pointer;" title="Kick & Yayıncı Kanalını Değiştirmek İçin Tıklayın">
         <span class="pulse-dot"></span>
-        <span>KICK: <strong id="kick-user-name">⚙️ Kanal Bağla</strong> (<span id="kick-follower-badge">0</span>)</span>
+        <span>KICK: <strong id="kick-user-name">cihanatas</strong> (<span id="kick-follower-badge">0</span>)</span>
       </div>
       <div class="status-pill" id="obs-status-pill" onclick="openObsSettingsModal()" style="cursor: pointer;" title="OBS WebSocket Ayarları İçin Tıklayın">
         <span class="pulse-dot" id="obs-pulse-dot" style="background: #64748b; box-shadow: none;"></span>
@@ -5275,7 +5275,7 @@
 
             <div class="mira-chat-header-actions">
               <!-- Kick Resmi Popout Sohbet Butonu (Yayıncının Direkt Kick Chat'e Yazması İçin) -->
-              <a id="studio-kick-popout-btn" href="https://kick.com" target="_blank" onclick="window.open(this.href, 'kick_chat_popout', 'width=420,height=680,scrollbars=yes,resizable=yes'); return false;" class="btn-clean-subtle" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.45); color: #00f5a0; font-weight: 800;" title="Kick resmi canlı sohbet penceresini açar; yayıncı hesabınızla izleyicilere direkt yanıt verebilirsiniz">
+              <a id="studio-kick-popout-btn" href="https://kick.com/popout/cihanatas/chat" target="_blank" onclick="window.open(this.href, 'kick_chat_popout', 'width=420,height=680,scrollbars=yes,resizable=yes'); return false;" class="btn-clean-subtle" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.45); color: #00f5a0; font-weight: 800;" title="Kick resmi canlı sohbet penceresini açar; yayıncı hesabınızla izleyicilere direkt yanıt verebilirsiniz">
                 ⚡ Kick'te Sohbete Yaz
               </a>
 
@@ -9112,10 +9112,14 @@
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.postMessage(payload, '*');
       }
-      // 2. Yalnızca tek bir BroadcastChannel üzerinden yayınla (kick_stream_bus)
+      // 2. BroadcastChannel'lar üzerinden yayınla (kick_stream_bus ve kick_hero_bus)
       try {
         const bus = new BroadcastChannel('kick_stream_bus');
         bus.postMessage(payload);
+      } catch (e) {}
+      try {
+        const busHero = new BroadcastChannel('kick_hero_bus');
+        busHero.postMessage(payload);
       } catch (e) {}
       // 3. Sunucuya ilet (OBS ve overlayler /api/poll ile tek sefer yakalar)
       if (window.location.protocol.startsWith('http')) {
@@ -9170,7 +9174,7 @@
       if (kickUserEl && kickUserEl.textContent.trim() && !kickUserEl.textContent.includes('Kanal Bağla')) {
         return kickUserEl.textContent.trim();
       }
-      return 'Yayıncı';
+      return 'cihanatas';
     }
 
     // Geriye dönük uyumluluk (Opaklık ayarları kaldırıldı, temiz koyu tema devrede)
@@ -9464,7 +9468,7 @@
           const payload = {
             id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
             senderSession: MIRA_TAB_SESSION_ID,
-            type: 'TEST_CHAT',
+            type: 'CHAT_MESSAGE',
             username: currentStreamer,
             content: text,
             badge: 'streamer',
@@ -10474,20 +10478,22 @@
     }
 
     function updateAllStreamerLabels(slug, nick) {
+      slug = slug || 'cihanatas';
+      nick = nick || slug || 'cihanatas';
       const kickUserEl = document.getElementById('kick-user-name');
-      if (kickUserEl) kickUserEl.textContent = slug || '⚙️ Kanal Bağla';
+      if (kickUserEl) kickUserEl.textContent = slug;
 
       const ttsLabel = document.getElementById('tts-streamer-label');
-      if (ttsLabel) ttsLabel.textContent = nick || slug || 'Yayıncı';
+      if (ttsLabel) ttsLabel.textContent = nick;
 
       const studioInp = document.getElementById('studio-chat-input');
-      if (studioInp) studioInp.placeholder = `${nick || slug || 'Yayıncı'} olarak mesaj yazın... (Enter)`;
+      if (studioInp) studioInp.placeholder = `${nick} olarak yayına mesaj yazın... (Enter)`;
 
       const floatInp = document.getElementById('floating-widget-input');
-      if (floatInp) floatInp.placeholder = `${nick || slug || 'Yayıncı'} olarak mesaj yazın... (Enter)`;
+      if (floatInp) floatInp.placeholder = `${nick} olarak yayına mesaj yazın... (Enter)`;
 
       const floatBadge = document.getElementById('float-streamer-badge');
-      if (floatBadge) floatBadge.textContent = `👑 ${nick || slug || 'Yayıncı'}`;
+      if (floatBadge) floatBadge.textContent = `👑 ${nick}`;
 
       const popBtn = document.getElementById('studio-kick-popout-btn');
       if (popBtn && slug) popBtn.href = `https://kick.com/popout/${encodeURIComponent(slug)}/chat`;
@@ -10678,12 +10684,18 @@
       fetch('/api/streamer/config')
         .then(r => r.json())
         .then(data => {
-          if (data && data.streamer) {
-            const sSlug = data.streamer.kickSlug || localStorage.getItem('mira_kick_slug') || '';
-            const sNick = data.streamer.username || localStorage.getItem('mira_streamer_username') || sSlug;
-            currentKickSlug = sSlug;
-            currentStreamerNick = sNick;
-            updateAllStreamerLabels(sSlug, sNick);
+          const sSlug = (data && data.streamer && data.streamer.kickSlug) || localStorage.getItem('mira_kick_slug') || 'cihanatas';
+          const sNick = (data && data.streamer && data.streamer.username) || localStorage.getItem('mira_streamer_username') || sSlug;
+          currentKickSlug = sSlug;
+          currentStreamerNick = sNick;
+          updateAllStreamerLabels(sSlug, sNick);
+
+          if (!data || !data.kickStatus || !data.kickStatus.connected || data.kickStatus.slug !== sSlug) {
+            fetch('/api/kick/connect', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ slug: sSlug, username: sNick })
+            }).then(() => checkKickBridgeStatus()).catch(() => {});
           }
         }).catch(() => {});
 

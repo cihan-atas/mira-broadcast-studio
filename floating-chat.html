@@ -362,8 +362,8 @@
       const chatFeed = document.getElementById('chat-feed');
       const inputEl = document.getElementById('streamer-input');
 
-      const streamerName = localStorage.getItem('mira_streamer_username') || 'Yayıncı';
-      const kickSlug = localStorage.getItem('mira_kick_slug') || (streamerName !== 'Yayıncı' ? streamerName : '');
+      const streamerName = localStorage.getItem('mira_streamer_username') || 'cihanatas';
+      const kickSlug = localStorage.getItem('mira_kick_slug') || streamerName || 'cihanatas';
       if (inputEl) inputEl.placeholder = `${streamerName} olarak mesaj yazın... (Enter)`;
       const popLink = document.getElementById('kick-popout-link');
       if (popLink && kickSlug) popLink.href = `https://kick.com/popout/${encodeURIComponent(kickSlug)}/chat`;
@@ -437,7 +437,7 @@
         const payload = {
           id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
           senderSession: SESSION_ID,
-          type: 'TEST_CHAT',
+          type: 'CHAT_MESSAGE',
           username: streamerName,
           content: text,
           badge: 'streamer',
@@ -452,6 +452,11 @@
         try {
           const bus = new BroadcastChannel('kick_stream_bus');
           bus.postMessage(payload);
+        } catch (e) {}
+
+        try {
+          const busHero = new BroadcastChannel('kick_hero_bus');
+          busHero.postMessage(payload);
         } catch (e) {}
 
         fetch('/api/chat-message', {

@@ -1569,8 +1569,10 @@
           const feed = document.getElementById('custom-chat-feed');
           if (feed) {
             const div = document.createElement('div');
-            div.className = 'mod-chat-msg';
-            div.innerHTML = `<span class="mod-chat-user">${esc(ev.username || 'İzleyici')}:</span>${esc(ev.content || ev.text || '')}`;
+            const isStr = !!ev.isStreamer || (ev.badge === 'streamer') || (ev.username && ev.username.toLowerCase() === 'cihanatas');
+            div.className = `mod-chat-msg ${isStr ? 'is-streamer' : ''}`;
+            const badgeTag = isStr ? '<span style="background:rgba(245,158,11,0.25); color:#f59e0b; border:1px solid rgba(245,158,11,0.5); font-size:10px; padding:1px 5px; border-radius:4px; margin-right:5px; font-weight:800;">👑 YAYINCI</span>' : '';
+            div.innerHTML = `${badgeTag}<span class="mod-chat-user" style="${isStr ? 'color:#f59e0b; font-weight:800;' : ''}">${esc(ev.username || 'İzleyici')}:</span> ${esc(ev.content || ev.text || '')}`;
             feed.appendChild(div);
             feed.scrollTop = feed.scrollHeight;
           }

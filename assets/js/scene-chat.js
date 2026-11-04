@@ -65,12 +65,18 @@
       let badgeLabel = (badge || 'CHAT').toUpperCase();
       if (badgeClass === 'tiktok') badgeLabel = 'TIKTOK';
       if (badgeClass === 'kick') badgeLabel = 'KICK';
+      if (badgeClass === 'streamer') {
+        badgeLabel = '👑 YAYINCI';
+        entry.classList.add('is-streamer');
+      }
 
-      const badgeHtml = badgeClass ? `<span class="chat-badge ${badgeClass}">${badgeLabel}</span>` : '';
+      const badgeStyle = badgeClass === 'streamer' ? 'style="background:rgba(245,158,11,0.25); color:#f59e0b; border:1px solid rgba(245,158,11,0.5); font-weight:800;"' : '';
+      const authorStyle = badgeClass === 'streamer' ? 'style="color:#f59e0b; font-weight:800;"' : '';
+      const badgeHtml = badgeClass ? `<span class="chat-badge ${badgeClass}" ${badgeStyle}>${badgeLabel}</span>` : '';
       entry.innerHTML = `
         <div class="large-chat-header-row">
           ${badgeHtml}
-          <span class="large-chat-author">${escapeHtml(author)}</span>
+          <span class="large-chat-author" ${authorStyle}>${escapeHtml(author)}</span>
         </div>
         <span class="large-chat-text">${escapeHtml(text)}</span>
       `;
@@ -135,7 +141,7 @@
 
     // Kick Pusher WebSocket doğrudan bağlantısı
     const config = window.OVERLAY_CONFIG || {};
-    const kickSlug = config.kickChannel || localStorage.getItem('mira_streamer_username') || localStorage.getItem('kick_channel') || '';
+    const kickSlug = config.kickChannel || localStorage.getItem('mira_streamer_username') || localStorage.getItem('mira_kick_slug') || 'cihanatas';
     if (kickSlug) {
       fetch(`/api/kick/channel?slug=${encodeURIComponent(kickSlug)}`)
         .then(r => {
