@@ -29,10 +29,6 @@
       "index.html",
       "custom-overlay.html",
       "floating-chat.html",
-      "stream-stats.json",
-      "tts-config.json",
-      "user-gallery.json",
-      "default-user-gallery.json",
       "main.js",
       "server.js",
       "package.json"
@@ -49,6 +45,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": true,
       "shortcutName": "MİRA Broadcast Studio"
     },
     "linux": {

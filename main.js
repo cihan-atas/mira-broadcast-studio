@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, nativeImage, shell, clipboard } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, shell, clipboard, dialog } = require('electron');
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
@@ -84,7 +84,7 @@ function ensureServer(callback) {
     console.log('[APP] Arka plan sunucu işlemi başlatılıyor...');
     serverProcess = fork(path.join(__dirname, 'server.js'), [], {
       silent: false,
-      env: { ...process.env, PORT: '8080', ELECTRON_RUN_AS_NODE: '1' }
+      env: { ...process.env, PORT: '8080', ELECTRON_RUN_AS_NODE: '1', MIRA_DATA_DIR: app.getPath('userData') }
     });
     serverProcess.on('error', (err) => console.error('[APP Server Error]', err));
     checkServerReady(callback);
@@ -282,6 +282,7 @@ function createTray() {
       }
     },
     { type: 'separator' },
+    { label: '🗑️ Uygulamayı Kaldır (Uninstall)', click: () => uninstallApp() },
     {
       label: '🛑 Tamamen Kapat ve Çık',
       click: () => {
@@ -305,6 +306,50 @@ function createTray() {
       createWindow();
     }
   });
+}
+
+function uninstallApp() {
+  const res = dialog.showMessageBoxSync({
+    type: 'warning',
+    buttons: ['İptal', 'Kaldır', 'Kaldır + Verilerimi de Sil'],
+    defaultId: 0,
+    cancelId: 0,
+    title: 'MİRA Broadcast Studio — Kaldır',
+    message: 'Uygulama kaldırılsın mı?',
+    detail: 'Galeri, TTS ve yayın ayarları kullanıcı veri klasöründe tutulur. "Verilerimi de Sil" seçeneği bunları da siler.'
+  });
+  if (res === 0) return;
+  const wipeData = res === 2;
+  const dataDir = app.getPath('userData');
+  const exeDir = path.dirname(process.execPath);
+
+  isQuitting = true;
+  killServerProcess();
+
+  const wipe = () => { if (wipeData) { try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {} } };
+
+  try {
+    if (process.platform === 'win32') {
+      const un = fs.existsSync(exeDir) ? fs.readdirSync(exeDir).find(f => /^uninstall.*\.exe$/i.test(f)) : null;
+      if (un) {
+        // Kaldırıcı (NSIS) başlatılır; veri silme için ayrıca cmd ile gecikmeli temizlik
+        if (wipeData) exec(`cmd /c ping 127.0.0.1 -n 8 >nul & rmdir /s /q "${dataDir}"`, { windowsHide: true });
+        require('child_process').spawn(path.join(exeDir, un), [], { detached: true, stdio: 'ignore' }).unref();
+      } else {
+        dialog.showMessageBoxSync({ type: 'info', message: 'Kaldırıcı bulunamadı (portable sürüm).', detail: 'Uygulama klasörünü elle silebilirsin.' + (wipeData ? ' Kullanıcı verisi silindi.' : '') });
+        wipe();
+      }
+    } else if (process.env.APPIMAGE) {
+      wipe();
+      try { fs.unlinkSync(process.env.APPIMAGE); } catch (e) {}
+    } else {
+      wipe();
+      exec('pkexec apt-get remove -y mira-broadcast-studio || pkexec dpkg -r mira-broadcast-studio');
+    }
+  } catch (e) {
+    console.error('[APP] Kaldırma hatası:', e);
+  }
+  app.quit();
 }
 
 function killServerProcess() {

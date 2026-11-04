@@ -6,6 +6,10 @@ const os = require('os');
 const crypto = require('crypto');
 const { spawn } = require('child_process');
 
+// Yazılabilir kullanıcı verisi dizini (kurulu uygulamada __dirname salt-okunur olabilir: asar / Program Files)
+const DATA_DIR = process.env.MIRA_DATA_DIR || __dirname;
+try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {}
+
 let PORT = process.env.PORT || 8080;
 const eventQueue = [];
 let currentSongTitle = "♪ MLBB Arena - Necrokeep Lo-Fi Chill Beats";
@@ -132,7 +136,7 @@ function pollTunaBackground() {
           currentSongLastUpdate = Date.now();
 
           // now-playing.txt senkronu
-          const txtPath = path.join(__dirname, 'now-playing.txt');
+          const txtPath = path.join(DATA_DIR, 'now-playing.txt');
           try {
             if (fs.existsSync(txtPath)) {
               const curTxt = fs.readFileSync(txtPath, 'utf-8').trim();
@@ -175,7 +179,7 @@ function pollTunaBackground() {
 }
 
 function checkNowPlayingFileFallback() {
-  const txtPath = path.join(__dirname, 'now-playing.txt');
+  const txtPath = path.join(DATA_DIR, 'now-playing.txt');
   if (fs.existsSync(txtPath)) {
     try {
       const content = fs.readFileSync(txtPath, 'utf-8').trim();
@@ -211,7 +215,7 @@ pollTunaBackground();
 // ========================================================
 // 0.3 CANLI YAYIN HEDEF & İSTATİSTİK (STREAM STATS & GOALS)
 // ========================================================
-const streamStatsFile = path.join(__dirname, 'stream-stats.json');
+const streamStatsFile = path.join(DATA_DIR, 'stream-stats.json');
 let studioStats = {
   streamer: {
     username: '',
@@ -827,7 +831,7 @@ if (studioStats.streamer && studioStats.streamer.kickSlug) {
 // ==========================================
 // 0.3 ANA GALERİ ŞABLON KATALOĞU & KULLANICI GALERİSİ YÖNETİMİ
 // ==========================================
-const USER_GALLERY_PATH = path.join(__dirname, 'user-gallery.json');
+const USER_GALLERY_PATH = path.join(DATA_DIR, 'user-gallery.json');
 
 const APP_GALLERY_CATALOG = [
   // --- 1. ŞAMPİYON SAHNE PAKETLERİ (HERO OVERLAYS) ---
@@ -1772,7 +1776,7 @@ const READY_BACKGROUNDS = [
 ];
 READY_BACKGROUNDS.forEach(b => APP_GALLERY_CATALOG.push(b));
 
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {
   try { fs.mkdirSync(UPLOADS_DIR, { recursive: true }); } catch (e) {}
 }
@@ -1818,21 +1822,9 @@ function listMediaLibrary() {
 }
 
 function loadUserGallery() {
-  if (!fs.existsSync(USER_GALLERY_PATH)) {
-    const fallbackPath = path.join(__dirname, 'default-user-gallery.json');
-    if (fs.existsSync(fallbackPath)) {
-      try {
-        const raw = fs.readFileSync(fallbackPath, 'utf-8');
-        fs.writeFileSync(USER_GALLERY_PATH, raw, 'utf-8');
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch(e) {}
-    }
-    return [];
-  }
+  if (!fs.existsSync(USER_GALLERY_PATH)) return [];
   try {
-    const raw = fs.readFileSync(USER_GALLERY_PATH, 'utf-8');
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(fs.readFileSync(USER_GALLERY_PATH, 'utf-8'));
     return Array.isArray(parsed) ? parsed : [];
   } catch (e) {
     return [];
@@ -1914,7 +1906,7 @@ const server = http.createServer((req, res) => {
         if (eventQueue.length > 60) eventQueue.shift();
 
         if (data.type === 'SET_CHAT_WIDGET') {
-          const widgetTxtPath = path.join(__dirname, 'chat-widget.txt');
+          const widgetTxtPath = path.join(DATA_DIR, 'chat-widget.txt');
           try { fs.writeFileSync(widgetTxtPath, (data.url || '').trim(), 'utf-8'); } catch(e){}
         }
 
@@ -2268,7 +2260,7 @@ const server = http.createServer((req, res) => {
 
   // 2.1 API: Müzik / Now Playing Al & Güncelle (Spotify / Snip / Tuna entegrasyonu)
   if (pathname === '/api/now-playing') {
-    const txtPath = path.join(__dirname, 'now-playing.txt');
+    const txtPath = path.join(DATA_DIR, 'now-playing.txt');
     if (req.method === 'GET') {
       let elapsed = currentSongProgress;
       if (!isTunaOnline && currentSongStatus === 'playing') {
@@ -2416,7 +2408,7 @@ const server = http.createServer((req, res) => {
 
   // 2.16 API: TTS (Sesli Okuma) Ayarları Kalıcılığı & Senkronizasyon
   if (pathname === '/api/tts/config') {
-    const ttsConfigPath = path.join(__dirname, 'tts-config.json');
+    const ttsConfigPath = path.join(DATA_DIR, 'tts-config.json');
     if (req.method === 'GET') {
       try {
         if (fs.existsSync(ttsConfigPath)) {
@@ -2540,7 +2532,7 @@ const server = http.createServer((req, res) => {
       text = text.substring(0, 250);
     }
 
-    const ttsCacheDir = path.join(__dirname, 'shared', 'tts_cache');
+    const ttsCacheDir = path.join(DATA_DIR, 'tts_cache');
     try {
       if (!fs.existsSync(ttsCacheDir)) {
         fs.mkdirSync(ttsCacheDir, { recursive: true });
@@ -2654,7 +2646,7 @@ const server = http.createServer((req, res) => {
 
   // 2.5 API: Chat Widget URL Al & Güncelle (BotRix / TikFinity kalıcılığı)
   if (pathname === '/api/chat-widget') {
-    const widgetTxtPath = path.join(__dirname, 'chat-widget.txt');
+    const widgetTxtPath = path.join(DATA_DIR, 'chat-widget.txt');
     if (req.method === 'GET') {
       let widgetUrl = '';
       if (fs.existsSync(widgetTxtPath)) {
@@ -3010,7 +3002,9 @@ const server = http.createServer((req, res) => {
 
   // 3. Statik Dosyalar
   const safePath = path.normalize(decodeURIComponent(pathname)).replace(/^(\.\.[\/\\])+/, '');
-  const filePath = path.join(__dirname, safePath);
+  const filePath = safePath.replace(/\\/g, '/').startsWith('/uploads/')
+    ? path.join(UPLOADS_DIR, path.basename(safePath))
+    : path.join(__dirname, safePath);
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {

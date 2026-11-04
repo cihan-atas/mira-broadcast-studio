@@ -63,3 +63,9 @@ both_*.png
 .env.local
 .env.*.local
 *.local
+
+# Kullanıcıya özel veriler (uygulama kendi oluşturur)
+user-gallery.json
+default-user-gallery.json
+stream-stats.json
+tts-config.json

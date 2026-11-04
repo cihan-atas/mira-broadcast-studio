@@ -973,7 +973,10 @@
         },
         playAudioStream(text) {
           try {
-            const url = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=tr`;
+            const pch = typeof this.config.pitch === 'number' ? this.config.pitch : 1.0;
+            const rt = typeof this.config.rate === 'number' ? this.config.rate : 1.0;
+            const lg = (this.config.voiceLang || 'tr').split('-')[0];
+            const url = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lg)}&pitch=${pch}&rate=${rt}`;
             const audio = this.getAudioPlayer();
             this.currentAudio = audio;
 
@@ -989,7 +992,7 @@
               audio.volume = Math.max(0, Math.min(1.0, targetVol));
             }
 
-            audio.playbackRate = typeof this.config.rate === 'number' ? Math.max(0.5, Math.min(2.0, this.config.rate)) : 1.0;
+            audio.playbackRate = 1.0; // Hız/perde sunucuda (ffmpeg rubberband) uygulanıyor; çift uygulamayı önle
             audio.src = url;
 
             const next = () => {
