@@ -245,3 +245,16 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
     - Ağır küme yapısı kaldırıldı; tek parça, esnek, zarif ve mobil/tablet ekranlarda kaydırılabilir (`overflow-x: auto`) modern birleşik bir sekme çubuğu (`.studio-main-nav`) kuruldu.
     - Buton adı sade `🛠️ Özel Tasarım` olarak kısaltıldı, gereksiz `CANVA FORGE` rozeti kaldırıldı ve `flex: 0 0 auto` kuralıyla ekran daralsa bile butonun devasa bir blok haline gelmesi tamamen engellendi.
     - Kendi Galerim karşılama kutusundaki butonlar da kompakt boyutlara (`padding: 9px 16px; font-size: 12px;`) çekildi.
+
+
+---
+
+## 🚀 13. GitHub Release v1.1.0 Yayınlandı (2026-11-04)
+
+- **Sürüm:** `v1.1.0`
+- **Release Başlığı:** `MİRA Broadcast Studio v1.1.0 (Windows & Linux)`
+- **URL:** [https://github.com/cihan-atas/mira-broadcast-studio/releases/tag/v1.1.0](https://github.com/cihan-atas/mira-broadcast-studio/releases/tag/v1.1.0)
+- **Derlenen & Yüklenen Paketler:**
+  1. `MİRA Broadcast Studio Setup 1.1.0.exe` (126.91 MB) — Windows 10/11 Kurulum Sihirbazı & Masaüstü Entegrasyonu
+  2. `MİRA Broadcast Studio-1.1.0.AppImage` (133.18 MB) — Kurulum gerektirmeyen tek dosya Linux sürümü
+  3. `mira-broadcast-studio_1.1.0_amd64.deb` (103.49 MB) — Ubuntu / Debian sistem kurulum paketi
