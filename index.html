@@ -3621,6 +3621,8 @@
 
     <!-- Right Header Actions -->
     <div style="display: flex; align-items: center; gap: 8px;">
+      <button class="btn-primary" id="btn-header-uninstall" title="Uygulamayı Kaldır (Uninstall)" style="display:none; padding: 7px 11px; font-size: 12px; background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.45); color: #f87171;" onclick="window.location.href='mira-action://uninstall'">🗑️ Kaldır</button>
+      <script>if (/Electron/i.test(navigator.userAgent)) document.getElementById('btn-header-uninstall').style.display = '';</script>
       <button class="btn-primary" id="btn-header-floating-chat" style="padding: 7px 13px; font-size: 12px; background: linear-gradient(135deg, rgba(168,85,247,0.3), rgba(0,245,160,0.25)); border: 1px solid #00f5a0; color: #fff; font-weight:800;" onclick="openAlwaysOnTopChat()" title="Sohbeti Her Zaman Üstte Kayan Pencere Olarak Aç">
         💬 Üstte Chat
       </button>
