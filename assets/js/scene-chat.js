@@ -141,7 +141,11 @@
 
     // Kick Pusher WebSocket doğrudan bağlantısı
     const config = window.OVERLAY_CONFIG || {};
-    const kickSlug = config.kickChannel || localStorage.getItem('mira_streamer_username') || localStorage.getItem('mira_kick_slug') || 'cihanatas';
+    const kickSlug = config.kickChannel || localStorage.getItem('mira_kick_slug') || localStorage.getItem('mira_streamer_username') || '';
+    if (!kickSlug) {
+      console.log('[SceneChat] Kick slug ayarlanmamış, Pusher bağlantısı başlatılmadı.');
+      return;
+    }
     if (kickSlug) {
       fetch(`/api/kick/channel?slug=${encodeURIComponent(kickSlug)}`)
         .then(r => {

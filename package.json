@@ -1,7 +1,7 @@
 {
   "name": "mira-broadcast-studio",
   "productName": "MİRA Broadcast Studio",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MLBB 5-Hero Kick & TikTok Live Studio Stream Deck & OBS Overlays",
   "main": "main.js",
   "scripts": {

@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (payload.type === 'TEST_CHAT' || payload.type === 'CHAT_MESSAGE' || payload.type === 'chat') {
         const u = payload.username || payload.user || payload.sender?.username || "İzleyici";
         const c = payload.content || payload.text || payload.message || "";
-        const isStreamer = !!payload.isStreamer || payload.badge === 'streamer' || (u && u.toLowerCase() === 'cihanatas');
+        const isStreamer = !!payload.isStreamer || payload.badge === 'streamer';
         const b = isStreamer ? 'streamer' : (payload.badge || (payload.platform ? payload.platform.toLowerCase() : 'sub'));
         addChatMessage(u, c, b);
         if (config.tts?.enabled) {
@@ -121,6 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.removeItem('stream_chat_widget_url');
         }
         initChatWidget();
+      } else if (payload.type === 'UPDATE_STREAMER' && payload.streamer) {
+        const nick = payload.streamer.username || payload.streamer.kickSlug || 'Yayıncı';
+        const userEls = document.querySelectorAll('.bind-username');
+        userEls.forEach(el => el.textContent = nick);
       }
     }
 

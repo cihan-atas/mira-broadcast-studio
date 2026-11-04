@@ -549,54 +549,17 @@ function handleTiktokConnect(username, callback) {
 let kickPusherWs = null;
 let kickPingInterval = null;
 let kickReconnectTimeout = null;
-const KNOWN_KICK_CHANNELS = {
-  'cihanatas': { chatroomId: 58578228, channelId: 58866639 }
-};
 let activeKickStatus = {
   connected: false,
-  slug: 'cihanatas',
-  chatroomId: 58578228,
-  channelId: 58866639,
+  slug: '',
+  chatroomId: null,
+  channelId: null,
   followersCount: 0,
   lastMessageAt: null,
   error: null
 };
 
-function fetchKickChannelInfo(slug) {
-  return new Promise((resolve, reject) => {
-    const cleanSlug = (slug || activeKickStatus.slug || (studioStats.streamer && studioStats.streamer.kickSlug) || 'cihanatas').replace(/[^a-zA-Z0-9_-]/g, '');
-    if (!cleanSlug) return reject(new Error('Kanal adı belirtilmedi'));
-    const options = {
-      hostname: 'kick.com',
-      path: `/api/v2/channels/${encodeURIComponent(cleanSlug)}`,
-      method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json'
-      }
-    };
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          resolve(parsed);
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
-    req.on('error', reject);
-    req.setTimeout(8000, () => {
-      req.destroy();
-      reject(new Error('Kick API zaman aşımı'));
-    });
-    req.end();
-  });
-}
-
-function startKickPusherBridge(slug) {
+function stopKickPusherBridge(clearStats = false) {
   if (kickReconnectTimeout) {
     clearTimeout(kickReconnectTimeout);
     kickReconnectTimeout = null;
@@ -613,15 +576,77 @@ function startKickPusherBridge(slug) {
     } catch (e) {}
     kickPusherWs = null;
   }
-
-  const targetSlug = (slug || activeKickStatus.slug || (studioStats.streamer && studioStats.streamer.kickSlug) || 'cihanatas').trim();
-  activeKickStatus.slug = targetSlug;
-
-  const knownFallback = KNOWN_KICK_CHANNELS[targetSlug.toLowerCase()];
-  if (!activeKickStatus.chatroomId && knownFallback) {
-    activeKickStatus.chatroomId = knownFallback.chatroomId;
-    activeKickStatus.channelId = knownFallback.channelId;
+  activeKickStatus = {
+    connected: false,
+    slug: clearStats ? '' : activeKickStatus.slug,
+    chatroomId: null,
+    channelId: null,
+    followersCount: clearStats ? 0 : activeKickStatus.followersCount,
+    lastMessageAt: null,
+    error: null
+  };
+  if (clearStats) {
+    if (studioStats.streamer) {
+      studioStats.streamer.kickSlug = '';
+      studioStats.streamer.username = '';
+    }
+    saveStreamStats();
   }
+}
+
+function fetchKickChannelInfo(slug) {
+  return new Promise((resolve, reject) => {
+    const cleanSlug = (slug || activeKickStatus.slug || (studioStats.streamer && studioStats.streamer.kickSlug) || '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
+    if (!cleanSlug) return reject(new Error('Kanal adı belirtilmedi'));
+    const options = {
+      hostname: 'kick.com',
+      path: `/api/v2/channels/${encodeURIComponent(cleanSlug)}`,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json'
+      }
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 404) {
+            return reject(new Error(`Kick üzerinde "${cleanSlug}" adında bir kanal bulunamadı (404). Lütfen kullanıcı adınızı kontrol edin.`));
+          }
+          if (res.statusCode >= 400) {
+            return reject(new Error(`Kick sunucusu yanıt vermedi (HTTP ${res.statusCode}). Lütfen daha sonra tekrar deneyin.`));
+          }
+          const parsed = JSON.parse(data);
+          if (!parsed || parsed.error || (!parsed.chatroom && !parsed.id)) {
+            return reject(new Error(parsed?.message || `"${cleanSlug}" kanalı bulunamadı veya verisi geçersiz.`));
+          }
+          resolve(parsed);
+        } catch (e) {
+          reject(new Error(`Kick kanal verisi okunamadı: ${e.message}`));
+        }
+      });
+    });
+    req.on('error', (err) => reject(new Error(`Kick bağlantı hatası: ${err.message}`)));
+    req.setTimeout(8000, () => {
+      req.destroy();
+      reject(new Error('Kick API zaman aşımı (İnternet bağlantınızı kontrol edin)'));
+    });
+    req.end();
+  });
+}
+
+function startKickPusherBridge(slug, prefetchedData = null) {
+  stopKickPusherBridge(false);
+
+  const targetSlug = (slug || activeKickStatus.slug || (studioStats.streamer && studioStats.streamer.kickSlug) || '').trim();
+  if (!targetSlug) {
+    console.log('[Kick Pusher] Kanal adı girilmedi, bağlantı başlatılmadı.');
+    return;
+  }
+  activeKickStatus.slug = targetSlug;
+  activeKickStatus.error = null;
 
   const connectWs = (chatroomId, channelId) => {
     if (!WebSocketClient) {
@@ -810,10 +835,12 @@ function startKickPusherBridge(slug) {
     ws.onclose = () => {
       activeKickStatus.connected = false;
       if (kickPingInterval) clearInterval(kickPingInterval);
-      console.log(`[KICK BRIDGE] Bağlantı koptu, 3 saniye sonra yeniden bağlanılıyor...`);
-      kickReconnectTimeout = setTimeout(() => {
-        startKickPusherBridge(activeKickStatus.slug);
-      }, 3000);
+      if (activeKickStatus.slug) {
+        console.log(`[KICK BRIDGE] Bağlantı koptu, 5 saniye sonra yeniden bağlanılıyor...`);
+        kickReconnectTimeout = setTimeout(() => {
+          if (activeKickStatus.slug) startKickPusherBridge(activeKickStatus.slug);
+        }, 5000);
+      }
     };
 
     ws.onerror = (err) => {
@@ -822,43 +849,55 @@ function startKickPusherBridge(slug) {
     };
   };
 
+  const handleChannelData = (channelData) => {
+    const chatroomId = channelData?.chatroom?.id;
+    const channelId = channelData?.id;
+    const fCount = channelData?.followers_count ?? channelData?.followersCount ?? 0;
+
+    activeKickStatus.chatroomId = chatroomId;
+    activeKickStatus.channelId = channelId;
+    activeKickStatus.followersCount = fCount;
+    activeKickStatus.error = null;
+
+    console.log(`[KICK BRIDGE] Kanal aktif: ${targetSlug} (Chatroom ID: ${chatroomId}, Channel ID: ${channelId}, Takipçi: ${fCount})`);
+    connectWs(chatroomId, channelId);
+  };
+
+  if (prefetchedData && prefetchedData.chatroom && prefetchedData.chatroom.id) {
+    handleChannelData(prefetchedData);
+    return;
+  }
+
   fetchKickChannelInfo(targetSlug)
-    .then(channelData => {
-      const chatroomId = channelData?.chatroom?.id || activeKickStatus.chatroomId || knownFallback?.chatroomId;
-      const channelId = channelData?.id || activeKickStatus.channelId || knownFallback?.channelId;
-      const fCount = channelData?.followers_count ?? channelData?.followersCount ?? 0;
-
-      activeKickStatus.chatroomId = chatroomId;
-      activeKickStatus.channelId = channelId;
-      activeKickStatus.followersCount = fCount;
-
-      console.log(`[KICK BRIDGE] Kanal bulundu: ${targetSlug} (Chatroom ID: ${chatroomId}, Channel ID: ${channelId}, Takipçi: ${fCount})`);
-      connectWs(chatroomId, channelId);
-    })
+    .then(handleChannelData)
     .catch(err => {
       console.error(`[KICK BRIDGE] Kanal bilgisi alınamadı (${targetSlug}):`, err.message);
-      const fallbackChatroom = activeKickStatus.chatroomId || knownFallback?.chatroomId;
-      const fallbackChannel = activeKickStatus.channelId || knownFallback?.channelId;
-      if (fallbackChatroom) {
-        console.log(`[KICK BRIDGE] Bilinen chatroom fallback kullanılıyor: ${fallbackChatroom}`);
-        connectWs(fallbackChatroom, fallbackChannel);
-      } else {
-        activeKickStatus.connected = false;
-        activeKickStatus.error = err.message;
+      activeKickStatus.connected = false;
+      activeKickStatus.error = err.message;
+
+      const is404 = err.message && (err.message.includes('404') || err.message.includes('bulunamadı'));
+      if (!is404) {
+        // Yalnızca geçici ağ veya sunucu hatalarında yeniden dene
         kickReconnectTimeout = setTimeout(() => {
-          startKickPusherBridge(targetSlug);
-        }, 5000);
+          if (activeKickStatus.slug === targetSlug) {
+            startKickPusherBridge(targetSlug);
+          }
+        }, 10000);
+      } else {
+        console.warn(`[KICK BRIDGE] "${targetSlug}" kanalı Kick'te bulunamadığından yeniden bağlanma durduruldu.`);
       }
     });
 }
 
 // Sunucu başlatıldığında kaydedilmiş Kick kanalına otomatik bağlan
 loadStreamStats();
-const defaultKickSlug = (studioStats.streamer && studioStats.streamer.kickSlug) || 'cihanatas';
-if (!studioStats.streamer) studioStats.streamer = { username: 'cihanatas', kickSlug: 'cihanatas' };
-if (!studioStats.streamer.kickSlug) studioStats.streamer.kickSlug = defaultKickSlug;
-if (!studioStats.streamer.username) studioStats.streamer.username = defaultKickSlug;
-startKickPusherBridge(defaultKickSlug);
+const defaultKickSlug = (studioStats.streamer && studioStats.streamer.kickSlug) || '';
+if (!studioStats.streamer) studioStats.streamer = { username: '', kickSlug: '' };
+if (defaultKickSlug) {
+  startKickPusherBridge(defaultKickSlug);
+} else {
+  console.log('[Kick Pusher] Kayıtlı kanal bulunamadı. Lütfen uygulamadan kanal ayarlarını yapın.');
+}
 
 // ==========================================
 // 0.3 ANA GALERİ ŞABLON KATALOĞU & KULLANICI GALERİSİ YÖNETİMİ
@@ -892,6 +931,8 @@ const APP_GALLERY_CATALOG = [
       youtubeHandle: '@mira.gaming',
       goalTitle: 'TAKİPÇİ HEDEFİ',
       goalTarget: 200,
+      avatarUrl: 'kick/vexana/assets/images/avatar.jpg',
+      showGameFrame: true,
       showTopBar: true,
       showWebcam: true,
       showChat: true,
@@ -927,6 +968,8 @@ const APP_GALLERY_CATALOG = [
       youtubeHandle: '@mira.gaming',
       goalTitle: 'TAKİPÇİ HEDEFİ',
       goalTarget: 200,
+      avatarUrl: 'kick/zetian/assets/images/avatar.jpg',
+      showGameFrame: true,
       showTopBar: true,
       showWebcam: true,
       showChat: true,
@@ -962,6 +1005,8 @@ const APP_GALLERY_CATALOG = [
       youtubeHandle: '@mira.gaming',
       goalTitle: 'TAKİPÇİ HEDEFİ',
       goalTarget: 200,
+      avatarUrl: 'kick/nana/assets/images/avatar.jpg',
+      showGameFrame: true,
       showTopBar: true,
       showWebcam: true,
       showChat: true,
@@ -997,6 +1042,8 @@ const APP_GALLERY_CATALOG = [
       youtubeHandle: '@mira.gaming',
       goalTitle: 'TAKİPÇİ HEDEFİ',
       goalTarget: 200,
+      avatarUrl: 'kick/carmilla/assets/images/avatar.jpg',
+      showGameFrame: true,
       showTopBar: true,
       showWebcam: true,
       showChat: true,
@@ -1032,6 +1079,8 @@ const APP_GALLERY_CATALOG = [
       youtubeHandle: '@mira.gaming',
       goalTitle: 'TAKİPÇİ HEDEFİ',
       goalTarget: 200,
+      avatarUrl: 'kick/atlas/assets/images/avatar.jpg',
+      showGameFrame: true,
       showTopBar: true,
       showWebcam: true,
       showChat: true,
@@ -1873,6 +1922,190 @@ function saveUserGallery(items) {
   }
 }
 
+// ==========================================
+// 0.4 AKTİF YAYIN SAHNELERİ & OBS ENTEGRASYON YÖNETİMİ
+// ==========================================
+const ACTIVE_SCENES_PATH = path.join(DATA_DIR, 'active-scenes.json');
+
+// Sahnelerim varsayılan olarak %100 boş (temiz) başlar, kullanıcı kendi seçer
+const DEFAULT_ACTIVE_SCENES = [];
+
+function loadActiveScenes() {
+  if (!fs.existsSync(ACTIVE_SCENES_PATH)) {
+    return [];
+  }
+  try {
+    const raw = fs.readFileSync(ACTIVE_SCENES_PATH, 'utf-8');
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+  } catch (e) {}
+  return [];
+}
+
+function saveActiveScenes(items) {
+  try {
+    fs.writeFileSync(ACTIVE_SCENES_PATH, JSON.stringify(items, null, 2), 'utf-8');
+    return true;
+  } catch (e) {
+    console.error('[SCENES] Kaydetme hatasi:', e.message);
+    return false;
+  }
+}
+
+// Çapraz Platform OBS Kaynak Tipleri (Linux & Windows Eşitliği)
+const IS_WINDOWS = process.platform === 'win32';
+const OBS_CAMERA_KIND = IS_WINDOWS ? 'dshow_input' : 'v4l2_input';
+const OBS_GAME_KIND = IS_WINDOWS ? 'game_capture' : 'xcomposite_input';
+const OBS_DISPLAY_KIND = IS_WINDOWS ? 'monitor_capture' : 'pipewire-screen-capture';
+const OBS_WINDOW_KIND = IS_WINDOWS ? 'window_capture' : 'xcomposite_input';
+const OBS_AUDIO_IN_KIND = IS_WINDOWS ? 'wasapi_input_capture' : 'pulse_input_capture';
+const OBS_AUDIO_OUT_KIND = IS_WINDOWS ? 'wasapi_output_capture' : 'pulse_output_capture';
+const OBS_IMAGE_KIND = 'image_source';
+const OBS_MEDIA_KIND = 'ffmpeg_source';
+
+async function getObsAvailableInputs() {
+  if (!obsWsConnected || !obsWsClient) {
+    return { connected: false, scenes: [], inputs: [], cameras: [], gameCaptures: [], audio: [], displays: [], windows: [] };
+  }
+  try {
+    const [sceneRes, inputRes] = await Promise.all([
+      obsWsClient.call('GetSceneList').catch(() => ({ scenes: [] })),
+      obsWsClient.call('GetInputList').catch(() => ({ inputs: [] }))
+    ]);
+
+    const scenes = (sceneRes.scenes || []).map(s => (typeof s === 'string' ? s : (s.sceneName || s.name)));
+    const inputs = inputRes.inputs || [];
+
+    const cameras = inputs.filter(i => {
+      const k = (i.inputKind || i.unversionedInputKind || '').toLowerCase();
+      const n = (i.inputName || '').toLowerCase();
+      return k.includes('dshow') || k.includes('v4l2') || k.includes('camera') || k.includes('video') || n.includes('cam') || n.includes('kamera');
+    }).map(i => ({ name: i.inputName, kind: i.inputKind }));
+
+    const gameCaptures = inputs.filter(i => {
+      const k = (i.inputKind || i.unversionedInputKind || '').toLowerCase();
+      const n = (i.inputName || '').toLowerCase();
+      return k.includes('game') || k.includes('window') || k.includes('monitor') || k.includes('display') || k.includes('screen') || k.includes('pipewire') || k.includes('xcomposite') || n.includes('oyun') || n.includes('ekran');
+    }).map(i => ({ name: i.inputName, kind: i.inputKind }));
+
+    const audio = inputs.filter(i => {
+      const k = (i.inputKind || i.unversionedInputKind || '').toLowerCase();
+      const n = (i.inputName || '').toLowerCase();
+      return k.includes('audio') || k.includes('wasapi') || k.includes('pulse') || k.includes('alsa') || n.includes('mic') || n.includes('ses');
+    }).map(i => ({ name: i.inputName, kind: i.inputKind }));
+
+    const displays = inputs.filter(i => {
+      const k = (i.inputKind || i.unversionedInputKind || '').toLowerCase();
+      return k.includes('monitor') || k.includes('display') || k.includes('screen') || k.includes('pipewire');
+    }).map(i => ({ name: i.inputName, kind: i.inputKind }));
+
+    const windows = inputs.filter(i => {
+      const k = (i.inputKind || i.unversionedInputKind || '').toLowerCase();
+      return k.includes('window') || k.includes('xcomposite');
+    }).map(i => ({ name: i.inputName, kind: i.inputKind }));
+
+    return { connected: true, scenes, inputs: inputs.map(i => i.inputName), cameras, gameCaptures, audio, displays, windows };
+  } catch (err) {
+    return { connected: false, error: err.message, scenes: [], inputs: [], cameras: [], gameCaptures: [], audio: [], displays: [], windows: [] };
+  }
+}
+
+async function syncScenesToObs(scenesToSync) {
+  if (!obsWsConnected || !obsWsClient) {
+    throw new Error(`OBS Studio açık değil veya WebSocket bağlı değil (Port: ${obsWsPort}). Lütfen OBS Studio'yu açıp tekrar deneyin.`);
+  }
+
+  const results = [];
+  let existingSceneNames = [];
+  let allObsInputs = [];
+  try {
+    const [listRes, inputsRes] = await Promise.all([
+      obsWsClient.call('GetSceneList'),
+      obsWsClient.call('GetInputList').catch(() => ({ inputs: [] }))
+    ]);
+    existingSceneNames = (listRes.scenes || []).map(s => (typeof s === 'string' ? s : (s.sceneName || s.name)));
+    allObsInputs = (inputsRes.inputs || []).map(i => i.inputName);
+  } catch (err) {
+    throw new Error('OBS sahne listesi alınamadı: ' + err.message);
+  }
+
+  for (const sc of scenesToSync) {
+    const sceneName = (sc.obsSceneName || sc.name || 'MİRA Sahnesi').trim();
+    const createdLayers = [];
+
+    // 1. Sahne yoksa oluştur
+    if (!existingSceneNames.includes(sceneName)) {
+      try {
+        await obsWsClient.call('CreateScene', { sceneName });
+        existingSceneNames.push(sceneName);
+      } catch (err) {
+        if (!err.message || (!err.message.includes('already exists') && !err.message.includes('ResourceAlreadyExists'))) {
+          results.push({ sceneName, success: false, error: err.message });
+          continue;
+        }
+      }
+    }
+
+    // Sahnedeki mevcut kaynakları kontrol et
+    let sceneItems = [];
+    try {
+      const itemsRes = await obsWsClient.call('GetSceneItemList', { sceneName });
+      sceneItems = itemsRes.sceneItems || [];
+    } catch (e) {}
+
+    // 2. MİRA Şeffaf Tarayıcı Katmanı (1080p 60 FPS Browser Source)
+    // StreamElements / BotRix standardı: Kamera ve oyun yakalama OBS'te yönetilir, MİRA şeffaf HUD olarak üstte durur.
+    const browserCfg = (sc.sources && sc.sources.browser) || {};
+    const browserSourceName = (browserCfg.name || sc.obsSourceName || `MİRA Overlay - ${sc.name || sceneName}`).trim();
+    const url = (browserCfg.url || sc.targetUrl || `http://127.0.0.1:${PORT}/custom-overlay.html?id=${sc.id}`).trim();
+    const width = parseInt(browserCfg.width || sc.width, 10) || 1920;
+    const height = parseInt(browserCfg.height || sc.height, 10) || 1080;
+    const fps = parseInt(browserCfg.fps || sc.fps, 10) || 60;
+
+    const existingInScene = sceneItems.find(it => it.sourceName === browserSourceName);
+    if (existingInScene) {
+      try {
+        await obsWsClient.call('SetInputSettings', {
+          inputName: browserSourceName,
+          inputSettings: { url, width, height, fps, restart_when_active: true, shutdown: false, reroute_audio: true }
+        });
+        createdLayers.push(`🌐 ${browserSourceName} (1080p Güncellendi)`);
+      } catch(e){}
+    } else {
+      if (allObsInputs.includes(browserSourceName)) {
+        try {
+          await obsWsClient.call('CreateSceneItem', { sceneName, sourceName: browserSourceName });
+          await obsWsClient.call('SetInputSettings', {
+            inputName: browserSourceName,
+            inputSettings: { url, width, height, fps, restart_when_active: true, shutdown: false, reroute_audio: true }
+          });
+          createdLayers.push(`🌐 ${browserSourceName} (Sahneye Eklendi)`);
+        } catch(e){}
+      } else {
+        try {
+          await obsWsClient.call('CreateInput', {
+            sceneName,
+            inputName: browserSourceName,
+            inputKind: 'browser_source',
+            inputSettings: { url, width, height, fps, restart_when_active: true, shutdown: false, reroute_audio: true },
+            sceneItemEnabled: true
+          });
+          allObsInputs.push(browserSourceName);
+          createdLayers.push(`🌐 ${browserSourceName} (1080p60 Şeffaf Katman Oluşturuldu)`);
+        } catch(e){}
+      }
+    }
+
+    results.push({
+      sceneName,
+      layers: createdLayers,
+      success: true
+    });
+  }
+
+  return results;
+}
+
 const MIME_TYPES = {
   '.html': 'text/html; charset=UTF-8',
   '.css': 'text/css; charset=UTF-8',
@@ -2092,7 +2325,7 @@ const server = http.createServer((req, res) => {
     }));
   }
 
-  // 2.42 API: Kick Kanalını Bağla & Pusher Başlat
+  // 2.42 API: Kick Kanalını Doğrula, Bağla & Pusher Başlat
   if (pathname === '/api/kick/connect' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -2100,33 +2333,66 @@ const server = http.createServer((req, res) => {
       try {
         const d = JSON.parse(body || '{}');
         const cleanSlug = (d.slug || d.kickSlug || '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
-        if (!cleanSlug) throw new Error('Geçerli bir Kick kanal adı giriniz');
-        
-        if (!studioStats.streamer) studioStats.streamer = {};
-        studioStats.streamer.kickSlug = cleanSlug;
-        if (d.username) studioStats.streamer.username = d.username;
-        else if (!studioStats.streamer.username) studioStats.streamer.username = cleanSlug;
-        saveStreamStats();
+        if (!cleanSlug) throw new Error('Geçerli bir Kick kanal adı giriniz (Örn: gamer_deniz)');
 
-        startKickPusherBridge(cleanSlug);
+        fetchKickChannelInfo(cleanSlug)
+          .then(channelData => {
+            if (!studioStats.streamer) studioStats.streamer = {};
+            studioStats.streamer.kickSlug = cleanSlug;
+            studioStats.streamer.username = (d.username || cleanSlug).trim();
+            saveStreamStats();
 
-        eventQueue.push({
-          type: 'UPDATE_STREAMER',
-          streamer: studioStats.streamer,
-          time: Date.now()
-        });
+            startKickPusherBridge(cleanSlug, channelData);
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, slug: cleanSlug, streamer: studioStats.streamer, status: activeKickStatus }));
+            eventQueue.push({
+              type: 'UPDATE_STREAMER',
+              streamer: studioStats.streamer,
+              time: Date.now()
+            });
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              success: true,
+              slug: cleanSlug,
+              followersCount: channelData.followers_count ?? channelData.followersCount ?? 0,
+              streamer: studioStats.streamer,
+              status: activeKickStatus
+            }));
+          })
+          .catch(err => {
+            console.error(`[KICK CONNECT] "${cleanSlug}" doğrulanamadı:`, err.message);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              success: false,
+              error: err.message || `Kick üzerinde "${cleanSlug}" adında bir kanal bulunamadı.`
+            }));
+          });
       } catch (err) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err.message }));
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
       }
     });
     return;
   }
 
-  // 2.421 API: Kick Yeniden Bağlan / Kanal Değiştir
+  // 2.421 API: Kick Bağlantısını Kes / Hesabı Kaldır (Veri Silmeden Temizle)
+  if (pathname === '/api/kick/disconnect' && req.method === 'POST') {
+    stopKickPusherBridge(true);
+    eventQueue.push({
+      type: 'UPDATE_STREAMER',
+      streamer: studioStats.streamer,
+      time: Date.now()
+    });
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({
+      success: true,
+      message: 'Kick hesabı bağlantısı başarıyla kaldırıldı',
+      streamer: studioStats.streamer,
+      status: activeKickStatus
+    }));
+  }
+
+  // 2.422 API: Kick Yeniden Bağlan / Kanal Değiştir
   if (pathname === '/api/kick/reconnect' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -2206,7 +2472,7 @@ const server = http.createServer((req, res) => {
           senderSession: d.senderSession,
           type: 'CHAT_MESSAGE',
           platform: d.platform || 'kick',
-          username: d.username || studioStats.streamer?.username || activeKickStatus.slug || 'cihanatas',
+          username: d.username || studioStats.streamer?.username || activeKickStatus.slug || 'Yayıncı',
           content: d.content || '',
           badge: d.badge || 'streamer',
           isStreamer: d.isStreamer !== undefined ? d.isStreamer : true,
@@ -2803,6 +3069,187 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // 2.81 API: OBS Mevcut Girdileri (Kamera, Oyun, Ekran, Ses, Sahneler)
+  if (pathname === '/api/obs/inputs' && req.method === 'GET') {
+    getObsAvailableInputs().then(data => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
+    }).catch(err => {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message, connected: false }));
+    });
+    return;
+  }
+
+  // 2.811 API: OBS Pull Devre Dışı Bırakıldı (Yalnızca Push / Aktarım Kullanılır)
+  if (pathname === '/api/obs/pull-scenes' && req.method === 'POST') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({
+      success: false,
+      message: 'OBS Pull özelliği kullanıcı isteğiyle kaldırıldı. Yalnızca MİRA -> OBS Push aktarımı kullanılmaktadır.'
+    }));
+  }
+
+  // 2.82 API: Aktif Yayın Sahneleri Listesi (GET)
+  if (pathname === '/api/scenes' && req.method === 'GET') {
+    const scenes = loadActiveScenes();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({
+      success: true,
+      scenes,
+      obsConnected: obsWsConnected,
+      obsPort: obsWsPort
+    }));
+  }
+
+  // 2.83 API: Aktif Yayın Sahnesi Ekle (POST)
+  if (pathname === '/api/scenes' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const d = JSON.parse(body || '{}');
+        const scenes = loadActiveScenes();
+        const newId = d.id || ('sc_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 4));
+        const newScene = {
+          id: newId,
+          name: (d.name || 'Yeni Sahne').trim(),
+          obsSceneName: (d.obsSceneName || d.name || 'MİRA - Yeni Sahne').trim(),
+          obsSourceName: (d.obsSourceName || `MİRA Overlay - ${d.name || 'Sahne'}`).trim(),
+          targetUrl: (d.targetUrl || `http://127.0.0.1:${PORT}/custom-overlay.html?id=${newId}`).trim(),
+          category: d.category || 'custom',
+          icon: d.icon || '🎬',
+          badge: d.badge || 'ÖZEL',
+          description: d.description || '',
+          sources: d.sources || {
+            browser: { enabled: true, name: (d.obsSourceName || `MİRA Overlay - ${d.name || 'Sahne'}`).trim() },
+            camera: { enabled: !!d.enableCamera, name: d.cameraSourceName || 'Kamera' },
+            game: { enabled: !!d.enableGame, name: d.gameSourceName || 'Oyun Yakalama' }
+          },
+          width: parseInt(d.width, 10) || 1920,
+          height: parseInt(d.height, 10) || 1080,
+          fps: parseInt(d.fps, 10) || 60,
+          galleryId: d.galleryId || null,
+          order: scenes.length + 1
+        };
+        scenes.push(newScene);
+        saveActiveScenes(scenes);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, scene: newScene, scenes }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 2.84 API: Aktif Sahneyi Düzenle (PUT)
+  if (pathname.startsWith('/api/scenes/') && req.method === 'PUT') {
+    const scId = decodeURIComponent(pathname.replace('/api/scenes/', '')).trim();
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const updates = JSON.parse(body || '{}');
+        const scenes = loadActiveScenes();
+        const idx = scenes.findIndex(s => s.id === scId);
+        if (idx === -1) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Sahne bulunamadı' }));
+        }
+        scenes[idx] = { ...scenes[idx], ...updates, id: scId };
+        saveActiveScenes(scenes);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, scene: scenes[idx], scenes }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // 2.85 API: Aktif Sahneyi Listeden Çıkar (DELETE)
+  if (pathname.startsWith('/api/scenes/') && req.method === 'DELETE') {
+    const scId = decodeURIComponent(pathname.replace('/api/scenes/', '')).trim();
+    const scenes = loadActiveScenes();
+    const filtered = scenes.filter(s => s.id !== scId);
+    saveActiveScenes(filtered);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ success: true, scenes: filtered }));
+  }
+
+  // 2.86 API: Aktif Sahneleri Sıfırla (POST)
+  if (pathname === '/api/scenes/reset' && req.method === 'POST') {
+    saveActiveScenes(DEFAULT_ACTIVE_SCENES);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ success: true, scenes: DEFAULT_ACTIVE_SCENES }));
+  }
+
+  // 2.87 API: TEK TIKLA OBS'E AKTAR (Tüm Aktif Sahneleri OBS'te Otomatik Oluştur)
+  if (pathname === '/api/obs/sync-scenes' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const d = JSON.parse(body || '{}');
+        const scenes = loadActiveScenes();
+        const targets = Array.isArray(d.sceneIds) && d.sceneIds.length > 0
+          ? scenes.filter(s => d.sceneIds.includes(s.id))
+          : scenes;
+
+        if (targets.length === 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Aktarılacak aktif sahne bulunamadı' }));
+        }
+
+        const results = await syncScenesToObs(targets);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          results,
+          total: results.length,
+          syncedCount: results.filter(r => r.success).length,
+          obsConnected: obsWsConnected
+        }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message, obsConnected: obsWsConnected }));
+      }
+    });
+    return;
+  }
+
+  // 2.88 API: Tek Bir Sahneyi OBS'e Aktar
+  if (pathname === '/api/obs/sync-single-scene' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const d = JSON.parse(body || '{}');
+        const scenes = loadActiveScenes();
+        const sc = scenes.find(s => s.id === d.sceneId);
+        if (!sc) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Sahne bulunamadı' }));
+        }
+
+        const results = await syncScenesToObs([sc]);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          result: results[0] || null,
+          obsConnected: obsWsConnected
+        }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message, obsConnected: obsWsConnected }));
+      }
+    });
+    return;
+  }
+
   // ==========================================
   // 2.9 API: ANA GALERİ & KULLANICI GALERİSİ (CRUD)
   // ==========================================
@@ -2924,6 +3371,7 @@ const server = http.createServer((req, res) => {
           subtitle: updates.subtitle !== undefined ? updates.subtitle : current.subtitle,
           icon: updates.icon !== undefined ? updates.icon : current.icon,
           badge: updates.badge !== undefined ? updates.badge : current.badge,
+          previewImg: updates.previewImg !== undefined ? updates.previewImg : current.previewImg,
           updatedAt: Date.now(),
           config: {
             ...(current.config || {}),
@@ -2960,6 +3408,221 @@ const server = http.createServer((req, res) => {
     saveUserGallery(filtered);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ success: true, items: filtered }));
+  }
+
+  // ==========================================
+  // 2.95 API: ŞABLON İÇE & DIŞA AKTARMA (IMPORT / EXPORT .mira) + GÖRSEL PAKETLEME
+  // ==========================================
+  // Yardımcı: Yerel dosya yolunu (örn. /uploads/...) Base64 Data URL'e çevirir
+  function getLocalAssetAsDataUrl(assetUrl) {
+    if (!assetUrl || typeof assetUrl !== 'string') return null;
+    if (assetUrl.startsWith('data:image/')) return assetUrl;
+    let diskPath = null;
+    const cleanUrl = assetUrl.split('?')[0];
+    if (cleanUrl.startsWith('/uploads/') || cleanUrl.startsWith('uploads/')) {
+      const filename = path.basename(decodeURIComponent(cleanUrl));
+      diskPath = path.join(UPLOADS_DIR, filename);
+    }
+    if (diskPath && fs.existsSync(diskPath)) {
+      try {
+        const ext = path.extname(diskPath).toLowerCase();
+        let mime = 'image/png';
+        if (ext === '.jpg' || ext === '.jpeg') mime = 'image/jpeg';
+        else if (ext === '.gif') mime = 'image/gif';
+        else if (ext === '.webp') mime = 'image/webp';
+        else if (ext === '.svg') mime = 'image/svg+xml';
+        const b64 = fs.readFileSync(diskPath).toString('base64');
+        return `data:${mime};base64,${b64}`;
+      } catch (e) {
+        console.error('[AssetPacker Error]', e.message);
+      }
+    }
+    return null;
+  }
+
+  // Şablon(lar) içindeki tüm özel /uploads/ resimlerini toplayıp pakete gömer
+  function bundleAssetsForTemplates(templatesList) {
+    const assetsMap = {};
+    function scanObject(obj) {
+      if (!obj || typeof obj !== 'object') return;
+      for (const k of Object.keys(obj)) {
+        const val = obj[k];
+        if (typeof val === 'string') {
+          if (val.startsWith('/uploads/') || val.startsWith('uploads/')) {
+            if (!assetsMap[val]) {
+              const dataUrl = getLocalAssetAsDataUrl(val);
+              if (dataUrl) assetsMap[val] = dataUrl;
+            }
+          }
+        } else if (typeof val === 'object') {
+          scanObject(val);
+        }
+      }
+    }
+    for (const tpl of templatesList) {
+      scanObject(tpl);
+    }
+    return assetsMap;
+  }
+
+  // İçe aktarılan paketteki gömülü resimleri kullanıcının yerel UPLOADS_DIR dizinine yazar ve URL'leri günceller
+  function unpackAndRestoreAssets(template, assetsMap) {
+    if (!template) return template;
+    let tplStr = JSON.stringify(template);
+    if (assetsMap && typeof assetsMap === 'object') {
+      for (const [origUrl, dataUrl] of Object.entries(assetsMap)) {
+        if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) continue;
+        try {
+          const match = dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+          if (!match) continue;
+          const mime = match[1].toLowerCase();
+          const base64Data = match[2];
+          let ext = '.png';
+          if (mime.includes('jpeg') || mime.includes('jpg')) ext = '.jpg';
+          else if (mime.includes('gif')) ext = '.gif';
+          else if (mime.includes('webp')) ext = '.webp';
+          else if (mime.includes('svg')) ext = '.svg';
+
+          const baseClean = path.basename(origUrl).replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_') || 'asset';
+          const newFilename = `${Date.now()}_${Math.random().toString(36).substring(2, 6)}_${baseClean}${ext}`;
+          const destPath = path.join(UPLOADS_DIR, newFilename);
+          fs.writeFileSync(destPath, Buffer.from(base64Data, 'base64'));
+
+          const newUrl = `/uploads/${encodeURIComponent(newFilename)}`;
+          tplStr = tplStr.split(origUrl).join(newUrl);
+          const noSlash = origUrl.startsWith('/') ? origUrl.substring(1) : '/' + origUrl;
+          tplStr = tplStr.split(noSlash).join(newUrl);
+        } catch (err) {
+          console.error('[AssetUnpacker Error]', err.message);
+        }
+      }
+    }
+    return JSON.parse(tplStr);
+  }
+
+  // Tüm Galeriyi .mira Paketi Olarak Dışa Aktar (Export All - Tüm görseller paketlenir)
+  if (pathname === '/api/gallery/export-all' && req.method === 'GET') {
+    const items = loadUserGallery();
+    const assets = bundleAssetsForTemplates(items);
+    const pkg = {
+      mira_version: '1.0',
+      type: 'full_gallery_backup',
+      exportedAt: Date.now(),
+      platform: 'cross_platform',
+      count: items.length,
+      templates: items,
+      assets: assets
+    };
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const filename = `mira-gallery-backup-${dateStr}.mira`;
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${filename}"`
+    });
+    return res.end(JSON.stringify(pkg, null, 2));
+  }
+
+  // Tekil Tasarımı .mira Paketi Olarak Dışa Aktar (Export Single - Görseller paketlenir)
+  if (pathname.startsWith('/api/gallery/export/') && req.method === 'GET') {
+    const itemId = decodeURIComponent(pathname.replace('/api/gallery/export/', '')).trim();
+    const userItems = loadUserGallery();
+    let found = userItems.find(x => x.id === itemId);
+    if (!found) {
+      found = APP_GALLERY_CATALOG.find(x => x.id === itemId);
+    }
+    if (!found) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Öğe bulunamadı' }));
+    }
+
+    const assets = bundleAssetsForTemplates([found]);
+    const pkg = {
+      mira_version: '1.0',
+      type: 'single_template',
+      exportedAt: Date.now(),
+      platform: 'cross_platform',
+      template: found,
+      assets: assets
+    };
+    const safeName = (found.name || 'template').replace(/[^a-zA-Z0-9_\u00C0-\u017F-]/g, '_').toLowerCase();
+    const filename = `${safeName}.mira`;
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="${filename}"`
+    });
+    return res.end(JSON.stringify(pkg, null, 2));
+  }
+
+  // Dışarıdan .mira / .json Şablon İçe Aktar (Import - Görseller çözülüp yerel ortama çıkartılır)
+  if (pathname === '/api/gallery/import' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const userItems = loadUserGallery();
+        const importedItems = [];
+        const globalAssets = payload.assets || {};
+
+        // Hem tekil şablon hem çoklu paket desteği
+        let rawTemplates = [];
+        if (payload.templates && Array.isArray(payload.templates)) {
+          rawTemplates = payload.templates;
+        } else if (payload.template && typeof payload.template === 'object') {
+          rawTemplates = [payload.template];
+        } else if (Array.isArray(payload)) {
+          rawTemplates = payload;
+        } else if (payload.name && (payload.category || payload.config)) {
+          rawTemplates = [payload];
+        } else {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Geçersiz veya tanınmayan MİRA şablon dosyası formatı.' }));
+        }
+
+        for (let tpl of rawTemplates) {
+          if (!tpl || typeof tpl !== 'object') continue;
+          // Gömülü resim paketini kullanıcının yerel diskine çıkart ve şablon içi linkleri güncelle
+          tpl = unpackAndRestoreAssets(tpl, { ...globalAssets, ...(tpl.assets || {}) });
+          const freshId = 'usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+          const newItem = {
+            id: freshId,
+            templateId: tpl.templateId || 'imported_template',
+            category: tpl.category || 'canvas',
+            cardType: tpl.cardType || null,
+            name: (tpl.name ? `${tpl.name} (İçe Aktarıldı)` : 'İçe Aktarılan Şablon').trim(),
+            subtitle: tpl.subtitle || 'Dışarıdan .mira paketi ile içe aktarıldı',
+            icon: tpl.icon || '📦',
+            badge: '📥 İÇE AKTARILDI',
+            previewImg: tpl.previewImg || null,
+            basePath: tpl.basePath || 'custom-overlay.html',
+            obsKey: tpl.obsKey || null,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            config: tpl.config ? JSON.parse(JSON.stringify(tpl.config)) : {}
+          };
+          userItems.push(newItem);
+          importedItems.push(newItem);
+        }
+
+        if (importedItems.length === 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Dosya içinde geçerli bir şablon bulunamadı.' }));
+        }
+
+        saveUserGallery(userItems);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({
+          success: true,
+          importedCount: importedItems.length,
+          importedItems,
+          items: userItems
+        }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: 'Şablon dosyası işlenirken hata: ' + err.message }));
+      }
+    });
+    return;
   }
 
   // ==========================================

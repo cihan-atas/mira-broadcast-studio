@@ -361,14 +361,31 @@
       const seenIds = new Set();
       const chatFeed = document.getElementById('chat-feed');
       const inputEl = document.getElementById('streamer-input');
-
-      const streamerName = localStorage.getItem('mira_streamer_username') || 'cihanatas';
-      const kickSlug = localStorage.getItem('mira_kick_slug') || streamerName || 'cihanatas';
-      if (inputEl) inputEl.placeholder = `${streamerName} olarak mesaj yazın... (Enter)`;
       const popLink = document.getElementById('kick-popout-link');
-      if (popLink && kickSlug) popLink.href = `https://kick.com/popout/${encodeURIComponent(kickSlug)}/chat`;
       const pill = document.getElementById('float-chat-pill');
-      if (pill && kickSlug) pill.textContent = `🟢 Kick: ${kickSlug}`;
+
+      let streamerName = localStorage.getItem('mira_streamer_username') || '';
+      let kickSlug = localStorage.getItem('mira_kick_slug') || streamerName || '';
+
+      function updateStreamerChatInfo(slug, name) {
+        if (slug) kickSlug = slug;
+        if (name) streamerName = name;
+        else if (slug && !streamerName) streamerName = slug;
+
+        if (inputEl) inputEl.placeholder = streamerName ? `${streamerName} olarak mesaj yazın... (Enter)` : 'Kanal bağlı değil — önce stüdyodan kanal bağlayın';
+        if (popLink && kickSlug) popLink.href = `https://kick.com/popout/${encodeURIComponent(kickSlug)}/chat`;
+        if (pill) pill.textContent = kickSlug ? `🟢 Kick: ${kickSlug}` : '⚪ Kick Bekleniyor';
+      }
+
+      updateStreamerChatInfo(kickSlug, streamerName);
+
+      fetch('/api/streamer/config')
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.streamer) {
+            updateStreamerChatInfo(data.streamer.kickSlug, data.streamer.username);
+          }
+        }).catch(() => {});
 
       function getNowTimeStr() {
         const d = new Date();

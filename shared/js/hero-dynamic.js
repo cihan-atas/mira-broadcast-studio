@@ -556,7 +556,7 @@
     window.addCustomChatMessage = addChatMessage;
 
     // Kick Pusher WebSocket doğrudan bağlantısı
-    const kickSlug = (window.HERO_CONFIG && window.HERO_CONFIG.kickChannel) || (window.OVERLAY_CONFIG && window.OVERLAY_CONFIG.kickChannel) || localStorage.getItem('mira_streamer_username') || localStorage.getItem('mira_kick_slug') || 'cihanatas';
+    const kickSlug = (window.HERO_CONFIG && window.HERO_CONFIG.kickChannel) || (window.OVERLAY_CONFIG && window.OVERLAY_CONFIG.kickChannel) || localStorage.getItem('mira_kick_slug') || localStorage.getItem('mira_streamer_username') || '';
     if (kickSlug) initKickPusher(kickSlug, addChatMessage);
   }
 

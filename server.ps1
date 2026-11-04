@@ -138,7 +138,7 @@ try {
                     id = if ($json.id) { $json.id } else { [Guid]::NewGuid().ToString() }
                     time = $nowTime
                     type = "CHAT_MESSAGE"
-                    username = if ($json.username) { $json.username } else { "cihanatas" }
+                    username = if ($json.username) { $json.username } else { "Yayıncı" }
                     content = if ($json.content) { $json.content } else { "" }
                     badge = if ($json.badge) { $json.badge } else { "streamer" }
                     isStreamer = if ($null -ne $json.isStreamer) { $json.isStreamer } else { $true }

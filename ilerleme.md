@@ -182,3 +182,66 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
   - Tuval düzenleme inspector'ına **"💾 Bu Kartı Kendi Galerime Kaydet"** butonu entegre edildi.
   - Kendi Galerim sekmesinde **"🌌 Arka Planlar"** filtresi ve arka planları tuvale uygulama aksiyonları eklendi.
 
+
+---
+
+## 🚀 7. Kendi Galerim & OBS Sahnelerim Ayrımı (Tamamlandı)
+
+- **Kendi Galerim (Kişisel Tasarım Masası):**
+  - Kullanıcının tasarladığı, kaydettiği veya içe aktardığı kart, sahne, arka plan ve alert şablonlarının güvenle depolandığı alan.
+  - Sahnelerim'e ekleme, düzenleme, çoğaltma, silme ve `.mira` formatında dışa aktarma yetenekleri burada yer alır.
+- **Sahnelerim (OBS Aktif Sahne Masası):**
+  - Sadece canlı yayında OBS'e aktarılmak üzere seçilmiş sahneleri barındırır.
+  - "Galerimden Sahne Ekle" butonu yalnızca kullanıcının kendi galerisindeki kayıtlı sahneleri listeler, yabancı katalog öğeleriyle karışmaz.
+
+---
+
+## 📦 8. .mira Taşınabilir Şablon Paketi & Gömülü Görsel Motoru (Tamamlandı)
+
+- **Bağımsız Taşınabilir Paket:**
+  - Kullanıcı kendi bilgisayarından özel logo, resim veya arka plan yükleyip dışa aktardığında (`GET /api/gallery/export/:id` veya `GET /api/gallery/export-all`), tüm yerel `/uploads/` dosyaları taranır ve pakete Base64 olarak gömülür.
+  - Başka bir kullanıcı veya bilgisayar paketi içe aktardığında (`POST /api/gallery/import`), gömülü resimler hedef sistemin `uploads/` dizinine otomatik olarak çıkartılır (`unpackAndRestoreAssets`) ve dosya yolları güncellenir. Sıfır kırık görsel veya 404 hatası garanti edilir.
+- **İçe/Dışa Aktarma Deneyimi:**
+  - Sürükle-bırak destekli içe aktarma modalı, bütünlük doğrulaması, şablon önizleme kartları ve tek tıkla galeriye yükleme.
+
+---
+
+## 🎨 9. Temiz Galeri İş Akışı & Mükerrer Kayıt Engelleme (Tamamlandı)
+
+- **`🚀 TUVALE EKLE & KULLAN`:** Galeriye ara kayıt atmaz, tasarım doğrudan tuval sahnesine canlı katman olarak aktarılır.
+- **`💾 GALERİME KAYDET`:** Yalnızca kullanıcı bilinçli olarak tıkladığında çalışır ve var olan öğeyi üzerine günceller (`PUT /api/gallery/user/:id`).
+- **Tuvalde Tekil Sahne Yönetimi:** Düzenleme oturumunda sahne kimliği (`builder-edit-id`) kilitlenerek mükerrer kopyaların oluşması kalıcı olarak engellenmiştir.
+
+---
+
+## 📱 10. Responsive Arayüz Düzeltmeleri & Windows / Linux Çapraz Platform Mimarisi (Tamamlandı)
+
+- **Responsive Buton & Düzen Düzeltmeleri:**
+  - Laptop ve kompakt ekranlarda (1366x768, 1280x720/800) konsolun sıkışmaması için ana ızgara breakpoint'i 1320px'e çıkarıldı.
+  - Kart altındaki aksiyon butonlarında metinli butonlar esnerken (`flex: 1 1 auto`), ikonlu butonlar (`📤`, `📋`, `⚙️`, `🗑️`) `.btn-icon-only` kuralı ile 36px kare buton olarak sabitlendi; butonların devasa bloklara dönüşüp satır kırması önlendi.
+  - Başlık ve araç çubuğu kapsayıcılarına `flex-wrap: wrap; gap: 8px;` eklenerek butonların taşması ve kayması engellendi.
+  - Aktif sahneler ızgarasına `.gallery-cards-grid` sınıfı ve `repeat(auto-fill, minmax(290px, 1fr))` uygulanarak otomatik sütun yerleşimi sağlandı.
+- **Sohbet TTS Toggle Düzeltmesi:**
+  - Sohbet botu arayüzündeki TTS butonunun tıklanır tıklanmaz geri kapanması sorunu; bellek konfigürasyonunun DOM tarafından ezilmesi engellenerek ve iki yönlü senkronizasyon sağlanarak giderildi.
+- **Windows ve Linux %100 Çapraz Platform Eşitliği:**
+  - **Dinamik Yollar:** Tüm dosya ve dizin erişimleri `path.join()`, `path.normalize()` ve `app.getPath('userData')` ile yürütülür; asla statik Unix (`/`) veya Windows (`\`) kullanılmaz.
+  - **OBS WebSocket 5.0:** Standart JSON-RPC WebSocket protokolü her iki işletim sisteminde de yerel `127.0.0.1:4455` portunda tam pariteyle çalışır.
+  - **Ses ve Akış:** Edge-TTS ve HTML5 Audio API doğrudan `audio/mpeg` akışı sağladığından Linux veya Windows yerel konuşma motoru farklılıklarından etkilenmez.
+  - **Paketleme:** `package.json` içerisinde hem Windows NSIS/portable (`npm run pack:win`, `npm run dist:win`) hem Linux AppImage/deb (`npm run pack:linux`, `npm run dist:linux`) yapılandırmaları tam hazır durumdadır.
+
+
+---
+
+## 🧭 12. Sekme Renk Hiyerarşisi & "Özel Tasarım" Buton Boyutlandırma Revizyonu (2026-11-04)
+
+- **Basılı Olmayan Sekmelerin Yanlış Renklerde Parlaması Sorununun Çözümü:**
+  - **Kök Neden:** HTML içerisinde `tab-btn-design-creator` ve `tab-btn-my-scenes` butonlarına statik inline stillerle mor ve yeşil degradeler ve parlak renkler atanmıştı. `switchTab()` fonksiyonu `.active` sınıfını kaldırsa dahi, HTML seviyesindeki inline stiller CSS'i ezdiği için butonlar sürekli basılı/seçiliymiş gibi parlıyordu ve kullanıcının hangi sekmede olduğunu anlamasını imkansız kılıyordu.
+  - **Çözüm:** Tüm butonlardaki inline renkler ve stil ezmeleri tamamen temizlendi. Bütün basılı olmayan sekmeler nötr koyu gri (`rgba(255,255,255,0.035)`, `color: #94a3b8`) baseline stiline çekildi.
+  - **Tekil Aktif Vurgusu:** **Yalnızca ve yalnızca kullanıcının tıkladığı aktif sekme** (`.studio-tab-btn.active`) parlak neon zümrüt ve mor degrade, 1.5px `#00f5a0` kenarlık ve neon gölge ile belirginleştirilir. Sayı rozetleri de yalnızca seçili sekmede canlı yeşile döner.
+- **Küçük Ekranlarda "Özel Tasarım" Butonunun Aşırı Büyümesi Sorununun Çözümü:**
+  - **Kök Neden 1 (Navigasyon Kümeleri & Rozet Şişmesi):** Navigasyon menüsünün 3 ayrı renkli kümeye bölünmesi ve `🛠️ Özel Tasarım Atölyesi [CANVA FORGE]` metninin 35 karakteri aşması; daralan ekranlarda butonun tek başına satırı kaplamasına yol açıyordu.
+  - **Kök Neden 2 (`flex: 1 1 auto`):** Kendi Galerim araç çubuğundaki `.btn-gal` öğesi alt satıra kaydığı anda satırın %100'ünü kaplayacak şekilde esniyordu.
+  - **Çözüm:** 
+    - Ağır küme yapısı kaldırıldı; tek parça, esnek, zarif ve mobil/tablet ekranlarda kaydırılabilir (`overflow-x: auto`) modern birleşik bir sekme çubuğu (`.studio-main-nav`) kuruldu.
+    - Buton adı sade `🛠️ Özel Tasarım` olarak kısaltıldı, gereksiz `CANVA FORGE` rozeti kaldırıldı ve `flex: 0 0 auto` kuralıyla ekran daralsa bile butonun devasa bir blok haline gelmesi tamamen engellendi.
+    - Kendi Galerim karşılama kutusundaki butonlar da kompakt boyutlara (`padding: 9px 16px; font-size: 12px;`) çekildi.

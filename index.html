@@ -216,13 +216,13 @@
 
     /* Main Grid Workspace */
     .studio-container {
-      max-width: 1680px;
+      max-width: 1720px;
       width: 100%;
-      margin: 24px auto 0;
-      padding: 0 24px;
+      margin: 20px auto 0;
+      padding: 0 20px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 480px;
-      gap: 24px;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 460px);
+      gap: 20px;
       align-items: start;
       transition: all 0.3s ease;
       min-width: 0;
@@ -238,115 +238,83 @@
       max-width: 100%;
     }
 
-    /* Modern Pro Clustered Tabs Nav */
-    .studio-pro-nav {
+    /* ========================================================
+       MODERN UNIFIED STUDIO NAVIGATION
+       ======================================================== */
+    .studio-main-nav, .studio-pro-nav {
       display: flex;
-      gap: 12px;
+      align-items: center;
+      gap: 6px;
       flex-wrap: wrap;
-      align-items: stretch;
-      background: rgba(10, 12, 22, 0.75);
+      background: rgba(10, 13, 24, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 8px 10px;
+      border-radius: 14px;
+      padding: 7px 10px;
       backdrop-filter: blur(16px);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
-    .nav-cluster {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 6px 10px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      flex: 1;
-      min-width: 220px;
+    .nav-divider {
+      width: 1px;
+      height: 22px;
+      background: rgba(255, 255, 255, 0.12);
+      margin: 0 4px;
+      flex-shrink: 0;
     }
-    .nav-cluster-creative {
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(6, 182, 212, 0.05));
-      border-color: rgba(168, 85, 247, 0.28);
-    }
-    .nav-cluster-library {
-      background: rgba(6, 182, 212, 0.04);
-      border-color: rgba(6, 182, 212, 0.2);
-    }
-    .nav-cluster-broadcast {
-      background: rgba(255, 255, 255, 0.015);
-      border-color: rgba(255, 255, 255, 0.06);
-      flex: 2;
-    }
-    .nav-cluster-header {
-      display: flex;
+    .studio-tab-btn {
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
+      gap: 7px;
+      padding: 7px 13px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: #94a3b8;
-      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+      flex: 0 0 auto;
+      user-select: none;
     }
-    .cluster-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      box-shadow: 0 0 6px currentColor;
+    .studio-tab-btn:hover {
+      color: #f1f5f9;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
     }
-    .nav-cluster-items {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      flex-wrap: wrap;
+    /* SADECE VE SADECE BASILI / SEÇİLİ OLAN SEKME PARLAR */
+    .studio-tab-btn.active {
+      background: linear-gradient(135deg, rgba(0, 245, 160, 0.22), rgba(168, 85, 247, 0.22)) !important;
+      border: 1.5px solid #00f5a0 !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      box-shadow: 0 0 16px rgba(0, 245, 160, 0.35) !important;
     }
     .tab-pill-badge {
       font-size: 9.5px;
       font-weight: 800;
       padding: 2px 7px;
       border-radius: 99px;
-      margin-left: 4px;
+      margin-left: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.18s ease;
     }
-
-    /* Legacy Fallback */
-    .studio-tabs-nav {
+    .studio-tab-btn.active .tab-pill-badge {
+      background: #00f5a0 !important;
+      color: #060911 !important;
+      border-color: #00f5a0 !important;
+      font-weight: 900 !important;
+    }
+    .gallery-toolbar-actions {
       display: flex;
       gap: 8px;
-      background: rgba(14, 18, 30, 0.8);
-      backdrop-filter: blur(12px);
-      padding: 6px;
-      border-radius: 14px;
-      border: 1px solid var(--border-subtle);
-      overflow-x: auto;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-    }
-    .studio-tabs-nav::-webkit-scrollbar {
-      display: none;
-    }
-    .studio-tab-btn {
-      display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      border-radius: 9px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
     }
-    .studio-tab-btn:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-    .studio-tab-btn.active {
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(6, 182, 212, 0.18));
-      border-color: rgba(168, 85, 247, 0.6);
-      color: #f3e8ff;
-      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.25);
+    .gallery-toolbar-actions .btn-gal {
+      flex: 0 0 auto !important;
     }
 
     /* Tab Panes */
@@ -383,6 +351,8 @@
       margin-bottom: 16px;
       padding-bottom: 12px;
       border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 12px;
     }
     .card-panel-title {
       font-family: 'Orbitron', sans-serif;
@@ -733,10 +703,12 @@
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
+      align-items: center;
     }
     .btn-gal {
-      flex: 1;
-      padding: 8px 10px;
+      flex: 1 1 auto;
+      min-width: 80px;
+      padding: 7px 10px;
       border-radius: 9px;
       font-size: 11.5px;
       font-weight: 700;
@@ -750,6 +722,14 @@
       gap: 5px;
       transition: all 0.18s ease;
       white-space: nowrap;
+    }
+    .btn-gal.btn-icon-only {
+      flex: 0 0 auto !important;
+      min-width: 36px !important;
+      width: 36px !important;
+      padding: 7px 0 !important;
+      text-align: center;
+      font-size: 13px !important;
     }
     .btn-gal:hover {
       background: rgba(255, 255, 255, 0.12);
@@ -1460,8 +1440,8 @@
        RESPONSIVE BREAKPOINTS (Desktop, Tablet, Mobile)
        ======================================================== */
 
-    /* 1. Kompakt Masaüstü & Büyük Tablet (<= 1200px) */
-    @media (max-width: 1200px) {
+    /* 1. Kompakt Masaüstü & Büyük Tablet (<= 1320px) */
+    @media (max-width: 1320px) {
       .studio-container {
         grid-template-columns: minmax(0, 1fr) !important;
         gap: 20px;
@@ -1507,6 +1487,20 @@
       }
       .card-panel {
         padding: 18px;
+      }
+      .studio-main-nav, .studio-pro-nav {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        padding: 6px 8px !important;
+        gap: 6px !important;
+      }
+      .studio-main-nav::-webkit-scrollbar, .studio-pro-nav::-webkit-scrollbar {
+        display: none !important;
+      }
+      .studio-tab-btn {
+        padding: 6px 11px !important;
+        font-size: 11.5px !important;
       }
     }
 
@@ -1559,21 +1553,22 @@
       }
 
       /* Swipeable Tab Menüsü */
-      .studio-tabs-nav {
-        gap: 6px;
-        padding-bottom: 6px;
-        overflow-x: auto;
-        scrollbar-width: none;
+      .studio-main-nav, .studio-pro-nav, .studio-tabs-nav {
+        gap: 6px !important;
+        padding: 6px 8px !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
       }
-      .studio-tabs-nav::-webkit-scrollbar {
-        display: none;
+      .studio-main-nav::-webkit-scrollbar, .studio-pro-nav::-webkit-scrollbar, .studio-tabs-nav::-webkit-scrollbar {
+        display: none !important;
       }
       .studio-tab-btn {
-        padding: 8px 12px;
-        font-size: 11.5px;
-        border-radius: 10px;
-        white-space: nowrap;
-        flex-shrink: 0;
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        border-radius: 8px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
       }
 
       /* Hero Kartları: 2 Sütun Dokunmatik Stream Deck Grid */
@@ -1802,6 +1797,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
     .canva-canvas-tag {
       font-family: 'Orbitron', sans-serif;
@@ -2355,7 +2351,8 @@
     .mira-chat-header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .chat-opacity-control {
@@ -3608,7 +3605,7 @@
       </div>
       <div class="status-pill active-kick" id="kick-status-pill" onclick="openStreamerSettingsModal()" style="cursor: pointer;" title="Kick & Yayıncı Kanalını Değiştirmek İçin Tıklayın">
         <span class="pulse-dot"></span>
-        <span>KICK: <strong id="kick-user-name">cihanatas</strong> (<span id="kick-follower-badge">0</span>)</span>
+        <span>KICK: <strong id="kick-user-name">⚙️ Kanal Bağla</strong> (<span id="kick-follower-badge">0</span>)</span>
       </div>
       <div class="status-pill" id="obs-status-pill" onclick="openObsSettingsModal()" style="cursor: pointer;" title="OBS WebSocket Ayarları İçin Tıklayın">
         <span class="pulse-dot" id="obs-pulse-dot" style="background: #64748b; box-shadow: none;"></span>
@@ -3620,7 +3617,7 @@
     </div>
 
     <!-- Right Header Actions -->
-    <div style="display: flex; align-items: center; gap: 8px;">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
       <button class="btn-primary" id="btn-header-uninstall" title="Uygulamayı Kaldır (Uninstall)" style="display:none; padding: 7px 11px; font-size: 12px; background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.45); color: #f87171;" onclick="window.location.href='mira-action://uninstall'">🗑️ Kaldır</button>
       <script>if (/Electron/i.test(navigator.userAgent)) document.getElementById('btn-header-uninstall').style.display = '';</script>
       <button class="btn-primary" id="btn-header-floating-chat" style="padding: 7px 13px; font-size: 12px; background: linear-gradient(135deg, rgba(168,85,247,0.3), rgba(0,245,160,0.25)); border: 1px solid #00f5a0; color: #fff; font-weight:800;" onclick="openAlwaysOnTopChat()" title="Sohbeti Her Zaman Üstte Kayan Pencere Olarak Aç">
@@ -3654,86 +3651,138 @@
     <!-- Left Workstation Console Deck -->
     <div class="console-section">
 
-      <!-- Profesyonel Kümeli Uygulama Gezinme Menüsü (Pro Clustered Navigation) -->
-      <nav class="studio-pro-nav">
-        <!-- 1. KÜME: 🎨 TASARIM & STÜDYO -->
-        <div class="nav-cluster nav-cluster-creative">
-          <div class="nav-cluster-header">
-            <span class="cluster-dot" style="background:#a855f7;"></span>
-            <span>🎨 TASARIM & STÜDYO</span>
-          </div>
-          <div class="nav-cluster-items">
-            <button class="studio-tab-btn" id="tab-btn-canvas-builder" onclick="openBlankCanvasBuilder()">
-              <span>🎨</span>
-              <span>Boş Tuval & Editör</span>
-              <span class="tab-pill-badge" style="background:rgba(56,189,248,0.22); color:#7dd3fc; border:1px solid rgba(56,189,248,0.45);">1080p</span>
-            </button>
-            <button class="studio-tab-btn" id="tab-btn-design-creator" onclick="switchTab('tab-design-creator', this)" style="background: linear-gradient(135deg, rgba(168,85,247,0.28), rgba(6,182,212,0.2)); border-color: rgba(168,85,247,0.6); color: #f3e8ff;">
-              <span>🛠️</span>
-              <span>Özel Tasarım Atölyesi</span>
-              <span class="tab-pill-badge" style="background:rgba(168,85,247,0.3); color:#f5d0fe; border:1px solid #c084fc;">CANVA FORGE</span>
-            </button>
-          </div>
-        </div>
+      <!-- Modern Profesyonel Uygulama Gezinme Menüsü (Unified Studio Nav) -->
+      <nav class="studio-main-nav">
+        <!-- 1. Grup: Sahnelerim & Kütüphanem -->
+        <button class="studio-tab-btn" id="tab-btn-my-scenes" onclick="switchTab('tab-my-scenes', this)">
+          <span>🎬</span>
+          <span>Sahnelerim (OBS)</span>
+          <span class="tab-pill-badge" id="my-scenes-count">0</span>
+        </button>
+        <button class="studio-tab-btn active" id="tab-btn-my-gallery" onclick="switchTab('tab-my-gallery', this)">
+          <span>📁</span>
+          <span>Kendi Galerim</span>
+          <span class="tab-pill-badge" id="my-gallery-count">0</span>
+        </button>
+        <button class="studio-tab-btn" id="tab-btn-app-gallery" onclick="switchTab('tab-app-gallery', this)">
+          <span>🏪</span>
+          <span>Ana Galeri</span>
+        </button>
 
-        <!-- 2. KÜME: 🗂️ KÜTÜPHANEM & MAĞAZA -->
-        <div class="nav-cluster nav-cluster-library">
-          <div class="nav-cluster-header">
-            <span class="cluster-dot" style="background:#06b6d4;"></span>
-            <span>🗂️ KÜTÜPHANEM & MAĞAZA</span>
-          </div>
-          <div class="nav-cluster-items">
-            <button class="studio-tab-btn active" id="tab-btn-my-gallery" onclick="switchTab('tab-my-gallery', this)">
-              <span>📁</span>
-              <span>Kendi Galerim</span>
-              <span class="tab-pill-badge" id="my-gallery-count" style="background:rgba(16,185,129,0.22); color:#6ee7b7; border:1px solid rgba(16,185,129,0.45);">0</span>
-            </button>
-            <button class="studio-tab-btn" id="tab-btn-app-gallery" onclick="switchTab('tab-app-gallery', this)">
-              <span>🏪</span>
-              <span>Ana Galeri (Mağaza)</span>
-            </button>
-          </div>
-        </div>
+        <div class="nav-divider"></div>
 
-        <!-- 3. KÜME: ⚡ CANLI YAYIN MODÜLLERİ -->
-        <div class="nav-cluster nav-cluster-broadcast">
-          <div class="nav-cluster-header">
-            <span class="cluster-dot" style="background:#ef4444;"></span>
-            <span>⚡ CANLI YAYIN MODÜLLERİ</span>
-          </div>
-          <div class="nav-cluster-items">
-            <button class="studio-tab-btn" id="tab-btn-alerts" onclick="switchTab('tab-alerts', this)">
-              <span>⚡</span>
-              <span>Alert & Sesli Okuma</span>
-            </button>
-            <button class="studio-tab-btn" id="tab-btn-goal" onclick="switchTab('tab-goal', this)">
-              <span>🎯</span>
-              <span>Hedef & İstatistik</span>
-            </button>
-            <button class="studio-tab-btn" id="tab-btn-chat" onclick="switchTab('tab-chat', this)">
-              <span>💬</span>
-              <span>Sohbet & BotRix</span>
-            </button>
-            <button class="studio-tab-btn" id="tab-btn-music" onclick="switchTab('tab-music', this)">
-              <span>🎵</span>
-              <span>Müzik & Tuna</span>
-            </button>
-            <button class="studio-tab-btn" id="tab-btn-tiktok" onclick="switchTab('tab-tiktok', this)">
-              <span>📱</span>
-              <span>TikTok Canlı</span>
-            </button>
-          </div>
-        </div>
+        <!-- 2. Grup: Tasarım & Tuval -->
+        <button class="studio-tab-btn" id="tab-btn-design-creator" onclick="switchTab('tab-design-creator', this)">
+          <span>🛠️</span>
+          <span>Özel Tasarım</span>
+        </button>
+        <button class="studio-tab-btn" id="tab-btn-canvas-builder" onclick="openBlankCanvasBuilder()">
+          <span>🎨</span>
+          <span>Boş Tuval</span>
+        </button>
+
+        <div class="nav-divider"></div>
+
+        <!-- 3. Grup: Canlı Yayın Modülleri -->
+        <button class="studio-tab-btn" id="tab-btn-alerts" onclick="switchTab('tab-alerts', this)">
+          <span>⚡</span>
+          <span>Alertler</span>
+        </button>
+        <button class="studio-tab-btn" id="tab-btn-goal" onclick="switchTab('tab-goal', this)">
+          <span>🎯</span>
+          <span>Hedefler</span>
+        </button>
+        <button class="studio-tab-btn" id="tab-btn-chat" onclick="switchTab('tab-chat', this)">
+          <span>💬</span>
+          <span>Sohbet & BotRix</span>
+        </button>
+        <button class="studio-tab-btn" id="tab-btn-music" onclick="switchTab('tab-music', this)">
+          <span>🎵</span>
+          <span>Müzik & Tuna</span>
+        </button>
+        <button class="studio-tab-btn" id="tab-btn-tiktok" onclick="switchTab('tab-tiktok', this)">
+          <span>📱</span>
+          <span>TikTok Canlı</span>
+        </button>
       </nav>
+
+      <!-- TAB 0: SAHNELERİM (AKTİF YAYIN MASASI & TEK TIKLA OBS AKTARIMI) -->
+      <div id="tab-my-scenes" class="tab-pane">
+        <div class="card-panel">
+          <div class="card-panel-header" style="flex-wrap: wrap; gap: 12px;">
+            <div>
+              <span class="card-panel-title">
+                <span>🎬</span> AKTİF YAYIN SAHNELERİM & OBS STUDIO AKTARIMI
+              </span>
+              <p style="margin: 4px 0 0 0; font-size: 12.5px; color: var(--text-muted);">
+                Canlı yayında kullanacağınız aktif sahneleri buradan seçip yönetin. OBS Studio açıkken <strong>tek tıkla</strong> tüm sahneler ve 1080p60 tarayıcı katmanları otomatik kurulur.
+              </p>
+            </div>
+
+            <!-- Sağ Taraf: Canlı OBS Durumu & Hızlı Aksiyonlar -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <div id="scenes-obs-status-box" style="display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); font-size: 12px;">
+                <span class="pulse-dot" id="scenes-obs-dot" style="background:#64748b; box-shadow:none;"></span>
+                <span id="scenes-obs-status-text" style="font-weight: 700; color: #cbd5e1;">OBS: Kontrol Ediliyor...</span>
+                <button type="button" class="btn-clean-subtle" onclick="reconnectObsFromScenesTab()" style="padding: 2px 8px; font-size: 11px;">🔄 Yenile</button>
+              </div>
+
+              <button type="button" class="btn-gal" onclick="openAddSceneModal()" style="background: rgba(0,245,160,0.18); border-color: rgba(0,245,160,0.5); color: #00f5a0; font-weight: 800;">
+                ➕ Galerimden Sahne Ekle
+              </button>
+
+              <button type="button" class="btn-clean-subtle" onclick="clearAllActiveScenes()" title="Aktif yayın masasındaki sahneleri temizle" style="color: #f87171;">
+                🗑️ Temizle
+              </button>
+            </div>
+          </div>
+
+          <!-- BÜYÜK TEK TIKLA OBS AKTARIM BANNER'I -->
+          <div style="background: linear-gradient(135deg, rgba(0,245,160,0.14), rgba(168,85,247,0.18)); border: 1px solid rgba(0,245,160,0.4); border-radius: 12px; padding: 18px 22px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 25px rgba(0,0,0,0.45);">
+            <div style="max-width: 720px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span style="font-size: 22px;">⚡</span>
+                <strong style="font-size: 15px; color: #fff; font-family: 'Orbitron', sans-serif;">TEK TIKLA OBS'E OTOMATİK AKTARIM MERKEZİ</strong>
+                <span style="background: #00f5a0; color: #060911; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;">OBS 5.0 LIVE</span>
+              </div>
+              <p style="margin: 0; font-size: 12.5px; color: #cbd5e1; line-height: 1.55;">
+                OBS Studio'da elle kaynak ekleme, link kopyala-yapıştır yapma ve 1920x1080 çözünürlük yazma devri bitti! OBS açıkken aşağıdaki butona basın; listedeki tüm sahneler ve 1080p 60 FPS tarayıcı katmanları <strong>saniyeler içinde OBS'e otomatik kurulsun</strong>.
+              </p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <button type="button" id="btn-sync-all-to-obs" class="btn-primary" onclick="syncAllScenesToObs()" style="background: linear-gradient(135deg, #00f5a0, #00d285); color: #060911; font-weight: 900; font-size: 13.5px; padding: 12px 24px; border-radius: 10px; box-shadow: 0 0 25px rgba(0,245,160,0.4); display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <span style="font-size: 18px;">⚡</span>
+                <span>TÜM SAHNELERİ OBS'E TEK TIKLA AKTAR</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Aktif Sahneler Grid'i -->
+          <div id="active-scenes-grid" class="gallery-cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; margin-top: 14px;">
+            <!-- Dinamik JS -->
+          </div>
+        </div>
+      </div>
 
       <!-- TAB 1: KENDİ GALERİM (KULLANICININ KİŞİSEL YAYIN MASASI) -->
       <div id="tab-my-gallery" class="tab-pane active">
         <div class="card-panel">
-          <div class="card-panel-header">
-            <span class="card-panel-title">
-              <span>🗂️</span> KENDİ GALERİM (KAYITLI SAHNE, KART & ALERTLERİM)
-            </span>
-            <span class="card-panel-badge" id="active-hero-badge">Aktif Sahne Yok</span>
+          <div class="card-panel-header" style="flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="card-panel-title">
+                <span>🗂️</span> KENDİ GALERİM (KAYITLI SAHNE, KART & ALERTLERİM)
+              </span>
+              <span class="card-panel-badge" id="active-hero-badge">Aktif Sahne Yok</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn-clean-subtle" onclick="openImportModal()" style="border-color: rgba(0,245,160,0.45); color: #00f5a0; font-weight: 700; font-size: 11.5px; padding: 6px 12px; display: flex; align-items: center; gap: 6px;" title="Dışarıdan .mira veya .json şablon paketini içe aktar">
+                <span>📥</span> Şablon İçe Aktar (.mira)
+              </button>
+              <button type="button" class="btn-clean-subtle" onclick="exportAllUserGallery()" style="border-color: rgba(168,85,247,0.45); color: #c084fc; font-weight: 700; font-size: 11.5px; padding: 6px 12px; display: flex; align-items: center; gap: 6px;" title="Kendi Galerinizdeki tüm tasarımları tek bir .mira paketi olarak yedekleyin">
+                <span>📦</span> Tümünü Dışa Aktar (.mira)
+              </button>
+            </div>
           </div>
 
           <div class="gallery-toolbar" id="my-gallery-toolbar" style="display: none;">
@@ -3745,15 +3794,15 @@
               <button class="gallery-filter-btn" onclick="filterMyGallery('alert', this)">⚡ Alertler</button>
               <button class="gallery-filter-btn" onclick="filterMyGallery('canvas', this)">🎨 Özel Tuval</button>
             </div>
-            <div style="display: flex; gap: 8px;">
+            <div class="gallery-toolbar-actions">
               <button class="btn-gal save-gal" onclick="openBlankCanvasBuilder()">
                 🎨 + Boş Tuval
               </button>
-              <button class="btn-gal" onclick="switchTab('tab-design-creator', document.getElementById('tab-btn-design-creator'))" style="background: rgba(168,85,247,0.2); border-color: #a855f7; color: #e9d5ff;">
-                🛠️ Özel Tasarım Atölyesi
+              <button class="btn-gal" onclick="switchTab('tab-design-creator', document.getElementById('tab-btn-design-creator'))">
+                🛠️ Özel Tasarım
               </button>
               <button class="btn-gal" onclick="goToAppGallery()">
-                🏪 Ana Galeriye Git
+                🏪 Ana Galeri
               </button>
             </div>
           </div>
@@ -3763,17 +3812,17 @@
             <div class="empty-gallery-icon">🗂️✨</div>
             <div class="empty-gallery-title">KENDİ GALERİNİZ HENÜZ BOŞ</div>
             <p class="empty-gallery-desc">
-              Uygulama açılışta hazır sahnelerle dolu gelmez. Kendi yayın tarzınızı oluşturmak için <strong>Ana Galeri (Mağaza)</strong>'dan beğendiğiniz Şampiyon, Sahne, Kart veya Alert şablonlarını kendi galerinize kaydedebilir, kendinize göre düzenleyebilir veya <strong>Boş Tuval</strong> ve <strong>Özel Tasarım Atölyesi</strong> ile sıfırdan kendi sahnenizi tasarlayabilirsiniz!
+              Uygulama açılışta hazır sahnelerle dolu gelmez. Kendi yayın tarzınızı oluşturmak için <strong>Ana Galeri (Mağaza)</strong>'dan beğendiğiniz Şampiyon, Sahne, Kart veya Alert şablonlarını kendi galerinize kaydedebilir, kendinize göre düzenleyebilir veya <strong>Boş Tuval</strong> ve <strong>Özel Tasarım</strong> ile sıfırdan kendi sahnenizi tasarlayabilirsiniz!
             </p>
             <div class="empty-gallery-actions">
-              <button class="btn-primary" onclick="goToAppGallery()">
-                🏪 ANA GALERİDEN ŞABLON SEÇ & KAYDET
+              <button class="btn-primary" onclick="goToAppGallery()" style="padding: 9px 16px; font-size: 12px;">
+                🏪 Ana Galeri (Mağaza)
               </button>
-              <button class="btn-primary btn-kick" onclick="openBlankCanvasBuilder()">
-                🎨 BOŞ TUVAL İLE SIFIRDAN OLUŞTUR
+              <button class="btn-primary btn-kick" onclick="openBlankCanvasBuilder()" style="padding: 9px 16px; font-size: 12px;">
+                🎨 Boş Tuval
               </button>
-              <button class="btn-primary" onclick="switchTab('tab-design-creator', document.getElementById('tab-btn-design-creator'))" style="background: linear-gradient(135deg, #a855f7, #06b6d4);">
-                🛠️ ÖZEL TASARIM ATÖLYESİ
+              <button class="btn-clean-subtle" onclick="switchTab('tab-design-creator', document.getElementById('tab-btn-design-creator'))" style="padding: 9px 16px; font-size: 12px; border-color: rgba(168,85,247,0.45); color: #c084fc;">
+                🛠️ Özel Tasarım
               </button>
             </div>
           </div>
@@ -5274,8 +5323,7 @@
             </div>
 
             <div class="mira-chat-header-actions">
-              <!-- Kick Resmi Popout Sohbet Butonu (Yayıncının Direkt Kick Chat'e Yazması İçin) -->
-              <a id="studio-kick-popout-btn" href="https://kick.com/popout/cihanatas/chat" target="_blank" onclick="window.open(this.href, 'kick_chat_popout', 'width=420,height=680,scrollbars=yes,resizable=yes'); return false;" class="btn-clean-subtle" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.45); color: #00f5a0; font-weight: 800;" title="Kick resmi canlı sohbet penceresini açar; yayıncı hesabınızla izleyicilere direkt yanıt verebilirsiniz">
+              <a id="studio-kick-popout-btn" href="#" target="_blank" onclick="if(!currentKickSlug){openStreamerSettingsModal(); return false;} window.open(this.href, 'kick_chat_popout', 'width=420,height=680,scrollbars=yes,resizable=yes'); return false;" class="btn-clean-subtle" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.45); color: #00f5a0; font-weight: 800;" title="Kick resmi canlı sohbet penceresini açar; yayıncı hesabınızla izleyicilere direkt yanıt verebilirsiniz">
                 ⚡ Kick'te Sohbete Yaz
               </a>
 
@@ -5719,12 +5767,21 @@
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 14px;">
+        <!-- Hata Bildirimi Kartı (Dinamik) -->
+        <div id="modal-kick-error-alert" style="display: none; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.45); border-radius: 8px; padding: 10px 12px; align-items: flex-start; gap: 8px;">
+          <span style="font-size: 16px; line-height: 1.2;">⚠️</span>
+          <div style="flex: 1;">
+            <div style="font-size: 11.5px; font-weight: 800; color: #fca5a5; text-transform: uppercase;">Bağlantı / Doğrulama Hatası</div>
+            <div id="modal-kick-error-msg" style="font-size: 12px; color: #fecaca; margin-top: 2px; line-height: 1.4;">-</div>
+          </div>
+        </div>
+
         <div>
           <label style="display: block; font-size: 11px; font-weight: 800; color: #00f5a0; text-transform: uppercase; margin-bottom: 6px;">
             🟢 Kick Kanal Adı (Slug / Nickname)
           </label>
           <div style="display: flex; gap: 8px;">
-            <input type="text" id="modal-kick-slug-input" class="mira-clean-input" style="flex: 1; font-size: 13px;" placeholder="Örn: gamer_deniz veya kanal adınız" autocomplete="off">
+            <input type="text" id="modal-kick-slug-input" class="mira-clean-input" style="flex: 1; font-size: 13px;" placeholder="Örn: gamer_deniz veya kanal adınız" autocomplete="off" onkeydown="if(event.key==='Enter') saveAndConnectKickChannel()">
             <button type="button" class="btn-primary" style="background: #00f5a0; color: #060911; font-weight: 900; padding: 0 16px;" onclick="saveAndConnectKickChannel()">
               Bağla
             </button>
@@ -5738,7 +5795,7 @@
           <label style="display: block; font-size: 11px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; margin-bottom: 6px;">
             👑 Yayıncı Görünen Adı (Nickname)
           </label>
-          <input type="text" id="modal-streamer-nick-input" class="mira-clean-input" style="font-size: 13px;" placeholder="Örn: Deniz (Sohbette yanıt verirken kullanılır)" autocomplete="off">
+          <input type="text" id="modal-streamer-nick-input" class="mira-clean-input" style="font-size: 13px;" placeholder="Örn: Deniz (Sohbette yanıt verirken kullanılır)" autocomplete="off" onkeydown="if(event.key==='Enter') saveAndConnectKickChannel()">
         </div>
 
         <!-- Canlı Bağlantı Durumu Kartı -->
@@ -5753,13 +5810,20 @@
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 16px;">
-        <button type="button" id="app-uninstall-btn" class="btn-clean-subtle" style="display:none; margin-right:auto; color:#f87171; border-color:rgba(248,113,113,0.4);" onclick="window.location.href='mira-action://uninstall'">🗑️ Uygulamayı Kaldır</button>
-        <script>if (/Electron/i.test(navigator.userAgent)) document.getElementById('app-uninstall-btn').style.display = '';</script>
-        <button type="button" class="btn-clean-subtle" onclick="closeStreamerSettingsModal()">Kapat</button>
-        <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #a855f7, #00f5a0); color: #060911; font-weight: 900; padding: 9px 18px;" onclick="saveAndConnectKickChannel()">
-          💾 KAYDET & BAĞLAN
-        </button>
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 16px;">
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="modal-kick-disconnect-btn" class="btn-clean-subtle" style="display: none; color: #f87171; border-color: rgba(248,113,113,0.4); background: rgba(248,113,113,0.08); font-weight: 700;" onclick="disconnectKickChannel()" title="Kayıtlı Kick hesabını kaldırır; verileriniz silinmez, istediğiniz zaman yeni kanal bağlayabilirsiniz">
+            🔗 Bağlı Hesabı Kaldır
+          </button>
+          <button type="button" id="app-uninstall-btn" class="btn-clean-subtle" style="display:none; color:#f87171; border-color:rgba(248,113,113,0.4);" onclick="window.location.href='mira-action://uninstall'">🗑️ Uygulamayı Kaldır</button>
+          <script>if (/Electron/i.test(navigator.userAgent)) document.getElementById('app-uninstall-btn').style.display = '';</script>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-clean-subtle" onclick="closeStreamerSettingsModal()">Kapat</button>
+          <button type="button" id="modal-kick-save-btn" class="btn-primary" style="background: linear-gradient(135deg, #a855f7, #00f5a0); color: #060911; font-weight: 900; padding: 9px 18px;" onclick="saveAndConnectKickChannel()">
+            💾 KAYDET & BAĞLAN
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -5812,6 +5876,168 @@
         <button type="button" class="btn-clean-subtle" onclick="closeObsSettingsModal()">Kapat</button>
         <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #a855f7, #00f5a0); color: #060911; font-weight: 900; padding: 9px 18px;" onclick="saveAndConnectObsSettings()">
           💾 KAYDET & BAĞLAN
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Galerimden Aktif Sahne Ekle -->
+  <div class="modal-backdrop" id="add-scene-modal" style="display: none;" onclick="handleModalBackdropClick(event)">
+    <div class="modal-card" style="max-width: 620px; text-align: left; border: 1px solid rgba(0,245,160,0.35); box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 25px rgba(0,245,160,0.15);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">➕</span>
+          <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 800; color: #fff;">Galerimden Aktif Sahnelere Ekle</h3>
+        </div>
+        <button class="modal-close-btn" style="position: static;" onclick="closeAddSceneModal()">✕</button>
+      </div>
+
+      <p style="margin: 0 0 14px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
+        Kişisel galerinizdeki veya resmi şablonlardaki tasarımları canlı yayın sahne masanıza ekleyin.
+      </p>
+
+      <div id="add-scene-items-list" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+        <!-- JS ile dinamik doldurulur -->
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 16px;">
+        <button type="button" class="btn-clean-subtle" onclick="closeAddSceneModal()">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Canlı Sahne Önizleme & OBS Ayarı -->
+  <div class="modal-backdrop" id="edit-scene-layers-modal" style="display: none;" onclick="handleModalBackdropClick(event)">
+    <div class="modal-card" style="max-width: 680px; max-height: 92vh; display: flex; flex-direction: column; text-align: left; border: 1px solid rgba(0,245,160,0.35); box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 30px rgba(0,245,160,0.15);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">👁️</span>
+          <div>
+            <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 800; color: #fff;">Canlı Sahne Önizleme & OBS Ayarı</h3>
+            <p style="margin: 2px 0 0 0; font-size: 11px; color: #94a3b8;">Sahneyi anlık izleyin, adını düzenleyin ve tek tıkla OBS Studio'ya şeffaf Browser Source olarak aktarın.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" style="position: static;" onclick="closeEditSceneLayersModal()">✕</button>
+      </div>
+
+      <input type="hidden" id="edit-sc-id">
+
+      <div style="overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 14px; flex: 1;">
+        <!-- Canlı 16:9 Önizleme Çerçevesi -->
+        <div class="monitor-viewport-wrap" id="modal-preview-wrap" style="width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 10px; overflow: hidden; border: 1px solid rgba(0,245,160,0.4); box-shadow: 0 6px 20px rgba(0,0,0,0.6); position: relative;">
+          <iframe id="edit-sc-preview-iframe" src="about:blank" style="position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; border: none; transform-origin: 0 0;" allow="autoplay"></iframe>
+          <div style="position: absolute; top: 10px; left: 10px; background: rgba(7,10,19,0.85); backdrop-filter: blur(6px); border: 1px solid rgba(0,245,160,0.5); border-radius: 6px; padding: 4px 10px; font-size: 10px; font-weight: 800; color: #00f5a0; display: flex; align-items: center; gap: 6px; pointer-events: none; z-index: 5;">
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: #00f5a0; box-shadow: 0 0 8px #00f5a0; animation: pulse 2s infinite;"></span>
+            CANLI ÖNİZLEME (1080P • 60 FPS)
+          </div>
+        </div>
+
+        <!-- Sahne Adları (2 Kolon) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="display: block; font-size: 11px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; margin-bottom: 6px;">
+              🎬 Sahne Görünen Adı (MİRA)
+            </label>
+            <input type="text" id="edit-sc-name" class="mira-clean-input" style="font-size: 12.5px;" placeholder="Örn: 🎮 3 - Oyun (Zetian)">
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; font-weight: 800; color: #00f5a0; text-transform: uppercase; margin-bottom: 6px;">
+              🎥 OBS Studio Sahne Adı
+            </label>
+            <input type="text" id="edit-sc-obs-name" class="mira-clean-input" style="font-size: 12.5px;" placeholder="Örn: MİRA - Zetian">
+          </div>
+        </div>
+
+        <!-- Overlay URL & Kopyalama -->
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px;">
+            🌐 1080P Şeffaf Browser Source URL (OBS İçin)
+          </label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="edit-sc-url" class="mira-clean-input" style="flex: 1; font-size: 11px; font-family: monospace;" readonly>
+            <button type="button" class="btn-clean-subtle" onclick="navigator.clipboard.writeText(document.getElementById('edit-sc-url').value).then(()=>showToast('Overlay bağlantısı panoya kopyalandı!','success'))" style="font-size: 11px; font-weight: 700; padding: 6px 12px; white-space: nowrap;">
+              📋 Kopyala
+            </button>
+            <button type="button" class="btn-clean-subtle" onclick="window.open(document.getElementById('edit-sc-url').value, '_blank')" style="font-size: 11px; font-weight: 700; padding: 6px 12px; white-space: nowrap;">
+              ↗️ Tarayıcıda Aç
+            </button>
+          </div>
+        </div>
+
+        <!-- OBS Entegrasyon Standardı Notu -->
+        <div style="background: rgba(0,245,160,0.05); border: 1px solid rgba(0,245,160,0.22); border-radius: 8px; padding: 12px; font-size: 11.5px; line-height: 1.55; color: #cbd5e1;">
+          <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; color: #00f5a0; margin-bottom: 4px;">
+            <span>💡</span> OBS Studio Entegrasyon Standardı (StreamElements & BotRix Stili)
+          </div>
+          Bu sahne OBS Studio'ya <strong>1080P 60 FPS Şeffaf Tarayıcı Kaynağı (Browser Source)</strong> olarak aktarılır. Web kameranızı ve oyun ekranınızı OBS Studio içerisinden ekleyip bu şeffaf katmanın altına yerleştirebilirsiniz.
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 14px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-clean-subtle" onclick="openActiveSceneInEditor()" style="border-color: rgba(168,85,247,0.5); color: #c084fc; font-weight: 700; font-size: 12px;">
+            ✏️ Görsel Editörde Düzenle
+          </button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-clean-subtle" onclick="closeEditSceneLayersModal()">Kapat</button>
+          <button type="button" class="btn-clean-subtle" onclick="switchObsToScene(document.getElementById('edit-sc-obs-name').value)" style="border-color: rgba(56,189,248,0.5); color: #38bdf8; font-weight: 700; font-size: 12px;">
+            ▶️ OBS'te Aç
+          </button>
+          <button type="button" class="btn-primary" onclick="syncSingleSceneFromModal()" style="background: linear-gradient(135deg, #00f5a0, #00c47d); color: #060911; font-weight: 900; font-size: 12px; padding: 8px 18px;">
+            ⚡ OBS'E AKTAR
+          </button>
+          <button type="button" class="btn-primary" onclick="saveSceneLayersChanges()" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff; font-weight: 800; font-size: 12px; padding: 8px 18px;">
+            💾 KAYDET
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Şablon & Tasarım İçe Aktar (.mira / .json) -->
+  <div class="modal-backdrop" id="import-template-modal" style="display: none;" onclick="handleModalBackdropClick(event)">
+    <div class="modal-card" style="max-width: 580px; text-align: left; border: 1px solid rgba(0,245,160,0.35); box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 30px rgba(0,245,160,0.15);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">📥</span>
+          <div>
+            <h3 style="margin: 0; font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 800; color: #fff;">MİRA Şablon & Tasarım İçe Aktar</h3>
+            <p style="margin: 2px 0 0 0; font-size: 11px; color: #94a3b8;">.mira veya .json paketlerini galerinize tek tıkla yükleyin.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" style="position: static;" onclick="closeImportModal()">✕</button>
+      </div>
+
+      <!-- Sürükle Bırak / Dosya Seçme Alanı -->
+      <div id="import-drop-zone" onclick="document.getElementById('mira-file-input').click()" ondragover="handleImportDragOver(event)" ondragleave="handleImportDragLeave(event)" ondrop="handleImportDrop(event)" style="border: 2px dashed rgba(0,245,160,0.45); border-radius: 12px; background: rgba(0,245,160,0.03); padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.2s;">
+        <div style="font-size: 42px; margin-bottom: 10px;">📦✨</div>
+        <strong style="color: #fff; font-size: 14.5px; display: block; margin-bottom: 6px;">
+          .mira veya .json dosyasını buraya sürükleyin
+        </strong>
+        <p style="color: #94a3b8; font-size: 12px; margin: 0 0 14px 0;">
+          veya bilgisayarınızdan seçmek için bu alana tıklayın
+        </p>
+        <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #00f5a0, #00c47d); color: #060911; font-weight: 800; font-size: 12px; padding: 7px 18px; pointer-events: none;">
+          📁 Dosya Seç (.mira / .json)
+        </button>
+        <input type="file" id="mira-file-input" accept=".mira,.json" style="display: none;" onchange="handleImportFileSelect(event)">
+      </div>
+
+      <!-- Dosya Okununca Açılan Önizleme ve Doğrulama Kutusu -->
+      <div id="import-preview-box" style="display: none; margin-top: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(0,245,160,0.3); border-radius: 10px; padding: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong id="import-preview-name" style="font-size: 13.5px; color: #00f5a0;">Şablon Paketi Algılandı</strong>
+          <span id="import-preview-badge" style="font-size: 10px; font-weight: 800; background: rgba(0,245,160,0.15); color: #00f5a0; padding: 2px 8px; border-radius: 99px;">1 Tasarım</span>
+        </div>
+        <p id="import-preview-desc" style="font-size: 11.5px; color: #cbd5e1; margin: 0 0 10px 0; line-height: 1.5;"></p>
+        <div id="import-items-summary" style="max-height: 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 16px;">
+        <button type="button" class="btn-clean-subtle" onclick="closeImportModal()">İptal</button>
+        <button type="button" id="btn-confirm-import" class="btn-primary" onclick="executeImportTemplate()" style="display: none; background: linear-gradient(135deg, #00f5a0, #00c47d); color: #060911; font-weight: 900; padding: 9px 22px;">
+          ✅ GALERİME EKLE & İÇE AKTAR
         </button>
       </div>
     </div>
@@ -7171,29 +7397,7 @@
       contentLayer.innerHTML = buildCreatorForgeMockupHtml();
     }
 
-    function directAddCreatedDesignToCanvas() {
-      saveCreatorDesignToGallery((savedItem) => {
-        openBlankCanvasBuilder();
-        const iframe = document.getElementById('preview-iframe');
-        if (iframe && iframe.contentWindow) {
-          setTimeout(() => {
-            iframe.contentWindow.postMessage({
-              type: 'MIRA_ADD_FORGE_CARD_DIRECT',
-              item: savedItem
-            }, '*');
-          }, 450);
-        }
-        showToast(`🚀 "${savedItem.name}" tuvalinize eklendi!`, 'success');
-      });
-    }
-
-    function saveCreatorDesignToGallery(onSavedCallback) {
-      const btn = document.getElementById('creator-save-to-gallery-btn');
-      if (btn) {
-        btn.textContent = '⏳ Galerime Kaydediliyor...';
-        btn.disabled = true;
-      }
-
+    function buildCreatorCurrentPayload() {
       let payload = null;
 
       if (creatorActiveMode === 'card') {
@@ -7327,56 +7531,157 @@
           }
         };
       }
-
-      fetch('/api/gallery/user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-        .then(r => r.json())
-        .then(res => {
-          if (btn) {
-            btn.textContent = '✓ KENDİ GALERİME KAYDEDİLDİ!';
-            btn.disabled = false;
-          }
-          if (res && res.items) userGallery = res.items;
-          lastSavedCreatorItem = (res && res.item) ? res.item : payload;
-          renderMyGalleryGrid();
-          showToast(`🎉 "${payload.name}" Kendi Galerine başarıyla eklendi!`, 'success');
-
-          const successBox = document.getElementById('creator-saved-success-box');
-          if (successBox) successBox.style.display = 'block';
-
-          if (typeof onSavedCallback === 'function') {
-            onSavedCallback(lastSavedCreatorItem);
-          }
-
-          setTimeout(() => {
-            if (btn) btn.textContent = '💾 BU TASARIMI KENDİ GALERİME KAYDET';
-          }, 3000);
-        })
-        .catch(() => {
-          if (btn) {
-            btn.textContent = '❌ Kaydetme Hatası';
-            btn.disabled = false;
-            setTimeout(() => (btn.textContent = '💾 BU TASARIMI KENDİ GALERİME KAYDET'), 2000);
-          }
-          showToast('Tasarım kaydedilirken bir hata oluştu.', 'error');
-        });
+      return payload;
     }
 
-    function openBlankCanvasWithCreatedDesign() {
-      if (!lastSavedCreatorItem) return;
+    /* TUVALE EKLE & KULLAN: Galeriye otomatik kayıt YAPMAZ, doğrudan tuval katmanı olarak aktarır */
+    function directAddCreatedDesignToCanvas() {
+      const designItem = buildCreatorCurrentPayload();
+      if (!designItem) {
+        showToast('Aktarılacak tasarım bulunamadı!', 'error');
+        return;
+      }
+
       openBlankCanvasBuilder();
       const iframe = document.getElementById('preview-iframe');
       if (iframe && iframe.contentWindow) {
-        if (lastSavedCreatorItem.category === 'background') {
-          const cfg = lastSavedCreatorItem.config || {};
+        setTimeout(() => {
+          if (designItem.category === 'background') {
+            const cfg = designItem.config || {};
+            iframe.contentWindow.postMessage({
+              type: 'MIRA_APPLY_OVERRIDE',
+              overrides: {
+                __canvasBg: {
+                  bgImage: cfg.bgImage || designItem.previewImg || '',
+                  bgStyle: cfg.bgStyle || 'cover',
+                  bgFit: cfg.bgFit || 'cover',
+                  bgOpacity: cfg.bgOpacity !== undefined ? cfg.bgOpacity : 100,
+                  bgDim: cfg.bgDim !== undefined ? cfg.bgDim : 20,
+                  bgBlur: cfg.bgBlur !== undefined ? cfg.bgBlur : 0,
+                  primaryColor: cfg.primaryColor || '#a855f7',
+                  secondaryColor: cfg.secondaryColor || '#06b6d4'
+                }
+              }
+            }, '*');
+            showToast(`🌌 "${designItem.name}" tuval arka planına uygulandı! (Galeriniz temiz tutuldu)`, 'success');
+          } else {
+            iframe.contentWindow.postMessage({
+              type: 'MIRA_ADD_FORGE_CARD_DIRECT',
+              item: designItem
+            }, '*');
+            showToast(`🚀 "${designItem.name}" tuvalinize eklendi! (Galeriniz temiz tutuldu)`, 'success');
+          }
+        }, 450);
+      }
+    }
+
+    let creatorEditItemId = null;
+
+    /* GALERİME KAYDET: Kullanıcı sadece bağımsız olarak kütüphanesine saklamak isterse çalışır */
+    function saveCreatorDesignToGallery(onSavedCallback) {
+      const btn = document.getElementById('creator-save-to-gallery-btn');
+      if (btn) {
+        btn.textContent = '⏳ Galerime Kaydediliyor...';
+        btn.disabled = true;
+      }
+
+      const payload = buildCreatorCurrentPayload();
+      if (!payload) {
+        if (btn) btn.disabled = false;
+        return;
+      }
+
+      if (creatorEditItemId) {
+        // Mevcut öğeyi güncelle (Asla mükerrer kopya üretme!)
+        fetch(`/api/gallery/user/${encodeURIComponent(creatorEditItemId)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: payload.name,
+            subtitle: payload.subtitle || payload.config?.subtitleText,
+            previewImg: payload.previewImg,
+            config: payload.config
+          })
+        })
+          .then(r => r.json())
+          .then(res => {
+            if (btn) {
+              btn.textContent = '✓ GÜNCELLENDİ!';
+              btn.disabled = false;
+            }
+            if (res && res.items) userGallery = res.items;
+            lastSavedCreatorItem = (res && res.item) ? res.item : payload;
+            renderMyGalleryGrid();
+            showToast(`💾 "${payload.name}" Kendi Galerinizde güncellendi!`, 'success');
+            if (typeof onSavedCallback === 'function') onSavedCallback(lastSavedCreatorItem);
+            setTimeout(() => {
+              if (btn) btn.textContent = '💾 BU TASARIMI KENDİ GALERİME KAYDET';
+            }, 3000);
+          })
+          .catch(() => {
+            if (btn) {
+              btn.textContent = '❌ Hata';
+              btn.disabled = false;
+              setTimeout(() => (btn.textContent = '💾 BU TASARIMI KENDİ GALERİME KAYDET'), 2000);
+            }
+            showToast('Tasarım güncellenirken hata oluştu.', 'error');
+          });
+      } else {
+        // Sıfırdan yeni öğe olarak kaydet
+        fetch('/api/gallery/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then(r => r.json())
+          .then(res => {
+            if (btn) {
+              btn.textContent = '✓ KENDİ GALERİME KAYDEDİLDİ!';
+              btn.disabled = false;
+            }
+            if (res && res.items) userGallery = res.items;
+            lastSavedCreatorItem = (res && res.item) ? res.item : payload;
+            if (res && res.item && res.item.id) {
+              creatorEditItemId = res.item.id; // Sonraki kaydetmeler bu öğeyi günceller!
+            }
+            renderMyGalleryGrid();
+            showToast(`🎉 "${payload.name}" Kendi Galerine başarıyla eklendi!`, 'success');
+
+            const successBox = document.getElementById('creator-saved-success-box');
+            if (successBox) successBox.style.display = 'block';
+
+            if (typeof onSavedCallback === 'function') {
+              onSavedCallback(lastSavedCreatorItem);
+            }
+
+            setTimeout(() => {
+              if (btn) btn.textContent = '💾 BU TASARIMI KENDİ GALERİME KAYDET';
+            }, 3000);
+          })
+          .catch(() => {
+            if (btn) {
+              btn.textContent = '❌ Kaydetme Hatası';
+              btn.disabled = false;
+              setTimeout(() => (btn.textContent = '💾 BU TASARIMI KENDİ GALERİME KAYDET'), 2000);
+            }
+            showToast('Tasarım kaydedilirken bir hata oluştu.', 'error');
+          });
+      }
+    }
+
+    function openBlankCanvasWithCreatedDesign() {
+      const targetItem = lastSavedCreatorItem || buildCreatorCurrentPayload();
+      if (!targetItem) return;
+      openBlankCanvasBuilder();
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        if (targetItem.category === 'background') {
+          const cfg = targetItem.config || {};
           iframe.contentWindow.postMessage({
             type: 'MIRA_APPLY_OVERRIDE',
             overrides: {
               __canvasBg: {
-                bgImage: cfg.bgImage || lastSavedCreatorItem.previewImg || '',
+                bgImage: cfg.bgImage || targetItem.previewImg || '',
                 bgStyle: cfg.bgStyle || 'cover',
                 bgFit: cfg.bgFit || 'cover',
                 bgOpacity: cfg.bgOpacity !== undefined ? cfg.bgOpacity : 100,
@@ -7392,7 +7697,7 @@
           setTimeout(() => {
             iframe.contentWindow.postMessage({
               type: 'MIRA_ADD_FORGE_CARD_DIRECT',
-              item: lastSavedCreatorItem
+              item: targetItem
             }, '*');
           }, 400);
         }
@@ -7501,6 +7806,10 @@
       }
       const targetPane = document.getElementById(tabId);
       if (targetPane) targetPane.classList.add('active');
+
+      if (tabId === 'tab-my-scenes') {
+        loadActiveScenesUi();
+      }
 
       const isVisualBuilder = tabId === 'tab-canvas-builder';
       const isDesignCreator = tabId === 'tab-design-creator';
@@ -7672,13 +7981,19 @@
                 <button class="btn-gal go-live" onclick="activateMyGalleryItem('${escHtml(item.id)}')">
                   ▶️ ${isLive ? 'Yayında' : 'Yayına Ver'}
                 </button>
+                <button class="btn-gal" onclick="addGalleryItemToActiveScenes('${escHtml(item.id)}')" title="Bu Tasarımı OBS Sahnelerim Listesine Ekle" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.4); color: #00f5a0; font-weight: 700;">
+                  🎬 Sahneme Ekle
+                </button>
                 <button class="btn-gal" onclick="editMyGalleryItem('${escHtml(item.id)}')">
                   ✏️ Düzenle
                 </button>
-                <button class="btn-gal" onclick="duplicateMyGalleryItem('${escHtml(item.id)}')" title="Kopyasını Oluştur">
+                <button class="btn-gal btn-icon-only" onclick="exportSingleGalleryItem('${escHtml(item.id)}')" title="Bu Tasarımı .mira Paketi Olarak İndir / Dışa Aktar" style="border-color: rgba(168,85,247,0.5); color: #c084fc;">
+                  📤
+                </button>
+                <button class="btn-gal btn-icon-only" onclick="duplicateMyGalleryItem('${escHtml(item.id)}')" title="Kopyasını Oluştur">
                   📋
                 </button>
-                <button class="btn-gal danger" onclick="deleteMyGalleryItem('${escHtml(item.id)}')" title="Galerimden Sil">
+                <button class="btn-gal danger btn-icon-only" onclick="deleteMyGalleryItem('${escHtml(item.id)}')" title="Galerimden Sil">
                   🗑️
                 </button>
               </div>
@@ -8187,6 +8502,8 @@
           .then(data => {
             if (data && data.success && data.item) {
               userGallery = data.items || userGallery;
+              // Yeni kaydedilen sahnenin ID'sini builder-edit-id'ye ata: sonraki kaydetmeler mükerrer kopya üretmez, günceller!
+              document.getElementById('builder-edit-id').value = data.item.id;
               renderMyGalleryGrid();
               activateMyGalleryItem(data.item.id);
               switchTab('tab-my-gallery', document.getElementById('tab-btn-my-gallery'));
@@ -8194,6 +8511,276 @@
             }
           });
       }
+    }
+
+    /* ==========================================================================
+       MİRA ŞABLON IMPORT & EXPORT SİSTEMİ (.mira / .json)
+       ========================================================================== */
+    let pendingImportPayload = null;
+
+    function downloadJsonAsMiraFile(dataObj, filename) {
+      const jsonStr = JSON.stringify(dataObj, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename.endsWith('.mira') ? filename : `${filename}.mira`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 350);
+    }
+
+    function exportSingleGalleryItem(itemId) {
+      const item = userGallery.find(i => i.id === itemId);
+      const safeName = (item?.name || 'sablon').replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
+      showToast('📦 Şablon ve görseller paketleniyor...', 'info');
+
+      fetch('/api/gallery/export/' + encodeURIComponent(itemId))
+        .then(r => {
+          if (!r.ok) throw new Error('Dışa aktarma hatası');
+          return r.json();
+        })
+        .then(pkg => {
+          downloadJsonAsMiraFile(pkg, `mira-${safeName}.mira`);
+          showToast(`📤 "${item?.name || 'Şablon'}" (tüm görseller dahil) .mira paketi olarak indirildi!`, 'success');
+        })
+        .catch(() => {
+          // Sunucu yanıt vermezse bellek içi fallback
+          const exportPayload = {
+            mira_version: '1.0',
+            type: 'single_template',
+            exportedAt: new Date().toISOString(),
+            templates: item ? [item] : []
+          };
+          downloadJsonAsMiraFile(exportPayload, `mira-${safeName}.mira`);
+          showToast(`📤 "${item?.name || 'Şablon'}" .mira paketi olarak indirildi!`, 'success');
+        });
+    }
+
+    function exportAllUserGallery() {
+      if (!userGallery || userGallery.length === 0) {
+        showToast('Dışa aktarılacak şablon bulunamadı (Galeriniz boş)', 'error');
+        return;
+      }
+      const dateStr = new Date().toISOString().slice(0, 10);
+      showToast('📦 Tüm galeri ve görseller paketleniyor...', 'info');
+
+      fetch('/api/gallery/export-all')
+        .then(r => {
+          if (!r.ok) throw new Error('Dışa aktarma hatası');
+          return r.json();
+        })
+        .then(pkg => {
+          downloadJsonAsMiraFile(pkg, `mira-gallery-backup-${dateStr}.mira`);
+          showToast(`📦 Toplam ${pkg.count || userGallery.length} tasarım (tüm görseller dahil) dışa aktarıldı!`, 'success');
+        })
+        .catch(() => {
+          // Sunucu yanıt vermezse bellek içi fallback
+          const exportPayload = {
+            mira_version: '1.0',
+            type: 'full_gallery_backup',
+            exportedAt: new Date().toISOString(),
+            templates: userGallery
+          };
+          downloadJsonAsMiraFile(exportPayload, `mira-gallery-backup-${dateStr}.mira`);
+          showToast(`📦 Toplam ${userGallery.length} tasarım tek paket (.mira) olarak dışa aktarıldı!`, 'success');
+        });
+    }
+
+    function openImportModal() {
+      const modal = document.getElementById('import-template-modal');
+      if (!modal) return;
+      pendingImportPayload = null;
+      const fileInput = document.getElementById('mira-file-input');
+      if (fileInput) fileInput.value = '';
+
+      const previewBox = document.getElementById('import-preview-box');
+      if (previewBox) previewBox.style.display = 'none';
+
+      const confirmBtn = document.getElementById('btn-confirm-import');
+      if (confirmBtn) confirmBtn.style.display = 'none';
+
+      const dropZone = document.getElementById('import-drop-zone');
+      if (dropZone) {
+        dropZone.style.borderColor = 'rgba(0,245,160,0.45)';
+        dropZone.style.background = 'rgba(0,245,160,0.03)';
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    function closeImportModal() {
+      const modal = document.getElementById('import-template-modal');
+      if (modal) modal.style.display = 'none';
+      pendingImportPayload = null;
+      const fileInput = document.getElementById('mira-file-input');
+      if (fileInput) fileInput.value = '';
+    }
+
+    function handleImportDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dropZone = document.getElementById('import-drop-zone');
+      if (dropZone) {
+        dropZone.style.borderColor = '#00f5a0';
+        dropZone.style.background = 'rgba(0,245,160,0.12)';
+      }
+    }
+
+    function handleImportDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dropZone = document.getElementById('import-drop-zone');
+      if (dropZone) {
+        dropZone.style.borderColor = 'rgba(0,245,160,0.45)';
+        dropZone.style.background = 'rgba(0,245,160,0.03)';
+      }
+    }
+
+    function handleImportDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dropZone = document.getElementById('import-drop-zone');
+      if (dropZone) {
+        dropZone.style.borderColor = 'rgba(0,245,160,0.45)';
+        dropZone.style.background = 'rgba(0,245,160,0.03)';
+      }
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        processImportFile(e.dataTransfer.files[0]);
+      }
+    }
+
+    function handleImportFileSelect(e) {
+      if (e.target.files && e.target.files.length > 0) {
+        processImportFile(e.target.files[0]);
+      }
+    }
+
+    function processImportFile(file) {
+      if (!file) return;
+      if (!file.name.endsWith('.mira') && !file.name.endsWith('.json')) {
+        showToast('Lütfen geçerli bir .mira veya .json dosyası seçin!', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const content = evt.target.result;
+          const parsed = JSON.parse(content);
+          validateAndPreviewImport(parsed, file.name);
+        } catch (err) {
+          console.error('[Import] JSON Parse Error:', err);
+          showToast('Dosya içeriği geçerli bir JSON / .mira paketi değil!', 'error');
+        }
+      };
+      reader.onerror = function() {
+        showToast('Dosya okunurken bir hata oluştu!', 'error');
+      };
+      reader.readAsText(file);
+    }
+
+    function validateAndPreviewImport(payload, fileName) {
+      let templates = [];
+      if (Array.isArray(payload)) {
+        templates = payload;
+      } else if (payload && Array.isArray(payload.templates)) {
+        templates = payload.templates;
+      } else if (payload && payload.template && typeof payload.template === 'object') {
+        templates = [payload.template];
+      } else if (payload && (payload.name || payload.config)) {
+        templates = [payload];
+      }
+
+      if (!templates || templates.length === 0) {
+        showToast('Paket içinde geçerli bir şablon bulunamadı!', 'error');
+        return;
+      }
+
+      pendingImportPayload = payload;
+
+      const previewBox = document.getElementById('import-preview-box');
+      const nameEl = document.getElementById('import-preview-name');
+      const badgeEl = document.getElementById('import-preview-badge');
+      const descEl = document.getElementById('import-preview-desc');
+      const listEl = document.getElementById('import-items-summary');
+      const confirmBtn = document.getElementById('btn-confirm-import');
+
+      if (nameEl) nameEl.textContent = `📦 ${fileName}`;
+      if (badgeEl) badgeEl.textContent = `${templates.length} Tasarım`;
+      if (descEl) {
+        const pkgType = payload.type === 'full_gallery_backup' ? 'Tam Galeri Yedeği' : 'Şablon Paketi';
+        const exportDate = payload.exportedAt ? new Date(payload.exportedAt).toLocaleString('tr-TR') : 'Belirtilmedi';
+        descEl.innerHTML = `Format: <strong>${escHtml(pkgType)}</strong> &bull; Dışa Aktarma: <strong>${escHtml(exportDate)}</strong> &bull; Sürüm: <strong>${escHtml(payload.mira_version || '1.0')}</strong>`;
+      }
+
+      if (listEl) {
+        listEl.innerHTML = templates.map((tmpl, idx) => {
+          const tName = tmpl.name || `Şablon #${idx + 1}`;
+          const tIcon = tmpl.icon || '🎨';
+          const tCat = getCategoryLabel(tmpl.category || 'hero');
+          const tSub = tmpl.subtitle || tmpl.config?.subtitleText || '';
+          return `
+            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 7px 10px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px;">${escHtml(tIcon)}</span>
+                <div>
+                  <div style="font-size: 12px; font-weight: 700; color: #fff;">${escHtml(tName)}</div>
+                  <div style="font-size: 10.5px; color: #94a3b8;">${escHtml(tSub)}</div>
+                </div>
+              </div>
+              <span style="font-size: 10px; font-weight: 700; color: #00f5a0; background: rgba(0,245,160,0.1); padding: 2px 7px; border-radius: 6px;">${escHtml(tCat)}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      if (previewBox) previewBox.style.display = 'block';
+      if (confirmBtn) {
+        confirmBtn.style.display = 'inline-flex';
+        confirmBtn.textContent = `✅ GALERİME EKLE (${templates.length} Tasarım)`;
+      }
+    }
+
+    function executeImportTemplate() {
+      if (!pendingImportPayload) {
+        showToast('İçe aktarılacak paket seçilmedi!', 'error');
+        return;
+      }
+
+      const confirmBtn = document.getElementById('btn-confirm-import');
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = '⏳ İçe Aktarılıyor...';
+      }
+
+      fetch('/api/gallery/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pendingImportPayload)
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (confirmBtn) confirmBtn.disabled = false;
+          if (data && data.success) {
+            userGallery = data.items || userGallery;
+            renderMyGalleryGrid();
+            closeImportModal();
+            showToast(`📥 ${data.importedCount || 1} yeni şablon galerinize başarıyla eklendi!`, 'success');
+            // Kullanıcıyı hemen Kendi Galerim sekmesine yönlendir
+            switchTab('tab-my-gallery', document.getElementById('tab-btn-my-gallery'));
+          } else {
+            showToast('İçe aktarma başarısız: ' + (data.error || 'Bilinmeyen hata'), 'error');
+          }
+        })
+        .catch(err => {
+          console.error('[Import] Request Error:', err);
+          if (confirmBtn) confirmBtn.disabled = false;
+          showToast('Sunucuya bağlanırken hata oluştu!', 'error');
+        });
     }
 
     /* Copy URL */
@@ -8749,11 +9336,14 @@
       // Quick Chat Tab Buttons
       const tabChatBtn = document.getElementById('chat-tab-tts-btn');
       const tabChatLabel = document.getElementById('chat-tab-tts-label');
+      const tabChatIcon = document.getElementById('chat-tab-tts-icon');
       if (tabChatBtn && tabChatLabel) {
         const on = !!miraTtsConfig.ttsChatEnabled;
         tabChatLabel.textContent = `Chat TTS: ${on ? 'AÇIK 🔊' : 'KAPALI'}`;
+        if (tabChatIcon) tabChatIcon.textContent = on ? '🔊' : '🔇';
         tabChatBtn.style.color = on ? '#00f5a0' : '#cbd5e1';
         tabChatBtn.style.borderColor = on ? '#00f5a0' : 'rgba(255,255,255,0.12)';
+        tabChatBtn.style.background = on ? 'rgba(0,245,160,0.15)' : 'transparent';
       }
 
       const floatChatLabel = document.getElementById('float-tts-label');
@@ -8809,12 +9399,12 @@
     }
 
     function saveTtsConfigAndSync(showToastMsg = false) {
-      // Gather inputs
+      // Toggle durumlarını miraTtsConfig ile eşitle (DOM üzerine yazmasını engelle)
       const alertToggle = document.getElementById('tts-alerts-toggle');
-      if (alertToggle) miraTtsConfig.ttsAlertsEnabled = alertToggle.checked;
+      if (alertToggle) alertToggle.checked = miraTtsConfig.ttsAlertsEnabled !== false;
 
       const chatToggle = document.getElementById('tts-chat-toggle');
-      if (chatToggle) miraTtsConfig.ttsChatEnabled = chatToggle.checked;
+      if (chatToggle) chatToggle.checked = !!miraTtsConfig.ttsChatEnabled;
 
       const outMode = document.getElementById('tts-output-mode');
       if (outMode) miraTtsConfig.outputMode = outMode.value;
@@ -8874,18 +9464,22 @@
     }
 
     function onTtsAlertsToggle(checked) {
-      miraTtsConfig.ttsAlertsEnabled = checked;
+      miraTtsConfig.ttsAlertsEnabled = !!checked;
+      const alertToggle = document.getElementById('tts-alerts-toggle');
+      if (alertToggle) alertToggle.checked = !!checked;
       saveTtsConfigAndSync(false);
-      showToast('Alert Sesli Okuma: ' + (checked ? 'AÇIK 🔊' : 'KAPALI 🔇'));
+      showToast('Alert Sesli Okuma: ' + (checked ? 'AÇIK 🔊' : 'KAPALI 🔇'), checked ? 'success' : 'info');
       if (checked) {
         localTTS.speak('Alert sesli okuma aktif.');
       }
     }
 
     function onTtsChatToggle(checked) {
-      miraTtsConfig.ttsChatEnabled = checked;
+      miraTtsConfig.ttsChatEnabled = !!checked;
+      const chatToggle = document.getElementById('tts-chat-toggle');
+      if (chatToggle) chatToggle.checked = !!checked;
       saveTtsConfigAndSync(false);
-      showToast('Sohbet (Chat) Sesli Okuma: ' + (checked ? 'AÇIK 🔊' : 'KAPALI 🔇'));
+      showToast('Sohbet (Chat) Sesli Okuma: ' + (checked ? 'AÇIK 🔊' : 'KAPALI 🔇'), checked ? 'success' : 'info');
       if (checked) {
         localTTS.speak('Sohbet sesli okuma aktif.');
       }
@@ -9174,7 +9768,7 @@
       if (kickUserEl && kickUserEl.textContent.trim() && !kickUserEl.textContent.includes('Kanal Bağla')) {
         return kickUserEl.textContent.trim();
       }
-      return 'cihanatas';
+      return currentStreamerNick || currentKickSlug || 'Yayıncı';
     }
 
     // Geriye dönük uyumluluk (Opaklık ayarları kaldırıldı, temiz koyu tema devrede)
@@ -10393,6 +10987,9 @@
       if (e.target.id === 'mobile-remote-modal') closeMobileRemoteModal();
       if (e.target.id === 'streamer-settings-modal') closeStreamerSettingsModal();
       if (e.target.id === 'obs-settings-modal') closeObsSettingsModal();
+      if (e.target.id === 'add-scene-modal') closeAddSceneModal();
+      if (e.target.id === 'edit-scene-layers-modal') closeEditSceneLayersModal();
+      if (e.target.id === 'import-template-modal') closeImportModal();
     }
 
     function copyMobileRemoteUrl() {
@@ -10410,6 +11007,9 @@
       if (!modal) return;
       const slugInput = document.getElementById('modal-kick-slug-input');
       const nickInput = document.getElementById('modal-streamer-nick-input');
+      const errAlert = document.getElementById('modal-kick-error-alert');
+      if (errAlert) errAlert.style.display = 'none';
+
       if (slugInput) slugInput.value = currentKickSlug || localStorage.getItem('mira_kick_slug') || '';
       if (nickInput) nickInput.value = currentStreamerNick || localStorage.getItem('mira_streamer_username') || '';
       modal.style.display = 'flex';
@@ -10420,6 +11020,8 @@
     function closeStreamerSettingsModal() {
       const modal = document.getElementById('streamer-settings-modal');
       if (modal) modal.style.display = 'none';
+      const errAlert = document.getElementById('modal-kick-error-alert');
+      if (errAlert) errAlert.style.display = 'none';
     }
 
     function refreshModalKickStatus() {
@@ -10428,12 +11030,45 @@
         .then(st => {
           const statusText = document.getElementById('modal-kick-status-text');
           const followerDisplay = document.getElementById('modal-kick-follower-display');
-          if (statusText) {
-            statusText.textContent = st.connected ? `🟢 Pusher Canlı Bağlı (${st.slug})` : (st.slug ? `🟡 Bağlanıyor: ${st.slug}` : '⚪ Kanal Belirtilmedi');
-            statusText.style.color = st.connected ? '#00f5a0' : (st.slug ? '#f59e0b' : '#94a3b8');
+          const disconnectBtn = document.getElementById('modal-kick-disconnect-btn');
+          const saveBtn = document.getElementById('modal-kick-save-btn');
+          const errAlert = document.getElementById('modal-kick-error-alert');
+          const errMsg = document.getElementById('modal-kick-error-msg');
+
+          if (st.slug) {
+            currentKickSlug = st.slug;
+            if (disconnectBtn) disconnectBtn.style.display = 'inline-flex';
+            if (saveBtn) saveBtn.textContent = '🔄 KANALI GÜNCELLE';
+          } else {
+            if (disconnectBtn) disconnectBtn.style.display = 'none';
+            if (saveBtn) saveBtn.textContent = '💾 KAYDET & BAĞLAN';
           }
-          if (followerDisplay && typeof st.followersCount === 'number') {
-            followerDisplay.textContent = `${st.followersCount} Takipçi`;
+
+          if (statusText) {
+            if (st.connected) {
+              statusText.textContent = `🟢 Pusher Canlı Bağlı (${st.slug})`;
+              statusText.style.color = '#00f5a0';
+            } else if (st.slug && st.error) {
+              statusText.textContent = `🔴 Doğrulama / Bağlantı Uyarısı`;
+              statusText.style.color = '#f87171';
+            } else if (st.slug) {
+              statusText.textContent = `🟡 Bağlanıyor: ${st.slug}`;
+              statusText.style.color = '#f59e0b';
+            } else {
+              statusText.textContent = '⚪ Kanal Bağlı Değil';
+              statusText.style.color = '#94a3b8';
+            }
+          }
+
+          if (followerDisplay) {
+            followerDisplay.textContent = (typeof st.followersCount === 'number' && st.slug) ? `${st.followersCount} Takipçi` : '- Takipçi';
+          }
+
+          if (st.error && st.slug) {
+            if (errAlert && errMsg) {
+              errAlert.style.display = 'flex';
+              errMsg.textContent = st.error;
+            }
           }
         }).catch(() => {});
     }
@@ -10441,20 +11076,27 @@
     function saveAndConnectKickChannel() {
       const slugInput = document.getElementById('modal-kick-slug-input');
       const nickInput = document.getElementById('modal-streamer-nick-input');
+      const saveBtn = document.getElementById('modal-kick-save-btn');
+      const errAlert = document.getElementById('modal-kick-error-alert');
+      const errMsg = document.getElementById('modal-kick-error-msg');
+
       const slug = (slugInput ? slugInput.value : '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
       const nick = (nickInput ? nickInput.value : '').trim() || slug;
 
       if (!slug) {
-        alert('Lütfen geçerli bir Kick kanal adı girin (Örn: gamer_deniz)');
+        if (errAlert && errMsg) {
+          errAlert.style.display = 'flex';
+          errMsg.textContent = 'Lütfen geçerli bir Kick kanal adı girin (Örn: gamer_deniz).';
+        }
+        if (slugInput) slugInput.focus();
         return;
       }
 
-      currentKickSlug = slug;
-      currentStreamerNick = nick;
-      localStorage.setItem('mira_kick_slug', slug);
-      localStorage.setItem('mira_streamer_username', nick);
-
-      updateAllStreamerLabels(slug, nick);
+      if (errAlert) errAlert.style.display = 'none';
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = '⏳ Doğrulanıyor...';
+      }
 
       fetch('/api/kick/connect', {
         method: 'POST',
@@ -10463,45 +11105,120 @@
       })
       .then(r => r.json())
       .then(data => {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = '🔄 KANALI GÜNCELLE';
+        }
         if (data.success) {
+          currentKickSlug = slug;
+          currentStreamerNick = nick;
+          localStorage.setItem('mira_kick_slug', slug);
+          localStorage.setItem('mira_streamer_username', nick);
+
+          updateAllStreamerLabels(slug, nick);
           showToast(`Kick kanalı bağlandı: ${slug}`, 'success');
           syncKickFollowersLive();
           refreshModalKickStatus();
           setTimeout(closeStreamerSettingsModal, 600);
         } else {
-          showToast(data.error || 'Bağlantı hatası', 'error');
+          // Hata durumunda veri asla bozulmaz, streamer kutudaki hatayı görür ve anında düzeltebilir!
+          if (errAlert && errMsg) {
+            errAlert.style.display = 'flex';
+            errMsg.textContent = data.error || 'Kick kanalı doğrulanamadı. Lütfen kullanıcı adınızı kontrol edip tekrar deneyin.';
+          }
+          showToast(data.error || 'Kanal adı geçersiz', 'error');
+          if (slugInput) slugInput.focus();
         }
       })
       .catch(err => {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = '💾 KAYDET & BAĞLAN';
+        }
+        if (errAlert && errMsg) {
+          errAlert.style.display = 'flex';
+          errMsg.textContent = 'Sunucu bağlantı hatası: ' + err.message;
+        }
         showToast('Sunucu bağlantı hatası: ' + err.message, 'error');
       });
     }
 
+    function disconnectKickChannel() {
+      if (!confirm('Bağlı Kick hesabını kaldırmak istediğinize emin misiniz?\nVerileriniz ve tasarımlarınız silinmez, istediğiniz an yeni bir kanal adı girebilirsiniz.')) {
+        return;
+      }
+
+      const disconnectBtn = document.getElementById('modal-kick-disconnect-btn');
+      const errAlert = document.getElementById('modal-kick-error-alert');
+      if (disconnectBtn) {
+        disconnectBtn.disabled = true;
+        disconnectBtn.textContent = '⏳ Kaldırılıyor...';
+      }
+
+      fetch('/api/kick/disconnect', {
+        method: 'POST'
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (disconnectBtn) {
+          disconnectBtn.disabled = false;
+          disconnectBtn.textContent = '🔗 Bağlı Hesabı Kaldır';
+          disconnectBtn.style.display = 'none';
+        }
+        currentKickSlug = '';
+        currentStreamerNick = '';
+        localStorage.removeItem('mira_kick_slug');
+        localStorage.removeItem('mira_streamer_username');
+
+        const slugInput = document.getElementById('modal-kick-slug-input');
+        const nickInput = document.getElementById('modal-streamer-nick-input');
+        if (slugInput) slugInput.value = '';
+        if (nickInput) nickInput.value = '';
+        if (errAlert) errAlert.style.display = 'none';
+
+        updateAllStreamerLabels('', '');
+        refreshModalKickStatus();
+        showToast('Kick hesabı bağlantısı başarıyla kaldırıldı.', 'info');
+      })
+      .catch(err => {
+        if (disconnectBtn) {
+          disconnectBtn.disabled = false;
+          disconnectBtn.textContent = '🔗 Bağlı Hesabı Kaldır';
+        }
+        showToast('Bağlantı kaldırma hatası: ' + err.message, 'error');
+      });
+    }
+
     function updateAllStreamerLabels(slug, nick) {
-      slug = slug || 'cihanatas';
-      nick = nick || slug || 'cihanatas';
+      slug = (slug || '').trim();
+      nick = (nick || slug || 'Yayıncı').trim();
       const kickUserEl = document.getElementById('kick-user-name');
-      if (kickUserEl) kickUserEl.textContent = slug;
+      if (kickUserEl) kickUserEl.textContent = slug || '⚙️ Kanal Bağla';
 
       const ttsLabel = document.getElementById('tts-streamer-label');
       if (ttsLabel) ttsLabel.textContent = nick;
 
       const studioInp = document.getElementById('studio-chat-input');
-      if (studioInp) studioInp.placeholder = `${nick} olarak yayına mesaj yazın... (Enter)`;
+      if (studioInp) studioInp.placeholder = slug ? `${nick} olarak yayına mesaj yazın... (Enter)` : 'Kanal bağlı değil — önce kanal bağlayın...';
 
       const floatInp = document.getElementById('floating-widget-input');
-      if (floatInp) floatInp.placeholder = `${nick} olarak yayına mesaj yazın... (Enter)`;
+      if (floatInp) floatInp.placeholder = slug ? `${nick} olarak yayına mesaj yazın... (Enter)` : 'Kanal bağlı değil...';
 
       const floatBadge = document.getElementById('float-streamer-badge');
       if (floatBadge) floatBadge.textContent = `👑 ${nick}`;
 
       const popBtn = document.getElementById('studio-kick-popout-btn');
-      if (popBtn && slug) popBtn.href = `https://kick.com/popout/${encodeURIComponent(slug)}/chat`;
+      if (popBtn) popBtn.href = slug ? `https://kick.com/popout/${encodeURIComponent(slug)}/chat` : '#';
 
       const chatPill = document.getElementById('mira-chat-conn-status');
-      if (chatPill && slug) {
-        chatPill.textContent = `🟢 Kick: ${slug}`;
-        chatPill.style.color = '#00f5a0';
+      if (chatPill) {
+        if (slug) {
+          chatPill.textContent = `🟢 Kick: ${slug}`;
+          chatPill.style.color = '#00f5a0';
+        } else {
+          chatPill.textContent = '⚪ Kick Bekleniyor (Bağla)';
+          chatPill.style.color = '#94a3b8';
+        }
       }
     }
 
@@ -10587,6 +11304,7 @@
             dot.style.background = '#64748b';
             dot.style.boxShadow = 'none';
           }
+          updateActiveScenesObsStatus(data.connected, data.port);
         }).catch(() => {});
     }
 
@@ -10602,6 +11320,536 @@
       }).catch(() => {});
     }
 
+    /* ==========================================================
+       🎬 SAHNELERİM (AKTİF YAYIN MASASI & TEK TIKLA OBS AKTARIMI)
+       ========================================================== */
+    let activeScenes = [];
+    let cachedObsInputs = { cameras: [], gameCaptures: [] };
+
+    function resolveItemTargetUrl(item) {
+      if (!item) return `${getHostPrefix()}/custom-overlay.html?standby=1`;
+      const host = getHostPrefix();
+      const isUser = Array.isArray(userGallery) && userGallery.some(u => u.id === item.id);
+      const rel = resolveItemUrl(item, isUser);
+      return `${host}/${rel}`;
+    }
+
+    function loadActiveScenesUi() {
+      fetch('/api/scenes')
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.scenes) {
+            activeScenes = data.scenes;
+            renderActiveScenesGrid();
+            updateActiveScenesObsStatus(data.obsConnected, data.obsPort);
+          }
+        })
+        .catch(() => {});
+      fetchObsInputsList();
+    }
+
+    function fetchObsInputsList() {
+      return fetch('/api/obs/inputs')
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.connected) {
+            cachedObsInputs = data;
+          }
+          return data;
+        }).catch(err => {
+          return { connected: false, error: err.message };
+        });
+    }
+
+    function updateActiveScenesObsStatus(connected, port) {
+      const dot = document.getElementById('scenes-obs-dot');
+      const txt = document.getElementById('scenes-obs-status-text');
+      const p = port || 4455;
+      if (dot && txt) {
+        if (connected) {
+          dot.style.background = '#00f5a0';
+          dot.style.boxShadow = '0 0 10px #00f5a0';
+          txt.textContent = `OBS: BAĞLI (Port ${p})`;
+          txt.style.color = '#00f5a0';
+        } else {
+          dot.style.background = '#f87171';
+          dot.style.boxShadow = 'none';
+          txt.textContent = `OBS: KAPALI / ÇEVRİMDIŞI`;
+          txt.style.color = '#f87171';
+        }
+      }
+    }
+
+    function reconnectObsFromScenesTab() {
+      showToast('OBS WebSocket bağlantısı kontrol ediliyor...', 'info');
+      fetch('/api/obs/connect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+        .then(r => r.json())
+        .then(st => {
+          updateActiveScenesObsStatus(st.connected, st.port);
+          checkObsWsStatus();
+          fetchObsInputsList();
+          if (st.connected) {
+            showToast('OBS Studio bağlantısı başarılı!', 'success');
+          } else {
+            showToast('OBS Studio kapalı görünüyor. Lütfen OBS uygulamasını açın.', 'warning');
+          }
+        })
+        .catch(err => {
+          showToast('OBS bağlantı hatası: ' + err.message, 'error');
+        });
+    }
+
+    function renderActiveScenesGrid() {
+      const grid = document.getElementById('active-scenes-grid');
+      const countBadge = document.getElementById('my-scenes-count');
+      if (countBadge) countBadge.textContent = activeScenes.length;
+      if (!grid) return;
+
+      if (activeScenes.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.12); border-radius: 14px; color: var(--text-muted);">
+            <div style="font-size: 38px; margin-bottom: 10px;">🎬✨</div>
+            <strong style="color: #fff; font-size: 16px; font-family: 'Orbitron', sans-serif;">AKTİF YAYIN MASANIZ HENÜZ BOŞ</strong>
+            <p style="font-size: 13px; max-width: 540px; margin: 8px auto 20px auto; line-height: 1.55; color: #94a3b8;">
+              Canlı yayında kullanmak istediğiniz sahneleri <strong>Kendi Galerinizden</strong> ekleyebilir, kamera ve oyun ekranı katmanlarını özelleştirip tek tıkla OBS Studio'ya aktarabilirsiniz.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+              <button class="btn-primary" onclick="openAddSceneModal()" style="background: linear-gradient(135deg, #00f5a0, #00c47d); color: #060911; font-weight: 900; padding: 11px 26px;">
+                ➕ GALERİMDEN SAHNE EKLE
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = activeScenes.map((sc, idx) => {
+        const orderNum = idx + 1;
+        const targetUrl = sc.targetUrl || `http://127.0.0.1:8080/custom-overlay.html?id=${sc.id}`;
+        const obsScene = sc.obsSceneName || sc.name;
+
+        return `
+          <div class="gallery-card" style="border-color: rgba(0,245,160,0.22); background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,245,160,0.03));">
+            <div>
+              <div class="gallery-card-top">
+                <div class="gallery-card-thumb" style="border-color: #00f5a0; background: rgba(0,245,160,0.08); font-size: 24px; display: flex; align-items: center; justify-content: center;">
+                  <span>${escHtml(sc.icon || '🎬')}</span>
+                </div>
+                <div class="gallery-card-info">
+                  <div class="gallery-card-badges">
+                    <span class="gallery-cat-pill" style="background: rgba(0,245,160,0.15); color: #00f5a0; border-color: rgba(0,245,160,0.4);">
+                      SAHNE #${orderNum}
+                    </span>
+                    <span class="gallery-cat-pill" style="border-color: rgba(255,255,255,0.15);">
+                      ${escHtml(sc.badge || '1080P • 60 FPS')}
+                    </span>
+                  </div>
+                  <div class="gallery-card-title" style="color: #fff; font-size: 14px;">${escHtml(sc.name)}</div>
+                  <div class="gallery-card-sub" style="font-size: 11.5px; color: #94a3b8;">${escHtml(sc.description || 'Aktif yayın sahnesi')}</div>
+                </div>
+              </div>
+
+              <!-- OBS Katman Rozeti (1080p60 Transparent Overlay) -->
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0;">
+                <span style="font-size: 10px; font-weight: 700; background: rgba(0,245,160,0.12); color: #00f5a0; border: 1px solid rgba(0,245,160,0.3); padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">
+                  🌐 Şeffaf Browser Source (1080P • 60 FPS)
+                </span>
+              </div>
+
+              <!-- OBS Detay Kutusu -->
+              <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; margin: 10px 0; font-size: 11px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <span style="color: #94a3b8;">OBS Sahne Adı:</span>
+                  <strong style="color: #00f5a0;">${escHtml(obsScene)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05);">
+                  <span style="color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">${escHtml(targetUrl)}</span>
+                  <button type="button" class="btn-clean-subtle" onclick="navigator.clipboard.writeText('${escHtml(targetUrl)}').then(()=>showToast('Link kopyalandı!'))" style="font-size: 10px; padding: 2px 6px;">
+                    📋 Kopyala
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="gallery-card-actions">
+                <button class="btn-gal go-live" onclick="syncSingleSceneToObs('${escHtml(sc.id)}')" title="Bu Sahneyi OBS'te Otomatik Oluştur / Güncelle" style="background: linear-gradient(135deg, #00f5a0, #00c47d); color: #060911; font-weight: 900;">
+                  ⚡ OBS'e Aktar
+                </button>
+                <button class="btn-gal" onclick="switchObsToScene('${escHtml(obsScene)}')" title="OBS'te Bu Sahneye Geç (Yayına Ver)">
+                  ▶️ OBS'te Aç
+                </button>
+                <button class="btn-gal" onclick="previewActiveSceneInStudio('${escHtml(sc.id)}')" title="Sağdaki Yayın Monitöründe Canlı Önizle" style="background: rgba(0,245,160,0.15); border-color: rgba(0,245,160,0.5); color: #00f5a0; font-weight: 700;">
+                  👁️ Önizle
+                </button>
+                <button class="btn-gal btn-icon-only" onclick="openEditSceneLayersModal('${escHtml(sc.id)}')" title="Sahne & OBS Ayarları" style="border-color: rgba(168,85,247,0.5); color: #c084fc;">
+                  ⚙️
+                </button>
+                <button class="btn-gal danger btn-icon-only" onclick="removeSceneFromActive('${escHtml(sc.id)}')" title="Aktif Sahne Masasından Çıkar">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function syncAllScenesToObs() {
+      const btn = document.getElementById('btn-sync-all-to-obs');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span><span>OBS\'E AKTARILIYOR...</span>';
+      }
+
+      showToast('OBS Studio\'ya bağlanılıyor ve sahneler katmanlarıyla otomatik oluşturuluyor...', 'info');
+
+      fetch('/api/obs/sync-scenes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span style="font-size: 18px;">⚡</span><span>TÜM SAHNELERİ OBS\'E TEK TIKLA AKTAR</span>';
+        }
+
+        if (data.success) {
+          updateActiveScenesObsStatus(true);
+          showToast(`✅ Harika! ${data.syncedCount || data.total} Sahne ve Tüm Katmanları OBS Studio'ya başarıyla aktarıldı!`, 'success');
+        } else {
+          updateActiveScenesObsStatus(false);
+          showToast(data.error || 'OBS aktarım hatası! OBS Studio açık mı?', 'error');
+        }
+      })
+      .catch(err => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span style="font-size: 18px;">⚡</span><span>TÜM SAHNELERİ OBS\'E TEK TIKLA AKTAR</span>';
+        }
+        showToast('Bağlantı hatası: ' + err.message, 'error');
+      });
+    }
+
+    function syncSingleSceneToObs(sceneId) {
+      showToast('Sahne ve katmanlar OBS\'e aktarılıyor...', 'info');
+      fetch('/api/obs/sync-single-scene', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sceneId })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.result && data.result.success) {
+          const lStr = (data.result.layers && data.result.layers.length > 0) ? ` (${data.result.layers.join(', ')})` : '';
+          showToast(`✅ "${data.result.sceneName}" sahnesi OBS Studio'da oluşturuldu${lStr}!`, 'success');
+        } else {
+          showToast((data.result && data.result.error) || data.error || 'OBS aktarılamadı! OBS açık mı?', 'error');
+        }
+      })
+      .catch(err => {
+        showToast('Hata: ' + err.message, 'error');
+      });
+    }
+
+    function switchObsToScene(sceneName) {
+      fetch('/api/obs/set-scene', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sceneName })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showToast(`▶️ OBS sahnesi "${sceneName}" olarak değiştirildi!`, 'success');
+        } else {
+          showToast(data.message || data.error || 'OBS sahnesi değiştirilemedi! OBS açık mı?', 'warning');
+        }
+      })
+      .catch(err => {
+        showToast('Hata: ' + err.message, 'error');
+      });
+    }
+
+    function openActiveScenePreview(url) {
+      window.open(url, 'mira_preview_popup', 'width=1280,height=720,scrollbars=no,resizable=yes');
+    }
+
+    function removeSceneFromActive(id) {
+      fetch(`/api/scenes/${encodeURIComponent(id)}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            activeScenes = data.scenes;
+            renderActiveScenesGrid();
+            showToast('Sahne aktif masadan çıkarıldı (Orijinal tasarım galerinizde duruyor).');
+          }
+        })
+        .catch(err => {
+          showToast('Hata: ' + err.message, 'error');
+        });
+    }
+
+    function clearAllActiveScenes() {
+      if (!confirm('Aktif yayın masasındaki tüm sahneleri kaldırmak istediğinize emin misiniz? (Galerinizdeki tasarımlar silinmez)')) return;
+      fetch('/api/scenes/reset', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            activeScenes = [];
+            renderActiveScenesGrid();
+            showToast('Aktif yayın masası temizlendi.');
+          }
+        })
+        .catch(err => {
+          showToast('Hata: ' + err.message, 'error');
+        });
+    }
+
+    function addGalleryItemToActiveScenes(galleryId) {
+      let item = userGallery.find(x => x.id === galleryId);
+      if (!item) {
+        item = appCatalog.find(x => x.id === galleryId);
+      }
+      if (!item) {
+        showToast('Öğe bulunamadı', 'error');
+        return;
+      }
+
+      const targetUrl = resolveItemTargetUrl(item);
+      const isHero = item.category === 'hero';
+
+      fetch('/api/scenes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          galleryId: item.id,
+          name: item.name,
+          obsSceneName: `MİRA - ${item.name}`,
+          obsSourceName: `MİRA Overlay - ${item.name}`,
+          targetUrl: targetUrl,
+          category: item.category || 'custom',
+          icon: item.icon || (isHero ? '🎮' : '🎬'),
+          badge: getCategoryLabel(item.category),
+          description: item.subtitle || (item.config && item.config.subtitleText) || 'Kişisel galerimden eklenen sahne',
+          sources: {
+            browser: { enabled: true, name: `MİRA Overlay - ${item.name}`, url: targetUrl }
+          }
+        })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          activeScenes = data.scenes;
+          renderActiveScenesGrid();
+          showToast(`🎬 "${item.name}" aktif OBS Sahnelerim listesine eklendi!`, 'success');
+        } else {
+          showToast(data.error || 'Eklenemedi', 'error');
+        }
+      })
+      .catch(err => {
+        showToast('Hata: ' + err.message, 'error');
+      });
+    }
+
+    function openAddSceneModal() {
+      const modal = document.getElementById('add-scene-modal');
+      const list = document.getElementById('add-scene-items-list');
+      if (!modal || !list) return;
+
+      if (!Array.isArray(userGallery) || userGallery.length === 0) {
+        list.innerHTML = `
+          <div style="padding: 36px 20px; text-align: center; color: #94a3b8;">
+            <div style="font-size: 38px; margin-bottom: 10px;">📁✨</div>
+            <strong style="color: #fff; font-size: 15px; font-family: 'Orbitron', sans-serif;">KENDİ GALERİNİZDE HENÜZ SAHNE BULUNMUYOR</strong>
+            <p style="font-size: 12px; margin: 8px auto 20px auto; max-width: 440px; color: #94a3b8; line-height: 1.55;">
+              Aktif sahne masanıza eklemek için önce <strong>'🗂️ Galerim'</strong> veya <strong>'🏪 Ana Galeri'</strong> sekmesinden beğendiğiniz sahneleri kendi galerinize kaydedin.
+            </p>
+            <button type="button" class="btn-primary" onclick="closeAddSceneModal(); switchTab('tab-app-gallery', document.getElementById('tab-btn-app-gallery'));" style="background: linear-gradient(135deg, #00f5a0, #00c47d); color: #060911; font-weight: 900; font-size: 12.5px; padding: 10px 24px;">
+              🏪 ANA GALERİYE GİT & SAHNE SEÇ
+            </button>
+          </div>
+        `;
+      } else {
+        list.innerHTML = userGallery.map(item => {
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:10px 14px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:20px;">${escHtml(item.icon || '🎬')}</span>
+                <div>
+                  <div style="font-size:13px; font-weight:700; color:#fff;">${escHtml(item.name)}</div>
+                  <div style="font-size:11px; color:#94a3b8;">📁 Kendi Galerim • ${getCategoryLabel(item.category)}</div>
+                </div>
+              </div>
+              <button type="button" class="btn-primary" onclick="addGalleryItemToActiveScenes('${escHtml(item.id)}'); closeAddSceneModal();" style="background:#00f5a0; color:#060911; font-weight:800; font-size:12px; padding:6px 14px;">
+                ➕ Sahnelere Ekle
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    function closeAddSceneModal() {
+      const modal = document.getElementById('add-scene-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    /* Stüdyo Sağ Monitöründe Sahneyi Canlı Önizle */
+    function previewActiveSceneInStudio(sceneId) {
+      const sc = activeScenes.find(s => s.id === sceneId);
+      if (!sc) return;
+      const targetUrl = sc.targetUrl || `http://127.0.0.1:8080/custom-overlay.html?id=${sc.id}`;
+      activeScenePath = targetUrl;
+
+      // Sağdaki ana yayın monitörüne anında yansıt
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe) {
+        iframe.src = targetUrl;
+      }
+      const title = document.getElementById('preview-title');
+      if (title) {
+        title.textContent = `[CANLI SAHNE] ${sc.name}`;
+      }
+      const pill = document.getElementById('monitor-url-pill');
+      if (pill) {
+        pill.textContent = targetUrl;
+      }
+
+      // Eğer monitör küçültülmüşse otomatik aç
+      const monitor = document.querySelector('.broadcast-monitor');
+      if (monitor && monitor.classList.contains('monitor-collapsed')) {
+        monitor.classList.remove('monitor-collapsed');
+        const btn = document.getElementById('btn-toggle-monitor');
+        if (btn) btn.textContent = '▼';
+      }
+
+      resizePreview();
+      showToast(`👁️ Canlı Önizleniyor: ${sc.name}`, 'info');
+    }
+
+    function resizeModalPreview() {
+      const wrap = document.getElementById('modal-preview-wrap');
+      const iframe = document.getElementById('edit-sc-preview-iframe');
+      if (wrap && iframe) {
+        const width = wrap.clientWidth;
+        if (width > 0) {
+          const scale = width / 1920;
+          iframe.style.transform = `scale(${scale})`;
+        }
+      }
+    }
+
+    /* Sahne Ayarları & Canlı Modal Önizleme */
+    function openEditSceneLayersModal(sceneId) {
+      try {
+        const sc = activeScenes.find(s => s.id === sceneId);
+        if (!sc) {
+          showToast('Sahne bulunamadı!', 'error');
+          return;
+        }
+
+        const modal = document.getElementById('edit-scene-layers-modal');
+        if (!modal) {
+          console.error('[MİRA] edit-scene-layers-modal elementi DOM içinde bulunamadı!');
+          return;
+        }
+
+        modal.style.display = 'flex';
+
+        document.getElementById('edit-sc-id').value = sc.id;
+        document.getElementById('edit-sc-name').value = sc.name || '';
+        document.getElementById('edit-sc-obs-name').value = sc.obsSceneName || sc.name || '';
+
+        const targetUrl = sc.targetUrl || `http://127.0.0.1:8080/custom-overlay.html?id=${sc.id}`;
+        document.getElementById('edit-sc-url').value = targetUrl;
+
+        const iframe = document.getElementById('edit-sc-preview-iframe');
+        if (iframe) {
+          iframe.src = targetUrl;
+        }
+
+        setTimeout(resizeModalPreview, 30);
+        setTimeout(resizeModalPreview, 150);
+      } catch (err) {
+        console.error('[MİRA] openEditSceneLayersModal hatası:', err);
+        showToast('Ayar ekranı açılırken hata oluştu: ' + err.message, 'error');
+      }
+    }
+
+    function closeEditSceneLayersModal() {
+      const modal = document.getElementById('edit-scene-layers-modal');
+      if (modal) modal.style.display = 'none';
+      const iframe = document.getElementById('edit-sc-preview-iframe');
+      if (iframe) iframe.src = 'about:blank';
+    }
+
+    function editActiveSceneCanvas(sceneId) {
+      const sc = activeScenes.find(s => s.id === sceneId);
+      if (!sc) return;
+      if (sc.galleryId && userGallery.some(u => u.id === sc.galleryId)) {
+        editMyGalleryItem(sc.galleryId);
+      } else {
+        openEditSceneLayersModal(sceneId);
+      }
+    }
+
+    function openActiveSceneInEditor() {
+      const id = document.getElementById('edit-sc-id').value;
+      closeEditSceneLayersModal();
+      if (id) editActiveSceneCanvas(id);
+    }
+
+    function syncSingleSceneFromModal() {
+      const id = document.getElementById('edit-sc-id').value;
+      if (!id) return;
+      saveSceneLayersChanges();
+      syncSingleSceneToObs(id);
+    }
+
+    function saveSceneLayersChanges() {
+      const id = document.getElementById('edit-sc-id').value;
+      const sc = activeScenes.find(s => s.id === id);
+      if (!sc) return;
+
+      const name = document.getElementById('edit-sc-name').value.trim() || sc.name;
+      const obsSceneName = document.getElementById('edit-sc-obs-name').value.trim() || name;
+      const url = document.getElementById('edit-sc-url').value.trim() || sc.targetUrl;
+
+      const updatedSources = {
+        browser: { enabled: true, name: `MİRA Overlay - ${name}`, url: url }
+      };
+
+      fetch(`/api/scenes/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          obsSceneName,
+          targetUrl: url,
+          sources: updatedSources
+        })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          activeScenes = data.scenes;
+          renderActiveScenesGrid();
+          closeEditSceneLayersModal();
+          showToast(`✅ "${name}" sahnesi kaydedildi!`, 'success');
+        } else {
+          showToast(data.error || 'Güncellenemedi', 'error');
+        }
+      })
+      .catch(err => {
+        showToast('Hata: ' + err.message, 'error');
+      });
+    }
+
     function toggleMonitorCollapse() {
       const monitor = document.querySelector('.broadcast-monitor');
       const btn = document.getElementById('btn-toggle-monitor');
@@ -10614,7 +11862,10 @@
     }
 
     /* Initial Load */
-    window.addEventListener('resize', resizePreview);
+    window.addEventListener('resize', () => {
+      resizePreview();
+      resizeModalPreview();
+    });
     window.addEventListener('load', () => {
       // Mobilde açıldığında kontrollerin hemen parmak altında olması için önizlemeyi kapalı başlat
       if (window.innerWidth <= 768) {
@@ -10630,12 +11881,16 @@
       syncForgeUIFromState();
       updateCreatorLivePreview();
       loadGalleries();
+      loadActiveScenesUi();
       const urlParams = new URLSearchParams(window.location.search);
       const initTab = urlParams.get('tab');
       const initFilter = urlParams.get('filter');
       const initMode = urlParams.get('mode');
       if (initFilter) appCatalogFilter = initFilter;
-      if (initTab === 'app-gallery') goToAppGallery();
+      if (initTab === 'scenes' || initTab === 'my-scenes' || initTab === 'tab-my-scenes') {
+        switchTab('tab-my-scenes', document.getElementById('tab-btn-my-scenes'));
+      }
+      else if (initTab === 'app-gallery') goToAppGallery();
       else if (initTab === 'canvas-builder') openBlankCanvasBuilder();
       else if (initTab === 'chat' || initTab === 'tab-chat') {
         switchTab('tab-chat', document.getElementById('tab-btn-chat'));
@@ -10684,18 +11939,27 @@
       fetch('/api/streamer/config')
         .then(r => r.json())
         .then(data => {
-          const sSlug = (data && data.streamer && data.streamer.kickSlug) || localStorage.getItem('mira_kick_slug') || 'cihanatas';
-          const sNick = (data && data.streamer && data.streamer.username) || localStorage.getItem('mira_streamer_username') || sSlug;
+          const sSlug = (data && data.streamer && data.streamer.kickSlug) || localStorage.getItem('mira_kick_slug') || '';
+          const sNick = (data && data.streamer && data.streamer.username) || localStorage.getItem('mira_streamer_username') || sSlug || 'Yayıncı';
           currentKickSlug = sSlug;
           currentStreamerNick = sNick;
           updateAllStreamerLabels(sSlug, sNick);
 
-          if (!data || !data.kickStatus || !data.kickStatus.connected || data.kickStatus.slug !== sSlug) {
-            fetch('/api/kick/connect', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ slug: sSlug, username: sNick })
-            }).then(() => checkKickBridgeStatus()).catch(() => {});
+          if (sSlug) {
+            if (!data || !data.kickStatus || !data.kickStatus.connected || data.kickStatus.slug !== sSlug) {
+              fetch('/api/kick/connect', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ slug: sSlug, username: sNick })
+              }).then(() => checkKickBridgeStatus()).catch(() => {});
+            }
+          } else {
+            // İlk açılış: Kanal henüz girilmemişse yayıncıya hemen kolay kanal kurulum modalını aç
+            setTimeout(() => {
+              if (!currentKickSlug) {
+                openStreamerSettingsModal();
+              }
+            }, 800);
           }
         }).catch(() => {});
 
