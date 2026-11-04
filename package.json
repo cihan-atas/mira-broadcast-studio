@@ -31,6 +31,8 @@
       "floating-chat.html",
       "stream-stats.json",
       "tts-config.json",
+      "user-gallery.json",
+      "default-user-gallery.json",
       "main.js",
       "server.js",
       "package.json"

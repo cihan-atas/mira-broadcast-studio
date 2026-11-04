@@ -31,7 +31,7 @@ lerna-debug.log*
 tmp/
 temp/
 now-playing.txt.tmp
-user-gallery.json
+chat-widget.txt
 uploads/
 shared/tts_cache/
 

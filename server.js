@@ -1788,6 +1788,15 @@ function listMediaLibrary() {
 
 function loadUserGallery() {
   if (!fs.existsSync(USER_GALLERY_PATH)) {
+    const fallbackPath = path.join(__dirname, 'default-user-gallery.json');
+    if (fs.existsSync(fallbackPath)) {
+      try {
+        const raw = fs.readFileSync(fallbackPath, 'utf-8');
+        fs.writeFileSync(USER_GALLERY_PATH, raw, 'utf-8');
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch(e) {}
+    }
     return [];
   }
   try {
