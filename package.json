@@ -27,6 +27,10 @@
       "tiktok/**/*",
       "shared/**/*",
       "index.html",
+      "custom-overlay.html",
+      "floating-chat.html",
+      "stream-stats.json",
+      "tts-config.json",
       "main.js",
       "server.js",
       "package.json"
