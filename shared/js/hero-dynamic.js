@@ -478,6 +478,7 @@
 
     function applyChatMode(widgetUrl) {
       if (widgetUrl && widgetUrl.trim().startsWith('http')) {
+        feed.classList.add('has-widget-iframe');
         feed.innerHTML = `
           <iframe src="${widgetUrl.trim()}" 
                   style="width: 100%; height: 100%; border: none; background: transparent;" 
@@ -491,6 +492,7 @@
           liveTag.style.background = 'rgba(16, 185, 129, 0.2)';
         }
       } else {
+        feed.classList.remove('has-widget-iframe');
         initRealLiveChat();
       }
     }
@@ -509,6 +511,7 @@
             applyChatMode(serverUrl);
           } else {
             localStorage.removeItem('stream_chat_widget_url');
+            feed.classList.remove('has-widget-iframe');
           }
         })
         .catch(() => {});
@@ -519,24 +522,53 @@
     return String(str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
+  const seenHeroChatIds = new Set();
+  const recentHeroChatContents = new Map();
+
   function initRealLiveChat() {
     const feed = document.getElementById('chat-messages');
     const panel = document.querySelector('.hero-chat-panel');
     if (!feed) return;
 
     // Temiz başlangıç - simüle mesaj yok
-    feed.innerHTML = '';
+    if (!feed.classList.contains('has-widget-iframe')) {
+      feed.innerHTML = '';
+    }
 
     const liveTag = panel ? panel.querySelector('.hero-chat-live-tag') : null;
-    if (liveTag) {
+    if (liveTag && !feed.classList.contains('has-widget-iframe')) {
       liveTag.textContent = '● CANLI SOHBET';
       liveTag.style.borderColor = '#10b981';
       liveTag.style.color = '#10b981';
       liveTag.style.background = 'rgba(16, 185, 129, 0.2)';
     }
 
-    function addChatMessage(author, text, badge = 'sub') {
+    function addChatMessage(author, text, badge = 'sub', msgId = null) {
       if (!author && !text) return;
+      // Eğer BotRix / harici widget iframe'i aktifse MİRA mesajlarını altına ikinci kez ekleme!
+      if (feed.classList.contains('has-widget-iframe') || feed.querySelector('iframe')) return;
+
+      const cleanText = String(text || '').trim();
+      if (!cleanText) return;
+      const now = Date.now();
+      if (msgId) {
+        if (seenHeroChatIds.has(msgId)) return;
+        seenHeroChatIds.add(msgId);
+        if (seenHeroChatIds.size > 200) {
+          seenHeroChatIds.delete(seenHeroChatIds.values().next().value);
+        }
+      }
+
+      const normContent = cleanText.toLowerCase();
+      const lastTime = recentHeroChatContents.get(normContent) || 0;
+      if ((now - lastTime) < 6000) {
+        return; // Aynı içerikli mesaj 6sn içinde mükerrer geldi (Kick Pusher + MİRA Poll), engelle!
+      }
+      recentHeroChatContents.set(normContent, now);
+      if (recentHeroChatContents.size > 150) {
+        recentHeroChatContents.delete(recentHeroChatContents.keys().next().value);
+      }
+
       const entry = document.createElement('div');
       entry.className = 'hero-chat-entry';
 
@@ -557,7 +589,7 @@
           ${badgeHtml}
           <span class="hero-chat-author" ${authorStyle}>${escapeHtml(author)}</span>
         </div>
-        <span class="hero-chat-text">${escapeHtml(text)}</span>
+        <span class="hero-chat-text">${escapeHtml(cleanText)}</span>
       `;
 
       feed.appendChild(entry);
@@ -566,6 +598,18 @@
       while (feed.children.length > 25) {
         feed.removeChild(feed.firstChild);
       }
+
+      // OBS ekranında mesajların asılı kalmaması için 15 saniye sonra yumuşakça sil (BotRix hideMessagesSeconds=15 uyumlu)
+      setTimeout(() => {
+        if (entry && entry.parentNode) {
+          entry.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+          entry.style.opacity = '0';
+          entry.style.transform = 'translateY(-6px)';
+          setTimeout(() => {
+            if (entry && entry.parentNode) entry.remove();
+          }, 450);
+        }
+      }, 15000);
     }
 
     // Dışarıdan ve WebSocket'ten çağrılacak fonksiyon
@@ -630,10 +674,12 @@
               const chatData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
               const sender = chatData.sender?.username || 'Kickİzleyici';
               const content = chatData.content || '';
-              const isSub = (chatData.sender?.badges || []).some(b => b.type === 'subscriber');
-              const isMod = (chatData.sender?.badges || []).some(b => b.type === 'moderator');
-              const badge = isMod ? 'mod' : (isSub ? 'sub' : 'kick');
-              if (onMessage) onMessage(sender, content, badge);
+              const badges = chatData.sender?.identity?.badges || chatData.sender?.badges || [];
+              const isStreamer = badges.some(b => b.type === 'broadcaster' || b.type === 'streamer') || (sender.toLowerCase() === channelSlug.toLowerCase());
+              const isSub = badges.some(b => b.type === 'subscriber');
+              const isMod = badges.some(b => b.type === 'moderator');
+              const badge = isStreamer ? 'streamer' : (isMod ? 'mod' : (isSub ? 'sub' : 'kick'));
+              if (onMessage) onMessage(sender, content, badge, chatData.id);
             }
             // Canlı Yeni Takipçi Olayı (Pusher üzerinden anlık tetiklenir)
             else if (packet.event === 'App\\Events\\FollowersUpdated') {
@@ -833,11 +879,29 @@
   // 8. HABERLEŞME KANALLARI (BroadcastChannel + postMessage)
   // =============================================================
   function initEventBus() {
+    const seenBusEventKeys = new Set();
+
     function handleIncomingEvent(eventObj) {
       if (!eventObj || typeof eventObj !== 'object') return;
 
+      if (eventObj.type === 'TEST_ALERT' || eventObj.type === 'LIVE_ALERT' || eventObj.type === 'TEST_CHAT' || eventObj.type === 'CHAT_MESSAGE' || eventObj.type === 'chat') {
+        const evKey = eventObj.id || `${eventObj.type}_${eventObj.username || eventObj.user || ''}_${eventObj.content || eventObj.text || ''}_${Math.floor((eventObj.time || Date.now()) / 2500)}`;
+        if (seenBusEventKeys.has(evKey)) return;
+        seenBusEventKeys.add(evKey);
+        if (seenBusEventKeys.size > 250) {
+          seenBusEventKeys.delete(seenBusEventKeys.values().next().value);
+        }
+      }
+
       if (eventObj.type === 'TEST_ALERT' || eventObj.type === 'LIVE_ALERT') {
         triggerAlertBanner(eventObj.alertType, eventObj.payload || {});
+      } else if (eventObj.type === 'CLEAR_CHAT') {
+        const feed = document.getElementById('chat-messages');
+        if (feed) {
+          feed.querySelectorAll('.hero-chat-entry').forEach(el => el.remove());
+        }
+        seenHeroChatIds.clear();
+        recentHeroChatContents.clear();
       } else if (eventObj.type === 'UPDATE_GOAL' && eventObj.goal) {
         updateGoalDisplay(eventObj.goal);
       } else if (eventObj.type === 'UPDATE_STATS' && eventObj.stats) {
@@ -875,7 +939,7 @@
           const user = eventObj.username || eventObj.user || eventObj.sender?.username || 'İzleyici';
           const msg = eventObj.content || eventObj.text || eventObj.message || '';
           const badge = eventObj.badge || (eventObj.platform ? eventObj.platform.toLowerCase() : 'sub');
-          window.addCustomChatMessage(user, msg, badge);
+          window.addCustomChatMessage(user, msg, badge, eventObj.id);
         }
       } else if (eventObj.type === 'USER_ITEM_UPDATED' && eventObj.item) {
         const params = new URLSearchParams(window.location.search);

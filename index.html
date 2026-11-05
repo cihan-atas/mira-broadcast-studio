@@ -9784,16 +9784,19 @@
        ======================================================== */
     const MIRA_TAB_SESSION_ID = 'session_' + Math.random().toString(36).substr(2, 9);
     const seenChatMessageIds = new Set();
+    const recentStudioChatContents = new Map();
 
     // Yayıncı Kullanıcı Adı Belirleyici (Dinamik)
     function getStreamerUsername() {
-      const saved = localStorage.getItem('mira_streamer_username');
-      if (saved && saved.trim()) return saved.trim();
+      const saved = (localStorage.getItem('mira_streamer_username') || '').trim();
+      const slug = (currentKickSlug || localStorage.getItem('mira_kick_slug') || '').trim();
+      if (saved && saved !== 'Yayıncı' && saved !== 'MİRA') return saved;
+      if (slug) return slug;
       const kickUserEl = document.getElementById('kick-user-name');
       if (kickUserEl && kickUserEl.textContent.trim() && !kickUserEl.textContent.includes('Kanal Bağla')) {
         return kickUserEl.textContent.trim();
       }
-      return currentStreamerNick || currentKickSlug || 'Yayıncı';
+      return (currentStreamerNick && currentStreamerNick !== 'Yayıncı') ? currentStreamerNick : (slug || saved || 'Yayıncı');
     }
 
     // Geriye dönük uyumluluk (Opaklık ayarları kaldırıldı, temiz koyu tema devrede)
@@ -10264,18 +10267,31 @@
           if (pipFeed) pipFeed.innerHTML = '';
         } catch (e) {}
       }
-      showToast('Sohbet akışı temizlendi.');
+      seenChatMessageIds.clear();
+      recentStudioChatContents.clear();
+      const clearPayload = { id: 'clear_' + Date.now(), type: 'CLEAR_CHAT', time: Date.now() };
+      const iframe = document.getElementById('preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage(clearPayload, '*');
+      }
+      try { new BroadcastChannel('kick_stream_bus').postMessage(clearPayload); } catch (e) {}
+      try { new BroadcastChannel('kick_hero_bus').postMessage(clearPayload); } catch (e) {}
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/clear-chat', { method: 'POST' }).catch(() => {});
+      }
+      showToast('Sohbet akışı ve OBS ekranındaki mesajlar temizlendi.');
     }
 
     // 6. Mesaj Ekleme Motoru (DEDUPLICATED — ASLA ÇİFT EKLENMEZ)
     function appendStudioChatMessage(item) {
       if (!item) return;
-      const content = item.content || item.text || '';
+      const content = String(item.content || item.text || '').trim();
       if (!content) return;
       const user = item.username || 'İzleyici';
+      const now = Date.now();
 
-      // Çift mesaj engelleme anahtarı
-      const msgKey = item.id || (user + '_' + content + '_' + Math.floor((item.time || Date.now()) / 1200));
+      // Çift mesaj engelleme anahtarı (ID + İçerik bazlı 6sn koruma)
+      const msgKey = item.id || (user + '_' + content + '_' + Math.floor((item.time || now) / 1200));
       if (seenChatMessageIds.has(msgKey)) {
         return; // Zaten eklendi, mükerrer mesajı engelle!
       }
@@ -10285,12 +10301,24 @@
         seenChatMessageIds.delete(oldest);
       }
 
+      const streamerName = getStreamerUsername();
+      const slugName = (currentKickSlug || localStorage.getItem('mira_kick_slug') || '').trim();
+      const isStreamer = !!item.isStreamer || item.badge === 'streamer' || user.toLowerCase() === streamerName.toLowerCase() || (slugName && user.toLowerCase() === slugName.toLowerCase()) || user === 'Yayıncı' || user === 'MİRA (Yayıncı)' || user === 'MİRA';
+
+      const normContentKey = (isStreamer ? '__streamer__' : user.toLowerCase()) + ':' + content.toLowerCase();
+      const lastTime = recentStudioChatContents.get(normContentKey) || 0;
+      if ((now - lastTime) < 6000) {
+        return; // Hem Kick'ten hem MİRA'dan gelen aynı mesajın 2 kez yazılmasını %100 engelle!
+      }
+      recentStudioChatContents.set(normContentKey, now);
+      if (recentStudioChatContents.size > 150) {
+        recentStudioChatContents.delete(recentStudioChatContents.keys().next().value);
+      }
+
       const feed1 = document.getElementById('studio-chat-feed');
       const feed2 = document.getElementById('floating-chat-feed');
 
-      const streamerName = getStreamerUsername();
-      const isStreamer = !!item.isStreamer || user.toLowerCase() === streamerName.toLowerCase() || user === 'MİRA (Yayıncı)' || user === 'MİRA';
-      const displayUser = isStreamer ? streamerName : user;
+      const displayUser = isStreamer ? (slugName || streamerName) : user;
       const d = new Date();
       const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
       const badge = isStreamer ? '👑 YAYINCI' : (item.badge === 'tiktok' ? 'TIKTOK' : 'KICK');
@@ -12031,9 +12059,13 @@
         .then(r => r.json())
         .then(data => {
           const sSlug = (data && data.streamer && data.streamer.kickSlug) || localStorage.getItem('mira_kick_slug') || '';
-          const sNick = (data && data.streamer && data.streamer.username) || localStorage.getItem('mira_streamer_username') || sSlug || 'Yayıncı';
+          const rawNick = (data && data.streamer && data.streamer.username) || localStorage.getItem('mira_streamer_username') || '';
+          const sNick = (rawNick && rawNick !== 'Yayıncı' && rawNick !== 'MİRA') ? rawNick : (sSlug || rawNick || 'Yayıncı');
           currentKickSlug = sSlug;
           currentStreamerNick = sNick;
+          if (sSlug && sNick !== 'Yayıncı') {
+            localStorage.setItem('mira_streamer_username', sNick);
+          }
           updateAllStreamerLabels(sSlug, sNick);
 
           if (sSlug) {

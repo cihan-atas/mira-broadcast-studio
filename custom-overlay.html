@@ -1362,9 +1362,7 @@
                 <span>💬 CANLI SOHBET</span>
                 <span style="color: var(--secondary-color);">● CANLI</span>
               </div>
-              <div class="mod-chat-feed" id="custom-chat-feed">
-                <div class="mod-chat-msg"><span class="mod-chat-user">MiraBot:</span>Canlı sohbet bağlantısı aktif!</div>
-              </div>
+              <div class="mod-chat-feed" id="custom-chat-feed"></div>
             </div>
           </div>
         `;
@@ -1598,9 +1596,10 @@
 
       // Tekilleştirme seti — Aynı olayın farklı kanallardan (Broadcast / Poll / PostMessage) çift çalışmasını %100 engeller
       const seenOverlayEventIds = new Set();
+      const recentOverlayChatContents = new Map();
       function isDuplicateOverlayEvent(ev) {
         if (!ev || typeof ev !== 'object') return true;
-        const coreMsg = ev.content || ev.text || (ev.payload ? (ev.payload.username + '_' + (ev.payload.amount || ev.payload.giftName || '')) : '');
+        const coreMsg = String(ev.content || ev.text || (ev.payload ? (ev.payload.username + '_' + (ev.payload.amount || ev.payload.giftName || '')) : '')).trim();
         const id = ev.id || `${ev.type}_${ev.username || ev.user || ''}_${coreMsg}_${Math.floor((ev.time || Date.now()) / 2500)}`;
         if (seenOverlayEventIds.has(id)) return true;
         seenOverlayEventIds.add(id);
@@ -1608,12 +1607,29 @@
           const oldest = seenOverlayEventIds.values().next().value;
           seenOverlayEventIds.delete(oldest);
         }
+        if ((ev.type === 'TEST_CHAT' || ev.type === 'CHAT_MESSAGE') && coreMsg) {
+          const norm = coreMsg.toLowerCase();
+          const now = Date.now();
+          const lastT = recentOverlayChatContents.get(norm) || 0;
+          if ((now - lastT) < 6000) return true;
+          recentOverlayChatContents.set(norm, now);
+          if (recentOverlayChatContents.size > 150) {
+            recentOverlayChatContents.delete(recentOverlayChatContents.keys().next().value);
+          }
+        }
         return false;
       }
 
       // Canlı Olay & Güncelleme Dinleyicisi
       function handleEvent(ev) {
         if (!ev || typeof ev !== 'object') return;
+        if (ev.type === 'CLEAR_CHAT') {
+          const feed = document.getElementById('custom-chat-feed');
+          if (feed) feed.innerHTML = '';
+          seenOverlayEventIds.clear();
+          recentOverlayChatContents.clear();
+          return;
+        }
         if (ev.type === 'TEST_ALERT' || ev.type === 'LIVE_ALERT' || ev.type === 'TEST_CHAT' || ev.type === 'CHAT_MESSAGE') {
           if (isDuplicateOverlayEvent(ev)) return;
         }
@@ -1637,6 +1653,14 @@
             div.innerHTML = `${badgeTag}<span class="mod-chat-user" style="${isStr ? 'color:#f59e0b; font-weight:800;' : ''}">${esc(ev.username || 'İzleyici')}:</span> ${esc(ev.content || ev.text || '')}`;
             feed.appendChild(div);
             feed.scrollTop = feed.scrollHeight;
+            setTimeout(() => {
+              if (div && div.parentNode) {
+                div.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+                div.style.opacity = '0';
+                div.style.transform = 'translateY(-6px)';
+                setTimeout(() => { if (div && div.parentNode) div.remove(); }, 450);
+              }
+            }, 15000);
           }
           OverlayTTS.speakChat(ev.username || 'İzleyici', ev.content || ev.text || '', ev.isStreamer);
         } else if (ev.type === 'UPDATE_TTS_CONFIG' && ev.config) {

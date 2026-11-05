@@ -101,6 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function processServerPayload(payload) {
       if (!payload) return;
+      if (payload.type === 'CLEAR_CHAT') {
+        if (chatMessagesEl && !chatMessagesEl.classList.contains('has-widget-iframe') && !chatMessagesEl.querySelector('iframe')) {
+          chatMessagesEl.innerHTML = '';
+        }
+        seenOverlayChatIds.clear();
+        recentOverlayChatMap.clear();
+        return;
+      }
       if (payload.type === 'TEST_ALERT' || payload.type === 'LIVE_ALERT') {
         handleAlertTrigger(payload.alertType, payload.payload || payload.data);
       } else if (payload.type === 'TEST_CHAT' || payload.type === 'CHAT_MESSAGE' || payload.type === 'chat') {
@@ -108,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const c = payload.content || payload.text || payload.message || "";
         const isStreamer = !!payload.isStreamer || payload.badge === 'streamer';
         const b = isStreamer ? 'streamer' : (payload.badge || (payload.platform ? payload.platform.toLowerCase() : 'sub'));
-        addChatMessage(u, c, b);
+        addChatMessage(u, c, b, payload.id);
         if (config.tts?.enabled) {
           ttsManager.speak(`${u} diyor ki: ${c}`);
         }
@@ -306,9 +314,26 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(() => {});
   }
 
-  function addChatMessage(user, text, badge = 'sub') {
+  const seenOverlayChatIds = new Set();
+  const recentOverlayChatMap = new Map();
+
+  function addChatMessage(user, text, badge = 'sub', msgId = null) {
     if (!chatMessagesEl || !showChat) return;
-    if (chatMessagesEl.classList.contains('has-widget-iframe')) return;
+    if (chatMessagesEl.classList.contains('has-widget-iframe') || chatMessagesEl.querySelector('iframe')) return;
+
+    const cleanText = String(text || '').trim();
+    if (!cleanText) return;
+    const now = Date.now();
+    if (msgId) {
+      if (seenOverlayChatIds.has(msgId)) return;
+      seenOverlayChatIds.add(msgId);
+      if (seenOverlayChatIds.size > 200) seenOverlayChatIds.delete(seenOverlayChatIds.values().next().value);
+    }
+    const norm = cleanText.toLowerCase();
+    const lastT = recentOverlayChatMap.get(norm) || 0;
+    if ((now - lastT) < 6000) return;
+    recentOverlayChatMap.set(norm, now);
+    if (recentOverlayChatMap.size > 150) recentOverlayChatMap.delete(recentOverlayChatMap.keys().next().value);
 
     const isLarge = chatMessagesEl.classList.contains('large-chat-feed');
     const msgDiv = document.createElement('div');
@@ -333,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ${badgeHtml}
           <span class="large-chat-author" ${authorStyle}>${escapeHtml(user)}</span>
         </div>
-        <span class="large-chat-text">${escapeHtml(text)}</span>
+        <span class="large-chat-text">${escapeHtml(cleanText)}</span>
       `;
     } else {
       msgDiv.innerHTML = `
@@ -341,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ${badgeHtml}
           <span class="deluxe-chat-author" ${authorStyle}>${escapeHtml(user)}</span>
         </div>
-        <span class="deluxe-chat-text">${escapeHtml(text)}</span>
+        <span class="deluxe-chat-text">${escapeHtml(cleanText)}</span>
       `;
     }
 
@@ -350,6 +375,15 @@ document.addEventListener('DOMContentLoaded', () => {
       chatMessagesEl.removeChild(chatMessagesEl.firstElementChild);
     }
     chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+
+    setTimeout(() => {
+      if (msgDiv && msgDiv.parentNode) {
+        msgDiv.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+        msgDiv.style.opacity = '0';
+        msgDiv.style.transform = 'translateY(-6px)';
+        setTimeout(() => { if (msgDiv && msgDiv.parentNode) msgDiv.remove(); }, 450);
+      }
+    }, 15000);
   }
 
   function escapeHtml(str) {

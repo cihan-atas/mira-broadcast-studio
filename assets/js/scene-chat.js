@@ -57,9 +57,26 @@
         .catch(() => {});
     }
 
-    function addMessage(author, text, badge = 'sub') {
+    const seenSceneChatIds = new Set();
+    const recentSceneChatContents = new Map();
+
+    function addMessage(author, text, badge = 'sub', msgId = null) {
       if (!author && !text) return;
-      if (feed.classList.contains('has-widget-iframe')) return;
+      if (feed.classList.contains('has-widget-iframe') || feed.querySelector('iframe')) return;
+
+      const cleanText = String(text || '').trim();
+      if (!cleanText) return;
+      const now = Date.now();
+      if (msgId) {
+        if (seenSceneChatIds.has(msgId)) return;
+        seenSceneChatIds.add(msgId);
+        if (seenSceneChatIds.size > 200) seenSceneChatIds.delete(seenSceneChatIds.values().next().value);
+      }
+      const norm = cleanText.toLowerCase();
+      const lastT = recentSceneChatContents.get(norm) || 0;
+      if ((now - lastT) < 6000) return;
+      recentSceneChatContents.set(norm, now);
+      if (recentSceneChatContents.size > 150) recentSceneChatContents.delete(recentSceneChatContents.keys().next().value);
 
       const entry = document.createElement('div');
       entry.className = 'large-chat-entry';
@@ -81,7 +98,7 @@
           ${badgeHtml}
           <span class="large-chat-author" ${authorStyle}>${escapeHtml(author)}</span>
         </div>
-        <span class="large-chat-text">${escapeHtml(text)}</span>
+        <span class="large-chat-text">${escapeHtml(cleanText)}</span>
       `;
 
       feed.appendChild(entry);
@@ -90,16 +107,33 @@
       while (feed.children.length > 25) {
         feed.removeChild(feed.firstChild);
       }
+
+      setTimeout(() => {
+        if (entry && entry.parentNode) {
+          entry.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+          entry.style.opacity = '0';
+          entry.style.transform = 'translateY(-6px)';
+          setTimeout(() => { if (entry && entry.parentNode) entry.remove(); }, 450);
+        }
+      }, 15000);
     }
 
     // Dışarıdan olay dinleme (BroadcastChannel + postMessage + Polling)
     function handleEvent(data) {
       if (!data) return;
+      if (data.type === 'CLEAR_CHAT') {
+        if (!feed.classList.contains('has-widget-iframe') && !feed.querySelector('iframe')) {
+          feed.innerHTML = '';
+        }
+        seenSceneChatIds.clear();
+        recentSceneChatContents.clear();
+        return;
+      }
       if (data.type === 'TEST_CHAT' || data.type === 'CHAT_MESSAGE' || data.type === 'chat') {
         const user = data.username || data.user || data.sender?.username || 'İzleyici';
         const msg = data.content || data.text || data.message || '';
         const badge = data.badge || (data.platform ? data.platform.toLowerCase() : 'sub');
-        addMessage(user, msg, badge);
+        addMessage(user, msg, badge, data.id);
       } else if (data.type === 'SET_CHAT_WIDGET') {
         if (data.url) {
           localStorage.setItem('stream_chat_widget_url', data.url);
@@ -174,10 +208,12 @@
                 const cData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
                 const sender = cData.sender?.username || 'Kickİzleyici';
                 const content = cData.content || '';
-                const isSub = (cData.sender?.badges || []).some(b => b.type === 'subscriber');
-                const isMod = (cData.sender?.badges || []).some(b => b.type === 'moderator');
-                const badge = isMod ? 'mod' : (isSub ? 'sub' : 'kick');
-                addMessage(sender, content, badge);
+                const badges = cData.sender?.identity?.badges || cData.sender?.badges || [];
+                const isStr = badges.some(b => b.type === 'broadcaster' || b.type === 'streamer') || (sender.toLowerCase() === kickSlug.toLowerCase());
+                const isSub = badges.some(b => b.type === 'subscriber');
+                const isMod = badges.some(b => b.type === 'moderator');
+                const badge = isStr ? 'streamer' : (isMod ? 'mod' : (isSub ? 'sub' : 'kick'));
+                addMessage(sender, content, badge, cData.id);
               }
             } catch (e) {}
           };

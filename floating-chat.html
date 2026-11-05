@@ -398,10 +398,18 @@
         return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
 
+      const recentFloatingContents = new Map();
+
       window.setFloatingChatOpacity = function (val) {};
 
       window.clearFeed = function () {
         if (chatFeed) chatFeed.innerHTML = '';
+        seenIds.clear();
+        recentFloatingContents.clear();
+        const clearPayload = { id: 'clear_' + Date.now(), type: 'CLEAR_CHAT', time: Date.now() };
+        try { new BroadcastChannel('kick_stream_bus').postMessage(clearPayload); } catch (e) {}
+        try { new BroadcastChannel('kick_hero_bus').postMessage(clearPayload); } catch (e) {}
+        fetch('/api/clear-chat', { method: 'POST' }).catch(() => {});
       };
 
       window.replyTo = function (username) {
@@ -413,11 +421,12 @@
       // Mesaj Ekleme Motoru (Deduplication Korumalı)
       function appendMessage(item) {
         if (!item) return;
-        const content = item.content || item.text || '';
+        const content = String(item.content || item.text || '').trim();
         if (!content) return;
         const user = item.username || 'İzleyici';
+        const now = Date.now();
 
-        const msgKey = item.id || (user + '_' + content + '_' + Math.floor((item.time || Date.now()) / 1200));
+        const msgKey = item.id || (user + '_' + content + '_' + Math.floor((item.time || now) / 1200));
         if (seenIds.has(msgKey)) return;
         seenIds.add(msgKey);
         if (seenIds.size > 200) {
@@ -425,8 +434,14 @@
           seenIds.delete(oldest);
         }
 
-        const isStreamer = !!item.isStreamer || user.toLowerCase() === streamerName.toLowerCase() || user === 'MİRA (Yayıncı)' || user === 'MİRA';
-        const displayUser = isStreamer ? streamerName : user;
+        const isStreamer = !!item.isStreamer || item.badge === 'streamer' || user.toLowerCase() === streamerName.toLowerCase() || (kickSlug && user.toLowerCase() === kickSlug.toLowerCase()) || user === 'Yayıncı' || user === 'MİRA (Yayıncı)' || user === 'MİRA';
+        const normKey = (isStreamer ? '__streamer__' : user.toLowerCase()) + ':' + content.toLowerCase();
+        const lastT = recentFloatingContents.get(normKey) || 0;
+        if ((now - lastT) < 6000) return;
+        recentFloatingContents.set(normKey, now);
+        if (recentFloatingContents.size > 150) recentFloatingContents.delete(recentFloatingContents.keys().next().value);
+
+        const displayUser = isStreamer ? (kickSlug || streamerName) : user;
         const timeStr = item.timeStr || getNowTimeStr();
         const badge = isStreamer ? '👑 YAYINCI' : (item.badge === 'tiktok' ? 'TIKTOK' : 'KICK');
 

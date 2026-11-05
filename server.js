@@ -263,6 +263,12 @@ function loadStreamStats() {
         recent: { ...studioStats.recent, ...(parsed.recent || {}) },
         session: { ...studioStats.session, ...(parsed.session || {}) }
       };
+      if (studioStats.streamer && studioStats.streamer.kickSlug) {
+        const curName = (studioStats.streamer.username || '').trim();
+        if (!curName || curName === 'Yayıncı' || curName === 'MİRA') {
+          studioStats.streamer.username = studioStats.streamer.kickSlug;
+        }
+      }
       if (studioStats.obs && studioStats.obs.port) {
         obsWsPort = studioStats.obs.port;
       }
@@ -684,7 +690,24 @@ function normalizeKickToken(raw) {
   return t.replace(/^["']|["']$/g, '').trim();
 }
 
-let lastDirectSentKickMsg = { content: '', time: 0 };
+const recentDirectSentKickMsgs = [];
+
+function recordDirectSentKickMsg(content) {
+  const clean = String(content || '').trim();
+  if (!clean) return;
+  const now = Date.now();
+  recentDirectSentKickMsgs.push({ content: clean.toLowerCase(), time: now });
+  while (recentDirectSentKickMsgs.length > 30) {
+    recentDirectSentKickMsgs.shift();
+  }
+}
+
+function isRecentDirectSentKickMsg(content) {
+  const clean = String(content || '').trim().toLowerCase();
+  if (!clean) return false;
+  const now = Date.now();
+  return recentDirectSentKickMsgs.some(m => m.content === clean && (now - m.time) < 15000);
+}
 
 function sendKickChatMessageDirect(chatroomId, content, token) {
   return new Promise((resolve) => {
@@ -695,7 +718,7 @@ function sendKickChatMessageDirect(chatroomId, content, token) {
     if (!cleanToken) return resolve({ sent: false, reason: 'empty_token' });
 
     const cleanContent = String(content).trim();
-    lastDirectSentKickMsg = { content: cleanContent, time: Date.now() };
+    recordDirectSentKickMsg(cleanContent);
 
     const postBody = JSON.stringify({
       content: cleanContent,
@@ -890,9 +913,9 @@ function startKickPusherBridge(slug, prefetchedData = null) {
           const chatData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
           const sender = chatData.sender?.username || 'Kickİzleyici';
           const content = chatData.content || '';
-          const badges = chatData.sender?.badges || [];
+          const badges = chatData.sender?.identity?.badges || chatData.sender?.badges || [];
           const isStreamer = badges.some(b => b.type === 'broadcaster' || b.type === 'streamer') || (sender.toLowerCase() === activeKickStatus.slug.toLowerCase());
-          if (isStreamer && content.trim() === lastDirectSentKickMsg.content && (Date.now() - lastDirectSentKickMsg.time) < 6000) {
+          if (isRecentDirectSentKickMsg(content)) {
             // MİRA üzerinden doğrudan gönderilen yayıncı mesajının Pusher yankısını mükerrer ekleme
             return;
           }
@@ -2300,13 +2323,19 @@ async function syncScenesToObs(scenesToSync) {
     const width = parseInt(browserCfg.width || sc.width, 10) || 1920;
     const height = parseInt(browserCfg.height || sc.height, 10) || 1080;
     const fps = parseInt(browserCfg.fps || sc.fps, 10) || 60;
+    const obsBrowserCss = [
+      'body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }',
+      '#chat-messages iframe ~ .hero-chat-entry, #chat-messages.has-widget-iframe .hero-chat-entry { display: none !important; }',
+      '@keyframes miraChatFadeOut { 0%, 85% { opacity: 1; max-height: 200px; transform: translateY(0); } 100% { opacity: 0; max-height: 0; margin-top: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; border-width: 0; transform: translateY(-6px); pointer-events: none; overflow: hidden; } }',
+      '.hero-chat-entry, .mod-chat-msg, .large-chat-entry, .deluxe-chat-entry { animation: miraChatFadeOut 15s ease forwards !important; }'
+    ].join('\n');
 
     const existingInScene = sceneItems.find(it => it.sourceName === browserSourceName);
     if (existingInScene) {
       try {
         await obsWsClient.call('SetInputSettings', {
           inputName: browserSourceName,
-          inputSettings: { url, width, height, fps, restart_when_active: true, shutdown: false, reroute_audio: true }
+          inputSettings: { url, width, height, fps, css: obsBrowserCss, restart_when_active: true, shutdown: false, reroute_audio: true }
         });
         createdLayers.push(`🌐 ${browserSourceName} (1080p Güncellendi)`);
       } catch(e){}
@@ -2316,7 +2345,7 @@ async function syncScenesToObs(scenesToSync) {
           await obsWsClient.call('CreateSceneItem', { sceneName, sourceName: browserSourceName });
           await obsWsClient.call('SetInputSettings', {
             inputName: browserSourceName,
-            inputSettings: { url, width, height, fps, restart_when_active: true, shutdown: false, reroute_audio: true }
+            inputSettings: { url, width, height, fps, css: obsBrowserCss, restart_when_active: true, shutdown: false, reroute_audio: true }
           });
           createdLayers.push(`🌐 ${browserSourceName} (Sahneye Eklendi)`);
         } catch(e){}
@@ -2326,7 +2355,7 @@ async function syncScenesToObs(scenesToSync) {
             sceneName,
             inputName: browserSourceName,
             inputKind: 'browser_source',
-            inputSettings: { url, width, height, fps, restart_when_active: true, shutdown: false, reroute_audio: true },
+            inputSettings: { url, width, height, fps, css: obsBrowserCss, restart_when_active: true, shutdown: false, reroute_audio: true },
             sceneItemEnabled: true
           });
           allObsInputs.push(browserSourceName);
@@ -2675,6 +2704,9 @@ const server = http.createServer((req, res) => {
           if (d.kickSlug !== undefined) {
             const clean = d.kickSlug.replace(/[^a-zA-Z0-9_-]/g, '').trim();
             studioStats.streamer.kickSlug = clean;
+            if (clean && (!studioStats.streamer.username || studioStats.streamer.username === 'Yayıncı' || studioStats.streamer.username === 'MİRA')) {
+              studioStats.streamer.username = clean;
+            }
             if (clean && clean !== activeKickStatus.slug) {
               startKickPusherBridge(clean);
             } else if (!clean) {
@@ -2703,6 +2735,23 @@ const server = http.createServer((req, res) => {
     }
   }
 
+  // 2.425 API: Canlı Sohbeti Temizle (MİRA + OBS Overlay)
+  if (pathname === '/api/clear-chat' && req.method === 'POST') {
+    for (let i = eventQueue.length - 1; i >= 0; i--) {
+      if (eventQueue[i].type === 'CHAT_MESSAGE' || eventQueue[i].type === 'TEST_CHAT') {
+        eventQueue.splice(i, 1);
+      }
+    }
+    const clearItem = {
+      id: 'clear_' + Date.now(),
+      type: 'CLEAR_CHAT',
+      time: Date.now()
+    };
+    eventQueue.push(clearItem);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ success: true, item: clearItem }));
+  }
+
   // 2.43 API: Canlı Chat Mesajı Gönder (Yayıncı Mesajı)
   if (pathname === '/api/chat-message' && req.method === 'POST') {
     let body = '';
@@ -2710,18 +2759,35 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const d = JSON.parse(body || '{}');
+        if (d.type === 'CLEAR_CHAT') {
+          for (let i = eventQueue.length - 1; i >= 0; i--) {
+            if (eventQueue[i].type === 'CHAT_MESSAGE' || eventQueue[i].type === 'TEST_CHAT') {
+              eventQueue.splice(i, 1);
+            }
+          }
+          const clearItem = { id: 'clear_' + Date.now(), type: 'CLEAR_CHAT', time: Date.now() };
+          eventQueue.push(clearItem);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, item: clearItem }));
+        }
+        const resolvedStreamerName = (d.username && d.username !== 'Yayıncı' && d.username !== 'MİRA')
+          ? d.username
+          : ((studioStats.streamer?.username && studioStats.streamer.username !== 'Yayıncı') ? studioStats.streamer.username : (activeKickStatus.slug || studioStats.streamer?.kickSlug || d.username || 'Yayıncı'));
         const item = {
           id: d.id || ('msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6)),
           senderSession: d.senderSession,
           type: 'CHAT_MESSAGE',
           platform: d.platform || 'kick',
-          username: d.username || studioStats.streamer?.username || activeKickStatus.slug || 'Yayıncı',
+          username: resolvedStreamerName,
           content: d.content || '',
           badge: d.badge || 'streamer',
           isStreamer: d.isStreamer !== undefined ? d.isStreamer : true,
           color: d.color || '#f59e0b',
           time: Date.now()
         };
+        if (item.isStreamer && item.content) {
+          recordDirectSentKickMsg(item.content);
+        }
         eventQueue.push(item);
         if (eventQueue.length > 80) eventQueue.shift();
 
