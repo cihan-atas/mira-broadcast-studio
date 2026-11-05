@@ -249,12 +249,29 @@ MİRA Broadcast Studio; **Mobile Legends: Bang Bang (MLBB)** temalı 5 şampiyon
 
 ---
 
-## 🚀 13. GitHub Release v1.1.0 Yayınlandı (2026-11-04)
+## 🚀 13. GitHub Release v1.1.0 Yayınlandı & Canlı Yayın Motoru Güncellendi (2026-11-05)
 
 - **Sürüm:** `v1.1.0`
 - **Release Başlığı:** `MİRA Broadcast Studio v1.1.0 (Windows & Linux)`
 - **URL:** [https://github.com/cihan-atas/mira-broadcast-studio/releases/tag/v1.1.0](https://github.com/cihan-atas/mira-broadcast-studio/releases/tag/v1.1.0)
 - **Derlenen & Yüklenen Paketler:**
-  1. `MİRA Broadcast Studio Setup 1.1.0.exe` (126.91 MB) — Windows 10/11 Kurulum Sihirbazı & Masaüstü Entegrasyonu
-  2. `MİRA Broadcast Studio-1.1.0.AppImage` (133.18 MB) — Kurulum gerektirmeyen tek dosya Linux sürümü
-  3. `mira-broadcast-studio_1.1.0_amd64.deb` (103.49 MB) — Ubuntu / Debian sistem kurulum paketi
+  1. `MİRA Broadcast Studio Setup 1.1.0.exe` — Windows 10/11 Kurulum Sihirbazı & Masaüstü Entegrasyonu
+  2. `MİRA Broadcast Studio-1.1.0.AppImage` — Kurulum gerektirmeyen tek dosya Linux sürümü
+  3. `mira-broadcast-studio_1.1.0_amd64.deb` — Ubuntu / Debian sistem kurulum paketi
+
+---
+
+## ⚡ 14. Canlı Yayın Kritikleri: Kick Takipçi Bildirimi, TTS Ses Motoru, OBS Ducking & Sohbet Gönderimi (2026-11-05)
+
+- **Gerçek Yayında Kick Takipçi Bildirimi & "Son Takipçi" Algılama Motoru (`server.js`, `index.html`, `hero-dynamic.js`):**
+  - Kick API'nin `"followers_count"` değerini metin (`string`) olarak döndürmesi nedeniyle başarısız olan `typeof count === 'number'` kontrolleri tüm istemci ve sunucu dosyalarında `parseCount()` / `parseInt(..., 10)` ile düzeltildi.
+  - Kick genel Pusher kanalında kimlik doğrulamasız gönderilmeyen takipçi olayları için `server.js` içine hibrit takipçi yakalayıcı (`checkKickUserFollowStatus` + 12 saniyelik canlı takipçi sayacı kontrolü + `emitKickFollowerAlert`) eklendi; gerçek yayında takip geldiği anda görsel alert, sesli TTS okuma, "Son Takipçi" (`recent.follower`) ve takipçi hedef çubuğu eşzamanlı güncellenir.
+- **TTS Ses Motorunun Robotik PC Sesine Düşmesi Sorununun Çözümü (`hero-audio.js`, `custom-overlay.html`, `server.js`):**
+  - Varsayılan ses başlangıçta doğrudan `'mira_natural_tr'` olarak sabitlendi ve hem `mira_natural_tr` hem de `mira_natural_male` bulut ses motoruna bağlandı.
+  - Sunucu tarafında `/api/tts/audio` uç noktasına çift istemci (`tw-ob` ve `gtx`) ile otomatik yeniden deneme eklendi; Windows (`System.Speech`) ve Linux (`espeak`) çevrimdışı yedekleri `windowsHide: true` ile çapraz platform uyumlu hale getirildi.
+- **OBS Müzik Sesi & Audio Ducking Gecikme / Senkronizasyon Çözümü (`server.js`, `index.html`, `hero-audio.js`, `custom-overlay.html`):**
+  - Seçili OBS ses kaynağının (`Desktop Audio` / `Masaüstü Sesi`) gerçek ses seviyesiyle (`volumeMul`) stüdyo kaydırıcısı birebir senkronize edildi.
+  - `triggerDucking(true)` çağrısı ses indirilirken değil, tam ses çalmaya başladığı anda (`audio.onplaying`) tetiklenecek şekilde taşındı ve TTS bitiminde 180ms yumuşak geri dönüş (debounce) eklendi.
+- **Sohbet Hızlı Başlatma & Kick.com'a Doğrudan Yayıncı Mesajı Gönderimi (`server.js`, `index.html`, `hero-dynamic.js`):**
+  - Eski/bozuk harici widget önbelleklerinin yerel sohbeti geciktirmesi engellendi.
+  - Yayıncının MİRA içinden yazdığı mesajların hem OBS ekranına hem de opsiyonel Kick Gönderim Tokenı (`sendKickChatMessageDirect`) ile doğrudan Kick.com sohbetine iletilmesi sağlandı.

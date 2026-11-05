@@ -72,8 +72,8 @@ class StateManager {
       }
       if (!data) throw new Error("Kick kanalı yanıt vermedi");
       
-      const followersCount = data.followers_count ?? data.followersCount;
-      if (typeof followersCount === 'number') {
+      const followersCount = parseInt(data.followers_count ?? data.followersCount, 10);
+      if (!isNaN(followersCount)) {
         console.log(`Kick Canlı Takipçi Sayısı Alındı: ${followersCount}`);
         this.updateGoalCurrent(followersCount);
         return {

@@ -391,9 +391,21 @@
     }
   }
 
+  let lastAlertKey = '';
+  let lastAlertTime = 0;
+
   function triggerAlertBanner(alertType, payload) {
     const container = document.getElementById('alert-container');
     if (!container) return;
+
+    const username = (payload && payload.username) || 'Gizemli Kahraman';
+    const dedupKey = `${alertType}_${username}`;
+    const now = Date.now();
+    if (dedupKey === lastAlertKey && (now - lastAlertTime) < 4000) {
+      return;
+    }
+    lastAlertKey = dedupKey;
+    lastAlertTime = now;
 
     // Ses çal (Yalnızca üst pencere ise, iframe önizlemesinde sessiz)
     if (window.self === window.top) {
@@ -412,7 +424,6 @@
     };
 
     const headerTag = titleMap[alertType] || 'CANLI BİLDİRİM';
-    const username = payload.username || 'Gizemli Kahraman';
     let subTitle = 'Ailemize Hoş Geldin!';
     if (alertType === 'donation' || alertType === 'kicks') subTitle = `${payload.amount || '500 Kicks'} Gönderdi! 💎`;
     else if (alertType === 'gift') subTitle = `${payload.giftName || '5x Hediye Abonelik'} Dağıttı! 🎁`;
@@ -465,37 +476,42 @@
     const panel = document.querySelector('.hero-chat-panel');
     if (!feed || !panel) return;
 
-    let savedWidgetUrl = localStorage.getItem('stream_chat_widget_url') || (window.HERO_CONFIG && window.HERO_CONFIG.chatWidgetUrl) || (window.OVERLAY_CONFIG && window.OVERLAY_CONFIG.chatWidgetUrl);
-
-    if (savedWidgetUrl && savedWidgetUrl.trim().startsWith('http')) {
-      // Gerçek Widget Modu (BotRix, TikFinity, StreamElements, Restream vb.)
-      feed.innerHTML = `
-        <iframe src="${savedWidgetUrl.trim()}" 
-                style="width: 100%; height: 100%; border: none; background: transparent;" 
-                allowtransparency="true"></iframe>
-      `;
-      const liveTag = panel.querySelector('.hero-chat-live-tag');
-      if (liveTag) {
-        liveTag.textContent = '● CANLI ENTEGRE';
-        liveTag.style.borderColor = '#10b981';
-        liveTag.style.color = '#10b981';
-        liveTag.style.background = 'rgba(16, 185, 129, 0.2)';
+    function applyChatMode(widgetUrl) {
+      if (widgetUrl && widgetUrl.trim().startsWith('http')) {
+        feed.innerHTML = `
+          <iframe src="${widgetUrl.trim()}" 
+                  style="width: 100%; height: 100%; border: none; background: transparent;" 
+                  allowtransparency="true"></iframe>
+        `;
+        const liveTag = panel.querySelector('.hero-chat-live-tag');
+        if (liveTag) {
+          liveTag.textContent = '● CANLI ENTEGRE';
+          liveTag.style.borderColor = '#10b981';
+          liveTag.style.color = '#10b981';
+          liveTag.style.background = 'rgba(16, 185, 129, 0.2)';
+        }
+      } else {
+        initRealLiveChat();
       }
-    } else {
-      // Saf Gerçek Canlı Chat Modu (Simülasyonsuz)
-      initRealLiveChat();
+    }
 
-      if (window.location.protocol.startsWith('http')) {
-        fetch('/api/chat-widget')
-          .then(r => r.json())
-          .then(d => {
-            if (d && d.url && d.url.trim().startsWith('http')) {
-              localStorage.setItem('stream_chat_widget_url', d.url.trim());
-              initLiveChatSystem();
-            }
-          })
-          .catch(() => {});
-      }
+    // Hemen yerel canlı sohbeti başlat (Gecikmesiz açılış)
+    initRealLiveChat();
+
+    // Sunucudan aktif widget ayarını kontrol et (Eski bozuk BotRix önbelleğini temizler)
+    if (window.location.protocol.startsWith('http')) {
+      fetch('/api/chat-widget')
+        .then(r => r.json())
+        .then(d => {
+          const serverUrl = (d && d.url) ? d.url.trim() : '';
+          if (serverUrl.startsWith('http')) {
+            localStorage.setItem('stream_chat_widget_url', serverUrl);
+            applyChatMode(serverUrl);
+          } else {
+            localStorage.removeItem('stream_chat_widget_url');
+          }
+        })
+        .catch(() => {});
     }
   }
 
@@ -573,8 +589,8 @@
         if (!data) return;
 
         // Gerçek canlı takipçi sayısını Kick sunucusundan eşitle
-        const fCount = data.followers_count ?? data.followersCount;
-        if (typeof fCount === 'number') {
+        const fCount = parseInt(data.followers_count ?? data.followersCount, 10);
+        if (!isNaN(fCount)) {
           currentGoal.current = fCount;
           localStorage.setItem('stream_goal_current', fCount);
           updateGoalDisplay(currentGoal);
@@ -622,14 +638,14 @@
             // Canlı Yeni Takipçi Olayı (Pusher üzerinden anlık tetiklenir)
             else if (packet.event === 'App\\Events\\FollowersUpdated') {
               const evData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
-              const newFollowerName = evData.follower?.username || 'Yeni Takipçi';
-              const updatedCount = evData.followersCount || evData.followers_count;
+              const newFollowerName = evData.follower?.username || evData.username || 'Yeni Takipçi';
+              const updatedCount = parseInt(evData.followersCount ?? evData.followers_count, 10);
 
               triggerAlertBanner('follower', { username: newFollowerName });
               updateRecentStat('follower', newFollowerName);
               localStorage.setItem('recent_follower', newFollowerName);
 
-              if (typeof updatedCount === 'number') {
+              if (!isNaN(updatedCount)) {
                 currentGoal.current = updatedCount;
               } else {
                 currentGoal.current += 1;
@@ -662,20 +678,20 @@
       })
       .catch(() => {});
 
-    // Periyodik Kick Canlı Takipçi Güncellemesi (Her 45 saniyede bir)
+    // Periyodik Kick Canlı Takipçi Güncellemesi (Her 20 saniyede bir)
     setInterval(() => {
       fetch(`/api/kick/channel?slug=${encodeURIComponent(channelSlug)}`)
         .then(r => r.json())
         .then(kData => {
-          const count = kData?.followers_count ?? kData?.followersCount;
-          if (typeof count === 'number') {
+          const count = parseInt(kData?.followers_count ?? kData?.followersCount, 10);
+          if (!isNaN(count)) {
             currentGoal.current = count;
             localStorage.setItem('stream_goal_current', count);
             updateGoalDisplay(currentGoal);
           }
         })
         .catch(() => {});
-    }, 45000);
+    }, 20000);
   }
 
   // =============================================================

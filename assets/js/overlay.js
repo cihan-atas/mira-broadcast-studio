@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = event.data;
     if (!data) return;
 
-    if (data.type === 'TEST_ALERT') {
+    if (data.type === 'TEST_ALERT' || data.type === 'LIVE_ALERT') {
       handleAlertTrigger(data.alertType, data.payload);
     } else if (data.type === 'TEST_CHAT' || data.type === 'CHAT_MESSAGE' || data.type === 'chat') {
       const u = data.username || data.user || data.sender?.username || "İzleyici";
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function processServerPayload(payload) {
       if (!payload) return;
-      if (payload.type === 'TEST_ALERT') {
+      if (payload.type === 'TEST_ALERT' || payload.type === 'LIVE_ALERT') {
         handleAlertTrigger(payload.alertType, payload.payload || payload.data);
       } else if (payload.type === 'TEST_CHAT' || payload.type === 'CHAT_MESSAGE' || payload.type === 'chat') {
         const u = payload.username || payload.user || payload.sender?.username || "İzleyici";
@@ -289,16 +289,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const isWidgetActive = initChatWidget();
+  initChatWidget();
 
-  if (!isWidgetActive && window.location.protocol.startsWith('http')) {
+  if (window.location.protocol.startsWith('http')) {
     fetch('/api/chat-widget')
       .then(r => r.json())
       .then(d => {
-        if (d && d.url && d.url.trim().startsWith('http')) {
-          localStorage.setItem('stream_chat_widget_url', d.url.trim());
-          initChatWidget();
+        const srvUrl = (d && d.url) ? d.url.trim() : '';
+        if (srvUrl.startsWith('http')) {
+          localStorage.setItem('stream_chat_widget_url', srvUrl);
+        } else {
+          localStorage.removeItem('stream_chat_widget_url');
         }
+        initChatWidget();
       })
       .catch(() => {});
   }

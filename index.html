@@ -5798,6 +5798,16 @@
           <input type="text" id="modal-streamer-nick-input" class="mira-clean-input" style="font-size: 13px;" placeholder="Örn: Deniz (Sohbette yanıt verirken kullanılır)" autocomplete="off" onkeydown="if(event.key==='Enter') saveAndConnectKickChannel()">
         </div>
 
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 800; color: #a855f7; text-transform: uppercase; margin-bottom: 6px;">
+            🔑 Kick Sohbet Gönderim Tokenı (Opsiyonel - Kick'e Mesaj Yazmak İçin)
+          </label>
+          <input type="password" id="modal-kick-token-input" class="mira-clean-input" style="font-size: 12px;" placeholder="Kick session_token / Bearer token (Yalnızca MİRA'dan Kick'e mesaj göndermek için)" autocomplete="off" onkeydown="if(event.key==='Enter') saveAndConnectKickChannel()">
+          <small style="display: block; margin-top: 4px; font-size: 10.5px; color: #94a3b8;">
+            Girilmezse mesajlarınız OBS ekranına düşer; girilirse aynı anda Kick.com sohbetine de gönderilir.
+          </small>
+        </div>
+
         <!-- Canlı Bağlantı Durumu Kartı -->
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
           <div>
@@ -9158,8 +9168,8 @@
       fetch('/api/kick/channel')
         .then(r => r.json())
         .then(data => {
-          const count = data.followers_count ?? data.followersCount;
-          if (typeof count === 'number') {
+          const count = parseInt(data.followers_count ?? data.followersCount, 10);
+          if (!isNaN(count)) {
             const curInput = document.getElementById('goal-current-input');
             if (curInput) curInput.value = count;
             const badge = document.getElementById('kick-follower-badge');
@@ -9172,14 +9182,16 @@
         .catch(() => showToast('Kick API bağlantı hatası', 'error'));
     }
 
-    // 30 saniyede bir otomatik Kick takipçi senkronizasyonu
+    // 15 saniyede bir otomatik Kick takipçi senkronizasyonu
     setInterval(() => {
       if (isGoalAutoSyncKick && currentGoalType === 'follower') {
         fetch('/api/kick/channel')
           .then(r => r.json())
           .then(data => {
-            const count = data.followers_count ?? data.followersCount;
-            if (typeof count === 'number') {
+            const count = parseInt(data.followers_count ?? data.followersCount, 10);
+            if (!isNaN(count)) {
+              const badge = document.getElementById('kick-follower-badge');
+              if (badge) badge.textContent = count;
               const curInput = document.getElementById('goal-current-input');
               if (curInput && parseInt(curInput.value, 10) !== count) {
                 curInput.value = count;
@@ -9190,7 +9202,7 @@
           })
           .catch(() => {});
       }
-    }, 30000);
+    }, 15000);
 
     /* ========================================================
        ALERT & SESLİ OKUMA (TTS) KONTROL MASASI ENGINE
@@ -9202,7 +9214,7 @@
       volume: 1.0,
       rate: 1.0,
       pitch: 1.0,
-      voiceName: '',
+      voiceName: 'mira_natural_tr',
       voiceLang: 'tr-TR',
       chatFormat: '{user} diyor ki: {message}',
       readStreamerSelf: false,
@@ -9243,6 +9255,7 @@
         const saved = localStorage.getItem('mira_tts_config');
         if (saved) {
           miraTtsConfig = { ...miraTtsConfig, ...JSON.parse(saved) };
+          if (!miraTtsConfig.voiceName) miraTtsConfig.voiceName = 'mira_natural_tr';
           localTTS.applyConfig(miraTtsConfig);
           updateTtsUI();
         }
@@ -9254,6 +9267,7 @@
           .then(cfg => {
             if (cfg) {
               miraTtsConfig = { ...miraTtsConfig, ...cfg };
+              if (!miraTtsConfig.voiceName) miraTtsConfig.voiceName = 'mira_natural_tr';
               localTTS.applyConfig(miraTtsConfig);
               updateTtsUI();
             }
@@ -9700,7 +9714,7 @@
 
     // Tekil ve Güvenli Chat Yayıncısı (Mükerrer ve 4x okumayı kesin olarak engeller)
     function broadcastChatMessage(payload) {
-      if (!payload) return;
+      if (!payload) return Promise.resolve({ ok: false });
       // 1. Canlı önizleme iframe'ine aktar (iframe içi sessizdir)
       const iframe = document.getElementById('preview-iframe');
       if (iframe && iframe.contentWindow) {
@@ -9715,14 +9729,17 @@
         const busHero = new BroadcastChannel('kick_hero_bus');
         busHero.postMessage(payload);
       } catch (e) {}
-      // 3. Sunucuya ilet (OBS ve overlayler /api/poll ile tek sefer yakalar)
+      // 3. Sunucuya ilet (OBS ve overlayler /api/poll ile tek sefer yakalar + varsa Kick API'ye iletir)
       if (window.location.protocol.startsWith('http')) {
-        fetch('/api/chat-message', {
+        return fetch('/api/chat-message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
-        }).catch(() => {});
+        })
+          .then(r => r.json())
+          .catch(() => ({ ok: false }));
       }
+      return Promise.resolve({ ok: true });
     }
 
     function testCustomChatTTS() {
@@ -10344,11 +10361,16 @@
       };
 
       appendStudioChatMessage(payload);
-      broadcastChatMessage(payload);
-
       inp.value = '';
       inp.focus();
-      showToast('✓ Yayıncı mesajı canlı OBS yayınına ve stüdyoya iletildi!', 'success');
+
+      broadcastChatMessage(payload).then(res => {
+        if (res && res.kickSent) {
+          showToast('✓ Yayıncı mesajı Kick.com sohbetine ve OBS yayınına iletildi!', 'success');
+        } else {
+          showToast('✓ Mesaj OBS yayınına iletildi (Kick.com sohbetine yazmak için Kanal Ayarlarından Kick Token girebilirsiniz)', 'info');
+        }
+      });
     }
 
     function sendFloatingWidgetReply() {
@@ -10371,11 +10393,16 @@
       };
 
       appendStudioChatMessage(payload);
-      broadcastChatMessage(payload);
-
       inp.value = '';
       inp.focus();
-      showToast('✓ Yayıncı mesajı canlı OBS yayınına ve stüdyoya iletildi!', 'success');
+
+      broadcastChatMessage(payload).then(res => {
+        if (res && res.kickSent) {
+          showToast('✓ Yayıncı mesajı Kick.com sohbetine ve OBS yayınına iletildi!', 'success');
+        } else {
+          showToast('✓ Mesaj OBS yayınına iletildi!', 'info');
+        }
+      });
     }
 
     function triggerTestChat() {
@@ -10404,6 +10431,7 @@
        ======================================================== */
     let currentObsMusicVolume = 0.40;
     let isMusicDuckingEnabled = true;
+    let obsVolumeSendTimer = null;
 
     function refreshObsAudioSources() {
       fetch('/api/obs/audio-sources')
@@ -10411,25 +10439,33 @@
         .then(data => {
           const select = document.getElementById('obs-audio-source-select');
           if (!select) return;
+          const savedSourcePref = localStorage.getItem('mira_obs_music_source') || select.value || 'Desktop Audio';
+          let activeSourceObj = null;
+
           if (data && data.sources && data.sources.length > 0) {
-            const currentVal = select.value;
             select.innerHTML = '';
             data.sources.forEach(src => {
               const opt = document.createElement('option');
               opt.value = src.name;
-              opt.textContent = `${src.name} (${Math.round((src.volumeMul || 1.0) * 100)}%)`;
+              opt.textContent = `${src.name} (${Math.round((src.volumeMul ?? 1.0) * 100)}%)`;
               select.appendChild(opt);
             });
-            if (currentVal && [...select.options].some(o => o.value === currentVal)) {
-              select.value = currentVal;
+            if (savedSourcePref && [...select.options].some(o => o.value === savedSourcePref)) {
+              select.value = savedSourcePref;
             } else {
-              select.value = 'Desktop Audio';
+              select.value = data.sources[0].name || 'Desktop Audio';
             }
+            activeSourceObj = data.sources.find(s => s.name === select.value);
           }
-          if (data.savedVolume !== undefined) {
+
+          if (activeSourceObj && typeof activeSourceObj.volumeMul === 'number' && !data.isDucked) {
+            currentObsMusicVolume = activeSourceObj.volumeMul;
+            updateMusicVolumeUI(currentObsMusicVolume);
+          } else if (data.savedVolume !== undefined) {
             currentObsMusicVolume = data.savedVolume;
             updateMusicVolumeUI(currentObsMusicVolume);
           }
+
           const badge = document.getElementById('music-vol-obs-badge');
           if (badge) {
             badge.textContent = data.success ? '🟢 OBS Canlı Bağlı' : '🟡 OBS Bekleniyor';
@@ -10443,11 +10479,13 @@
       const src = document.getElementById('obs-audio-source-select')?.value || 'Desktop Audio';
       localStorage.setItem('mira_obs_music_source', src);
       if (localTTS) localTTS.obsMusicSource = src;
+      refreshObsAudioSources();
       showToast(`Müzik ses kaynağı: ${src}`, 'info');
     }
 
     function updateMusicVolumeUI(val) {
-      const v = Math.max(0, Math.min(1.0, parseFloat(val) || 0.4));
+      const parsed = parseFloat(val);
+      const v = Math.max(0, Math.min(1.0, isNaN(parsed) ? 0.4 : parsed));
       const range = document.getElementById('music-volume-range');
       const badge = document.getElementById('music-vol-badge');
       if (range) range.value = v;
@@ -10457,17 +10495,26 @@
     }
 
     function onMusicVolumeChange(val) {
-      const v = Math.max(0, Math.min(1.0, parseFloat(val) || 0));
+      const parsed = parseFloat(val);
+      const v = Math.max(0, Math.min(1.0, isNaN(parsed) ? 0 : parsed));
       currentObsMusicVolume = v;
       updateMusicVolumeUI(v);
       localStorage.setItem('mira_obs_music_volume', v);
 
-      const src = document.getElementById('obs-audio-source-select')?.value || 'Desktop Audio';
-      fetch('/api/obs/volume', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputName: src, volumeMul: v })
-      }).catch(() => {});
+      const select = document.getElementById('obs-audio-source-select');
+      const src = select?.value || 'Desktop Audio';
+      if (select && select.selectedOptions && select.selectedOptions[0]) {
+        select.selectedOptions[0].textContent = `${src} (${Math.round(v * 100)}%)`;
+      }
+
+      if (obsVolumeSendTimer) clearTimeout(obsVolumeSendTimer);
+      obsVolumeSendTimer = setTimeout(() => {
+        fetch('/api/obs/volume', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ inputName: src, volumeMul: v })
+        }).catch(() => {});
+      }, 60);
     }
 
     function setMusicVolumePreset(val) {
@@ -11007,11 +11054,13 @@
       if (!modal) return;
       const slugInput = document.getElementById('modal-kick-slug-input');
       const nickInput = document.getElementById('modal-streamer-nick-input');
+      const tokenInput = document.getElementById('modal-kick-token-input');
       const errAlert = document.getElementById('modal-kick-error-alert');
       if (errAlert) errAlert.style.display = 'none';
 
       if (slugInput) slugInput.value = currentKickSlug || localStorage.getItem('mira_kick_slug') || '';
       if (nickInput) nickInput.value = currentStreamerNick || localStorage.getItem('mira_streamer_username') || '';
+      if (tokenInput) tokenInput.value = localStorage.getItem('mira_kick_token') || '';
       modal.style.display = 'flex';
       refreshModalKickStatus();
       if (slugInput) setTimeout(() => slugInput.focus(), 80);
@@ -11076,12 +11125,17 @@
     function saveAndConnectKickChannel() {
       const slugInput = document.getElementById('modal-kick-slug-input');
       const nickInput = document.getElementById('modal-streamer-nick-input');
+      const tokenInput = document.getElementById('modal-kick-token-input');
       const saveBtn = document.getElementById('modal-kick-save-btn');
       const errAlert = document.getElementById('modal-kick-error-alert');
       const errMsg = document.getElementById('modal-kick-error-msg');
 
       const slug = (slugInput ? slugInput.value : '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
       const nick = (nickInput ? nickInput.value : '').trim() || slug;
+      const kickToken = (tokenInput ? tokenInput.value : '').trim();
+      if (tokenInput) {
+        localStorage.setItem('mira_kick_token', kickToken);
+      }
 
       if (!slug) {
         if (errAlert && errMsg) {
@@ -11101,7 +11155,7 @@
       fetch('/api/kick/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: slug, username: nick })
+        body: JSON.stringify({ slug: slug, username: nick, kickToken: kickToken })
       })
       .then(r => r.json())
       .then(data => {
@@ -12131,22 +12185,47 @@
                     if (fEl) fEl.textContent = `+${(parseInt(fEl.textContent.replace('+', ''), 10) || 0) + 1}`;
                     const fInp = document.getElementById('stat-follower-input');
                     if (fInp && ev.payload?.username) fInp.value = ev.payload.username;
+                    if (ev.type === 'LIVE_ALERT') {
+                      localSFX.playFollowerSound();
+                    }
                   } else if (aType === 'sub') {
                     const sEl = document.getElementById('session-count-subs');
                     if (sEl) sEl.textContent = `+${(parseInt(sEl.textContent.replace('+', ''), 10) || 0) + 1}`;
                     const sInp = document.getElementById('stat-sub-input');
                     if (sInp && ev.payload?.username) sInp.value = `${ev.payload.username} (${ev.payload.months || 1}. Ay)`;
+                    if (ev.type === 'LIVE_ALERT') {
+                      localSFX.playSubscriberSound();
+                    }
                   } else if (aType === 'donation' || aType === 'kicks') {
                     const kEl = document.getElementById('session-count-kicks');
                     const amt = parseInt(ev.payload?.amount || 500, 10) || 500;
                     if (kEl) kEl.textContent = `+${(parseInt(kEl.textContent.replace('+', ''), 10) || 0) + amt}`;
                     const dInp = document.getElementById('stat-donation-input');
                     if (dInp && ev.payload?.username) dInp.value = `${ev.payload.username} (${ev.payload.amount || '500 Kicks'})`;
+                    if (ev.type === 'LIVE_ALERT') {
+                      localSFX.playDonationSound();
+                    }
                   } else if (aType === 'gift') {
                     const gEl = document.getElementById('session-count-gifts');
                     if (gEl) gEl.textContent = `+${(parseInt(gEl.textContent.replace('+', ''), 10) || 0) + 1}`;
                     const gInp = document.getElementById('stat-gift-input');
                     if (gInp && ev.payload?.username) gInp.value = `${ev.payload.username} (${ev.payload.giftName || '5x Hediye'})`;
+                    if (ev.type === 'LIVE_ALERT') {
+                      localSFX.playSubscriberSound();
+                    }
+                  }
+
+                  // Sunucudan gelen gerçek canlı alertleri önizleme ekranına ve BroadcastChannel'a da ilet
+                  if (ev.type === 'LIVE_ALERT' && ev.senderSession !== MIRA_TAB_SESSION_ID) {
+                    const iframe = document.getElementById('preview-iframe');
+                    if (iframe && iframe.contentWindow) {
+                      iframe.contentWindow.postMessage(ev, '*');
+                    }
+                    try {
+                      const busHero = new BroadcastChannel('kick_hero_bus');
+                      busHero.postMessage(ev);
+                    } catch (e) {}
+                    showToast(`🎉 Canlı ${aType.toUpperCase()} Bildirimi: ${ev.payload?.username || 'Yeni İzleyici'}`, 'success');
                   }
 
                   if (ev.payload && ev.payload.username && ev.senderSession !== MIRA_TAB_SESSION_ID) {

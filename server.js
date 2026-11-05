@@ -318,8 +318,20 @@ function setObsTextSource(sourceName, text, callback) {
   });
 }
 
-let obsSavedMusicVolume = 1.0;
+let obsSavedMusicVolume = 0.4;
+let obsSavedMusicVolumeInitialized = false;
 let obsIsDucked = false;
+let obsDuckingRefCount = 0;
+let obsUnduckTimer = null;
+
+function parseCount(val) {
+  if (typeof val === 'number' && !isNaN(val)) return val;
+  if (typeof val === 'string' && val.trim() !== '') {
+    const parsed = parseInt(val.replace(/[^0-9-]/g, ''), 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return null;
+}
 
 // Windows & Linux Çoklu Dil Destekli OBS Ses Ayarlama Yardımcısı
 async function callObsSetInputVolume(inputName, volumeMul) {
@@ -356,7 +368,7 @@ async function callObsGetInputVolume(inputName) {
       }
     } catch(err) {}
   }
-  return { name: inputName || 'Desktop Audio', volumeMul: obsSavedMusicVolume || 1.0 };
+  return { name: inputName || 'Desktop Audio', volumeMul: obsSavedMusicVolume || 0.4 };
 }
 
 function getObsAudioInputs(callback) {
@@ -378,6 +390,13 @@ function getObsAudioInputs(callback) {
           });
         } catch(e) {}
       }
+      if (!obsIsDucked && !obsSavedMusicVolumeInitialized && audioInputs.length > 0) {
+        const primary = audioInputs.find(a => ['Desktop Audio', 'Masaüstü Sesi', 'Masaüstü Ses', 'Müzik', 'Spotify'].includes(a.name)) || audioInputs[0];
+        if (primary && typeof primary.volumeMul === 'number') {
+          obsSavedMusicVolume = primary.volumeMul;
+          obsSavedMusicVolumeInitialized = true;
+        }
+      }
       callback(null, audioInputs);
     })
     .catch(err => callback(err));
@@ -388,11 +407,12 @@ function setObsAudioVolume(inputName, volumeMul, callback) {
     if (callback) callback(new Error('OBS WebSocket bağlı değil'));
     return;
   }
-  const mul = Math.max(0, Math.min(2.0, parseFloat(volumeMul) || 1.0));
-  if (!obsIsDucked) {
-    obsSavedMusicVolume = mul;
-  }
-  callObsSetInputVolume(inputName || 'Desktop Audio', mul)
+  const rawVal = parseFloat(volumeMul);
+  const mul = Math.max(0, Math.min(2.0, isNaN(rawVal) ? 0.4 : rawVal));
+  obsSavedMusicVolume = mul;
+  obsSavedMusicVolumeInitialized = true;
+  const targetApplyMul = obsIsDucked ? Math.max(0.02, mul * 0.25) : mul;
+  callObsSetInputVolume(inputName || 'Desktop Audio', targetApplyMul)
     .then((matchedName) => {
       if (callback) callback(null, { inputName: matchedName, volumeMul: mul });
     })
@@ -408,24 +428,37 @@ async function setObsDucking(duck, inputName = 'Desktop Audio', callback) {
   }
   try {
     if (duck) {
+      if (obsUnduckTimer) {
+        clearTimeout(obsUnduckTimer);
+        obsUnduckTimer = null;
+      }
       if (!obsIsDucked) {
         // Canlı OBS ses seviyesini oku ve sakla
         try {
           const current = await callObsGetInputVolume(inputName);
-          if (current && typeof current.volumeMul === 'number' && current.volumeMul > 0.05) {
+          if (current && typeof current.volumeMul === 'number' && current.volumeMul > 0.02) {
             obsSavedMusicVolume = current.volumeMul;
+            obsSavedMusicVolumeInitialized = true;
           }
         } catch(e) {}
         obsIsDucked = true;
       }
-      const duckedVolume = Math.max(0.05, obsSavedMusicVolume * 0.25); // %75 kıs
+      const duckedVolume = Math.max(0.02, obsSavedMusicVolume * 0.25); // %75 kıs
       const matchedName = await callObsSetInputVolume(inputName || 'Desktop Audio', duckedVolume);
       if (callback) callback(null, { ducked: true, volume: duckedVolume, inputName: matchedName });
     } else {
-      obsIsDucked = false;
-      const restoreVolume = Math.max(0.1, obsSavedMusicVolume || 1.0);
-      const matchedName = await callObsSetInputVolume(inputName || 'Desktop Audio', restoreVolume);
-      if (callback) callback(null, { ducked: false, volume: restoreVolume, inputName: matchedName });
+      if (obsUnduckTimer) clearTimeout(obsUnduckTimer);
+      obsUnduckTimer = setTimeout(async () => {
+        obsUnduckTimer = null;
+        obsIsDucked = false;
+        const restoreVolume = Math.max(0, obsSavedMusicVolume !== undefined ? obsSavedMusicVolume : 0.4);
+        try {
+          const matchedName = await callObsSetInputVolume(inputName || 'Desktop Audio', restoreVolume);
+          if (callback) callback(null, { ducked: false, volume: restoreVolume, inputName: matchedName });
+        } catch (e) {
+          if (callback) callback(e);
+        }
+      }, 180);
     }
   } catch(err) {
     if (callback) callback(err);
@@ -548,7 +581,11 @@ function handleTiktokConnect(username, callback) {
 // ==========================================
 let kickPusherWs = null;
 let kickPingInterval = null;
+let kickFollowerPollInterval = null;
 let kickReconnectTimeout = null;
+const knownKickFollowerUsers = new Set();
+const recentChatUserFollowerChecked = new Map();
+let lastKickChatSender = null;
 let activeKickStatus = {
   connected: false,
   slug: '',
@@ -559,6 +596,134 @@ let activeKickStatus = {
   error: null
 };
 
+function emitKickFollowerAlert(followerUsername, updatedCount = null) {
+  const cleanName = (followerUsername || 'Yeni Takipçi').trim();
+  const normKey = cleanName.toLowerCase();
+  if (cleanName !== 'Yeni Takipçi') {
+    if (knownKickFollowerUsers.has(normKey)) return;
+    knownKickFollowerUsers.add(normKey);
+  }
+
+  if (typeof updatedCount === 'number' && !isNaN(updatedCount)) {
+    activeKickStatus.followersCount = updatedCount;
+  } else {
+    activeKickStatus.followersCount = (parseCount(activeKickStatus.followersCount) || 0) + 1;
+  }
+
+  studioStats.recent.follower = cleanName;
+  studioStats.session.followers = (studioStats.session.followers || 0) + 1;
+  if (studioStats.goal.type === 'follower') {
+    if (typeof updatedCount === 'number' && !isNaN(updatedCount)) {
+      studioStats.goal.current = updatedCount;
+    } else {
+      studioStats.goal.current = (parseCount(studioStats.goal.current) || 0) + 1;
+    }
+    eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+  }
+  eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, session: studioStats.session, time: Date.now() });
+  saveStreamStats();
+
+  const alertItem = {
+    id: 'alert_follow_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+    type: 'LIVE_ALERT',
+    alertType: 'follower',
+    payload: {
+      username: cleanName,
+      followersCount: activeKickStatus.followersCount
+    },
+    time: Date.now()
+  };
+  eventQueue.push(alertItem);
+  if (eventQueue.length > 80) eventQueue.shift();
+  console.log(`[KICK TAKİPÇİ] ${cleanName} kanalı takip etti! (Toplam: ${activeKickStatus.followersCount})`);
+}
+
+function checkKickUserFollowStatus(slug, username) {
+  if (!slug || !username) return Promise.resolve(null);
+  const normUser = username.trim().toLowerCase();
+  if (!normUser || normUser === slug.toLowerCase()) return Promise.resolve(null);
+
+  return new Promise((resolve) => {
+    const options = {
+      hostname: 'kick.com',
+      path: `/api/v2/channels/${encodeURIComponent(slug)}/users/${encodeURIComponent(username.trim())}`,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json'
+      }
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          if (res.statusCode === 200) {
+            const parsed = JSON.parse(data);
+            return resolve(parsed);
+          }
+        } catch (e) {}
+        resolve(null);
+      });
+    });
+    req.on('error', () => resolve(null));
+    req.setTimeout(5000, () => {
+      req.destroy();
+      resolve(null);
+    });
+    req.end();
+  });
+}
+
+function sendKickChatMessageDirect(chatroomId, content, token) {
+  return new Promise((resolve, reject) => {
+    if (!chatroomId || !content || !token) {
+      return resolve({ sent: false, reason: 'missing_params' });
+    }
+    const cleanToken = String(token).replace(/^Bearer\s+/i, '').trim();
+    if (!cleanToken) return resolve({ sent: false, reason: 'empty_token' });
+
+    const postBody = JSON.stringify({
+      content: String(content).trim(),
+      type: 'message'
+    });
+
+    const options = {
+      hostname: 'kick.com',
+      path: `/api/v2/messages/send/${encodeURIComponent(chatroomId)}`,
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${cleanToken}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Length': Buffer.byteLength(postBody),
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Origin': 'https://kick.com',
+        'Referer': `https://kick.com/${encodeURIComponent(activeKickStatus.slug || '')}`
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve({ sent: true, statusCode: res.statusCode });
+        } else {
+          resolve({ sent: false, statusCode: res.statusCode, error: data.substring(0, 200) });
+        }
+      });
+    });
+    req.on('error', (err) => resolve({ sent: false, error: err.message }));
+    req.setTimeout(6000, () => {
+      req.destroy();
+      resolve({ sent: false, error: 'timeout' });
+    });
+    req.write(postBody);
+    req.end();
+  });
+}
+
 function stopKickPusherBridge(clearStats = false) {
   if (kickReconnectTimeout) {
     clearTimeout(kickReconnectTimeout);
@@ -567,6 +732,10 @@ function stopKickPusherBridge(clearStats = false) {
   if (kickPingInterval) {
     clearInterval(kickPingInterval);
     kickPingInterval = null;
+  }
+  if (kickFollowerPollInterval) {
+    clearInterval(kickFollowerPollInterval);
+    kickFollowerPollInterval = null;
   }
   if (kickPusherWs) {
     try {
@@ -729,38 +898,45 @@ function startKickPusherBridge(slug, prefetchedData = null) {
           if (eventQueue.length > 80) eventQueue.shift();
           activeKickStatus.lastMessageAt = Date.now();
           console.log(`[KICK CHAT] [${badge.toUpperCase()}] ${sender}: ${content}`);
+
+          if (!isStreamer && sender && sender !== 'Kickİzleyici') {
+            lastKickChatSender = sender;
+            const normSender = sender.toLowerCase();
+            const lastChecked = recentChatUserFollowerChecked.get(normSender) || 0;
+            if (!knownKickFollowerUsers.has(normSender) && (Date.now() - lastChecked) > 30000) {
+              recentChatUserFollowerChecked.set(normSender, Date.now());
+              checkKickUserFollowStatus(targetSlug, sender).then(userData => {
+                if (userData && userData.following_since) {
+                  const followTime = new Date(userData.following_since).getTime();
+                  if (!isNaN(followTime)) {
+                    const ageMs = Date.now() - followTime;
+                    // Son 15 dakika içinde takip etmişse ve henüz bildirim atılmadıysa canlı bildirimi tetikle!
+                    if (ageMs >= -60000 && ageMs <= 15 * 60 * 1000) {
+                      fetchKickChannelInfo(targetSlug).then(chInfo => {
+                        const cNum = parseCount(chInfo?.followers_count ?? chInfo?.followersCount);
+                        emitKickFollowerAlert(userData.username || sender, cNum);
+                      }).catch(() => {
+                        emitKickFollowerAlert(userData.username || sender, null);
+                      });
+                    } else {
+                      knownKickFollowerUsers.add(normSender);
+                    }
+                  }
+                }
+              }).catch(() => {});
+            }
+          }
         }
         // Canlı Takipçi Güncellemesi (Kick Pusher FollowersUpdated)
         else if (packet.event === 'App\\Events\\FollowersUpdated') {
           const evData = typeof packet.data === 'string' ? JSON.parse(packet.data) : packet.data;
           const isFollow = evData.followed !== false;
-          const updatedCount = typeof evData.followersCount === 'number' ? evData.followersCount : (typeof evData.followers_count === 'number' ? evData.followers_count : null);
+          const updatedCount = parseCount(evData.followersCount ?? evData.followers_count);
           if (updatedCount !== null) activeKickStatus.followersCount = updatedCount;
 
           if (isFollow) {
             const newFollowerName = evData.username || evData.follower?.username || evData.user?.username || evData.follower_username || 'Yeni Takipçi';
-            studioStats.recent.follower = newFollowerName;
-            studioStats.session.followers = (studioStats.session.followers || 0) + 1;
-            if (studioStats.goal.type === 'follower') {
-              if (updatedCount !== null) studioStats.goal.current = updatedCount;
-              else studioStats.goal.current = (studioStats.goal.current || 0) + 1;
-              eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
-            }
-            eventQueue.push({ type: 'UPDATE_STATS', stats: studioStats.recent, session: studioStats.session, time: Date.now() });
-            saveStreamStats();
-
-            const alertItem = {
-              type: 'LIVE_ALERT',
-              alertType: 'follower',
-              payload: {
-                username: newFollowerName,
-                followersCount: activeKickStatus.followersCount
-              },
-              time: Date.now()
-            };
-            eventQueue.push(alertItem);
-            if (eventQueue.length > 80) eventQueue.shift();
-            console.log(`[KICK TAKİPÇİ] ${newFollowerName} kanalı takip etti! (Toplam: ${activeKickStatus.followersCount})`);
+            emitKickFollowerAlert(newFollowerName, updatedCount);
           } else {
             if (studioStats.goal.type === 'follower' && updatedCount !== null) {
               studioStats.goal.current = updatedCount;
@@ -852,15 +1028,59 @@ function startKickPusherBridge(slug, prefetchedData = null) {
   const handleChannelData = (channelData) => {
     const chatroomId = channelData?.chatroom?.id;
     const channelId = channelData?.id;
-    const fCount = channelData?.followers_count ?? channelData?.followersCount ?? 0;
+    const fCount = parseCount(channelData?.followers_count ?? channelData?.followersCount) ?? 0;
 
     activeKickStatus.chatroomId = chatroomId;
     activeKickStatus.channelId = channelId;
     activeKickStatus.followersCount = fCount;
     activeKickStatus.error = null;
 
+    if (studioStats.goal.type === 'follower' && studioStats.goal.autoSyncKick !== false) {
+      studioStats.goal.current = fCount;
+      saveStreamStats();
+    }
+
     console.log(`[KICK BRIDGE] Kanal aktif: ${targetSlug} (Chatroom ID: ${chatroomId}, Channel ID: ${channelId}, Takipçi: ${fCount})`);
     connectWs(chatroomId, channelId);
+
+    if (kickFollowerPollInterval) clearInterval(kickFollowerPollInterval);
+    kickFollowerPollInterval = setInterval(() => {
+      if (!activeKickStatus.slug) return;
+      fetchKickChannelInfo(activeKickStatus.slug)
+        .then(latestData => {
+          const newCount = parseCount(latestData?.followers_count ?? latestData?.followersCount);
+          if (newCount === null) return;
+          const prevCount = parseCount(activeKickStatus.followersCount) ?? 0;
+          if (newCount > prevCount) {
+            // Yeni takipçi algılandı! Son sohbet eden kullanıcıyı kontrol et
+            const candidateUser = lastKickChatSender;
+            if (candidateUser && !knownKickFollowerUsers.has(candidateUser.toLowerCase())) {
+              checkKickUserFollowStatus(activeKickStatus.slug, candidateUser)
+                .then(uInfo => {
+                  if (uInfo && uInfo.following_since) {
+                    const fTime = new Date(uInfo.following_since).getTime();
+                    if (!isNaN(fTime) && (Date.now() - fTime) <= 15 * 60 * 1000) {
+                      emitKickFollowerAlert(uInfo.username || candidateUser, newCount);
+                      return;
+                    }
+                  }
+                  emitKickFollowerAlert('Yeni Takipçi', newCount);
+                })
+                .catch(() => emitKickFollowerAlert('Yeni Takipçi', newCount));
+            } else {
+              emitKickFollowerAlert('Yeni Takipçi', newCount);
+            }
+          } else if (newCount !== prevCount) {
+            activeKickStatus.followersCount = newCount;
+            if (studioStats.goal.type === 'follower' && studioStats.goal.autoSyncKick !== false) {
+              studioStats.goal.current = newCount;
+              eventQueue.push({ type: 'UPDATE_GOAL', goal: studioStats.goal, time: Date.now() });
+              saveStreamStats();
+            }
+          }
+        })
+        .catch(() => {});
+    }, 12000);
   };
 
   if (prefetchedData && prefetchedData.chatroom && prefetchedData.chatroom.id) {
@@ -2340,6 +2560,9 @@ const server = http.createServer((req, res) => {
             if (!studioStats.streamer) studioStats.streamer = {};
             studioStats.streamer.kickSlug = cleanSlug;
             studioStats.streamer.username = (d.username || cleanSlug).trim();
+            if (d.kickToken !== undefined) {
+              studioStats.streamer.kickToken = String(d.kickToken || '').trim();
+            }
             saveStreamStats();
 
             startKickPusherBridge(cleanSlug, channelData);
@@ -2354,7 +2577,7 @@ const server = http.createServer((req, res) => {
             res.end(JSON.stringify({
               success: true,
               slug: cleanSlug,
-              followersCount: channelData.followers_count ?? channelData.followersCount ?? 0,
+              followersCount: parseCount(channelData.followers_count ?? channelData.followersCount) ?? 0,
               streamer: studioStats.streamer,
               status: activeKickStatus
             }));
@@ -2429,6 +2652,7 @@ const server = http.createServer((req, res) => {
           const d = JSON.parse(body || '{}');
           if (!studioStats.streamer) studioStats.streamer = {};
           if (d.username !== undefined) studioStats.streamer.username = d.username;
+          if (d.kickToken !== undefined) studioStats.streamer.kickToken = String(d.kickToken || '').trim();
           if (d.kickSlug !== undefined) {
             const clean = d.kickSlug.replace(/[^a-zA-Z0-9_-]/g, '').trim();
             studioStats.streamer.kickSlug = clean;
@@ -2481,8 +2705,24 @@ const server = http.createServer((req, res) => {
         };
         eventQueue.push(item);
         if (eventQueue.length > 80) eventQueue.shift();
+
+        const kickToken = (d.kickToken || studioStats.streamer?.kickToken || '').trim();
+        const chatroomId = activeKickStatus.chatroomId;
+        if (kickToken && chatroomId && item.content) {
+          sendKickChatMessageDirect(chatroomId, item.content, kickToken)
+            .then(kickRes => {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: true, item, kickSent: !!kickRes.sent, kickResult: kickRes }));
+            })
+            .catch(() => {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: true, item, kickSent: false }));
+            });
+          return;
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, item }));
+        res.end(JSON.stringify({ success: true, item, kickSent: false, reason: kickToken ? 'no_chatroom' : 'no_token' }));
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));
@@ -2722,7 +2962,7 @@ const server = http.createServer((req, res) => {
         volume: 1.0,
         rate: 1.0,
         pitch: 1.0,
-        voiceName: '',
+        voiceName: 'mira_natural_tr',
         voiceLang: 'tr-TR',
         chatFormat: '{user} diyor ki: {message}',
         readStreamerSelf: false,
@@ -2873,13 +3113,13 @@ const server = http.createServer((req, res) => {
       if (!isTransformed) {
         return serveFinalAudio(inputMp3);
       }
-      // FFmpeg rubberband ile perde (pitch) ve tempo (hız) dönüştür
+      // FFmpeg rubberband ile perde (pitch) ve tempo (hız) dönüştür (Windows'ta konsol penceresi gizlenir)
       const ffmpeg = spawn('ffmpeg', [
         '-y',
         '-i', inputMp3,
         '-af', `rubberband=pitch=${pitchStr}:tempo=${rateStr}`,
         finalFilePath
-      ]);
+      ], { windowsHide: true });
 
       ffmpeg.on('close', (code) => {
         if (code === 0 && fs.existsSync(finalFilePath)) {
@@ -2898,47 +3138,101 @@ const server = http.createServer((req, res) => {
       return applyTransformAndServe(baseFilePath);
     }
 
-    // Google Translate TTS'ten ham sesi indir
-    const googleTtsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
-    const ttsReq = https.get(googleTtsUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'audio/mpeg, audio/*; q=0.9, */*; q=0.1'
-      }
-    }, (googleRes) => {
-      if (googleRes.statusCode === 200) {
-        const fileStream = fs.createWriteStream(baseFilePath);
-        googleRes.pipe(fileStream);
-        fileStream.on('finish', () => {
-          applyTransformAndServe(baseFilePath);
-        });
-        fileStream.on('error', () => {
-          serveEspeakFallback();
-        });
-      } else {
-        serveEspeakFallback();
-      }
-    });
-
     const serveEspeakFallback = () => {
+      if (process.platform === 'win32') {
+        // Windows: PowerShell System.Speech ile geçici WAV üret veya 503 döndür
+        const winWavPath = path.join(ttsCacheDir, `win_${textHash}.wav`);
+        const safeText = text.replace(/'/g, "''").replace(/[\r\n]+/g, ' ');
+        const psScript = `Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.SetOutputToWaveFile('${winWavPath.replace(/'/g, "''")}'); $s.Speak('${safeText}'); $s.Dispose()`;
+        const ps = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', psScript], { windowsHide: true });
+        ps.on('close', (code) => {
+          if (code === 0 && fs.existsSync(winWavPath)) {
+            try {
+              const stat = fs.statSync(winWavPath);
+              res.writeHead(200, { 'Content-Type': 'audio/wav', 'Content-Length': stat.size });
+              return fs.createReadStream(winWavPath).pipe(res);
+            } catch (e) {}
+          }
+          if (!res.headersSent) {
+            res.writeHead(503, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'TTS çevrimdışı' }));
+          }
+        });
+        ps.on('error', () => {
+          if (!res.headersSent) {
+            res.writeHead(503, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'TTS çevrimdışı' }));
+          }
+        });
+        return;
+      }
       try {
-        const espeak = spawn('espeak', ['-v', lang === 'tr' ? 'tr' : 'en', text, '--stdout']);
-        res.writeHead(200, { 'Content-Type': 'audio/wav' });
-        espeak.stdout.pipe(res);
-        espeak.on('error', () => { try { res.end(); } catch(e){} });
+        const espeak = spawn('espeak', ['-v', lang === 'tr' ? 'tr' : 'en', text, '--stdout'], { windowsHide: true });
+        let chunks = [];
+        espeak.stdout.on('data', d => chunks.push(d));
+        espeak.on('close', (code) => {
+          const buf = Buffer.concat(chunks);
+          if (code === 0 && buf.length > 44 && !res.headersSent) {
+            res.writeHead(200, { 'Content-Type': 'audio/wav', 'Content-Length': buf.length });
+            res.end(buf);
+          } else if (!res.headersSent) {
+            res.writeHead(503, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'TTS ses sentezi başarısız' }));
+          }
+        });
+        espeak.on('error', () => {
+          if (!res.headersSent) {
+            res.writeHead(503, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'TTS ses sentezi başarısız' }));
+          }
+        });
       } catch(e) {
         if (!res.headersSent) {
-          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.writeHead(503, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'TTS ses sentezi başarısız' }));
         }
       }
     };
 
-    ttsReq.on('error', () => serveEspeakFallback());
-    ttsReq.setTimeout(4000, () => {
-      ttsReq.destroy();
-      serveEspeakFallback();
-    });
+    // Google Translate TTS'ten ham sesi indir (2 deneme + yüksek zaman aşımı ile espeak'e gereksiz düşmeyi önle)
+    const fetchGoogleTts = (attempt = 1) => {
+      const clientParam = attempt === 1 ? 'tw-ob' : 'gtx';
+      const googleTtsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=${clientParam}`;
+      const ttsReq = https.get(googleTtsUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': 'audio/mpeg, audio/*; q=0.9, */*; q=0.1'
+        }
+      }, (googleRes) => {
+        if (googleRes.statusCode === 200) {
+          const fileStream = fs.createWriteStream(baseFilePath);
+          googleRes.pipe(fileStream);
+          fileStream.on('finish', () => {
+            applyTransformAndServe(baseFilePath);
+          });
+          fileStream.on('error', () => {
+            if (attempt < 2) fetchGoogleTts(attempt + 1);
+            else serveEspeakFallback();
+          });
+        } else {
+          googleRes.resume();
+          if (attempt < 2) fetchGoogleTts(attempt + 1);
+          else serveEspeakFallback();
+        }
+      });
+
+      ttsReq.on('error', () => {
+        if (attempt < 2) fetchGoogleTts(attempt + 1);
+        else serveEspeakFallback();
+      });
+      ttsReq.setTimeout(7000, () => {
+        ttsReq.destroy();
+        if (attempt < 2) fetchGoogleTts(attempt + 1);
+        else serveEspeakFallback();
+      });
+    };
+
+    fetchGoogleTts(1);
     return;
   }
 

@@ -204,13 +204,17 @@ class HeroTTSManager {
     this.initVoices();
   }
 
+  isNaturalVoiceSelected() {
+    return !this.voiceName || this.voiceName === 'mira_natural_tr' || this.voiceName === 'mira_natural_male';
+  }
+
   initVoices() {
     if (!('speechSynthesis' in window)) return;
     const setVoice = () => {
       const voices = window.speechSynthesis.getVoices();
       if (!voices || voices.length === 0) return;
 
-      if (this.voiceName && this.voiceName !== 'mira_natural_tr') {
+      if (!this.isNaturalVoiceSelected()) {
         const found = voices.find(v => v.name === this.voiceName);
         if (found) {
           this.selectedVoice = found;
@@ -232,8 +236,8 @@ class HeroTTSManager {
   }
 
   setVoiceByName(name) {
-    this.voiceName = name;
-    if (name === 'mira_natural_tr') return;
+    this.voiceName = name || 'mira_natural_tr';
+    if (this.isNaturalVoiceSelected()) return;
     if (!('speechSynthesis' in window)) return;
     const voices = window.speechSynthesis.getVoices();
     const found = voices.find(v => v.name === name);
@@ -436,9 +440,9 @@ class HeroTTSManager {
 
     const rawText = this.queue.shift();
 
-    // Sistemde ses varsa ve kullanıcı browser_speech seçtiyse SpeechSynthesis kullan
+    // Sistemde ses varsa ve kullanıcı açıkça tarayıcı içi bir ses seçtiyse SpeechSynthesis kullan
     const hasBrowserVoices = ('speechSynthesis' in window) && window.speechSynthesis.getVoices().length > 0;
-    if (this.voiceName && this.voiceName !== 'mira_natural_tr' && hasBrowserVoices) {
+    if (!this.isNaturalVoiceSelected() && hasBrowserVoices) {
       this.playSpeechSynthesis(rawText);
     } else {
       // Varsayılan ve en güvenilir yöntem: MİRA Doğal Ses Akışı (OBS ve Linux'ta %100 çalışır)
@@ -446,11 +450,15 @@ class HeroTTSManager {
     }
   }
 
-  playAudioStream(text) {
+  playAudioStream(text, retryCount = 0) {
     try {
-      const p = typeof this.pitch === 'number' ? this.pitch : 1.0;
+      let p = typeof this.pitch === 'number' ? this.pitch : 1.0;
+      if (this.voiceName === 'mira_natural_male' && Math.abs(p - 1.0) < 0.05) {
+        p = 0.85; // Erkek / alternatif doğal ses tonu
+      }
       const r = typeof this.rate === 'number' ? this.rate : 1.0;
-      const audioUrl = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(this.voiceLang || 'tr')}&pitch=${encodeURIComponent(p)}&rate=${encodeURIComponent(r)}`;
+      const lg = (this.voiceLang || 'tr').split('-')[0].toLowerCase();
+      const audioUrl = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lg)}&pitch=${encodeURIComponent(p)}&rate=${encodeURIComponent(r)}`;
       const audio = this.getAudioPlayer();
       this.currentAudio = audio;
 
@@ -466,35 +474,56 @@ class HeroTTSManager {
         audio.volume = Math.max(0, Math.min(1.0, targetVol));
       }
 
-      audio.src = audioUrl;
-
-      // TTS başladığında müziği otomatik kıs (Ducking)
-      this.triggerDucking(true);
+      let duckTriggered = false;
+      audio.onplaying = () => {
+        if (!duckTriggered) {
+          duckTriggered = true;
+          this.triggerDucking(true);
+        }
+      };
 
       const finish = () => {
+        audio.onplaying = null;
+        audio.onended = null;
+        audio.onerror = null;
         this.isPlaying = false;
         this.currentAudio = null;
         if (this.queue.length === 0) {
           this.triggerDucking(false);
         }
-        setTimeout(() => this.processQueue(), 250);
+        setTimeout(() => this.processQueue(), 180);
+      };
+
+      const handleFail = (err) => {
+        if (retryCount < 1) {
+          setTimeout(() => this.playAudioStream(text, retryCount + 1), 350);
+          return;
+        }
+        if (this.isNaturalVoiceSelected()) {
+          // Doğal ses seçiliyken PC'nin mekanik sesine (SpeechSynthesis) düşme!
+          console.warn('Doğal TTS ses akışı oynatılamadı:', err);
+          finish();
+        } else {
+          this.playSpeechSynthesis(text);
+        }
       };
 
       audio.onended = finish;
-      audio.onerror = (e) => {
-        console.warn('TTS Audio akış hatası, SpeechSynthesis deneniyor:', e);
-        this.playSpeechSynthesis(text);
-      };
+      audio.onerror = (e) => handleFail(e);
 
+      audio.src = audioUrl;
       const playPromise = audio.play();
       if (playPromise !== undefined) {
-        playPromise.catch(err => {
-          console.warn('Ses oynatma engellendi, SpeechSynthesis deneniyor:', err);
-          this.playSpeechSynthesis(text);
-        });
+        playPromise.catch(err => handleFail(err));
       }
     } catch(err) {
-      this.playSpeechSynthesis(text);
+      if (this.isNaturalVoiceSelected()) {
+        this.isPlaying = false;
+        this.triggerDucking(false);
+        setTimeout(() => this.processQueue(), 200);
+      } else {
+        this.playSpeechSynthesis(text);
+      }
     }
   }
 

@@ -40,16 +40,19 @@
       }
     }
 
-    const isWidgetActive = initChatWidget();
+    initChatWidget();
 
-    if (!isWidgetActive && window.location.protocol.startsWith('http')) {
+    if (window.location.protocol.startsWith('http')) {
       fetch('/api/chat-widget')
         .then(r => r.json())
         .then(d => {
-          if (d && d.url && d.url.trim().startsWith('http')) {
-            localStorage.setItem('stream_chat_widget_url', d.url.trim());
-            initChatWidget();
+          const srvUrl = (d && d.url) ? d.url.trim() : '';
+          if (srvUrl.startsWith('http')) {
+            localStorage.setItem('stream_chat_widget_url', srvUrl);
+          } else {
+            localStorage.removeItem('stream_chat_widget_url');
           }
+          initChatWidget();
         })
         .catch(() => {});
     }

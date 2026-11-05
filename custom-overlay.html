@@ -901,12 +901,28 @@
               }).catch(() => {});
           }
         },
+        isNaturalVoice() {
+          return !this.config.voiceName || this.config.voiceName === 'mira_natural_tr' || this.config.voiceName === 'mira_natural_male';
+        },
+        triggerDucking(enable) {
+          if (this.config.autoDucking === false) return;
+          try {
+            if (typeof fetch === 'function' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
+              const source = this.config.obsMusicSource || (typeof localStorage !== 'undefined' ? localStorage.getItem('mira_obs_music_source') : null) || 'Desktop Audio';
+              fetch('/api/obs/ducking', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ duck: enable, inputName: source })
+              }).catch(() => {});
+            }
+          } catch(e) {}
+        },
         initVoices() {
           if (!('speechSynthesis' in window)) return;
           const setV = () => {
             const voices = window.speechSynthesis.getVoices();
             if (!voices || voices.length === 0) return;
-            if (this.config.voiceName && this.config.voiceName !== 'mira_natural_tr') {
+            if (!this.isNaturalVoice()) {
               const found = voices.find(v => v.name === this.config.voiceName);
               if (found) { this.selectedVoice = found; return; }
             }
@@ -965,17 +981,20 @@
           const rawText = this.queue.shift();
 
           const hasVoices = ('speechSynthesis' in window) && window.speechSynthesis.getVoices().length > 0;
-          if (this.config.voiceName && this.config.voiceName !== 'mira_natural_tr' && hasVoices) {
+          if (!this.isNaturalVoice() && hasVoices) {
             this.playSpeechSynthesis(rawText);
           } else {
             this.playAudioStream(rawText);
           }
         },
-        playAudioStream(text) {
+        playAudioStream(text, retryCount = 0) {
           try {
-            const pch = typeof this.config.pitch === 'number' ? this.config.pitch : 1.0;
+            let pch = typeof this.config.pitch === 'number' ? this.config.pitch : 1.0;
+            if (this.config.voiceName === 'mira_natural_male' && Math.abs(pch - 1.0) < 0.05) {
+              pch = 0.85;
+            }
             const rt = typeof this.config.rate === 'number' ? this.config.rate : 1.0;
-            const lg = (this.config.voiceLang || 'tr').split('-')[0];
+            const lg = (this.config.voiceLang || 'tr').split('-')[0].toLowerCase();
             const url = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lg)}&pitch=${pch}&rate=${rt}`;
             const audio = this.getAudioPlayer();
             this.currentAudio = audio;
@@ -993,28 +1012,57 @@
             }
 
             audio.playbackRate = 1.0; // Hız/perde sunucuda (ffmpeg rubberband) uygulanıyor; çift uygulamayı önle
-            audio.src = url;
+
+            let duckTriggered = false;
+            audio.onplaying = () => {
+              if (!duckTriggered) {
+                duckTriggered = true;
+                this.triggerDucking(true);
+              }
+            };
 
             const next = () => {
+              audio.onplaying = null;
+              audio.onended = null;
+              audio.onerror = null;
               this.isPlaying = false;
               this.currentAudio = null;
-              setTimeout(() => this.process(), 200);
+              if (this.queue.length === 0) {
+                this.triggerDucking(false);
+              }
+              setTimeout(() => this.process(), 180);
+            };
+
+            const handleFail = () => {
+              if (retryCount < 1) {
+                setTimeout(() => this.playAudioStream(text, retryCount + 1), 350);
+                return;
+              }
+              if (this.isNaturalVoice()) {
+                next();
+              } else {
+                this.playSpeechSynthesis(text);
+              }
             };
 
             audio.onended = next;
-            audio.onerror = () => {
-              this.playSpeechSynthesis(text);
-            };
-            audio.play().catch(() => {
-              this.playSpeechSynthesis(text);
-            });
+            audio.onerror = handleFail;
+            audio.src = url;
+            audio.play().catch(handleFail);
           } catch(e) {
-            this.playSpeechSynthesis(text);
+            if (this.isNaturalVoice()) {
+              this.isPlaying = false;
+              this.triggerDucking(false);
+              setTimeout(() => this.process(), 200);
+            } else {
+              this.playSpeechSynthesis(text);
+            }
           }
         },
         playSpeechSynthesis(text) {
           if (!('speechSynthesis' in window)) {
             this.isPlaying = false;
+            this.triggerDucking(false);
             setTimeout(() => this.process(), 200);
             return;
           }
@@ -1022,20 +1070,23 @@
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             if (this.selectedVoice) utterance.voice = this.selectedVoice;
-            utterance.volume = typeof this.config.volume === 'number' ? this.config.volume : 1.0;
+            utterance.volume = typeof this.config.volume === 'number' ? Math.min(1.0, this.config.volume) : 1.0;
             utterance.rate = typeof this.config.rate === 'number' ? this.config.rate : 1.0;
             utterance.pitch = typeof this.config.pitch === 'number' ? this.config.pitch : 1.0;
-            utterance.onend = () => {
+            this.triggerDucking(true);
+            const finishSynth = () => {
               this.isPlaying = false;
+              if (this.queue.length === 0) {
+                this.triggerDucking(false);
+              }
               setTimeout(() => this.process(), 200);
             };
-            utterance.onerror = () => {
-              this.isPlaying = false;
-              setTimeout(() => this.process(), 200);
-            };
+            utterance.onend = finishSynth;
+            utterance.onerror = finishSynth;
             window.speechSynthesis.speak(utterance);
           } catch(e) {
             this.isPlaying = false;
+            this.triggerDucking(false);
             setTimeout(() => this.process(), 200);
           }
         },
@@ -1048,6 +1099,7 @@
           if ('speechSynthesis' in window) {
             try { window.speechSynthesis.cancel(); } catch(e){}
           }
+          this.triggerDucking(false);
           this.isPlaying = false;
         },
         speakAlert(alertType, data = {}) {

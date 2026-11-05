@@ -176,9 +176,51 @@ class TTSManager {
 
   processQueue() {
     if (this.isSpeaking || this.queue.length === 0) return;
+    if (window.self !== window.top) {
+      this.queue = [];
+      return;
+    }
 
     this.isSpeaking = true;
     const item = this.queue.shift();
+
+    if (window.location.protocol.startsWith('http')) {
+      const ttsUrl = `/api/tts/audio?lang=tr&rate=${encodeURIComponent(this.rate)}&pitch=${encodeURIComponent(this.pitch)}&text=${encodeURIComponent(item.text)}`;
+      const audio = new Audio(ttsUrl);
+      audio.volume = Math.min(1.0, Math.max(0, this.volume));
+      let ducked = false;
+      const setDuck = (enable) => {
+        if (enable === ducked) return;
+        ducked = enable;
+        fetch('/api/obs/duck', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ duck: enable, inputName: localStorage.getItem('mira_obs_music_source') || 'Desktop Audio' })
+        }).catch(() => {});
+      };
+      audio.onplaying = () => setDuck(true);
+      audio.onended = () => {
+        setDuck(false);
+        this.isSpeaking = false;
+        setTimeout(() => this.processQueue(), 200);
+      };
+      audio.onerror = () => {
+        setDuck(false);
+        this.isSpeaking = false;
+        setTimeout(() => this.processQueue(), 250);
+      };
+      audio.play().catch(() => {
+        setDuck(false);
+        this.isSpeaking = false;
+        setTimeout(() => this.processQueue(), 250);
+      });
+      return;
+    }
+
+    if (!('speechSynthesis' in window)) {
+      this.isSpeaking = false;
+      return;
+    }
 
     const utterance = new SpeechSynthesisUtterance(item.text);
     if (this.selectedVoice) utterance.voice = this.selectedVoice;
