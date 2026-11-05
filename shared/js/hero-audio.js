@@ -345,8 +345,15 @@ class HeroTTSManager {
       if (AudioCtx && !this.mediaSourceConnected) {
         this.audioCtx = new AudioCtx();
         const source = this.audioCtx.createMediaElementSource(el);
+        this.compressorNode = this.audioCtx.createDynamicsCompressor();
+        this.compressorNode.threshold.value = -24;
+        this.compressorNode.knee.value = 12;
+        this.compressorNode.ratio.value = 6;
+        this.compressorNode.attack.value = 0.003;
+        this.compressorNode.release.value = 0.15;
         this.gainNode = this.audioCtx.createGain();
-        source.connect(this.gainNode);
+        source.connect(this.compressorNode);
+        this.compressorNode.connect(this.gainNode);
         this.gainNode.connect(this.audioCtx.destination);
         this.mediaSourceConnected = true;
       }
@@ -462,13 +469,14 @@ class HeroTTSManager {
       const audio = this.getAudioPlayer();
       this.currentAudio = audio;
 
-      // Web Audio GainNode ile standart %100 sınırını aşıp %250 ses yükseltme (Booster) desteği:
+      // Web Audio Compressor + GainNode ile güçlü ses yükseltme (3.2x Pre-Amp + %500'e kadar Booster):
       const targetVol = typeof this.volume === 'number' ? Math.max(0, this.volume) : 1.0;
+      const preAmpFactor = 3.2;
       if (this.gainNode) {
         if (this.audioCtx && this.audioCtx.state === 'suspended') {
           this.audioCtx.resume().catch(() => {});
         }
-        this.gainNode.gain.value = targetVol;
+        this.gainNode.gain.value = targetVol * preAmpFactor;
         audio.volume = 1.0;
       } else {
         audio.volume = Math.max(0, Math.min(1.0, targetVol));

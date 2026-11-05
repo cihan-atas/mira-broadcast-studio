@@ -443,7 +443,7 @@ async function setObsDucking(duck, inputName = 'Desktop Audio', callback) {
         } catch(e) {}
         obsIsDucked = true;
       }
-      const duckedVolume = Math.max(0.02, obsSavedMusicVolume * 0.25); // %75 kıs
+      const duckedVolume = Math.max(0.01, obsSavedMusicVolume * 0.15); // %85 kıs (TTS net duyulsun)
       const matchedName = await callObsSetInputVolume(inputName || 'Desktop Audio', duckedVolume);
       if (callback) callback(null, { ducked: true, volume: duckedVolume, inputName: matchedName });
     } else {
@@ -675,16 +675,30 @@ function checkKickUserFollowStatus(slug, username) {
   });
 }
 
+function normalizeKickToken(raw) {
+  let t = String(raw || '').replace(/^Bearer\s+/i, '').trim();
+  if (!t) return '';
+  try {
+    if (t.includes('%')) t = decodeURIComponent(t);
+  } catch (e) {}
+  return t.replace(/^["']|["']$/g, '').trim();
+}
+
+let lastDirectSentKickMsg = { content: '', time: 0 };
+
 function sendKickChatMessageDirect(chatroomId, content, token) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (!chatroomId || !content || !token) {
       return resolve({ sent: false, reason: 'missing_params' });
     }
-    const cleanToken = String(token).replace(/^Bearer\s+/i, '').trim();
+    const cleanToken = normalizeKickToken(token);
     if (!cleanToken) return resolve({ sent: false, reason: 'empty_token' });
 
+    const cleanContent = String(content).trim();
+    lastDirectSentKickMsg = { content: cleanContent, time: Date.now() };
+
     const postBody = JSON.stringify({
-      content: String(content).trim(),
+      content: cleanContent,
       type: 'message'
     });
 
@@ -694,10 +708,11 @@ function sendKickChatMessageDirect(chatroomId, content, token) {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${cleanToken}`,
+        'Cookie': `session_token=${encodeURIComponent(cleanToken)}`,
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        'Accept': 'application/json, text/plain, */*',
         'Content-Length': Buffer.byteLength(postBody),
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Origin': 'https://kick.com',
         'Referer': `https://kick.com/${encodeURIComponent(activeKickStatus.slug || '')}`
       }
@@ -877,6 +892,10 @@ function startKickPusherBridge(slug, prefetchedData = null) {
           const content = chatData.content || '';
           const badges = chatData.sender?.badges || [];
           const isStreamer = badges.some(b => b.type === 'broadcaster' || b.type === 'streamer') || (sender.toLowerCase() === activeKickStatus.slug.toLowerCase());
+          if (isStreamer && content.trim() === lastDirectSentKickMsg.content && (Date.now() - lastDirectSentKickMsg.time) < 6000) {
+            // MİRA üzerinden doğrudan gönderilen yayıncı mesajının Pusher yankısını mükerrer ekleme
+            return;
+          }
           const isMod = badges.some(b => b.type === 'moderator');
           const isSub = badges.some(b => b.type === 'subscriber');
           const badge = isStreamer ? 'streamer' : (isMod ? 'mod' : (isSub ? 'sub' : 'kick'));
@@ -2561,7 +2580,7 @@ const server = http.createServer((req, res) => {
             studioStats.streamer.kickSlug = cleanSlug;
             studioStats.streamer.username = (d.username || cleanSlug).trim();
             if (d.kickToken !== undefined) {
-              studioStats.streamer.kickToken = String(d.kickToken || '').trim();
+              studioStats.streamer.kickToken = normalizeKickToken(d.kickToken);
             }
             saveStreamStats();
 
@@ -2652,7 +2671,7 @@ const server = http.createServer((req, res) => {
           const d = JSON.parse(body || '{}');
           if (!studioStats.streamer) studioStats.streamer = {};
           if (d.username !== undefined) studioStats.streamer.username = d.username;
-          if (d.kickToken !== undefined) studioStats.streamer.kickToken = String(d.kickToken || '').trim();
+          if (d.kickToken !== undefined) studioStats.streamer.kickToken = normalizeKickToken(d.kickToken);
           if (d.kickSlug !== undefined) {
             const clean = d.kickSlug.replace(/[^a-zA-Z0-9_-]/g, '').trim();
             studioStats.streamer.kickSlug = clean;
@@ -3083,8 +3102,8 @@ const server = http.createServer((req, res) => {
     const pitchStr = pitch.toFixed(2);
     const rateStr = rate.toFixed(2);
     const isTransformed = Math.abs(pitch - 1.0) >= 0.03 || Math.abs(rate - 1.0) >= 0.03;
-    const finalHash = isTransformed ? crypto.createHash('md5').update(`${lang}_p${pitchStr}_r${rateStr}_${text}`).digest('hex') : textHash;
-    const finalFilePath = path.join(ttsCacheDir, isTransformed ? `mod_${finalHash}.mp3` : `base_${textHash}.mp3`);
+    const finalHash = crypto.createHash('md5').update(`v2boost_${lang}_p${pitchStr}_r${rateStr}_${text}`).digest('hex');
+    const finalFilePath = path.join(ttsCacheDir, `boost_${finalHash}.mp3`);
 
     const serveFinalAudio = (filePath) => {
       try {
@@ -3103,21 +3122,22 @@ const server = http.createServer((req, res) => {
       }
     };
 
-    // 1. Nihai işlenmiş ses önbellekte var mı?
+    // 1. Nihai yükseltilmiş ses önbellekte var mı?
     if (fs.existsSync(finalFilePath)) {
       return serveFinalAudio(finalFilePath);
     }
 
-    // 2. Base sesi elde et (varsa kullan, yoksa Google'dan indir)
+    // 2. Base sesi elde et (varsa kullan, yoksa Google'dan indir) ve FFmpeg ile ses gücünü (compressor + +9dB boost) yükselt
     const applyTransformAndServe = (inputMp3) => {
-      if (!isTransformed) {
-        return serveFinalAudio(inputMp3);
-      }
-      // FFmpeg rubberband ile perde (pitch) ve tempo (hız) dönüştür (Windows'ta konsol penceresi gizlenir)
+      const boostChain = 'acompressor=threshold=-22dB:ratio=4:attack=5:release=50:makeup=8dB,volume=2.6,alimiter=limit=0.98:level=false';
+      const afFilter = isTransformed
+        ? `rubberband=pitch=${pitchStr}:tempo=${rateStr},${boostChain}`
+        : boostChain;
+
       const ffmpeg = spawn('ffmpeg', [
         '-y',
         '-i', inputMp3,
-        '-af', `rubberband=pitch=${pitchStr}:tempo=${rateStr}`,
+        '-af', afFilter,
         finalFilePath
       ], { windowsHide: true });
 

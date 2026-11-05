@@ -7,6 +7,7 @@ const { fork, exec } = require('child_process');
 let mainWindow = null;
 let previewWindow = null;
 let floatingChatWindow = null;
+let kickAuthWindow = null;
 let tray = null;
 let serverProcess = null;
 let isQuitting = false;
@@ -137,6 +138,95 @@ function openFloatingChatWindow(url) {
   });
 }
 
+function openKickAuthWindow() {
+  if (kickAuthWindow && !kickAuthWindow.isDestroyed()) {
+    kickAuthWindow.show();
+    kickAuthWindow.focus();
+    return;
+  }
+
+  const appIcon = getAppIcon();
+  kickAuthWindow = new BrowserWindow({
+    width: 520,
+    height: 700,
+    title: 'MİRA STUDIO — Kick Hesabınızla Giriş Yapın (Giriş Yapınca Otomatik Bağlanır)',
+    backgroundColor: '#0b0e14',
+    icon: appIcon,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  let tokenCaptured = false;
+  let pollTimer = null;
+
+  const checkKickSessionCookie = async () => {
+    if (tokenCaptured || !kickAuthWindow || kickAuthWindow.isDestroyed()) return;
+    try {
+      const cookies = await kickAuthWindow.webContents.session.cookies.get({ name: 'session_token' });
+      const kickCookie = (cookies || []).find(c => c.domain && c.domain.includes('kick.com') && c.value);
+      if (kickCookie && kickCookie.value) {
+        let cleanToken = kickCookie.value;
+        try {
+          if (cleanToken.includes('%')) cleanToken = decodeURIComponent(cleanToken);
+        } catch (e) {}
+        cleanToken = cleanToken.trim();
+        if (cleanToken.length > 15) {
+          tokenCaptured = true;
+          if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+
+          const postData = JSON.stringify({ kickToken: cleanToken });
+          const req = http.request({
+            hostname: '127.0.0.1',
+            port: 8080,
+            path: '/api/streamer/config',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(postData)
+            }
+          }, (res) => { res.resume(); });
+          req.on('error', () => {});
+          req.write(postData);
+          req.end();
+
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            const safeJsToken = JSON.stringify(cleanToken);
+            mainWindow.webContents.executeJavaScript(`
+              try {
+                localStorage.setItem('mira_kick_token', ${safeJsToken});
+                const inp = document.getElementById('modal-kick-token-input');
+                if (inp) inp.value = ${safeJsToken};
+                if (typeof showToast === 'function') {
+                  showToast('✓ Kick oturum anahtarı otomatik alındı ve kaydedildi!', 'success');
+                }
+              } catch(e) {}
+            `).catch(() => {});
+          }
+
+          setTimeout(() => {
+            if (kickAuthWindow && !kickAuthWindow.isDestroyed()) {
+              kickAuthWindow.close();
+            }
+          }, 500);
+        }
+      }
+    } catch (e) {}
+  };
+
+  kickAuthWindow.loadURL('https://kick.com/');
+  kickAuthWindow.webContents.on('did-finish-load', checkKickSessionCookie);
+  kickAuthWindow.webContents.on('did-navigate', checkKickSessionCookie);
+  pollTimer = setInterval(checkKickSessionCookie, 1200);
+
+  kickAuthWindow.on('closed', () => {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    kickAuthWindow = null;
+  });
+}
+
 function openPreviewWindow(url) {
   if (previewWindow && !previewWindow.isDestroyed()) {
     previewWindow.loadURL(url);
@@ -217,11 +307,12 @@ function createWindow() {
     return { action: 'deny' };
   });
 
-  // Arayüzdeki "Kaldır" düğmesi mira-action://uninstall adresine gider
+  // Arayüzdeki özel aksiyon düğmeleri mira-action:// adresine gider
   mainWindow.webContents.on('will-navigate', (e, navUrl) => {
     if (navUrl.startsWith('mira-action://')) {
       e.preventDefault();
       if (navUrl === 'mira-action://uninstall') uninstallApp();
+      if (navUrl === 'mira-action://kick-login') openKickAuthWindow();
     }
   });
 

@@ -5268,15 +5268,15 @@
             <div class="voice-engine-grid" style="margin-top:0;">
               <div>
                 <div class="range-label-row">
-                  <span>🔊 TTS Ses Gücü (Booster)</span>
+                  <span>🔊 TTS Ses Gücü (Mega Booster)</span>
                   <span class="range-val-badge" id="val-tts-vol">100%</span>
                 </div>
-                <input type="range" id="tts-volume-range" class="form-control" style="padding:0; height:auto; accent-color:#00f5a0;" min="0" max="2.5" step="0.05" value="1.0" oninput="onTtsVolumeChange(this.value)">
+                <input type="range" id="tts-volume-range" class="form-control" style="padding:0; height:auto; accent-color:#00f5a0;" min="0" max="5.0" step="0.1" value="2.5" oninput="onTtsVolumeChange(this.value)">
                 <div style="display:flex; gap:4px; margin-top:6px;">
                   <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px;" onclick="setTtsVolumePreset(1.0)">%100 Normal</button>
-                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px;" onclick="setTtsVolumePreset(1.5)">%150 ⚡ Yüksek</button>
-                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px; border-color:#00f5a0; color:#00f5a0;" onclick="setTtsVolumePreset(2.0)">%200 🚀 Ultra</button>
-                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px; border-color:#f59e0b; color:#f59e0b;" onclick="setTtsVolumePreset(2.5)">%250 🔥 Boost</button>
+                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px;" onclick="setTtsVolumePreset(2.0)">%200 ⚡ Yüksek</button>
+                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px; border-color:#00f5a0; color:#00f5a0;" onclick="setTtsVolumePreset(3.5)">%350 🚀 Ultra</button>
+                  <button type="button" class="btn-secondary" style="flex:1; padding:3px 4px; font-size:9.5px; border-color:#f59e0b; color:#f59e0b;" onclick="setTtsVolumePreset(5.0)">%500 🔥 Mega Boost</button>
                 </div>
               </div>
 
@@ -5799,12 +5799,17 @@
         </div>
 
         <div>
-          <label style="display: block; font-size: 11px; font-weight: 800; color: #a855f7; text-transform: uppercase; margin-bottom: 6px;">
-            🔑 Kick Sohbet Gönderim Tokenı (Opsiyonel - Kick'e Mesaj Yazmak İçin)
-          </label>
-          <input type="password" id="modal-kick-token-input" class="mira-clean-input" style="font-size: 12px;" placeholder="Kick session_token / Bearer token (Yalnızca MİRA'dan Kick'e mesaj göndermek için)" autocomplete="off" onkeydown="if(event.key==='Enter') saveAndConnectKickChannel()">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="font-size: 11px; font-weight: 800; color: #a855f7; text-transform: uppercase;">
+              🔑 Kick Sohbet Gönderim Tokenı (Kick'e Mesaj Yazmak İçin)
+            </label>
+            <button type="button" class="btn-clean-subtle" style="background: rgba(168,85,247,0.18); border-color: rgba(168,85,247,0.55); color: #e9d5ff; font-size: 10.5px; font-weight: 800; padding: 3px 9px;" onclick="openKickAutoTokenLogin()" title="Kick hesabınıza giriş yaparak Token'ı F12 kullanmadan tek tıkla otomatik çeker">
+              🔐 Kick ile Giriş Yap (Otomatik Al)
+            </button>
+          </div>
+          <input type="password" id="modal-kick-token-input" class="mira-clean-input" style="font-size: 12px;" placeholder="Otomatik al butonuna tıklayın veya session_token yapıştırın" autocomplete="off" onkeydown="if(event.key==='Enter') saveAndConnectKickChannel()">
           <small style="display: block; margin-top: 4px; font-size: 10.5px; color: #94a3b8;">
-            Girilmezse mesajlarınız OBS ekranına düşer; girilirse aynı anda Kick.com sohbetine de gönderilir.
+            Bir kez bağlandığında kalıcı kaydedilir; her yayında tekrar almanıza gerek yoktur.
           </small>
         </div>
 
@@ -9527,11 +9532,14 @@
       const v = parseFloat(val);
       miraTtsConfig.volume = v;
       localTTS.volume = v;
+      if (localTTS.gainNode) {
+        localTTS.gainNode.gain.value = v * 3.2;
+      }
       const badge = document.getElementById('val-tts-vol');
       if (badge) {
         let tag = '';
-        if (v >= 2.1) tag = ' (🔥 Boost)';
-        else if (v >= 1.5) tag = ' (🚀 Ultra)';
+        if (v >= 4.0) tag = ' (🔥 Mega Boost)';
+        else if (v >= 2.5) tag = ' (🚀 Ultra)';
         else if (v > 1.0) tag = ' (⚡ Yüksek)';
         badge.textContent = `${Math.round(v * 100)}%${tag}`;
       }
@@ -11049,6 +11057,24 @@
     let currentKickSlug = '';
     let currentStreamerNick = '';
 
+    function normalizeClientKickToken(raw) {
+      let t = String(raw || '').replace(/^Bearer\s+/i, '').trim();
+      try {
+        if (t.includes('%')) t = decodeURIComponent(t);
+      } catch (e) {}
+      return t.replace(/^["']|["']$/g, '').trim();
+    }
+
+    function openKickAutoTokenLogin() {
+      if (/Electron/i.test(navigator.userAgent)) {
+        showToast('🔐 Kick giriş penceresi açılıyor... Giriş yaptığınız anda Token otomatik alınacaktır.', 'info');
+        window.location.href = 'mira-action://kick-login';
+      } else {
+        window.open('https://kick.com/', '_blank');
+        showToast('Tarayıcı modundasınız: Kick.com üzerinden session_token değerini kutuya yapıştırabilirsiniz.', 'info');
+      }
+    }
+
     function openStreamerSettingsModal() {
       const modal = document.getElementById('streamer-settings-modal');
       if (!modal) return;
@@ -11060,7 +11086,17 @@
 
       if (slugInput) slugInput.value = currentKickSlug || localStorage.getItem('mira_kick_slug') || '';
       if (nickInput) nickInput.value = currentStreamerNick || localStorage.getItem('mira_streamer_username') || '';
-      if (tokenInput) tokenInput.value = localStorage.getItem('mira_kick_token') || '';
+      if (tokenInput) tokenInput.value = normalizeClientKickToken(localStorage.getItem('mira_kick_token') || '');
+      fetch('/api/streamer/config')
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.streamer && d.streamer.kickToken && tokenInput) {
+            const cleanT = normalizeClientKickToken(d.streamer.kickToken);
+            tokenInput.value = cleanT;
+            localStorage.setItem('mira_kick_token', cleanT);
+          }
+        })
+        .catch(() => {});
       modal.style.display = 'flex';
       refreshModalKickStatus();
       if (slugInput) setTimeout(() => slugInput.focus(), 80);
@@ -11132,8 +11168,9 @@
 
       const slug = (slugInput ? slugInput.value : '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
       const nick = (nickInput ? nickInput.value : '').trim() || slug;
-      const kickToken = (tokenInput ? tokenInput.value : '').trim();
+      const kickToken = normalizeClientKickToken(tokenInput ? tokenInput.value : '');
       if (tokenInput) {
+        tokenInput.value = kickToken;
         localStorage.setItem('mira_kick_token', kickToken);
       }
 
