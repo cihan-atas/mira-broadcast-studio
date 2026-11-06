@@ -176,7 +176,7 @@ class HeroTTSManager {
     this.enabled = options.ttsEnabled !== undefined ? options.ttsEnabled : true;
     this.ttsAlertsEnabled = options.ttsAlertsEnabled !== undefined ? options.ttsAlertsEnabled : true;
     this.ttsChatEnabled = options.ttsChatEnabled !== undefined ? options.ttsChatEnabled : true;
-    this.outputMode = options.outputMode || 'all';
+    this.outputMode = options.outputMode || 'studio';
     this.heroName = (options.heroName || 'vexana').toLowerCase();
     this.volume = options.volume !== undefined ? options.volume : 1.0;
     this.autoDucking = options.autoDucking !== undefined ? options.autoDucking : true;
@@ -199,6 +199,7 @@ class HeroTTSManager {
 
     this.selectedVoice = null;
     this.queue = [];
+    this.recentSpokenMap = new Map();
     this.isPlaying = false;
     this.currentAudio = null;
     this.initVoices();
@@ -361,7 +362,7 @@ class HeroTTSManager {
     return this.audioEl;
   }
 
-  speak(text) {
+  speak(text, forceTest = false) {
     if (!this.enabled) return;
     if (window.self !== window.top) return; // İframe içinde (ör: önizleme kutusu) ASLA ses çıkarma!
 
@@ -373,13 +374,28 @@ class HeroTTSManager {
     if (!text || !text.trim()) return;
 
     const cleanText = text.trim();
-    if (!this.acquireAudioLock(cleanText)) {
-      // Bu ses zaten başka bir pencere veya OBS sahnesi tarafından tek sefer oynatılıyor!
-      return;
+    const normKey = cleanText.toLowerCase().replace(/^[^:]{1,35}:\s*/, '').replace(/\bdiyor ki\b/g, '').replace(/[^a-z0-9\u00c0-\u024f]/gi, '').slice(0, 80) || cleanText.toLowerCase();
+    const now = Date.now();
+    if (!forceTest) {
+      const prevTime = this.recentSpokenMap.get(normKey) || 0;
+      if ((now - prevTime) < 6000) return;
+      this.recentSpokenMap.set(normKey, now);
+      if (this.recentSpokenMap.size > 120) {
+        this.recentSpokenMap.delete(this.recentSpokenMap.keys().next().value);
+      }
+      if (!this.acquireAudioLock(cleanText)) {
+        // Bu ses zaten başka bir pencere veya OBS sahnesi tarafından tek sefer oynatılıyor!
+        return;
+      }
     }
 
-    this.queue.push(cleanText);
-    this.processQueue();
+    this.queue.push({ text: cleanText, force: !!forceTest });
+    if (!isStudioWindow && this.outputMode === 'all') {
+      // Stüdyo penceresinin sunucu kilidini ilk alması için OBS katmanına 250ms öncelik gecikmesi ver
+      setTimeout(() => this.processQueue(), 250);
+    } else {
+      this.processQueue();
+    }
   }
 
   speakAlert(alertType, data = {}) {
@@ -445,19 +461,22 @@ class HeroTTSManager {
     if (this.isPlaying || this.queue.length === 0) return;
     this.isPlaying = true;
 
-    const rawText = this.queue.shift();
+    const item = this.queue.shift();
+    const rawText = typeof item === 'object' ? item.text : String(item || '');
+    const forceFlag = typeof item === 'object' ? !!item.force : false;
 
-    // Sistemde ses varsa ve kullanıcı açıkça tarayıcı içi bir ses seçtiyse SpeechSynthesis kullan
+    const isStudioWindow = (window.location.pathname === '/' || window.location.pathname.endsWith('index.html'));
+    // Sistemde ses varsa ve kullanıcı açıkça tarayıcı içi bir ses seçtiyse SpeechSynthesis kullan (OBS ikincil pencerede çift okumayı önlemek için sadece birincil hedefse)
     const hasBrowserVoices = ('speechSynthesis' in window) && window.speechSynthesis.getVoices().length > 0;
-    if (!this.isNaturalVoiceSelected() && hasBrowserVoices) {
+    if (!this.isNaturalVoiceSelected() && hasBrowserVoices && (isStudioWindow || this.outputMode === 'overlay')) {
       this.playSpeechSynthesis(rawText);
     } else {
-      // Varsayılan ve en güvenilir yöntem: MİRA Doğal Ses Akışı (OBS ve Linux'ta %100 çalışır)
-      this.playAudioStream(rawText);
+      // Varsayılan ve en güvenilir yöntem: MİRA Doğal Ses Akışı (OBS, Windows ve Linux'ta %100 çalışır)
+      this.playAudioStream(rawText, 0, forceFlag);
     }
   }
 
-  playAudioStream(text, retryCount = 0) {
+  playAudioStream(text, retryCount = 0, forceFlag = false) {
     try {
       let p = typeof this.pitch === 'number' ? this.pitch : 1.0;
       if (this.voiceName === 'mira_natural_male' && Math.abs(p - 1.0) < 0.05) {
@@ -465,7 +484,7 @@ class HeroTTSManager {
       }
       const r = typeof this.rate === 'number' ? this.rate : 1.0;
       const lg = (this.voiceLang || 'tr').split('-')[0].toLowerCase();
-      const audioUrl = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lg)}&pitch=${encodeURIComponent(p)}&rate=${encodeURIComponent(r)}`;
+      const audioUrl = `/api/tts/audio?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lg)}&pitch=${encodeURIComponent(p)}&rate=${encodeURIComponent(r)}${forceFlag ? '&force=1' : ''}`;
       const audio = this.getAudioPlayer();
       this.currentAudio = audio;
 

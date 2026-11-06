@@ -10465,7 +10465,7 @@
     /* ========================================================
        OBS MÜZİK & ARKA PLAN SES KONTROL MOTORU (OBS WEBSOCKET)
        ======================================================== */
-    let currentObsMusicVolume = 0.40;
+    let currentObsMusicVolume = 1.0;
     let isMusicDuckingEnabled = true;
     let obsVolumeSendTimer = null;
 
@@ -10521,7 +10521,7 @@
 
     function updateMusicVolumeUI(val) {
       const parsed = parseFloat(val);
-      const v = Math.max(0, Math.min(1.0, isNaN(parsed) ? 0.4 : parsed));
+      const v = Math.max(0, Math.min(1.0, isNaN(parsed) ? 1.0 : parsed));
       const range = document.getElementById('music-volume-range');
       const badge = document.getElementById('music-vol-badge');
       if (range) range.value = v;

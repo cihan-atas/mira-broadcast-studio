@@ -960,11 +960,19 @@
           if (colonIdx > 0 && colonIdx < 35) {
             core = core.substring(colonIdx + 1).trim();
           }
-          const norm = core.replace(/[^a-z0-9ğüşıöç]/gi, '').substring(0, 70);
+          const norm = core.replace(/\bdiyor ki\b/g, '').replace(/[^a-z0-9ğüşıöç\u00c0-\u024f]/gi, '').substring(0, 80);
           if (!norm) return;
 
-          const lockKey = 'mira_tts_audio_lock';
+          if (!this.recentSpokenMap) this.recentSpokenMap = new Map();
           const now = Date.now();
+          const prevSpoken = this.recentSpokenMap.get(norm) || 0;
+          if ((now - prevSpoken) < 6000) return;
+          this.recentSpokenMap.set(norm, now);
+          if (this.recentSpokenMap.size > 120) {
+            this.recentSpokenMap.delete(this.recentSpokenMap.keys().next().value);
+          }
+
+          const lockKey = 'mira_tts_audio_lock';
           try {
             const raw = localStorage.getItem(lockKey);
             if (raw) {
@@ -980,7 +988,12 @@
           } catch(e) {}
 
           this.queue.push(clean);
-          this.process();
+          if (this.config.outputMode !== 'overlay') {
+            // MİRA Stüdyo açıksa ilk ses kilidini onun alması için OBS katmanına 260ms öncelik gecikmesi ver
+            setTimeout(() => this.process(), 260);
+          } else {
+            this.process();
+          }
         },
         process() {
           if (this.isPlaying || this.queue.length === 0) return;
@@ -988,7 +1001,7 @@
           const rawText = this.queue.shift();
 
           const hasVoices = ('speechSynthesis' in window) && window.speechSynthesis.getVoices().length > 0;
-          if (!this.isNaturalVoice() && hasVoices) {
+          if (!this.isNaturalVoice() && hasVoices && this.config.outputMode === 'overlay') {
             this.playSpeechSynthesis(rawText);
           } else {
             this.playAudioStream(rawText);
@@ -1748,7 +1761,10 @@
       } catch (e) {}
 
       let lastPoll = Date.now() - 3000;
+      let overlayPollInFlight = false;
       setInterval(() => {
+        if (overlayPollInFlight) return;
+        overlayPollInFlight = true;
         fetch(`/api/poll?since=${lastPoll}`)
           .then(r => r.json())
           .then(d => {
@@ -1759,7 +1775,8 @@
               });
             }
           })
-          .catch(() => {});
+          .catch(() => {})
+          .finally(() => { overlayPollInFlight = false; });
       }, 250);
 
       // Başlatma

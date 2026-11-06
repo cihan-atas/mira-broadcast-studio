@@ -36,10 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
     config,
     (chatMsg) => {
       // Gelen Chat Mesajı
-      addChatMessage(chatMsg.sender?.username || "İzleyici", chatMsg.content || "");
+      const added = addChatMessage(chatMsg.sender?.username || "İzleyici", chatMsg.content || "", 'kick', chatMsg.id);
       
-      // Tüm sohbeti sesli okuma açıksa
-      if (config.tts?.enabled && config.tts?.readAllChat) {
+      // Tüm sohbeti sesli okuma açıksa (yalnızca tekil yeni mesajlarda)
+      if (added && config.tts?.enabled && config.tts?.readAllChat) {
         ttsManager.speak(`${chatMsg.sender?.username} diyor ki: ${chatMsg.content}`);
       }
     },
@@ -48,7 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   );
 
-  function handleAlertTrigger(alertType, data) {
+  const seenAlertKeys = new Map();
+  function handleAlertTrigger(alertType, data, eventId = null) {
+    const now = Date.now();
+    const key = eventId || `${alertType}_${(data && (data.username || data.user)) || ''}`;
+    const prev = seenAlertKeys.get(key) || 0;
+    if ((now - prev) < 4500) return;
+    seenAlertKeys.set(key, now);
+
     alertEngine.trigger(alertType, data);
     if (alertType === 'follower') {
       stateManager.updateEvent('follower', data.username);
@@ -65,12 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!data) return;
 
     if (data.type === 'TEST_ALERT' || data.type === 'LIVE_ALERT') {
-      handleAlertTrigger(data.alertType, data.payload);
+      handleAlertTrigger(data.alertType, data.payload, data.id);
     } else if (data.type === 'TEST_CHAT' || data.type === 'CHAT_MESSAGE' || data.type === 'chat') {
       const u = data.username || data.user || data.sender?.username || "İzleyici";
       const c = data.content || data.text || data.message || "";
-      addChatMessage(u, c);
-      if (config.tts?.enabled) {
+      const added = addChatMessage(u, c, data.badge || 'sub', data.id);
+      if (added && config.tts?.enabled && config.tts?.readAllChat) {
         ttsManager.speak(`${u} diyor ki: ${c}`);
       }
     } else if (data.type === 'UPDATE_GOAL' && data.goal) {
@@ -110,14 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       if (payload.type === 'TEST_ALERT' || payload.type === 'LIVE_ALERT') {
-        handleAlertTrigger(payload.alertType, payload.payload || payload.data);
+        handleAlertTrigger(payload.alertType, payload.payload || payload.data, payload.id);
       } else if (payload.type === 'TEST_CHAT' || payload.type === 'CHAT_MESSAGE' || payload.type === 'chat') {
         const u = payload.username || payload.user || payload.sender?.username || "İzleyici";
         const c = payload.content || payload.text || payload.message || "";
         const isStreamer = !!payload.isStreamer || payload.badge === 'streamer';
         const b = isStreamer ? 'streamer' : (payload.badge || (payload.platform ? payload.platform.toLowerCase() : 'sub'));
-        addChatMessage(u, c, b, payload.id);
-        if (config.tts?.enabled) {
+        const added = addChatMessage(u, c, b, payload.id);
+        if (added && config.tts?.enabled && config.tts?.readAllChat) {
           ttsManager.speak(`${u} diyor ki: ${c}`);
         }
       } else if (payload.type === 'UPDATE_GOAL' && payload.goal) {
@@ -318,22 +325,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const recentOverlayChatMap = new Map();
 
   function addChatMessage(user, text, badge = 'sub', msgId = null) {
-    if (!chatMessagesEl || !showChat) return;
-    if (chatMessagesEl.classList.contains('has-widget-iframe') || chatMessagesEl.querySelector('iframe')) return;
-
     const cleanText = String(text || '').trim();
-    if (!cleanText) return;
+    if (!cleanText) return false;
     const now = Date.now();
     if (msgId) {
-      if (seenOverlayChatIds.has(msgId)) return;
+      if (seenOverlayChatIds.has(msgId)) return false;
       seenOverlayChatIds.add(msgId);
       if (seenOverlayChatIds.size > 200) seenOverlayChatIds.delete(seenOverlayChatIds.values().next().value);
     }
     const norm = cleanText.toLowerCase();
     const lastT = recentOverlayChatMap.get(norm) || 0;
-    if ((now - lastT) < 6000) return;
+    if ((now - lastT) < 6000) return false;
     recentOverlayChatMap.set(norm, now);
     if (recentOverlayChatMap.size > 150) recentOverlayChatMap.delete(recentOverlayChatMap.keys().next().value);
+
+    if (!chatMessagesEl || !showChat) return true;
+    if (chatMessagesEl.classList.contains('has-widget-iframe') || chatMessagesEl.querySelector('iframe')) return true;
 
     const isLarge = chatMessagesEl.classList.contains('large-chat-feed');
     const msgDiv = document.createElement('div');
@@ -384,6 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { if (msgDiv && msgDiv.parentNode) msgDiv.remove(); }, 450);
       }
     }, 15000);
+    return true;
   }
 
   function escapeHtml(str) {
