@@ -137,13 +137,15 @@ async function ensureObsDesktopAudioHealthy() {
         }
         const volInfo = await obsWsClient.call('GetInputVolume', { inputName: name }).catch(() => null);
         if (volInfo && typeof volInfo.inputVolumeMul === 'number') {
-          // Eğer önceki oturumda ducking sebebiyle ses %16'nın altında kısık kaldıysa %100'e geri aç
-          if (volInfo.inputVolumeMul > 0 && volInfo.inputVolumeMul < 0.16 && !obsIsDucked) {
-            await obsWsClient.call('SetInputVolume', { inputName: name, inputVolumeMul: 1.0 }).catch(() => {});
-            obsSavedMusicVolume = 1.0;
-          } else if (volInfo.inputVolumeMul >= 0.16 && !obsIsDucked) {
-            obsSavedMusicVolume = volInfo.inputVolumeMul;
-            obsSavedMusicVolumeInitialized = true;
+          if (!obsIsDucked) {
+            if (obsSavedMusicVolumeInitialized && typeof obsSavedMusicVolume === 'number') {
+              // Kullanıcı daha önce bir ses seviyesi ayarladıysa onu koru ve uygula
+              await obsWsClient.call('SetInputVolume', { inputName: name, inputVolumeMul: obsSavedMusicVolume }).catch(() => {});
+            } else {
+              // Kullanıcı henüz bir seviye seçmediyse OBS'in mevcut seviyesini benimse
+              obsSavedMusicVolume = volInfo.inputVolumeMul;
+              obsSavedMusicVolumeInitialized = true;
+            }
           }
         }
       } catch (e) {}
@@ -566,7 +568,7 @@ function getObsAudioInputs(callback) {
       }
       if (!obsIsDucked && !obsSavedMusicVolumeInitialized && audioInputs.length > 0) {
         const primary = audioInputs.find(a => ['Desktop Audio', 'Masaüstü Sesi', 'Masaüstü Ses', 'Müzik', 'Spotify'].includes(a.name)) || audioInputs[0];
-        if (primary && typeof primary.volumeMul === 'number' && primary.volumeMul >= 0.16) {
+        if (primary && typeof primary.volumeMul === 'number') {
           obsSavedMusicVolume = primary.volumeMul;
           obsSavedMusicVolumeInitialized = true;
         }
@@ -585,7 +587,7 @@ function setObsAudioVolume(inputName, volumeMul, callback) {
   const mul = Math.max(0, Math.min(2.0, isNaN(rawVal) ? 1.0 : rawVal));
   obsSavedMusicVolume = mul;
   obsSavedMusicVolumeInitialized = true;
-  const targetApplyMul = obsIsDucked ? Math.max(0.05, mul * 0.25) : mul;
+  const targetApplyMul = obsIsDucked ? (mul * 0.25) : mul;
   callObsSetInputVolume(inputName || 'Desktop Audio', targetApplyMul)
     .then((matchedName) => {
       if (callback) callback(null, { inputName: matchedName, volumeMul: mul });
@@ -607,28 +609,30 @@ async function setObsDucking(duck, inputName = 'Desktop Audio', callback) {
         obsUnduckTimer = null;
       }
       if (!obsIsDucked) {
-        // Canlı OBS ses seviyesini oku; ancak zaten kısılmış (< 0.22) bir değer varsa asla normal ses olarak kaydetme!
-        try {
-          const current = await callObsGetInputVolume(inputName);
-          if (current && typeof current.volumeMul === 'number' && current.volumeMul >= 0.22) {
-            obsSavedMusicVolume = current.volumeMul;
-            obsSavedMusicVolumeInitialized = true;
-          } else if (!obsSavedMusicVolume || obsSavedMusicVolume < 0.22) {
-            obsSavedMusicVolume = 1.0;
-          }
-        } catch(e) {}
+        // Eğer kullanıcı henüz özel bir ses belirlemediyse, anlık OBS seviyesini referans al
+        if (!obsSavedMusicVolumeInitialized) {
+          try {
+            const current = await callObsGetInputVolume(inputName);
+            if (current && typeof current.volumeMul === 'number') {
+              obsSavedMusicVolume = current.volumeMul;
+              obsSavedMusicVolumeInitialized = true;
+            }
+          } catch(e) {}
+        }
         obsIsDucked = true;
       }
-      const baseVol = (obsSavedMusicVolume && obsSavedMusicVolume >= 0.22) ? obsSavedMusicVolume : 1.0;
-      const duckedVolume = Math.max(0.08, baseVol * 0.22); // %78 kıs (TTS net duyulsun ama müzik tamamen kaybolmasın)
+      const normalVol = (typeof obsSavedMusicVolume === 'number' && !isNaN(obsSavedMusicVolume)) ? obsSavedMusicVolume : 1.0;
+      // Müziği kullanıcının ayarladığı seviyenin %25'ine düşür (asla %100'e zıplatma!)
+      const duckedVolume = Math.min(normalVol, normalVol * 0.25);
       const matchedName = await callObsSetInputVolume(inputName || 'Desktop Audio', duckedVolume);
-      if (callback) callback(null, { ducked: true, volume: duckedVolume, inputName: matchedName });
+      if (callback) callback(null, { ducked: true, volume: duckedVolume, normalVolume: normalVol, inputName: matchedName });
     } else {
       if (obsUnduckTimer) clearTimeout(obsUnduckTimer);
       obsUnduckTimer = setTimeout(async () => {
         obsUnduckTimer = null;
         obsIsDucked = false;
-        const restoreVolume = (obsSavedMusicVolume !== undefined && obsSavedMusicVolume >= 0.20) ? obsSavedMusicVolume : 1.0;
+        // Kullanıcının ayarladığı tam seviyeye geri dön (asla 1.0 zorlaması yapma)
+        const restoreVolume = (typeof obsSavedMusicVolume === 'number' && !isNaN(obsSavedMusicVolume)) ? obsSavedMusicVolume : 1.0;
         try {
           const matchedName = await callObsSetInputVolume(inputName || 'Desktop Audio', restoreVolume);
           if (callback) callback(null, { ducked: false, volume: restoreVolume, inputName: matchedName });
@@ -3194,10 +3198,10 @@ const server = http.createServer((req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ success: false, sources: [
           { name: 'Desktop Audio', kind: 'pulse_output_capture', volumeMul: obsSavedMusicVolume }
-        ], error: err.message, savedVolume: obsSavedMusicVolume }));
+        ], error: err.message, savedVolume: obsSavedMusicVolume, isDucked: obsIsDucked }));
       }
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, sources, savedVolume: obsSavedMusicVolume }));
+      res.end(JSON.stringify({ success: true, sources, savedVolume: obsSavedMusicVolume, isDucked: obsIsDucked }));
     });
     return;
   }

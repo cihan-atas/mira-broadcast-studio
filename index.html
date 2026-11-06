@@ -12130,7 +12130,17 @@
       refreshObsAudioSources();
       const savedMusicVol = localStorage.getItem('mira_obs_music_volume');
       if (savedMusicVol !== null) {
-        updateMusicVolumeUI(parseFloat(savedMusicVol));
+        const v = parseFloat(savedMusicVol);
+        if (!isNaN(v)) {
+          updateMusicVolumeUI(v);
+          currentObsMusicVolume = v;
+          const src = localStorage.getItem('mira_obs_music_source') || 'Desktop Audio';
+          fetch('/api/obs/volume', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ inputName: src, volumeMul: v })
+          }).catch(() => {});
+        }
       }
       const savedDuck = localStorage.getItem('mira_music_ducking');
       if (savedDuck !== null) {
