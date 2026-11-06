@@ -5217,7 +5217,7 @@
               </label>
               <div style="display:grid; grid-template-columns: 140px 1fr; gap:8px; margin-bottom:8px;">
                 <input type="text" id="test-chat-author" class="form-control" value="NecroFan" placeholder="İzleyici adı...">
-                <input type="text" id="test-chat-msg" class="form-control" value="Selamlar, yayının kalitesi harika olmuş başarılar!" placeholder="Yazılacak test mesajı...">
+                <input type="text" id="test-chat-msg" class="form-control" value="Selamlar, yayına hoş geldiniz, iyi seyirler dilerim!" placeholder="Yazılacak test mesajı...">
               </div>
               <button type="button" class="btn-primary" style="width:100%; font-weight:800; background:#00f5a0; color:#060911;" onclick="testCustomChatTTS()">
                 🔊 SOHBET TTS'İNİ TEST ET
@@ -9752,7 +9752,7 @@
 
     function testCustomChatTTS() {
       const author = document.getElementById('test-chat-author').value || 'NecroFan';
-      const text = document.getElementById('test-chat-msg').value || 'Selamlar, yayının kalitesi harika olmuş başarılar!';
+      const text = document.getElementById('test-chat-msg').value || 'Selamlar, yayına hoş geldiniz, iyi seyirler dilerim!';
 
       const payload = {
         id: 'msg_test_' + Date.now(),
