@@ -3612,7 +3612,7 @@ const server = http.createServer((req, res) => {
         }
       };
 
-      const boostChain = 'acompressor=threshold=-22dB:ratio=4:attack=5:release=50:makeup=8dB,volume=2.6,alimiter=limit=0.98:level=false';
+      const boostChain = 'volume=2.8,acompressor=threshold=-18dB:ratio=4:attack=5:release=50:makeup=8dB,volume=1.8,alimiter=limit=0.99:level=false';
       const afFilter = isTransformed
         ? `rubberband=pitch=${pitchStr}:tempo=${rateStr},${boostChain}`
         : boostChain;

@@ -488,17 +488,17 @@ class HeroTTSManager {
       const audio = this.getAudioPlayer();
       this.currentAudio = audio;
 
-      // Web Audio Compressor + GainNode ile güçlü ses yükseltme (3.2x Pre-Amp + %500'e kadar Booster):
+      // Web Audio Compressor + GainNode ile güçlü ses yükseltme:
       const targetVol = typeof this.volume === 'number' ? Math.max(0, this.volume) : 1.0;
-      const preAmpFactor = 3.2;
       if (this.gainNode) {
         if (this.audioCtx && this.audioCtx.state === 'suspended') {
           this.audioCtx.resume().catch(() => {});
         }
-        this.gainNode.gain.value = targetVol * preAmpFactor;
+        // Gain çarpanını doğrudan güçlü lineer seviyeye ayarla (Windows düşük ses sorununu çözer)
+        this.gainNode.gain.value = Math.max(1.0, targetVol * 4.5);
         audio.volume = 1.0;
       } else {
-        audio.volume = Math.max(0, Math.min(1.0, targetVol));
+        audio.volume = Math.max(0, Math.min(1.0, targetVol > 1.0 ? 1.0 : targetVol));
       }
 
       let duckTriggered = false;
