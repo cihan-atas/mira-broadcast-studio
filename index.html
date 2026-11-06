@@ -9287,22 +9287,22 @@
 
       const currentVal = miraTtsConfig.voiceName || 'mira_natural_tr';
       select.innerHTML = `
-        <option value="mira_natural_tr">🌟 MİRA Doğal Türkçe Kadın Sesi (Bulut & OBS Uyumlu - Önerilen)</option>
-        <option value="mira_natural_male">🌟 MİRA Doğal Türkçe Alternatif Sesi</option>
+        <option value="mira_natural_tr">🎙️ MİRA Stüdyo Doğal Kadın Sesi (Önerilen - Net & Yakın Stüdyo Tonu)</option>
+        <option value="mira_natural_male">🎙️ MİRA Stüdyo Doğal Erkek Sesi (Net & Yakın Stüdyo Tonu)</option>
       `;
 
       if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices() || [];
         if (voices.length > 0) {
           const trGroup = document.createElement('optgroup');
-          trGroup.label = '🇹🇷 Tarayıcı İçi Türkçe Sesler';
+          trGroup.label = '⚠️ Windows Yerel SAPI Sesleri (Boğuk / Kısık Kalabilir)';
           const otherGroup = document.createElement('optgroup');
           otherGroup.label = '🌐 Diğer Sistem Sesleri';
 
           voices.forEach(v => {
             const opt = document.createElement('option');
             opt.value = v.name;
-            opt.textContent = `${v.name} (${v.lang})`;
+            opt.textContent = `${v.name} (Windows SAPI - Kısık)`;
             if (v.lang.includes('tr') || v.lang.includes('TR')) {
               trGroup.appendChild(opt);
             } else {

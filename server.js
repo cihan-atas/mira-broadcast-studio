@@ -3575,7 +3575,7 @@ const server = http.createServer((req, res) => {
     const pitchStr = pitch.toFixed(2);
     const rateStr = rate.toFixed(2);
     const isTransformed = Math.abs(pitch - 1.0) >= 0.03 || Math.abs(rate - 1.0) >= 0.03;
-    const finalHash = crypto.createHash('md5').update(`v2boost_${lang}_p${pitchStr}_r${rateStr}_${text}`).digest('hex');
+    const finalHash = crypto.createHash('md5').update(`v3studio_${lang}_p${pitchStr}_r${rateStr}_${text}`).digest('hex');
     const finalFilePath = path.join(ttsCacheDir, `boost_${finalHash}.mp3`);
 
     let audioResponseSent = false;
@@ -3616,7 +3616,8 @@ const server = http.createServer((req, res) => {
         }
       };
 
-      const boostChain = 'volume=2.8,acompressor=threshold=-18dB:ratio=4:attack=5:release=50:makeup=8dB,volume=1.8,alimiter=limit=0.99:level=false';
+      // Stüdyo Yayını Ses İşleme Zinciri: 80Hz Low-cut, 250Hz kutu sesini alma, 3.2kHz vokal varlığı (+3.5dB Presence), 7.5kHz parlaklık ve transparan broadcast kompresör
+      const boostChain = 'highpass=f=80,equalizer=f=250:t=q:w=1.5:g=-1.5,equalizer=f=3200:t=q:w=1.2:g=3.5,treble=g=1.5:f=7500,acompressor=threshold=-14dB:ratio=2.5:attack=12:release=75:makeup=5dB,volume=1.6,alimiter=limit=0.96:level=false';
       const afFilter = isTransformed
         ? `rubberband=pitch=${pitchStr}:tempo=${rateStr},${boostChain}`
         : boostChain;

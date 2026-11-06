@@ -346,14 +346,32 @@ class HeroTTSManager {
       if (AudioCtx && !this.mediaSourceConnected) {
         this.audioCtx = new AudioCtx();
         const source = this.audioCtx.createMediaElementSource(el);
+
+        // 1. Vokal Varlık Filtresi (+3.5dB @ 3.2kHz): Sesi dinleyicinin kulağına yaklaştırır, uzaktan gelme hissini yok eder
+        const presenceFilter = this.audioCtx.createBiquadFilter();
+        presenceFilter.type = 'peaking';
+        presenceFilter.frequency.value = 3200;
+        presenceFilter.Q.value = 1.0;
+        presenceFilter.gain.value = 3.5;
+
+        // 2. High-pass Filtresi (85Hz): Boğuk alt frekans çamurunu temizler
+        const highpassFilter = this.audioCtx.createBiquadFilter();
+        highpassFilter.type = 'highpass';
+        highpassFilter.frequency.value = 85;
+
+        // 3. Şeffaf Peak Limiter (asla sesi geriye itip ezmez)
         this.compressorNode = this.audioCtx.createDynamicsCompressor();
-        this.compressorNode.threshold.value = -24;
-        this.compressorNode.knee.value = 12;
-        this.compressorNode.ratio.value = 6;
-        this.compressorNode.attack.value = 0.003;
-        this.compressorNode.release.value = 0.15;
+        this.compressorNode.threshold.value = -3;
+        this.compressorNode.knee.value = 4;
+        this.compressorNode.ratio.value = 3;
+        this.compressorNode.attack.value = 0.01;
+        this.compressorNode.release.value = 0.08;
+
         this.gainNode = this.audioCtx.createGain();
-        source.connect(this.compressorNode);
+
+        source.connect(highpassFilter);
+        highpassFilter.connect(presenceFilter);
+        presenceFilter.connect(this.compressorNode);
         this.compressorNode.connect(this.gainNode);
         this.gainNode.connect(this.audioCtx.destination);
         this.mediaSourceConnected = true;
